@@ -1123,7 +1123,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.12,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1147,7 +1147,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.12,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1171,7 +1171,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.12,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1195,7 +1195,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.89,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1219,7 +1219,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.89,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1243,7 +1243,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.89,
       "firstCapturedAt": "2026-09-22T05:53:26.778Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1291,7 +1291,7 @@
       "lineupEdge": 0,
       "projectedTotal": null,
       "firstCapturedAt": "2026-09-22T00:19:31.025Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1315,7 +1315,7 @@
       "lineupEdge": 0,
       "projectedTotal": null,
       "firstCapturedAt": "2026-09-22T00:19:31.025Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1339,7 +1339,7 @@
       "lineupEdge": 0,
       "projectedTotal": null,
       "firstCapturedAt": "2026-09-22T00:19:31.025Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1363,7 +1363,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.38,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1387,7 +1387,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.38,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1411,7 +1411,7 @@
       "lineupEdge": 0,
       "projectedTotal": 9.38,
       "firstCapturedAt": "2026-09-22T00:19:33.627Z",
-      "capturedAt": "2026-09-22T07:52:41.481Z",
+      "capturedAt": "2026-09-22T08:12:12.522Z",
       "result": "PENDING"
     },
     {
@@ -1437,7 +1437,7 @@
       "bullpenMargin": 0.7290898645250206,
       "promoted": false,
       "firstCapturedAt": "2026-09-22T00:19:31.020Z",
-      "capturedAt": "2026-09-22T07:52:41.886Z",
+      "capturedAt": "2026-09-22T08:12:12.926Z",
       "result": "PENDING"
     }
   ]
