@@ -1,0 +1,397 @@
+{
+  "generatedAt": "2026-09-14T17:28:07.054Z",
+  "final": "LOCKED",
+  "pairedRows": 3590,
+  "rejectedNot2": 0,
+  "scales": {
+    "ML": {
+      "STARTER": 39.25669440433766,
+      "FORM": 17.709089526337934,
+      "BULLPEN": 18.90630651200614,
+      "LINEUP": 9.228749363527806
+    },
+    "HANDICAP": {
+      "STARTER": 39.01990168199719,
+      "FORM": 17.6689172380097,
+      "BULLPEN": 18.880299978356465,
+      "LINEUP": 9.208864306644
+    },
+    "TOTAL": {
+      "TOTAL_EDGE": 0.9599512255171622
+    }
+  },
+  "results": {
+    "ML": {
+      "CONFIDENCE": {
+        "discovery": {
+          "n": 216,
+          "corr": -0.0853,
+          "slope": -0.88013,
+          "posN": 108,
+          "posResidual": -8.054,
+          "negN": 108,
+          "negResidual": 8.054,
+          "spread": -16.107
+        },
+        "internal": {
+          "n": 492,
+          "corr": -0.046,
+          "slope": -0.449477,
+          "posN": 246,
+          "posResidual": 3.814,
+          "negN": 246,
+          "negResidual": -3.814,
+          "spread": 7.629
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "NEGATIVE",
+        "sameDirection": true
+      },
+      "STARTER": {
+        "discovery": {
+          "n": 216,
+          "corr": -0.0413,
+          "slope": -0.020497,
+          "posN": 83,
+          "posResidual": -5.94,
+          "negN": 83,
+          "negResidual": 5.94,
+          "spread": -11.88
+        },
+        "internal": {
+          "n": 492,
+          "corr": 0.0533,
+          "slope": 0.031293,
+          "posN": 246,
+          "posResidual": 2.313,
+          "negN": 246,
+          "negResidual": -2.313,
+          "spread": 4.626
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": false
+      },
+      "FORM": {
+        "discovery": {
+          "n": 216,
+          "corr": -0.0772,
+          "slope": -0.038358,
+          "posN": 84,
+          "posResidual": -4.977,
+          "negN": 84,
+          "negResidual": 4.977,
+          "spread": -9.954
+        },
+        "internal": {
+          "n": 492,
+          "corr": -0.047,
+          "slope": -0.022212,
+          "posN": 245,
+          "posResidual": -0.703,
+          "negN": 245,
+          "negResidual": 0.703,
+          "spread": -1.406
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "NEGATIVE",
+        "sameDirection": true
+      },
+      "BULLPEN": {
+        "discovery": {
+          "n": 216,
+          "corr": -0.0262,
+          "slope": -0.013029,
+          "posN": 101,
+          "posResidual": -9.01,
+          "negN": 101,
+          "negResidual": 9.01,
+          "spread": -18.02
+        },
+        "internal": {
+          "n": 492,
+          "corr": -0.0353,
+          "slope": -0.012923,
+          "posN": 243,
+          "posResidual": -0.476,
+          "negN": 243,
+          "negResidual": 0.476,
+          "spread": -0.953
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "NEGATIVE",
+        "sameDirection": true
+      },
+      "LINEUP": {
+        "discovery": {
+          "n": 216,
+          "corr": -0.0996,
+          "slope": -0.049472,
+          "posN": 102,
+          "posResidual": -3.436,
+          "negN": 102,
+          "negResidual": 3.436,
+          "spread": -6.872
+        },
+        "internal": {
+          "n": 492,
+          "corr": -0.0215,
+          "slope": -0.014134,
+          "posN": 245,
+          "posResidual": -2.986,
+          "negN": 245,
+          "negResidual": 2.986,
+          "spread": -5.972
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "NEGATIVE",
+        "sameDirection": true
+      }
+    },
+    "HANDICAP": {
+      "CONFIDENCE": {
+        "discovery": {
+          "n": 220,
+          "corr": -0.0738,
+          "slope": -2.316359,
+          "posN": 110,
+          "posResidual": -1.567,
+          "negN": 110,
+          "negResidual": 1.567,
+          "spread": -3.133
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0439,
+          "slope": 1.095983,
+          "posN": 251,
+          "posResidual": 2.14,
+          "negN": 251,
+          "negResidual": -2.14,
+          "spread": 4.28
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": false
+      },
+      "STARTER": {
+        "discovery": {
+          "n": 220,
+          "corr": -0.0504,
+          "slope": -0.023275,
+          "posN": 84,
+          "posResidual": -6.387,
+          "negN": 84,
+          "negResidual": 6.387,
+          "spread": -12.773
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0884,
+          "slope": 0.051019,
+          "posN": 251,
+          "posResidual": 3.269,
+          "negN": 251,
+          "negResidual": -3.269,
+          "spread": 6.537
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": false
+      },
+      "FORM": {
+        "discovery": {
+          "n": 220,
+          "corr": 0.0827,
+          "slope": 0.03817,
+          "posN": 85,
+          "posResidual": 3.923,
+          "negN": 85,
+          "negResidual": -3.923,
+          "spread": 7.846
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0465,
+          "slope": 0.021461,
+          "posN": 250,
+          "posResidual": 3.054,
+          "negN": 250,
+          "negResidual": -3.054,
+          "spread": 6.108
+        },
+        "dDirection": "POSITIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": true
+      },
+      "BULLPEN": {
+        "discovery": {
+          "n": 220,
+          "corr": -0.2259,
+          "slope": -0.104313,
+          "posN": 103,
+          "posResidual": -14.306,
+          "negN": 103,
+          "negResidual": 14.306,
+          "spread": -28.612
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0683,
+          "slope": 0.024077,
+          "posN": 248,
+          "posResidual": 0.848,
+          "negN": 248,
+          "negResidual": -0.848,
+          "spread": 1.697
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": false
+      },
+      "LINEUP": {
+        "discovery": {
+          "n": 220,
+          "corr": -0.036,
+          "slope": -0.016623,
+          "posN": 104,
+          "posResidual": 0.416,
+          "negN": 104,
+          "negResidual": -0.416,
+          "spread": 0.832
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0417,
+          "slope": 0.0269,
+          "posN": 250,
+          "posResidual": 0.367,
+          "negN": 250,
+          "negResidual": -0.367,
+          "spread": 0.735
+        },
+        "dDirection": "NEGATIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": false
+      }
+    },
+    "TOTAL": {
+      "CONFIDENCE": {
+        "discovery": {
+          "n": 220,
+          "corr": 0.0439,
+          "slope": 0.301803,
+          "posN": 105,
+          "posResidual": 1.289,
+          "negN": 105,
+          "negResidual": -1.289,
+          "spread": 2.577
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0.0284,
+          "slope": 0.235033,
+          "posN": 251,
+          "posResidual": -0.797,
+          "negN": 251,
+          "negResidual": 0.797,
+          "spread": -1.594
+        },
+        "dDirection": "POSITIVE",
+        "iDirection": "POSITIVE",
+        "sameDirection": true
+      },
+      "TOTAL_EDGE": {
+        "discovery": {
+          "n": 220,
+          "corr": 0,
+          "slope": 0,
+          "posN": 210,
+          "posResidual": 0,
+          "negN": 0,
+          "negResidual": 0,
+          "spread": 0
+        },
+        "internal": {
+          "n": 502,
+          "corr": 0,
+          "slope": 0,
+          "posN": 502,
+          "posResidual": 0,
+          "negN": 0,
+          "negResidual": 0,
+          "spread": 0
+        },
+        "dDirection": "ZERO",
+        "iDirection": "ZERO",
+        "sameDirection": false
+      }
+    }
+  },
+  "composites": {
+    "ML": {
+      "chosen": [
+        {
+          "name": "FORM",
+          "direction": -1
+        },
+        {
+          "name": "BULLPEN",
+          "direction": -1
+        },
+        {
+          "name": "LINEUP",
+          "direction": -1
+        }
+      ],
+      "discovery": {
+        "n": 216,
+        "corr": 0.1026,
+        "slope": 0.077361,
+        "posN": 103,
+        "posResidual": 2.4,
+        "negN": 103,
+        "negResidual": -2.4,
+        "spread": 4.799
+      },
+      "internal": {
+        "n": 492,
+        "corr": 0.0516,
+        "slope": 0.034992,
+        "posN": 246,
+        "posResidual": -1.033,
+        "negN": 246,
+        "negResidual": 1.033,
+        "spread": -2.065
+      }
+    },
+    "HANDICAP": {
+      "chosen": [
+        {
+          "name": "FORM",
+          "direction": 1
+        }
+      ],
+      "discovery": {
+        "n": 220,
+        "corr": 0.0827,
+        "slope": 0.03817,
+        "posN": 85,
+        "posResidual": 3.923,
+        "negN": 85,
+        "negResidual": -3.923,
+        "spread": 7.846
+      },
+      "internal": {
+        "n": 502,
+        "corr": 0.0465,
+        "slope": 0.021461,
+        "posN": 250,
+        "posResidual": 3.054,
+        "negN": 250,
+        "negResidual": -3.054,
+        "spread": 6.108
+      }
+    }
+  }
+}

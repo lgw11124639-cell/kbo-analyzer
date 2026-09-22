@@ -1,0 +1,99 @@
+KBO SCORE MODEL V0.8 FINAL LOCK
+================================
+
+STATUS
+------
+MODEL: FROZEN
+RESEARCH: CLOSED
+POST-FINAL RETUNING: FORBIDDEN
+
+SCORE MODEL
+-----------
+V0.8 CANDIDATE A
+
+FINAL PERIOD
+------------
+2026-07-01 ~ 2026-09-13
+N=242
+
+FINAL SCORE PERFORMANCE
+-----------------------
+TEAM_MAE=2.855109
+TOTAL_MAE=4.188081
+DIFF_MAE=4.108996
+WINNER_ACC=54.0%
+
+CALIBRATION
+-----------
+ML alpha=0.50
+HANDICAP alpha=0.50
+TOTAL alpha=1.00
+
+FROZEN DISPLAY GATES
+--------------------
+ML P>=60%
+HANDICAP P>=65%
+TOTAL P>=65%
+
+FINAL DISPLAY-GATE RESULTS
+--------------------------
+ML:
+N=64
+HIT=57.8%
+BE=69.9%
+ROI=-16.9%
+
+HANDICAP:
+N=154
+HIT=60.4%
+BE=75.2%
+ROI=-19.6%
+
+TOTAL:
+N=16
+HIT=56.3%
+BE=57.5%
+ROI=-1.4%
+
+FROZEN PRODUCTION RECOMMENDATION
+--------------------------------
+TOTAL P>=65% AND EV>=0%
+
+FINAL RESULT:
+N=16
+HIT=56.3%
+PRED=69.6%
+BE=57.5%
+ROI=-1.4%
+
+VERDICT
+-------
+PRODUCTION BET RECOMMENDATION: FAIL
+
+ML: DISPLAY ONLY
+HANDICAP: DISPLAY ONLY
+TOTAL: DISPLAY ONLY
+
+V0.8 MUST NOT BE USED TO GENERATE
+RECOMMENDED BETTING COMBINATIONS.
+
+NO POST-FINAL:
+- probability threshold tuning
+- alpha tuning
+- odds-bin filtering
+- OVER-only filtering
+- UNDER-only filtering
+- month filtering
+- EV threshold tuning
+
+NOTE
+----
+The Jul-Sep score-model metrics had already appeared
+during the earlier Round31 temporal audit.
+
+Therefore Jul-Sep was not a completely unseen
+score-model holdout.
+
+However the frozen market recommendation policy
+was evaluated in Round38 and failed its predefined
+production criterion.

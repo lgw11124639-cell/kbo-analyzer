@@ -1,0 +1,31 @@
+-- v0.2용 적중 기록/추천 저장 스키마
+create table if not exists kbo_pick_groups (
+  id uuid primary key default gen_random_uuid(),
+  pick_date date not null,
+  group_type text not null,
+  combined_odds numeric,
+  status text not null default 'pending' check (status in ('pending','hit','miss','void')),
+  created_at timestamptz not null default now()
+);
+
+create table if not exists kbo_picks (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid references kbo_pick_groups(id) on delete cascade,
+  game_id text not null,
+  market text not null,
+  selection text not null,
+  line numeric,
+  odds numeric,
+  model_probability numeric,
+  model_ev numeric,
+  grade text,
+  result text not null default 'pending' check (result in ('pending','hit','miss','push','void')),
+  away_score integer,
+  home_score integer,
+  snapshot jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  settled_at timestamptz
+);
+
+create index if not exists kbo_picks_game_id_idx on kbo_picks(game_id);
+create index if not exists kbo_pick_groups_date_idx on kbo_pick_groups(pick_date desc);

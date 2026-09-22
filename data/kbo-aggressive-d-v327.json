@@ -1,0 +1,102 @@
+{
+  "version": "V3.27",
+  "structure": {
+    "A": "HANDICAP FORM #1",
+    "B": "HANDICAP FORM #2 / DIFFERENT GAME",
+    "C": "FROZEN ML / DIFFERENT FROM A AND B",
+    "D": "FAMILY AUDIT",
+    "candidates": [
+      "ML",
+      "OVER",
+      "UNDER",
+      "TOTAL"
+    ],
+    "selector": "partnerScore",
+    "constraint": "A/B/C/D ALL DIFFERENT GAMES"
+  },
+  "discovery": [
+    {
+      "family": "ML",
+      "days": 3,
+      "abcdWins": 0,
+      "abcdHit": 0,
+      "avgOdds": 23.193,
+      "abcdROI": -100,
+      "abcHitDays": 1,
+      "dHitWhenABCHit": 0
+    },
+    {
+      "family": "OVER",
+      "days": 3,
+      "abcdWins": 1,
+      "abcdHit": 33.33,
+      "avgOdds": 19.833,
+      "abcdROI": 633.68,
+      "abcHitDays": 1,
+      "dHitWhenABCHit": 100
+    },
+    {
+      "family": "UNDER",
+      "days": 3,
+      "abcdWins": 1,
+      "abcdHit": 33.33,
+      "avgOdds": 21.346,
+      "abcdROI": 728.78,
+      "abcHitDays": 1,
+      "dHitWhenABCHit": 100
+    },
+    {
+      "family": "TOTAL",
+      "days": 3,
+      "abcdWins": 1,
+      "abcdHit": 33.33,
+      "avgOdds": 19.927,
+      "abcdROI": 633.68,
+      "abcHitDays": 1,
+      "dHitWhenABCHit": 100
+    }
+  ],
+  "internal": [
+    {
+      "family": "ML",
+      "days": 10,
+      "abcdWins": 1,
+      "abcdHit": 10,
+      "avgOdds": 20.141,
+      "abcdROI": 75.02,
+      "abcHitDays": 3,
+      "dHitWhenABCHit": 33.33
+    },
+    {
+      "family": "OVER",
+      "days": 10,
+      "abcdWins": 2,
+      "abcdHit": 20,
+      "avgOdds": 19.169,
+      "abcdROI": 237.01,
+      "abcHitDays": 3,
+      "dHitWhenABCHit": 66.67
+    },
+    {
+      "family": "UNDER",
+      "days": 10,
+      "abcdWins": 2,
+      "abcdHit": 20,
+      "avgOdds": 19.849,
+      "abcdROI": 252.04,
+      "abcHitDays": 3,
+      "dHitWhenABCHit": 66.67
+    },
+    {
+      "family": "TOTAL",
+      "days": 10,
+      "abcdWins": 3,
+      "abcdHit": 30,
+      "avgOdds": 19.652,
+      "abcdROI": 416.54,
+      "abcHitDays": 3,
+      "dHitWhenABCHit": 100
+    }
+  ],
+  "final": "LOCKED / NOT OPENED"
+}

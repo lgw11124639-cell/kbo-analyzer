@@ -1,0 +1,271 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "totalStakePerDay": 10000,
+  "discoveryScan": [
+    {
+      "abShare": 90,
+      "abcShare": 10,
+      "days": 10,
+      "roi": 38.07,
+      "finalBank": 1038070,
+      "profit": 38070,
+      "mdd": 5.46,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 538.68,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 38.07,
+          "profit": 38070
+        }
+      ]
+    },
+    {
+      "abShare": 80,
+      "abcShare": 20,
+      "days": 10,
+      "roi": 38.02,
+      "finalBank": 1038022,
+      "profit": 38022,
+      "mdd": 5.46,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 478.82,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 38.02,
+          "profit": 38022
+        }
+      ]
+    },
+    {
+      "abShare": 70,
+      "abcShare": 30,
+      "days": 10,
+      "roi": 37.97,
+      "finalBank": 1037974,
+      "profit": 37974,
+      "mdd": 5.46,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 418.97,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.97,
+          "profit": 37974
+        }
+      ]
+    },
+    {
+      "abShare": 60,
+      "abcShare": 40,
+      "days": 10,
+      "roi": 37.93,
+      "finalBank": 1037926,
+      "profit": 37926,
+      "mdd": 5.46,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 359.12,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.93,
+          "profit": 37926
+        }
+      ]
+    },
+    {
+      "abShare": 50,
+      "abcShare": 50,
+      "days": 10,
+      "roi": 37.88,
+      "finalBank": 1037878,
+      "profit": 37878,
+      "mdd": 5.47,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 299.26,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.88,
+          "profit": 37878
+        }
+      ]
+    },
+    {
+      "abShare": 40,
+      "abcShare": 60,
+      "days": 10,
+      "roi": 37.83,
+      "finalBank": 1037830,
+      "profit": 37830,
+      "mdd": 5.47,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 239.41,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.83,
+          "profit": 37830
+        }
+      ]
+    },
+    {
+      "abShare": 30,
+      "abcShare": 70,
+      "days": 10,
+      "roi": 37.78,
+      "finalBank": 1037782,
+      "profit": 37782,
+      "mdd": 5.47,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 179.56,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.78,
+          "profit": 37782
+        }
+      ]
+    },
+    {
+      "abShare": 20,
+      "abcShare": 80,
+      "days": 10,
+      "roi": 37.73,
+      "finalBank": 1037735,
+      "profit": 37735,
+      "mdd": 5.47,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 119.71,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.73,
+          "profit": 37735
+        }
+      ]
+    },
+    {
+      "abShare": 10,
+      "abcShare": 90,
+      "days": 10,
+      "roi": 37.69,
+      "finalBank": 1037687,
+      "profit": 37687,
+      "mdd": 5.47,
+      "maxLosingStreak": 6,
+      "zeroHitDays": 7,
+      "abOnlyDays": 1,
+      "bothDays": 2,
+      "avgABOnlyRecovery": 59.85,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 10,
+          "roi": 37.69,
+          "profit": 37687
+        }
+      ]
+    }
+  ],
+  "selectedRatio": {
+    "ab": 90,
+    "abc": 10
+  },
+  "internal": {
+    "abShare": 90,
+    "abcShare": 10,
+    "days": 35,
+    "roi": 10.52,
+    "finalBank": 1036830,
+    "profit": 36830,
+    "mdd": 9.81,
+    "maxLosingStreak": 10,
+    "zeroHitDays": 25,
+    "abOnlyDays": 3,
+    "bothDays": 7,
+    "avgABOnlyRecovery": 363.99,
+    "monthly": [
+      {
+        "month": "2026-05",
+        "days": 20,
+        "roi": -4.5,
+        "profit": -8990
+      },
+      {
+        "month": "2026-06",
+        "days": 15,
+        "roi": 30.55,
+        "profit": 45820
+      }
+    ]
+  },
+  "final": {
+    "abShare": 90,
+    "abcShare": 10,
+    "days": 44,
+    "roi": 41.23,
+    "finalBank": 1181410,
+    "profit": 181410,
+    "mdd": 8.93,
+    "maxLosingStreak": 8,
+    "zeroHitDays": 26,
+    "abOnlyDays": 7,
+    "bothDays": 11,
+    "avgABOnlyRecovery": 337.52,
+    "monthly": [
+      {
+        "month": "2026-07",
+        "days": 17,
+        "roi": 34.99,
+        "profit": 59476
+      },
+      {
+        "month": "2026-08",
+        "days": 16,
+        "roi": 6.81,
+        "profit": 10896
+      },
+      {
+        "month": "2026-09",
+        "days": 11,
+        "roi": 100.94,
+        "profit": 111039
+      }
+    ]
+  }
+}

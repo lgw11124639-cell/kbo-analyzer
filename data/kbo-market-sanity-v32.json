@@ -1,0 +1,672 @@
+{
+  "generatedAt": "2026-09-14T17:16:45.702Z",
+  "final": "LOCKED",
+  "output": {
+    "DISCOVERY": {
+      "all": {
+        "1.20-1.39": {
+          "bets": 97,
+          "wins": 67,
+          "losses": 30,
+          "hit": 69.07,
+          "avgOdds": 1.3,
+          "breakEven": 76.94,
+          "edgeVsBE": -7.87,
+          "roi": -10.52
+        },
+        "1.40-1.59": {
+          "bets": 89,
+          "wins": 55,
+          "losses": 34,
+          "hit": 61.8,
+          "avgOdds": 1.499,
+          "breakEven": 66.72,
+          "edgeVsBE": -4.92,
+          "roi": -7.15
+        },
+        "1.60-1.79": {
+          "bets": 205,
+          "wins": 108,
+          "losses": 97,
+          "hit": 52.68,
+          "avgOdds": 1.702,
+          "breakEven": 58.76,
+          "edgeVsBE": -6.08,
+          "roi": -10.36
+        },
+        "1.80-1.99": {
+          "bets": 109,
+          "wins": 45,
+          "losses": 64,
+          "hit": 41.28,
+          "avgOdds": 1.879,
+          "breakEven": 53.22,
+          "edgeVsBE": -11.94,
+          "roi": -22.5
+        },
+        "2.00-2.49": {
+          "bets": 85,
+          "wins": 32,
+          "losses": 53,
+          "hit": 37.65,
+          "avgOdds": 2.234,
+          "breakEven": 44.76,
+          "edgeVsBE": -7.11,
+          "roi": -15.79
+        },
+        "2.50+": {
+          "bets": 71,
+          "wins": 21,
+          "losses": 50,
+          "hit": 29.58,
+          "avgOdds": 2.745,
+          "breakEven": 36.43,
+          "edgeVsBE": -6.85,
+          "roi": -20.03
+        }
+      },
+      "markets": {
+        "ML": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 12,
+            "wins": 6,
+            "losses": 6,
+            "hit": 50,
+            "avgOdds": 1.34,
+            "breakEven": 74.63,
+            "edgeVsBE": -24.63,
+            "roi": -33.08
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 55,
+            "wins": 32,
+            "losses": 23,
+            "hit": 58.18,
+            "avgOdds": 1.505,
+            "breakEven": 66.43,
+            "edgeVsBE": -8.25,
+            "roi": -12.87
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 59,
+            "wins": 32,
+            "losses": 27,
+            "hit": 54.24,
+            "avgOdds": 1.701,
+            "breakEven": 58.78,
+            "edgeVsBE": -4.54,
+            "roi": -7.75
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 41,
+            "wins": 18,
+            "losses": 23,
+            "hit": 43.9,
+            "avgOdds": 1.897,
+            "breakEven": 52.71,
+            "edgeVsBE": -8.81,
+            "roi": -16.24
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 44,
+            "wins": 17,
+            "losses": 27,
+            "hit": 38.64,
+            "avgOdds": 2.168,
+            "breakEven": 46.13,
+            "edgeVsBE": -7.49,
+            "roi": -16.59
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 5,
+            "wins": 3,
+            "losses": 2,
+            "hit": 60,
+            "avgOdds": 2.648,
+            "breakEven": 37.76,
+            "edgeVsBE": 22.24,
+            "roi": 54.6
+          }
+        },
+        "HANDICAP": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 85,
+            "wins": 61,
+            "losses": 24,
+            "hit": 71.76,
+            "avgOdds": 1.294,
+            "breakEven": 77.28,
+            "edgeVsBE": -5.52,
+            "roi": -7.33
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 24,
+            "wins": 15,
+            "losses": 9,
+            "hit": 62.5,
+            "avgOdds": 1.449,
+            "breakEven": 69.01,
+            "edgeVsBE": -6.51,
+            "roi": -8.13
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "hit": 0,
+            "avgOdds": 1.65,
+            "breakEven": 60.61,
+            "edgeVsBE": -60.61,
+            "roi": -100
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "hit": 33.33,
+            "avgOdds": 1.927,
+            "breakEven": 51.9,
+            "edgeVsBE": -18.57,
+            "roi": -38.67
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 41,
+            "wins": 15,
+            "losses": 26,
+            "hit": 36.59,
+            "avgOdds": 2.306,
+            "breakEven": 43.37,
+            "edgeVsBE": -6.78,
+            "roi": -14.93
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 66,
+            "wins": 18,
+            "losses": 48,
+            "hit": 27.27,
+            "avgOdds": 2.752,
+            "breakEven": 36.33,
+            "edgeVsBE": -9.06,
+            "roi": -25.68
+          }
+        },
+        "TOTAL": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "hit": 0,
+            "avgOdds": 0,
+            "breakEven": 0,
+            "edgeVsBE": 0,
+            "roi": 0
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 10,
+            "wins": 8,
+            "losses": 2,
+            "hit": 80,
+            "avgOdds": 1.583,
+            "breakEven": 63.17,
+            "edgeVsBE": 16.83,
+            "roi": 26.7
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 145,
+            "wins": 76,
+            "losses": 69,
+            "hit": 52.41,
+            "avgOdds": 1.702,
+            "breakEven": 58.74,
+            "edgeVsBE": -6.33,
+            "roi": -10.8
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 65,
+            "wins": 26,
+            "losses": 39,
+            "hit": 40,
+            "avgOdds": 1.865,
+            "breakEven": 53.61,
+            "edgeVsBE": -13.61,
+            "roi": -25.71
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "hit": 0,
+            "avgOdds": 0,
+            "breakEven": 0,
+            "edgeVsBE": 0,
+            "roi": 0
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "hit": 0,
+            "avgOdds": 0,
+            "breakEven": 0,
+            "edgeVsBE": 0,
+            "roi": 0
+          }
+        }
+      },
+      "consistency": {
+        "ML": {
+          "exact2": 108,
+          "opposite": 108,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        },
+        "HANDICAP": {
+          "exact2": 110,
+          "opposite": 110,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        },
+        "TOTAL": {
+          "exact2": 110,
+          "opposite": 110,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        }
+      }
+    },
+    "INTERNAL": {
+      "all": {
+        "1.20-1.39": {
+          "bets": 212,
+          "wins": 145,
+          "losses": 67,
+          "hit": 68.4,
+          "avgOdds": 1.307,
+          "breakEven": 76.53,
+          "edgeVsBE": -8.13,
+          "roi": -10.67
+        },
+        "1.40-1.59": {
+          "bets": 207,
+          "wins": 128,
+          "losses": 79,
+          "hit": 61.84,
+          "avgOdds": 1.502,
+          "breakEven": 66.58,
+          "edgeVsBE": -4.74,
+          "roi": -7.26
+        },
+        "1.60-1.79": {
+          "bets": 445,
+          "wins": 223,
+          "losses": 222,
+          "hit": 50.11,
+          "avgOdds": 1.704,
+          "breakEven": 58.67,
+          "edgeVsBE": -8.56,
+          "roi": -14.76
+        },
+        "1.80-1.99": {
+          "bets": 256,
+          "wins": 123,
+          "losses": 133,
+          "hit": 48.05,
+          "avgOdds": 1.876,
+          "breakEven": 53.31,
+          "edgeVsBE": -5.26,
+          "roi": -10.24
+        },
+        "2.00-2.49": {
+          "bets": 221,
+          "wins": 82,
+          "losses": 139,
+          "hit": 37.1,
+          "avgOdds": 2.216,
+          "breakEven": 45.13,
+          "edgeVsBE": -8.03,
+          "roi": -18.15
+        },
+        "2.50+": {
+          "bets": 155,
+          "wins": 47,
+          "losses": 108,
+          "hit": 30.32,
+          "avgOdds": 2.759,
+          "breakEven": 36.25,
+          "edgeVsBE": -5.93,
+          "roi": -16.19
+        }
+      },
+      "markets": {
+        "ML": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 38,
+            "wins": 28,
+            "losses": 10,
+            "hit": 73.68,
+            "avgOdds": 1.328,
+            "breakEven": 75.29,
+            "edgeVsBE": -1.61,
+            "roi": -2.37
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 123,
+            "wins": 76,
+            "losses": 47,
+            "hit": 61.79,
+            "avgOdds": 1.509,
+            "breakEven": 66.28,
+            "edgeVsBE": -4.49,
+            "roi": -7.1
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 112,
+            "wins": 59,
+            "losses": 53,
+            "hit": 52.68,
+            "avgOdds": 1.699,
+            "breakEven": 58.86,
+            "edgeVsBE": -6.18,
+            "roi": -10.72
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 85,
+            "wins": 37,
+            "losses": 48,
+            "hit": 43.53,
+            "avgOdds": 1.894,
+            "breakEven": 52.8,
+            "edgeVsBE": -9.27,
+            "roi": -18.01
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 114,
+            "wins": 41,
+            "losses": 73,
+            "hit": 35.96,
+            "avgOdds": 2.172,
+            "breakEven": 46.04,
+            "edgeVsBE": -10.08,
+            "roi": -22.93
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 20,
+            "wins": 5,
+            "losses": 15,
+            "hit": 25,
+            "avgOdds": 2.754,
+            "breakEven": 36.31,
+            "edgeVsBE": -11.31,
+            "roi": -32.35
+          }
+        },
+        "HANDICAP": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 174,
+            "wins": 117,
+            "losses": 57,
+            "hit": 67.24,
+            "avgOdds": 1.302,
+            "breakEven": 76.8,
+            "edgeVsBE": -9.56,
+            "roi": -12.48
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 65,
+            "wins": 40,
+            "losses": 25,
+            "hit": 61.54,
+            "avgOdds": 1.47,
+            "breakEven": 68.02,
+            "edgeVsBE": -6.48,
+            "roi": -9.35
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 13,
+            "wins": 7,
+            "losses": 6,
+            "hit": 53.85,
+            "avgOdds": 1.65,
+            "breakEven": 60.61,
+            "edgeVsBE": -6.76,
+            "roi": -11.31
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 14,
+            "wins": 6,
+            "losses": 8,
+            "hit": 42.86,
+            "avgOdds": 1.914,
+            "breakEven": 52.26,
+            "edgeVsBE": -9.4,
+            "roi": -18.36
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 101,
+            "wins": 39,
+            "losses": 62,
+            "hit": 38.61,
+            "avgOdds": 2.277,
+            "breakEven": 43.93,
+            "edgeVsBE": -5.32,
+            "roi": -11.88
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 135,
+            "wins": 42,
+            "losses": 93,
+            "hit": 31.11,
+            "avgOdds": 2.76,
+            "breakEven": 36.24,
+            "edgeVsBE": -5.13,
+            "roi": -13.79
+          }
+        },
+        "TOTAL": {
+          "1.20-1.39": {
+            "bucket": "1.20-1.39",
+            "bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "hit": 0,
+            "avgOdds": 0,
+            "breakEven": 0,
+            "edgeVsBE": 0,
+            "roi": 0
+          },
+          "1.40-1.59": {
+            "bucket": "1.40-1.59",
+            "bets": 19,
+            "wins": 12,
+            "losses": 7,
+            "hit": 63.16,
+            "avgOdds": 1.566,
+            "breakEven": 63.84,
+            "edgeVsBE": -0.68,
+            "roi": -1.16
+          },
+          "1.60-1.79": {
+            "bucket": "1.60-1.79",
+            "bets": 320,
+            "wins": 157,
+            "losses": 163,
+            "hit": 49.06,
+            "avgOdds": 1.708,
+            "breakEven": 58.53,
+            "edgeVsBE": -9.47,
+            "roi": -16.32
+          },
+          "1.80-1.99": {
+            "bucket": "1.80-1.99",
+            "bets": 157,
+            "wins": 80,
+            "losses": 77,
+            "hit": 50.96,
+            "avgOdds": 1.863,
+            "breakEven": 53.68,
+            "edgeVsBE": -2.72,
+            "roi": -5.31
+          },
+          "2.00-2.49": {
+            "bucket": "2.00-2.49",
+            "bets": 6,
+            "wins": 2,
+            "losses": 4,
+            "hit": 33.33,
+            "avgOdds": 2.032,
+            "breakEven": 49.22,
+            "edgeVsBE": -15.89,
+            "roi": -32.83
+          },
+          "2.50+": {
+            "bucket": "2.50+",
+            "bets": 0,
+            "wins": 0,
+            "losses": 0,
+            "hit": 0,
+            "avgOdds": 0,
+            "breakEven": 0,
+            "edgeVsBE": 0,
+            "roi": 0
+          }
+        }
+      },
+      "consistency": {
+        "ML": {
+          "exact2": 246,
+          "opposite": 246,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        },
+        "HANDICAP": {
+          "exact2": 251,
+          "opposite": 251,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        },
+        "TOTAL": {
+          "exact2": 251,
+          "opposite": 251,
+          "sameResult": 0,
+          "oppositeRate": 100,
+          "moreThan2": 0,
+          "badSamples": []
+        }
+      }
+    }
+  },
+  "lowHandiTable": [
+    {
+      "period": "DISCOVERY",
+      "bucket": "1.20-1.29",
+      "bets": 41,
+      "wins": 33,
+      "losses": 8,
+      "hit": 80.49,
+      "avgOdds": 1.251,
+      "breakEven": 79.91,
+      "edgeVsBE": 0.58,
+      "roi": 0.88
+    },
+    {
+      "period": "DISCOVERY",
+      "bucket": "1.30-1.39",
+      "bets": 44,
+      "wins": 28,
+      "losses": 16,
+      "hit": 63.64,
+      "avgOdds": 1.334,
+      "breakEven": 74.98,
+      "edgeVsBE": -11.34,
+      "roi": -14.98
+    },
+    {
+      "period": "DISCOVERY",
+      "bucket": "1.20-1.49",
+      "bets": 104,
+      "wins": 71,
+      "losses": 33,
+      "hit": 68.27,
+      "avgOdds": 1.318,
+      "breakEven": 75.85,
+      "edgeVsBE": -7.58,
+      "roi": -10.42
+    },
+    {
+      "period": "INTERNAL",
+      "bucket": "1.20-1.29",
+      "bets": 83,
+      "wins": 56,
+      "losses": 27,
+      "hit": 67.47,
+      "avgOdds": 1.261,
+      "breakEven": 79.32,
+      "edgeVsBE": -11.85,
+      "roi": -14.8
+    },
+    {
+      "period": "INTERNAL",
+      "bucket": "1.30-1.39",
+      "bets": 91,
+      "wins": 61,
+      "losses": 30,
+      "hit": 67.03,
+      "avgOdds": 1.34,
+      "breakEven": 74.64,
+      "edgeVsBE": -7.61,
+      "roi": -10.37
+    },
+    {
+      "period": "INTERNAL",
+      "bucket": "1.20-1.49",
+      "bets": 224,
+      "wins": 148,
+      "losses": 76,
+      "hit": 66.07,
+      "avgOdds": 1.334,
+      "breakEven": 74.95,
+      "edgeVsBE": -8.88,
+      "roi": -11.95
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-09-14T17:10:12.740Z",
+  "final": "LOCKED",
+  "scales": {
+    "ML": {
+      "FORM": 17.709089526337934,
+      "LINEUP": 9.228749363527806,
+      "BULLPEN": 18.90630651200614
+    },
+    "HANDICAP": {
+      "FORM": 17.6689172380097
+    }
+  },
+  "familyPerformance": [
+    {
+      "family": "ML_EDGE",
+      "DBets": 103,
+      "DHit": 51.46,
+      "DOdds": 1.821,
+      "DROI": -8.71,
+      "IBets": 246,
+      "IHit": 45.53,
+      "IOdds": 1.941,
+      "IROI": -16.29,
+      "minROI": -16.29
+    },
+    {
+      "family": "HANDI_EDGE",
+      "DBets": 85,
+      "DHit": 50.59,
+      "DOdds": 2.075,
+      "DROI": -8.8,
+      "IBets": 250,
+      "IHit": 49.2,
+      "IOdds": 2.087,
+      "IROI": -6.04,
+      "minROI": -8.8
+    },
+    {
+      "family": "OVER_EV3_10",
+      "DBets": 7,
+      "DHit": 71.43,
+      "DOdds": 1.776,
+      "DROI": 26.14,
+      "IBets": 3,
+      "IHit": 66.67,
+      "IOdds": 1.837,
+      "IROI": 26.33,
+      "minROI": 26.14
+    }
+  ],
+  "supply": {
+    "discovery": {
+      "activeDays": 21,
+      "days1plus": 21,
+      "days2plus": 21,
+      "days3plus": 21,
+      "picks": 195,
+      "avg": 9.29
+    },
+    "internal": {
+      "activeDays": 52,
+      "days1plus": 52,
+      "days2plus": 52,
+      "days3plus": 51,
+      "picks": 499,
+      "avg": 9.6
+    }
+  },
+  "dailyBest": [
+    {
+      "family": "ML_EDGE",
+      "DBets": 21,
+      "DHit": 66.67,
+      "DROI": 29.43,
+      "IBets": 52,
+      "IHit": 53.85,
+      "IROI": 5.94,
+      "minROI": 5.94
+    },
+    {
+      "family": "HANDI_EDGE",
+      "DBets": 17,
+      "DHit": 52.94,
+      "DROI": -1.41,
+      "IBets": 52,
+      "IHit": 51.92,
+      "IROI": 12.63,
+      "minROI": -1.41
+    },
+    {
+      "family": "OVER_EV3_10",
+      "DBets": 6,
+      "DHit": 66.67,
+      "DROI": 17.5,
+      "IBets": 3,
+      "IHit": 66.67,
+      "IROI": 26.33,
+      "minROI": 17.5
+    }
+  ]
+}

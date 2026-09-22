@@ -1,0 +1,88 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": [
+    {
+      "family": "ML",
+      "days": 10,
+      "wins": 2,
+      "hit": 20,
+      "avgOdds": 12.068,
+      "roi": 92.3,
+      "abcHitDays": 2,
+      "dHitWhenABCHit": 100
+    },
+    {
+      "family": "HANDI",
+      "days": 10,
+      "wins": 2,
+      "hit": 20,
+      "avgOdds": 9.592,
+      "roi": 74.97,
+      "abcHitDays": 2,
+      "dHitWhenABCHit": 100
+    },
+    {
+      "family": "OVER",
+      "days": 10,
+      "wins": 1,
+      "hit": 10,
+      "avgOdds": 13.239,
+      "roi": 6.69,
+      "abcHitDays": 2,
+      "dHitWhenABCHit": 50
+    },
+    {
+      "family": "UNDER",
+      "days": 10,
+      "wins": 0,
+      "hit": 0,
+      "avgOdds": 12.769,
+      "roi": -100,
+      "abcHitDays": 2,
+      "dHitWhenABCHit": 0
+    }
+  ],
+  "internal": [
+    {
+      "family": "ML",
+      "days": 35,
+      "wins": 3,
+      "hit": 8.57,
+      "avgOdds": 10.589,
+      "roi": -27.32,
+      "abcHitDays": 7,
+      "dHitWhenABCHit": 42.86
+    },
+    {
+      "family": "HANDI",
+      "days": 35,
+      "wins": 4,
+      "hit": 11.43,
+      "avgOdds": 8.185,
+      "roi": -19.07,
+      "abcHitDays": 7,
+      "dHitWhenABCHit": 57.14
+    },
+    {
+      "family": "OVER",
+      "days": 35,
+      "wins": 3,
+      "hit": 8.57,
+      "avgOdds": 11.228,
+      "roi": -12.69,
+      "abcHitDays": 7,
+      "dHitWhenABCHit": 42.86
+    },
+    {
+      "family": "UNDER",
+      "days": 35,
+      "wins": 3,
+      "hit": 8.57,
+      "avgOdds": 11.414,
+      "roi": -14.57,
+      "abcHitDays": 7,
+      "dHitWhenABCHit": 42.86
+    }
+  ]
+}

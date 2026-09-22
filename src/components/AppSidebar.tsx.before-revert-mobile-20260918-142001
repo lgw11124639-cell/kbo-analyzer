@@ -1,0 +1,259 @@
+"use client";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+export type MainSidebarTab =
+  | "games"
+  | "combos"
+  | "my-combos"
+  | "settings";
+
+export type AppSidebarTab =
+  | MainSidebarTab
+  | "stats";
+
+type AppSidebarProps = {
+  active: AppSidebarTab;
+  onMainTab?: (
+    tab: MainSidebarTab
+  ) => void;
+};
+
+export default function AppSidebar({
+  active,
+  onMainTab,
+}: AppSidebarProps) {
+  const [
+    mobileOpen,
+    setMobileOpen,
+  ] = useState(false);
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      return;
+    }
+
+    function onKeyDown(
+      event: KeyboardEvent
+    ) {
+      if (
+        event.key === "Escape"
+      ) {
+        setMobileOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "keydown",
+      onKeyDown
+    );
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    return () => {
+      document.removeEventListener(
+        "keydown",
+        onKeyDown
+      );
+
+      document.body.style.overflow =
+        previousOverflow;
+    };
+  }, [mobileOpen]);
+
+  function closeMobile() {
+    setMobileOpen(false);
+  }
+
+  function openMain(
+    tab: MainSidebarTab
+  ) {
+    closeMobile();
+
+    if (onMainTab) {
+      onMainTab(tab);
+      return;
+    }
+
+    if (tab === "games") {
+      window.location.href = "/";
+      return;
+    }
+
+    window.location.href =
+      `/?tab=${encodeURIComponent(
+        tab
+      )}`;
+  }
+
+  function openStats() {
+    closeMobile();
+
+    if (active === "stats") {
+      return;
+    }
+
+    window.location.href =
+      "/stats";
+  }
+
+  const sidebarContent = (
+    <>
+      <div className="brand">
+        ⚾ <b>KBO Analyzer</b>
+        <small>v0.1</small>
+      </div>
+
+      <nav className="mainNav">
+        <button
+          type="button"
+          className={
+            active === "games"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            openMain("games")
+          }
+        >
+          오늘 경기
+        </button>
+
+        <button
+          type="button"
+          className={
+            active === "combos"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            openMain("combos")
+          }
+        >
+          AI 추천픽
+        </button>
+
+        <button
+          type="button"
+          className={
+            active === "my-combos"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            openMain("my-combos")
+          }
+        >
+          내 조합
+        </button>
+
+        <button
+          type="button"
+          className={
+            active === "stats"
+              ? "active"
+              : ""
+          }
+          onClick={
+            openStats
+          }
+        >
+          통계 리포트
+        </button>
+
+        <button
+          type="button"
+          className={
+            active === "settings"
+              ? "active"
+              : ""
+          }
+          onClick={() =>
+            openMain("settings")
+          }
+        >
+          설정
+        </button>
+      </nav>
+
+      <div className="collector">
+        <b>자동 수집</b>
+        <span>
+          ● KBO 경기/선발
+        </span>
+        <span>
+          ● 실시간 점수
+        </span>
+        <span>
+          ○ 팀·투수 세부지표 (다음)
+        </span>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        className="mobileMenuButton"
+        aria-label="메뉴 열기"
+        aria-expanded={
+          mobileOpen
+        }
+        onClick={() =>
+          setMobileOpen(true)
+        }
+      >
+        <span>☰</span>
+        <b>메뉴</b>
+      </button>
+
+      <aside className="sidebar">
+        {sidebarContent}
+      </aside>
+
+      {mobileOpen ? (
+        <div
+          className="mobileSidebarLayer"
+          aria-hidden={false}
+        >
+          <button
+            type="button"
+            className="mobileSidebarBackdrop"
+            aria-label="메뉴 닫기"
+            onClick={
+              closeMobile
+            }
+          />
+
+          <aside className="mobileSidebar">
+            <div className="mobileSidebarTop">
+              <strong>
+                메뉴
+              </strong>
+
+              <button
+                type="button"
+                aria-label="메뉴 닫기"
+                onClick={
+                  closeMobile
+                }
+              >
+                ✕
+              </button>
+            </div>
+
+            {sidebarContent}
+          </aside>
+        </div>
+      ) : null}
+    </>
+  );
+}

@@ -1,0 +1,573 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const dynamic = "force-dynamic";
+
+const LIVE_START = "2026-09-16";
+
+type LivePrediction = {
+  id: string;
+  date: string;
+  gameId: string;
+  awayTeamName: string;
+  homeTeamName: string;
+  market: "ML" | "HANDICAP" | "TOTAL";
+  label: string;
+  grade: string;
+  confidence: number;
+  ev: number | null;
+  odds: number;
+  firstCapturedAt: string;
+  capturedAt: string;
+  result: "PENDING" | "WIN" | "LOSS" | "PUSH" | "VOID";
+  settledAt?: string;
+  awayScore?: number | null;
+  homeScore?: number | null;
+};
+
+type LiveStore = {
+  version: 1;
+  liveStart: string;
+  predictions: LivePrediction[];
+};
+
+const dataFile = path.join(
+  process.cwd(),
+  "data",
+  "kbo-live-predictions.json"
+);
+
+function emptyStore(): LiveStore {
+  return {
+    version: 1,
+    liveStart: LIVE_START,
+    predictions: [],
+  };
+}
+
+async function readStore(): Promise<LiveStore> {
+  try {
+    const raw = await fs.readFile(dataFile, "utf8");
+    const parsed = JSON.parse(raw);
+
+    return {
+      version: 1,
+      liveStart: LIVE_START,
+      predictions: Array.isArray(parsed?.predictions)
+        ? parsed.predictions
+        : [],
+    };
+  } catch {
+    return emptyStore();
+  }
+}
+
+async function writeStore(store: LiveStore) {
+  await fs.mkdir(path.dirname(dataFile), {
+    recursive: true,
+  });
+
+  const temp =
+    `${dataFile}.tmp-${process.pid}-${Date.now()}`;
+
+  await fs.writeFile(
+    temp,
+    JSON.stringify(store, null, 2),
+    "utf8"
+  );
+
+  await fs.rename(temp, dataFile);
+}
+
+function todayKst() {
+  return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }
+  ).format(new Date());
+}
+
+function parseLastNumber(label: string) {
+  const matches =
+    String(label).match(/[+-]?\d+(?:\.\d+)?/g);
+
+  if (!matches?.length) return null;
+
+  const value =
+    Number(matches[matches.length - 1]);
+
+  return Number.isFinite(value)
+    ? value
+    : null;
+}
+
+function settlePrediction(
+  prediction: LivePrediction,
+  game: any
+): LivePrediction["result"] {
+  if (!game) return "PENDING";
+
+  const cancelName =
+    String((game as any)?.status?.cancelName || "").trim();
+
+  if (
+    cancelName &&
+    cancelName !== "정상경기"
+  ) {
+    return "VOID";
+  }
+
+  if (
+    String((game as any)?.status?.stateCode || "") !== "3"
+  ) {
+    return "PENDING";
+  }
+
+  const awayScore =
+    (game as any)?.score?.away;
+
+  const homeScore =
+    (game as any)?.score?.home;
+
+  if (
+    typeof awayScore !== "number" ||
+    typeof homeScore !== "number"
+  ) {
+    return "PENDING";
+  }
+
+  if (prediction.market === "ML") {
+    if (
+      prediction.label.startsWith(
+        `${prediction.awayTeamName} `
+      )
+    ) {
+      if (awayScore > homeScore) return "WIN";
+      if (awayScore < homeScore) return "LOSS";
+      return "PUSH";
+    }
+
+    if (
+      prediction.label.startsWith(
+        `${prediction.homeTeamName} `
+      )
+    ) {
+      if (homeScore > awayScore) return "WIN";
+      if (homeScore < awayScore) return "LOSS";
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  if (prediction.market === "HANDICAP") {
+    const line =
+      parseLastNumber(prediction.label);
+
+    if (line === null) {
+      return "VOID";
+    }
+
+    if (
+      prediction.label.startsWith(
+        `${prediction.awayTeamName} `
+      )
+    ) {
+      const adjusted =
+        awayScore + line;
+
+      if (adjusted > homeScore) return "WIN";
+      if (adjusted < homeScore) return "LOSS";
+      return "PUSH";
+    }
+
+    if (
+      prediction.label.startsWith(
+        `${prediction.homeTeamName} `
+      )
+    ) {
+      const adjusted =
+        homeScore + line;
+
+      if (adjusted > awayScore) return "WIN";
+      if (adjusted < awayScore) return "LOSS";
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  if (prediction.market === "TOTAL") {
+    const line =
+      parseLastNumber(prediction.label);
+
+    if (line === null) {
+      return "VOID";
+    }
+
+    const total =
+      awayScore + homeScore;
+
+    if (
+      prediction.label.startsWith("오버")
+    ) {
+      if (total > line) return "WIN";
+      if (total < line) return "LOSS";
+      return "PUSH";
+    }
+
+    if (
+      prediction.label.startsWith("언더")
+    ) {
+      if (total < line) return "WIN";
+      if (total > line) return "LOSS";
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  return "VOID";
+}
+
+export async function GET() {
+  const store =
+    await readStore();
+
+  const predictions =
+    [...store.predictions].sort(
+      (a, b) =>
+        b.date.localeCompare(a.date) ||
+        b.gameId.localeCompare(a.gameId)
+    );
+
+  const settled =
+    predictions.filter(
+      (x) =>
+        x.result !== "PENDING"
+    );
+
+  const wins =
+    settled.filter(
+      (x) => x.result === "WIN"
+    ).length;
+
+  const losses =
+    settled.filter(
+      (x) => x.result === "LOSS"
+    ).length;
+
+  const graded =
+    wins + losses;
+
+  const hitRate =
+    graded
+      ? wins / graded
+      : null;
+
+  let stake = 0;
+  let returned = 0;
+
+  for (const item of settled) {
+    stake += 10000;
+
+    if (item.result === "WIN") {
+      returned +=
+        10000 * item.odds;
+    } else if (
+      item.result === "PUSH" ||
+      item.result === "VOID"
+    ) {
+      returned += 10000;
+    }
+  }
+
+  const returnRate =
+    stake
+      ? (returned - stake) / stake
+      : null;
+
+  return NextResponse.json({
+    version: 1,
+    liveStart: LIVE_START,
+    count: predictions.length,
+    settled: settled.length,
+    pending:
+      predictions.length - settled.length,
+    wins,
+    losses,
+    hitRate,
+    returnRate,
+    predictions,
+  });
+}
+
+export async function POST(
+  request: Request
+) {
+  const body =
+    await request.json();
+
+  const date =
+    String(body?.date || "");
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+    date < LIVE_START
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "INVALID_DATE",
+      },
+      { status: 400 }
+    );
+  }
+
+  const incomingPredictions =
+    Array.isArray(body?.predictions)
+      ? body.predictions
+      : [];
+
+  const games =
+    Array.isArray(body?.games)
+      ? body.games
+      : [];
+
+  const gameMap =
+    new Map(
+      games.map(
+        (game: any) => [
+          String((game as any)?.gameId || ""),
+          game,
+        ]
+      )
+    );
+
+  const store =
+    await readStore();
+
+  const byId =
+    new Map(
+      store.predictions.map(
+        (item) => [
+          item.id,
+          item,
+        ]
+      )
+    );
+
+  const now =
+    new Date().toISOString();
+
+  const currentDate =
+    todayKst();
+
+  let created = 0;
+  let updated = 0;
+  let settledCount = 0;
+
+  if (date === currentDate) {
+    for (
+      const raw of incomingPredictions
+    ) {
+      const gameId =
+        String(raw?.gameId || "");
+
+      const game =
+        gameMap.get(gameId);
+
+      if (!gameId || !game) {
+        continue;
+      }
+
+      const stateCode =
+        String(
+          (game as any)?.status?.stateCode || ""
+        );
+
+      const inning =
+        (game as any)?.status?.inning;
+
+      const topBottom =
+        (game as any)?.status?.topBottom;
+
+      const cancelled =
+        String(
+          (game as any)?.status?.cancelName || ""
+        ).trim();
+
+      const started =
+        stateCode === "2" ||
+        stateCode === "3" ||
+        (
+          inning !== null &&
+          inning !== undefined
+        ) ||
+        Boolean(topBottom);
+
+      if (
+        started ||
+        (
+          cancelled &&
+          cancelled !== "정상경기"
+        )
+      ) {
+        continue;
+      }
+
+      const market =
+        String(raw?.market || "");
+
+      const label =
+        String(raw?.label || "");
+
+      const odds =
+        Number(raw?.odds);
+
+      const confidence =
+        Number(raw?.confidence);
+
+      if (
+        ![
+          "ML",
+          "HANDICAP",
+          "TOTAL",
+        ].includes(market) ||
+        !label ||
+        !Number.isFinite(odds) ||
+        odds <= 1 ||
+        !Number.isFinite(confidence)
+      ) {
+        continue;
+      }
+
+      const id =
+        `${date}:${gameId}`;
+
+      const previous =
+        byId.get(id);
+
+      const next: LivePrediction = {
+        id,
+        date,
+        gameId,
+        awayTeamName:
+          String(
+            (game as any)?.awayTeamName ||
+            raw?.awayTeamName ||
+            ""
+          ),
+        homeTeamName:
+          String(
+            (game as any)?.homeTeamName ||
+            raw?.homeTeamName ||
+            ""
+          ),
+        market:
+          market as LivePrediction["market"],
+        label,
+        grade:
+          String(raw?.grade || "C"),
+        confidence,
+        ev:
+          raw?.ev === null ||
+          raw?.ev === undefined
+            ? null
+            : Number(raw.ev),
+        odds,
+        firstCapturedAt:
+          previous?.firstCapturedAt ||
+          now,
+        capturedAt: now,
+        result: "PENDING",
+      };
+
+      byId.set(
+        id,
+        next
+      );
+
+      if (previous) {
+        updated += 1;
+      } else {
+        created += 1;
+      }
+    }
+  }
+
+  for (
+    const [id, prediction] of byId
+  ) {
+    if (
+      prediction.date !== date
+    ) {
+      continue;
+    }
+
+    const game =
+      gameMap.get(
+        prediction.gameId
+      );
+
+    if (!game) {
+      continue;
+    }
+
+    const result =
+      settlePrediction(
+        prediction,
+        game
+      );
+
+    if (
+      result !== "PENDING" &&
+      (
+        prediction.result !== result ||
+        prediction.awayScore !==
+          (game as any)?.score?.away ||
+        prediction.homeScore !==
+          (game as any)?.score?.home
+      )
+    ) {
+      byId.set(
+        id,
+        {
+          ...prediction,
+          result,
+          settledAt: now,
+          awayScore:
+            (game as any)?.score?.away ?? null,
+          homeScore:
+            (game as any)?.score?.home ?? null,
+        }
+      );
+
+      settledCount += 1;
+    }
+  }
+
+  store.predictions =
+    [...byId.values()].sort(
+      (a, b) =>
+        a.date.localeCompare(b.date) ||
+        a.gameId.localeCompare(b.gameId)
+    );
+
+  await writeStore(store);
+
+  return NextResponse.json({
+    ok: true,
+    date,
+    currentDate,
+    created,
+    updated,
+    settled: settledCount,
+    total: store.predictions.length,
+  });
+}

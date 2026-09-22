@@ -1,0 +1,1144 @@
+import * as cheerio from "cheerio";
+
+const HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/152 Safari/537.36",
+  Accept:
+    "text/html,application/xhtml+xml",
+  "Accept-Language":
+    "ko-KR,ko;q=0.9,en;q=0.8",
+};
+
+function clean(
+  value: string | undefined
+) {
+  return (
+    value
+      ?.replace(/\s+/g, " ")
+      .trim() || ""
+  );
+}
+
+function num(
+  value: string | undefined
+) {
+  if (!value) return 0;
+
+  const n =
+    Number(
+      value
+        .replace(/,/g, "")
+        .trim()
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : 0;
+}
+
+function kstToday() {
+  return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:
+        "Asia/Seoul",
+      year:
+        "numeric",
+      month:
+        "2-digit",
+      day:
+        "2-digit",
+    }
+  ).format(
+    new Date()
+  );
+}
+
+export function isHistoricalDate(
+  targetDate:
+    string | null | undefined
+) {
+  return Boolean(
+    targetDate &&
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      targetDate
+    ) &&
+    targetDate < kstToday()
+  );
+}
+
+async function fetchHtml(
+  url: string
+) {
+  const response =
+    await fetch(
+      url,
+      {
+        headers:
+          HEADERS,
+        cache:
+          "no-store",
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `KBO historical HTTP ${response.status}`
+    );
+  }
+
+  return response.text();
+}
+
+function fullDate(
+  year: string,
+  mmdd: string
+) {
+  const match =
+    mmdd.match(
+      /^(\d{2})\.(\d{2})$/
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  return (
+    `${year}-${match[1]}-${match[2]}`
+  );
+}
+
+export type HistoricalHitterStats = {
+  avg: number | null;
+  g: number | null;
+  pa: number | null;
+  ab: number | null;
+
+  runs: number | null;
+  hits: number | null;
+  doubles: number | null;
+  triples: number | null;
+
+  hr: number | null;
+  rbi: number | null;
+
+  bb: number | null;
+  so: number | null;
+
+  obp: number | null;
+  slg: number | null;
+  ops: number | null;
+};
+
+export async function fetchHistoricalHitterStats(
+  playerId: number,
+  targetDate:
+    string | null | undefined
+): Promise<
+  HistoricalHitterStats | null
+> {
+  if (
+    !isHistoricalDate(
+      targetDate
+    )
+  ) {
+    return null;
+  }
+
+  const year =
+    targetDate!.slice(
+      0,
+      4
+    );
+
+  const url =
+    `https://www.koreabaseball.com/Record/Player/HitterDetail/Daily.aspx?playerId=${playerId}`;
+
+  const html =
+    await fetchHtml(
+      url
+    );
+
+  const $ =
+    cheerio.load(
+      html
+    );
+
+  const games:
+    Array<
+      Record<
+        string,
+        string
+      >
+    > = [];
+
+  $("table").each(
+    (_, table) => {
+      const headers =
+        $(table)
+          .find(
+            "thead th"
+          )
+          .map(
+            (_, el) =>
+              clean(
+                $(el).text()
+              )
+          )
+          .get();
+
+      if (
+        !headers.includes(
+          "PA"
+        ) ||
+        !headers.includes(
+          "AB"
+        ) ||
+        !headers.includes(
+          "H"
+        ) ||
+        !headers.includes(
+          "HR"
+        )
+      ) {
+        return;
+      }
+
+      $(table)
+        .find(
+          "tbody tr"
+        )
+        .each(
+          (_, tr) => {
+            const values =
+              $(tr)
+                .find(
+                  "th,td"
+                )
+                .map(
+                  (_, el) =>
+                    clean(
+                      $(el).text()
+                    )
+                )
+                .get();
+
+            if (
+              !values.length
+            ) {
+              return;
+            }
+
+            const date =
+              fullDate(
+                year,
+                values[0]
+              );
+
+            if (
+              !date ||
+              date >=
+                targetDate!
+            ) {
+              return;
+            }
+
+            const row:
+              Record<
+                string,
+                string
+              > = {};
+
+            headers.forEach(
+              (
+                header,
+                index
+              ) => {
+                row[
+                  index === 0
+                    ? "DATE"
+                    : header
+                ] =
+                  values[
+                    index
+                  ] ?? "";
+              }
+            );
+
+            games.push(
+              row
+            );
+          }
+        );
+    }
+  );
+
+  if (
+    !games.length
+  ) {
+    return null;
+  }
+
+  const sum =
+    (
+      key:
+        string
+    ) =>
+      games.reduce(
+        (
+          total,
+          game
+        ) =>
+          total +
+          num(
+            game[
+              key
+            ]
+          ),
+        0
+      );
+
+  const pa =
+    sum("PA");
+
+  const ab =
+    sum("AB");
+
+  const runs =
+    sum("R");
+
+  const hits =
+    sum("H");
+
+  const doubles =
+    sum("2B");
+
+  const triples =
+    sum("3B");
+
+  const hr =
+    sum("HR");
+
+  const rbi =
+    sum("RBI");
+
+  const bb =
+    sum("BB");
+
+  const hbp =
+    sum("HBP");
+
+  const so =
+    sum("SO");
+
+  const singles =
+    Math.max(
+      0,
+      hits -
+        doubles -
+        triples -
+        hr
+    );
+
+  const avg =
+    ab > 0
+      ? hits / ab
+      : null;
+
+  /*
+    Daily 페이지에는 SF가 따로 없어서
+    과거 OBP는 H+BB+HBP /
+    AB+BB+HBP 기준으로 계산.
+    현재값 미래누수보다 훨씬 안전한
+    과거 전용 근사치.
+  */
+  const obpDenominator =
+    ab +
+    bb +
+    hbp;
+
+  const obp =
+    obpDenominator > 0
+      ? (
+          hits +
+          bb +
+          hbp
+        ) /
+        obpDenominator
+      : null;
+
+  const slg =
+    ab > 0
+      ? (
+          singles +
+          doubles * 2 +
+          triples * 3 +
+          hr * 4
+        ) /
+        ab
+      : null;
+
+  const ops =
+    obp !== null &&
+    slg !== null
+      ? obp + slg
+      : null;
+
+  const round3 =
+    (
+      value:
+        number | null
+    ) =>
+      value === null
+        ? null
+        : Number(
+            value.toFixed(
+              3
+            )
+          );
+
+  return {
+    avg:
+      round3(
+        avg
+      ),
+
+    g:
+      games.length,
+
+    pa,
+    ab,
+
+    runs,
+    hits,
+    doubles,
+    triples,
+
+    hr,
+    rbi,
+
+    bb,
+    so,
+
+    obp:
+      round3(
+        obp
+      ),
+
+    slg:
+      round3(
+        slg
+      ),
+
+    ops:
+      round3(
+        ops
+      ),
+  };
+}
+
+type HistoricalPitcherGame = {
+  date: string;
+
+  opponent: string;
+  location: string;
+  result: string;
+
+  era: number | null;
+  tbf: number | null;
+  innings: string | null;
+
+  hits: number | null;
+  homeRuns: number | null;
+  walks: number | null;
+  strikeouts: number | null;
+
+  runs: number | null;
+  earnedRuns: number | null;
+};
+
+function inningsToOuts(
+  value:
+    string | null
+) {
+  if (!value) {
+    return 0;
+  }
+
+  const text =
+    value.trim();
+
+  if (
+    /^\d+$/.test(
+      text
+    )
+  ) {
+    return (
+      Number(text) *
+      3
+    );
+  }
+
+  const mixed =
+    text.match(
+      /^(\d+)\s+([12])\/3$/
+    );
+
+  if (mixed) {
+    return (
+      Number(
+        mixed[1]
+      ) *
+        3 +
+      Number(
+        mixed[2]
+      )
+    );
+  }
+
+  const decimal =
+    Number(
+      text
+    );
+
+  if (
+    Number.isFinite(
+      decimal
+    )
+  ) {
+    const whole =
+      Math.floor(
+        decimal
+      );
+
+    const fraction =
+      decimal -
+      whole;
+
+    if (
+      Math.abs(
+        fraction -
+        0.1
+      ) < 0.02
+    ) {
+      return (
+        whole * 3 +
+        1
+      );
+    }
+
+    if (
+      Math.abs(
+        fraction -
+        0.2
+      ) < 0.02
+    ) {
+      return (
+        whole * 3 +
+        2
+      );
+    }
+
+    return Math.round(
+      decimal * 3
+    );
+  }
+
+  return 0;
+}
+
+function outsToInningsText(
+  outs: number
+) {
+  const whole =
+    Math.floor(
+      outs / 3
+    );
+
+  const remain =
+    outs % 3;
+
+  if (
+    remain === 0
+  ) {
+    return String(
+      whole
+    );
+  }
+
+  return (
+    `${whole} ${remain}/3`
+  );
+}
+
+function outsToNumber(
+  outs: number
+) {
+  return (
+    outs / 3
+  );
+}
+
+function summarizePitcherRecent(
+  games:
+    HistoricalPitcherGame[]
+) {
+  if (
+    !games.length
+  ) {
+    return null;
+  }
+
+  const outs =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        inningsToOuts(
+          game.innings
+        ),
+      0
+    );
+
+  const ip =
+    outsToNumber(
+      outs
+    );
+
+  const hits =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        (
+          game.hits ??
+          0
+        ),
+      0
+    );
+
+  const walks =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        (
+          game.walks ??
+          0
+        ),
+      0
+    );
+
+  const strikeouts =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        (
+          game.strikeouts ??
+          0
+        ),
+      0
+    );
+
+  const earnedRuns =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        (
+          game.earnedRuns ??
+          0
+        ),
+      0
+    );
+
+  return {
+    games:
+      games.length,
+
+    innings:
+      Number(
+        ip.toFixed(
+          2
+        )
+      ),
+
+    era:
+      ip > 0
+        ? Number(
+            (
+              earnedRuns *
+              9 /
+              ip
+            ).toFixed(
+              2
+            )
+          )
+        : null,
+
+    whip:
+      ip > 0
+        ? Number(
+            (
+              (
+                hits +
+                walks
+              ) /
+              ip
+            ).toFixed(
+              2
+            )
+          )
+        : null,
+
+    strikeouts,
+    walks,
+
+    kbb:
+      walks > 0
+        ? Number(
+            (
+              strikeouts /
+              walks
+            ).toFixed(
+              2
+            )
+          )
+        : strikeouts > 0
+          ? strikeouts
+          : null,
+  };
+}
+
+export async function fetchHistoricalPitcherStats(
+  playerId: number,
+  targetDate:
+    string | null | undefined
+) {
+  if (
+    !isHistoricalDate(
+      targetDate
+    )
+  ) {
+    return null;
+  }
+
+  const year =
+    targetDate!.slice(
+      0,
+      4
+    );
+
+  const url =
+    `https://www.koreabaseball.com/Record/Player/PitcherDetail/Daily.aspx?playerId=${playerId}`;
+
+  const html =
+    await fetchHtml(
+      url
+    );
+
+  const $ =
+    cheerio.load(
+      html
+    );
+
+  const games:
+    HistoricalPitcherGame[] =
+      [];
+
+  $("table").each(
+    (_, table) => {
+      const headers =
+        $(table)
+          .find(
+            "thead th"
+          )
+          .map(
+            (_, el) =>
+              clean(
+                $(el).text()
+              )
+          )
+          .get();
+
+      if (
+        !headers.includes(
+          "TBF"
+        ) ||
+        !headers.includes(
+          "IP"
+        ) ||
+        !headers.includes(
+          "ER"
+        ) ||
+        !headers.includes(
+          "SO"
+        )
+      ) {
+        return;
+      }
+
+      $(table)
+        .find(
+          "tbody tr"
+        )
+        .each(
+          (_, tr) => {
+            const values =
+              $(tr)
+                .find(
+                  "th,td"
+                )
+                .map(
+                  (_, el) =>
+                    clean(
+                      $(el).text()
+                    )
+                )
+                .get();
+
+            if (
+              !values.length
+            ) {
+              return;
+            }
+
+            const date =
+              fullDate(
+                year,
+                values[0]
+              );
+
+            if (
+              !date ||
+              date >=
+                targetDate!
+            ) {
+              return;
+            }
+
+            const row:
+              Record<
+                string,
+                string
+              > = {};
+
+            headers.forEach(
+              (
+                header,
+                index
+              ) => {
+                row[
+                  index === 0
+                    ? "DATE"
+                    : header
+                ] =
+                  values[
+                    index
+                  ] ?? "";
+              }
+            );
+
+            games.push({
+              date,
+
+              opponent:
+                row["상대"] ||
+                "",
+
+              location:
+                row["구분"] ||
+                "",
+
+              result:
+                row["결과"] ||
+                "",
+
+              era:
+                num(
+                  row["ERA1"] ??
+                  row["ERA"]
+                ),
+
+              tbf:
+                num(
+                  row["TBF"]
+                ),
+
+              innings:
+                row["IP"] ||
+                null,
+
+              hits:
+                num(
+                  row["H"]
+                ),
+
+              homeRuns:
+                num(
+                  row["HR"]
+                ),
+
+              walks:
+                num(
+                  row["BB"]
+                ),
+
+              strikeouts:
+                num(
+                  row["SO"]
+                ),
+
+              runs:
+                num(
+                  row["R"]
+                ),
+
+              earnedRuns:
+                num(
+                  row["ER"]
+                ),
+            });
+          }
+        );
+    }
+  );
+
+  if (
+    !games.length
+  ) {
+    return null;
+  }
+
+  games.sort(
+    (
+      a,
+      b
+    ) =>
+      a.date.localeCompare(
+        b.date
+      )
+  );
+
+  const sum =
+    (
+      key:
+        | "tbf"
+        | "hits"
+        | "homeRuns"
+        | "walks"
+        | "strikeouts"
+        | "runs"
+        | "earnedRuns"
+    ) =>
+      games.reduce(
+        (
+          total,
+          game
+        ) =>
+          total +
+          (
+            game[
+              key
+            ] ??
+            0
+          ),
+        0
+      );
+
+  const outs =
+    games.reduce(
+      (
+        total,
+        game
+      ) =>
+        total +
+        inningsToOuts(
+          game.innings
+        ),
+      0
+    );
+
+  const ip =
+    outsToNumber(
+      outs
+    );
+
+  const hits =
+    sum("hits");
+
+  const walks =
+    sum("walks");
+
+  const er =
+    sum(
+      "earnedRuns"
+    );
+
+  const wins =
+    games.filter(
+      (
+        game
+      ) =>
+        game.result ===
+        "승"
+    ).length;
+
+  const losses =
+    games.filter(
+      (
+        game
+      ) =>
+        game.result ===
+        "패"
+    ).length;
+
+  const qs =
+    games.filter(
+      (
+        game
+      ) =>
+        game.location ===
+          "선발" &&
+        inningsToOuts(
+          game.innings
+        ) >= 18 &&
+        (
+          game.earnedRuns ??
+          0
+        ) <= 3
+    ).length;
+
+  const recent5Games =
+    games.slice(
+      -5
+    );
+
+  const recent10Games =
+    games.slice(
+      -10
+    );
+
+  return {
+    playerId,
+
+    era:
+      ip > 0
+        ? Number(
+            (
+              er *
+              9 /
+              ip
+            ).toFixed(
+              2
+            )
+          )
+        : null,
+
+    games:
+      games.length,
+
+    wins,
+    losses,
+
+    saves:
+      0,
+
+    holds:
+      0,
+
+    winPct:
+      wins +
+        losses >
+      0
+        ? Number(
+            (
+              wins /
+              (
+                wins +
+                losses
+              )
+            ).toFixed(
+              3
+            )
+          )
+        : null,
+
+    battersFaced:
+      sum("tbf"),
+
+    pitches:
+      null,
+
+    innings:
+      outsToInningsText(
+        outs
+      ),
+
+    hits,
+
+    homeRuns:
+      sum(
+        "homeRuns"
+      ),
+
+    walks,
+
+    strikeouts:
+      sum(
+        "strikeouts"
+      ),
+
+    runs:
+      sum(
+        "runs"
+      ),
+
+    earnedRuns:
+      er,
+
+    whip:
+      ip > 0
+        ? Number(
+            (
+              (
+                hits +
+                walks
+              ) /
+              ip
+            ).toFixed(
+              2
+            )
+          )
+        : null,
+
+    avg:
+      null,
+
+    qs,
+
+    recent5:
+      summarizePitcherRecent(
+        recent5Games
+      ),
+
+    recent10:
+      summarizePitcherRecent(
+        recent10Games
+      ),
+
+    recentGames:
+      recent10Games,
+  };
+}

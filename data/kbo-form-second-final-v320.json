@@ -1,0 +1,85 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "bets": 3,
+    "wins": 1,
+    "losses": 2,
+    "hit": 33.33,
+    "avgOdds": 6.234,
+    "roi": 112.62,
+    "mdd": 1.9,
+    "losingStreak": 2,
+    "finalBank": 1033787,
+    "monthly": [
+      {
+        "month": "2026-04",
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "roi": 112.62
+      }
+    ]
+  },
+  "internal": {
+    "bets": 10,
+    "wins": 3,
+    "losses": 7,
+    "hit": 30,
+    "avgOdds": 6.682,
+    "roi": 102.33,
+    "mdd": 4,
+    "losingStreak": 4,
+    "finalBank": 1102329,
+    "monthly": [
+      {
+        "month": "2026-05",
+        "bets": 5,
+        "wins": 1,
+        "hit": 20,
+        "roi": 25.84
+      },
+      {
+        "month": "2026-06",
+        "bets": 5,
+        "wins": 2,
+        "hit": 40,
+        "roi": 178.82
+      }
+    ]
+  },
+  "final": {
+    "bets": 15,
+    "wins": 5,
+    "losses": 10,
+    "hit": 33.33,
+    "avgOdds": 5.612,
+    "roi": 95.08,
+    "mdd": 3,
+    "losingStreak": 3,
+    "finalBank": 1142617,
+    "monthly": [
+      {
+        "month": "2026-07",
+        "bets": 8,
+        "wins": 3,
+        "hit": 37.5,
+        "roi": 85.86
+      },
+      {
+        "month": "2026-08",
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "roi": 95.64
+      },
+      {
+        "month": "2026-09",
+        "bets": 4,
+        "wins": 1,
+        "hit": 25,
+        "roi": 113.1
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "model": {
+      "marketBrier": 0.21324254044950472,
+      "adjustedBrier": 0.2117856024733158,
+      "marketLogLoss": 0.617366556819218,
+      "adjustedLogLoss": 0.6140965143948238
+    },
+    "positive": {
+      "bets": 85,
+      "wins": 43,
+      "hit": 50.59,
+      "avgOdds": 2.075,
+      "roi": -8.8
+    },
+    "positiveEV": {
+      "bets": 13,
+      "wins": 5,
+      "hit": 38.46,
+      "avgOdds": 2.561,
+      "roi": -5.08
+    },
+    "dailyBest": {
+      "bets": 10,
+      "wins": 4,
+      "hit": 40,
+      "avgOdds": 2.612,
+      "roi": 0.7
+    }
+  },
+  "internal": {
+    "model": {
+      "marketBrier": 0.22644604416062425,
+      "adjustedBrier": 0.22625317391206018,
+      "marketLogLoss": 0.6452663619941681,
+      "adjustedLogLoss": 0.6444354759234688
+    },
+    "positive": {
+      "bets": 250,
+      "wins": 123,
+      "hit": 49.2,
+      "avgOdds": 2.087,
+      "roi": -6.04
+    },
+    "positiveEV": {
+      "bets": 45,
+      "wins": 20,
+      "hit": 44.44,
+      "avgOdds": 2.51,
+      "roi": 12.24
+    },
+    "dailyBest": {
+      "bets": 35,
+      "wins": 16,
+      "hit": 45.71,
+      "avgOdds": 2.501,
+      "roi": 13.49
+    }
+  }
+}

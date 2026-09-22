@@ -1,0 +1,7493 @@
+{
+  "generatedAt": "2026-09-14T13:00:38.072Z",
+  "dailyInvestmentAmount": 100000,
+  "strategy": "V0.4_FULL_PORTFOLIO_HOME_ML_EV3_OR_UNDER",
+  "avoidInvestmentOverlap": true,
+  "comboSettings": {
+    "legs": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "combosPerLeg": 3,
+    "minimumGrade": "ALL",
+    "minimumConfidence": 0.5,
+    "minimumEv": -0.15
+  },
+  "overall": [
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 안전",
+      "days": 50,
+      "profitableDays": 30,
+      "lossDays": 20,
+      "breakevenDays": 0,
+      "allWin": 29,
+      "partial": 2,
+      "allLoss": 19,
+      "totalStake": 5000000,
+      "totalReturned": 5335600,
+      "profit": 335600,
+      "roi": 6.71
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 안전",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 안전",
+      "days": 50,
+      "profitableDays": 29,
+      "lossDays": 21,
+      "breakevenDays": 0,
+      "allWin": 29,
+      "partial": 0,
+      "allLoss": 21,
+      "totalStake": 5000000,
+      "totalReturned": 5697180,
+      "profit": 697180,
+      "roi": 13.94
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 균형",
+      "days": 8,
+      "profitableDays": 4,
+      "lossDays": 4,
+      "breakevenDays": 0,
+      "allWin": 4,
+      "partial": 0,
+      "allLoss": 4,
+      "totalStake": 800000,
+      "totalReturned": 1230180,
+      "profit": 430180,
+      "roi": 53.77
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 안전",
+      "days": 8,
+      "profitableDays": 4,
+      "lossDays": 4,
+      "breakevenDays": 0,
+      "allWin": 4,
+      "partial": 0,
+      "allLoss": 4,
+      "totalStake": 800000,
+      "totalReturned": 1230180,
+      "profit": 430180,
+      "roi": 53.77
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    }
+  ],
+  "validation": [
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 안전",
+      "days": 15,
+      "profitableDays": 8,
+      "lossDays": 7,
+      "breakevenDays": 0,
+      "allWin": 8,
+      "partial": 1,
+      "allLoss": 6,
+      "totalStake": 1500000,
+      "totalReturned": 1510000,
+      "profit": 10000,
+      "roi": 0.67
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "2조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 안전",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축미사용",
+      "strategy": "3조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 안전",
+      "days": 15,
+      "profitableDays": 8,
+      "lossDays": 7,
+      "breakevenDays": 0,
+      "allWin": 8,
+      "partial": 0,
+      "allLoss": 7,
+      "totalStake": 1500000,
+      "totalReturned": 1442000,
+      "profit": -58000,
+      "roi": -3.87
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 균형",
+      "days": 1,
+      "profitableDays": 0,
+      "lossDays": 1,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 1,
+      "totalStake": 100000,
+      "totalReturned": 0,
+      "profit": -100000,
+      "roi": -100
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "2조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 안전",
+      "days": 1,
+      "profitableDays": 0,
+      "lossDays": 1,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 1,
+      "totalStake": 100000,
+      "totalReturned": 0,
+      "profit": -100000,
+      "roi": -100
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 균형",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    },
+    {
+      "anchor": "축사용",
+      "strategy": "3조합 공격",
+      "days": 0,
+      "profitableDays": 0,
+      "lossDays": 0,
+      "breakevenDays": 0,
+      "allWin": 0,
+      "partial": 0,
+      "allLoss": 0,
+      "totalStake": 0,
+      "totalReturned": 0,
+      "profit": 0,
+      "roi": 0
+    }
+  ],
+  "records": [
+    {
+      "date": "2026-03-29",
+      "month": "2026-03",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 101400,
+      "profit": 1400,
+      "result": "PARTIAL_WIN",
+      "wins": 1,
+      "losses": 1,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "WIN",
+          "effectiveOdds": 1.69,
+          "returned": 101400,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-01",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260401OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260401OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-02",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 185000,
+      "profit": 85000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "WIN",
+          "effectiveOdds": 1.85,
+          "returned": 111000,
+          "picks": [
+            {
+              "gameId": "20260402OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "WIN",
+          "effectiveOdds": 1.85,
+          "returned": 74000,
+          "picks": [
+            {
+              "gameId": "20260402OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-07",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260407SSHT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260407SSHT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-08",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 160000,
+      "profit": 60000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "WIN",
+          "effectiveOdds": 1.6,
+          "returned": 96000,
+          "picks": [
+            {
+              "gameId": "20260408LGNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "WIN",
+          "effectiveOdds": 1.6,
+          "returned": 64000,
+          "picks": [
+            {
+              "gameId": "20260408LGNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-11",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 195000,
+      "profit": 95000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.95,
+          "result": "WIN",
+          "effectiveOdds": 1.95,
+          "returned": 117000,
+          "picks": [
+            {
+              "gameId": "20260411NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.95
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.95,
+          "result": "WIN",
+          "effectiveOdds": 1.95,
+          "returned": 78000,
+          "picks": [
+            {
+              "gameId": "20260411NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.95
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-12",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260412NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260412NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 176000,
+      "profit": 76000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 105600,
+          "picks": [
+            {
+              "gameId": "20260421OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 70400,
+          "picks": [
+            {
+              "gameId": "20260421OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "month": "2026-04",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260422OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260422OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-01",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 177000,
+      "profit": 77000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 106200,
+          "picks": [
+            {
+              "gameId": "20260501HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 70800,
+          "picks": [
+            {
+              "gameId": "20260501HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-02",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.83,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260502HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.83
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.83,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260502HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.83
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260506WOSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260506WOSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-08",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 184000,
+      "profit": 84000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "WIN",
+          "effectiveOdds": 1.84,
+          "returned": 110400,
+          "picks": [
+            {
+              "gameId": "20260508SSNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "WIN",
+          "effectiveOdds": 1.84,
+          "returned": 73600,
+          "picks": [
+            {
+              "gameId": "20260508SSNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260516HTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260516HTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-17",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260517HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260517HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 2.09,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260524NCKT0",
+              "market": "ML",
+              "label": "KT 승",
+              "odds": 2.09
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 2.09,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260524NCKT0",
+              "market": "ML",
+              "label": "KT 승",
+              "odds": 2.09
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-27",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 178000,
+      "profit": 78000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 106800,
+          "picks": [
+            {
+              "gameId": "20260527HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 71200,
+          "picks": [
+            {
+              "gameId": "20260527HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 169000,
+      "profit": 69000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "WIN",
+          "effectiveOdds": 1.69,
+          "returned": 101400,
+          "picks": [
+            {
+              "gameId": "20260528SSSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "WIN",
+          "effectiveOdds": 1.69,
+          "returned": 67600,
+          "picks": [
+            {
+              "gameId": "20260528SSSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-31",
+      "month": "2026-05",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260531OBSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.69
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260531OBSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.69
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-02",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260602LGKT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260602LGKT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-03",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 167000,
+      "profit": 67000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.67,
+          "result": "WIN",
+          "effectiveOdds": 1.67,
+          "returned": 100200,
+          "picks": [
+            {
+              "gameId": "20260603NCSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.67
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.67,
+          "result": "WIN",
+          "effectiveOdds": 1.67,
+          "returned": 66800,
+          "picks": [
+            {
+              "gameId": "20260603NCSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.67
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-06",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 176000,
+      "profit": 76000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 105600,
+          "picks": [
+            {
+              "gameId": "20260606KTSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 70400,
+          "picks": [
+            {
+              "gameId": "20260606KTSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 179200,
+      "profit": 79200,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 105600,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "WIN",
+          "effectiveOdds": 1.84,
+          "returned": 73600,
+          "picks": [
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-14",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260614SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260614SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-16",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 197000,
+      "profit": 97000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.97,
+          "result": "WIN",
+          "effectiveOdds": 1.97,
+          "returned": 118200,
+          "picks": [
+            {
+              "gameId": "20260616WOSS0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.97
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.97,
+          "result": "WIN",
+          "effectiveOdds": 1.97,
+          "returned": 78800,
+          "picks": [
+            {
+              "gameId": "20260616WOSS0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.97
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 164000,
+      "profit": 64000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.64,
+          "result": "WIN",
+          "effectiveOdds": 1.64,
+          "returned": 98400,
+          "picks": [
+            {
+              "gameId": "20260617WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.64
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.64,
+          "result": "WIN",
+          "effectiveOdds": 1.64,
+          "returned": 65600,
+          "picks": [
+            {
+              "gameId": "20260617WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.64
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-18",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 177000,
+      "profit": 77000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 106200,
+          "picks": [
+            {
+              "gameId": "20260618HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 70800,
+          "picks": [
+            {
+              "gameId": "20260618HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.9,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-21",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.86,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260621HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.86,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260621HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-23",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260623OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260623OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 167200,
+      "profit": 67200,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.62,
+          "result": "WIN",
+          "effectiveOdds": 1.62,
+          "returned": 97200,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.75,
+          "result": "WIN",
+          "effectiveOdds": 1.75,
+          "returned": 70000,
+          "picks": [
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 170800,
+      "profit": 70800,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "WIN",
+          "effectiveOdds": 1.66,
+          "returned": 99600,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 71200,
+          "picks": [
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 182000,
+      "profit": 82000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.86,
+          "result": "WIN",
+          "effectiveOdds": 1.86,
+          "returned": 111600,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 70400,
+          "picks": [
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-27",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.81,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260627LGLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.81
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.81,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260627LGLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.81
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-28",
+      "month": "2026-06",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.94,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-07",
+      "month": "2026-07",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260707HTLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260707HTLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "month": "2026-07",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 179000,
+      "profit": 79000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "WIN",
+          "effectiveOdds": 1.79,
+          "returned": 107400,
+          "picks": [
+            {
+              "gameId": "20260717OBNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "WIN",
+          "effectiveOdds": 1.79,
+          "returned": 71600,
+          "picks": [
+            {
+              "gameId": "20260717OBNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "month": "2026-07",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 178000,
+      "profit": 78000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 106800,
+          "picks": [
+            {
+              "gameId": "20260724KTLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 71200,
+          "picks": [
+            {
+              "gameId": "20260724KTLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "month": "2026-07",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 68000,
+      "profit": -32000,
+      "result": "PARTIAL_WIN",
+      "wins": 1,
+      "losses": 1,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 가치 1폴",
+          "legs": 1,
+          "odds": 1.7,
+          "result": "WIN",
+          "effectiveOdds": 1.7,
+          "returned": 68000,
+          "picks": [
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "month": "2026-08",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260814HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260814HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-15",
+      "month": "2026-08",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260815HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260815HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-19",
+      "month": "2026-08",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260819SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260819SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 182000,
+      "profit": 82000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.82,
+          "result": "WIN",
+          "effectiveOdds": 1.82,
+          "returned": 109200,
+          "picks": [
+            {
+              "gameId": "20260902HTNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.82
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.82,
+          "result": "WIN",
+          "effectiveOdds": 1.82,
+          "returned": 72800,
+          "picks": [
+            {
+              "gameId": "20260902HTNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.82
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-05",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 187000,
+      "profit": 87000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.87,
+          "result": "WIN",
+          "effectiveOdds": 1.87,
+          "returned": 112200,
+          "picks": [
+            {
+              "gameId": "20260905OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.87
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.87,
+          "result": "WIN",
+          "effectiveOdds": 1.87,
+          "returned": 74800,
+          "picks": [
+            {
+              "gameId": "20260905OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.87
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-06",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260906OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.89
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260906OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.89
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-08",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 191000,
+      "profit": 91000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "WIN",
+          "effectiveOdds": 1.91,
+          "returned": 114600,
+          "picks": [
+            {
+              "gameId": "20260908HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.91
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "WIN",
+          "effectiveOdds": 1.91,
+          "returned": 76400,
+          "picks": [
+            {
+              "gameId": "20260908HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 189000,
+      "profit": 89000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "WIN",
+          "effectiveOdds": 1.89,
+          "returned": 113400,
+          "picks": [
+            {
+              "gameId": "20260909NCHT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.89
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "WIN",
+          "effectiveOdds": 1.89,
+          "returned": 75600,
+          "picks": [
+            {
+              "gameId": "20260909NCHT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.89
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 166000,
+      "profit": 66000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "WIN",
+          "effectiveOdds": 1.66,
+          "returned": 99600,
+          "picks": [
+            {
+              "gameId": "20260911WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "WIN",
+          "effectiveOdds": 1.66,
+          "returned": 66400,
+          "picks": [
+            {
+              "gameId": "20260911WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-12",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 170000,
+      "profit": 70000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.7,
+          "result": "WIN",
+          "effectiveOdds": 1.7,
+          "returned": 102000,
+          "picks": [
+            {
+              "gameId": "20260912LGSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.7,
+          "result": "WIN",
+          "effectiveOdds": 1.7,
+          "returned": 68000,
+          "picks": [
+            {
+              "gameId": "20260912LGSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-13",
+      "month": "2026-09",
+      "anchor": "OFF",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260913LGSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260913LGSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-03-29",
+      "month": "2026-03",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-03-29",
+      "month": "2026-03",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-03-29",
+      "month": "2026-03",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 3,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.0251,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260329LTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            },
+            {
+              "gameId": "20260329OBNC0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-01",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260401OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260401OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-02",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 185000,
+      "profit": 85000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "WIN",
+          "effectiveOdds": 1.85,
+          "returned": 111000,
+          "picks": [
+            {
+              "gameId": "20260402OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "WIN",
+          "effectiveOdds": 1.85,
+          "returned": 74000,
+          "picks": [
+            {
+              "gameId": "20260402OBSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-07",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260407SSHT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260407SSHT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-08",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 160000,
+      "profit": 60000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "WIN",
+          "effectiveOdds": 1.6,
+          "returned": 96000,
+          "picks": [
+            {
+              "gameId": "20260408LGNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.6,
+          "result": "WIN",
+          "effectiveOdds": 1.6,
+          "returned": 64000,
+          "picks": [
+            {
+              "gameId": "20260408LGNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-11",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 195000,
+      "profit": 95000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.95,
+          "result": "WIN",
+          "effectiveOdds": 1.95,
+          "returned": 117000,
+          "picks": [
+            {
+              "gameId": "20260411NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.95
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.95,
+          "result": "WIN",
+          "effectiveOdds": 1.95,
+          "returned": 78000,
+          "picks": [
+            {
+              "gameId": "20260411NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.95
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-12",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260412NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260412NCSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-21",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 176000,
+      "profit": 76000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 105600,
+          "picks": [
+            {
+              "gameId": "20260421OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 70400,
+          "picks": [
+            {
+              "gameId": "20260421OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-04-22",
+      "month": "2026-04",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260422OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260422OBLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-01",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 177000,
+      "profit": 77000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 106200,
+          "picks": [
+            {
+              "gameId": "20260501HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 70800,
+          "picks": [
+            {
+              "gameId": "20260501HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-02",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.83,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260502HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.83
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.83,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260502HHSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.83
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-06",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260506WOSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260506WOSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-08",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 184000,
+      "profit": 84000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "WIN",
+          "effectiveOdds": 1.84,
+          "returned": 110400,
+          "picks": [
+            {
+              "gameId": "20260508SSNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "WIN",
+          "effectiveOdds": 1.84,
+          "returned": 73600,
+          "picks": [
+            {
+              "gameId": "20260508SSNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-16",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260516HTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260516HTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-17",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260517HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.73,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260517HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-24",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 2.09,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260524NCKT0",
+              "market": "ML",
+              "label": "KT 승",
+              "odds": 2.09
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 2.09,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260524NCKT0",
+              "market": "ML",
+              "label": "KT 승",
+              "odds": 2.09
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-27",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 178000,
+      "profit": 78000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 106800,
+          "picks": [
+            {
+              "gameId": "20260527HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 71200,
+          "picks": [
+            {
+              "gameId": "20260527HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-28",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 169000,
+      "profit": 69000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "WIN",
+          "effectiveOdds": 1.69,
+          "returned": 101400,
+          "picks": [
+            {
+              "gameId": "20260528SSSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "WIN",
+          "effectiveOdds": 1.69,
+          "returned": 67600,
+          "picks": [
+            {
+              "gameId": "20260528SSSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.69
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-05-31",
+      "month": "2026-05",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260531OBSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.69
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.69,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260531OBSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.69
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-02",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260602LGKT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260602LGKT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-03",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 167000,
+      "profit": 67000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.67,
+          "result": "WIN",
+          "effectiveOdds": 1.67,
+          "returned": 100200,
+          "picks": [
+            {
+              "gameId": "20260603NCSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.67
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.67,
+          "result": "WIN",
+          "effectiveOdds": 1.67,
+          "returned": 66800,
+          "picks": [
+            {
+              "gameId": "20260603NCSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.67
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-06",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 176000,
+      "profit": 76000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 105600,
+          "picks": [
+            {
+              "gameId": "20260606KTSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "WIN",
+          "effectiveOdds": 1.76,
+          "returned": 70400,
+          "picks": [
+            {
+              "gameId": "20260606KTSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 323840,
+      "profit": 223840,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 194304,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 129536,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 323840,
+      "profit": 223840,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 194304,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 129536,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-12",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 323840,
+      "profit": 223840,
+      "result": "ALL_WIN",
+      "wins": 3,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 145728,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 113344,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2384,
+          "result": "WIN",
+          "effectiveOdds": 3.2384,
+          "returned": 64768,
+          "picks": [
+            {
+              "gameId": "20260612SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            },
+            {
+              "gameId": "20260612NCKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-14",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260614SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.76,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260614SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-16",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 197000,
+      "profit": 97000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.97,
+          "result": "WIN",
+          "effectiveOdds": 1.97,
+          "returned": 118200,
+          "picks": [
+            {
+              "gameId": "20260616WOSS0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.97
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.97,
+          "result": "WIN",
+          "effectiveOdds": 1.97,
+          "returned": 78800,
+          "picks": [
+            {
+              "gameId": "20260616WOSS0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.97
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-17",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 164000,
+      "profit": 64000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.64,
+          "result": "WIN",
+          "effectiveOdds": 1.64,
+          "returned": 98400,
+          "picks": [
+            {
+              "gameId": "20260617WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.64
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.64,
+          "result": "WIN",
+          "effectiveOdds": 1.64,
+          "returned": 65600,
+          "picks": [
+            {
+              "gameId": "20260617WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.64
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-18",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 177000,
+      "profit": 77000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 106200,
+          "picks": [
+            {
+              "gameId": "20260618HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.77,
+          "result": "WIN",
+          "effectiveOdds": 1.77,
+          "returned": 70800,
+          "picks": [
+            {
+              "gameId": "20260618HHNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.77
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-20",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 3,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.401,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260620HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            },
+            {
+              "gameId": "20260620SSHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-21",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.86,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260621HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.86,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260621HTKT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-23",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 180000,
+      "profit": 80000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 108000,
+          "picks": [
+            {
+              "gameId": "20260623OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.8
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.8,
+          "result": "WIN",
+          "effectiveOdds": 1.8,
+          "returned": 72000,
+          "picks": [
+            {
+              "gameId": "20260623OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 283500,
+      "profit": 183500,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 170100,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 113400,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 283500,
+      "profit": 183500,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 170100,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 113400,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-24",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 283500,
+      "profit": 183500,
+      "result": "ALL_WIN",
+      "wins": 3,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 127575,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 99225,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.835,
+          "result": "WIN",
+          "effectiveOdds": 2.835,
+          "returned": 56700,
+          "picks": [
+            {
+              "gameId": "20260624OBHH0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.62
+            },
+            {
+              "gameId": "20260624NCLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.75
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 295480,
+      "profit": 195480,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 177288,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 118192,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 295480,
+      "profit": 195480,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 177288,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 118192,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-25",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 295480,
+      "profit": 195480,
+      "result": "ALL_WIN",
+      "wins": 3,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 132966,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 103418,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 2.9548,
+          "result": "WIN",
+          "effectiveOdds": 2.9548,
+          "returned": 59096,
+          "picks": [
+            {
+              "gameId": "20260625NCLT0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            },
+            {
+              "gameId": "20260625OBHH0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 327360,
+      "profit": 227360,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 196416,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 130944,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 327360,
+      "profit": 227360,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 196416,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 130944,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-26",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 327360,
+      "profit": 227360,
+      "result": "ALL_WIN",
+      "wins": 3,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 147312,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 114576,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.2736,
+          "result": "WIN",
+          "effectiveOdds": 3.2736,
+          "returned": 65472,
+          "picks": [
+            {
+              "gameId": "20260626LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.86
+            },
+            {
+              "gameId": "20260626KTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.76
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-27",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.81,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260627LGLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.81
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.81,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260627LGLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.81
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-28",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-28",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-06-28",
+      "month": "2026-06",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 3,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.7054,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260628LGLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.91
+            },
+            {
+              "gameId": "20260628KTSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.94
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-07",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260707HTLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.85
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.85,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260707HTLT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-17",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 179000,
+      "profit": 79000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "WIN",
+          "effectiveOdds": 1.79,
+          "returned": 107400,
+          "picks": [
+            {
+              "gameId": "20260717OBNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.79,
+          "result": "WIN",
+          "effectiveOdds": 1.79,
+          "returned": 71600,
+          "picks": [
+            {
+              "gameId": "20260717OBNC0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.79
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 178000,
+      "profit": 78000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 106800,
+          "picks": [
+            {
+              "gameId": "20260724KTLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "WIN",
+          "effectiveOdds": 1.78,
+          "returned": 71200,
+          "picks": [
+            {
+              "gameId": "20260724KTLT0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "BALANCED",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "month": "2026-07",
+      "anchor": "ON",
+      "planCount": 3,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 3,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.45,
+          "originalRatio": 0.45,
+          "stake": 45000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.35,
+          "originalRatio": 0.35,
+          "stake": 35000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "balance",
+          "ratio": 0.2,
+          "originalRatio": 0.2,
+          "stake": 20000,
+          "comboName": "방어형 2폴",
+          "legs": 2,
+          "odds": 3.06,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260729HTSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.8
+            },
+            {
+              "gameId": "20260729OBSK0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "month": "2026-08",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260814HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260814HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-15",
+      "month": "2026-08",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260815HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.78
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.78,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260815HHSS0",
+              "market": "TOTAL",
+              "label": "언더 12.5",
+              "odds": 1.78
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-19",
+      "month": "2026-08",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260819SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.84,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260819SKSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.84
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 182000,
+      "profit": 82000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.82,
+          "result": "WIN",
+          "effectiveOdds": 1.82,
+          "returned": 109200,
+          "picks": [
+            {
+              "gameId": "20260902HTNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.82
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.82,
+          "result": "WIN",
+          "effectiveOdds": 1.82,
+          "returned": 72800,
+          "picks": [
+            {
+              "gameId": "20260902HTNC0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.82
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-05",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 187000,
+      "profit": 87000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.87,
+          "result": "WIN",
+          "effectiveOdds": 1.87,
+          "returned": 112200,
+          "picks": [
+            {
+              "gameId": "20260905OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.87
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.87,
+          "result": "WIN",
+          "effectiveOdds": 1.87,
+          "returned": 74800,
+          "picks": [
+            {
+              "gameId": "20260905OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.87
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-06",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260906OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.89
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260906OBSK0",
+              "market": "TOTAL",
+              "label": "언더 9.5",
+              "odds": 1.89
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-08",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 191000,
+      "profit": 91000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "WIN",
+          "effectiveOdds": 1.91,
+          "returned": 114600,
+          "picks": [
+            {
+              "gameId": "20260908HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.91
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.91,
+          "result": "WIN",
+          "effectiveOdds": 1.91,
+          "returned": 76400,
+          "picks": [
+            {
+              "gameId": "20260908HTSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.91
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 189000,
+      "profit": 89000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "WIN",
+          "effectiveOdds": 1.89,
+          "returned": 113400,
+          "picks": [
+            {
+              "gameId": "20260909NCHT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.89
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.89,
+          "result": "WIN",
+          "effectiveOdds": 1.89,
+          "returned": 75600,
+          "picks": [
+            {
+              "gameId": "20260909NCHT0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.89
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 166000,
+      "profit": 66000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "WIN",
+          "effectiveOdds": 1.66,
+          "returned": 99600,
+          "picks": [
+            {
+              "gameId": "20260911WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "WIN",
+          "effectiveOdds": 1.66,
+          "returned": 66400,
+          "picks": [
+            {
+              "gameId": "20260911WOSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-12",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 170000,
+      "profit": 70000,
+      "result": "ALL_WIN",
+      "wins": 2,
+      "losses": 0,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.7,
+          "result": "WIN",
+          "effectiveOdds": 1.7,
+          "returned": 102000,
+          "picks": [
+            {
+              "gameId": "20260912LGSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.7
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.7,
+          "result": "WIN",
+          "effectiveOdds": 1.7,
+          "returned": 68000,
+          "picks": [
+            {
+              "gameId": "20260912LGSS0",
+              "market": "TOTAL",
+              "label": "언더 10.5",
+              "odds": 1.7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-09-13",
+      "month": "2026-09",
+      "anchor": "ON",
+      "planCount": 2,
+      "profile": "SAFE",
+      "plannedAmount": 100000,
+      "actualStake": 100000,
+      "returned": 0,
+      "profit": -100000,
+      "result": "ALL_LOSS",
+      "wins": 0,
+      "losses": 2,
+      "voids": 0,
+      "plans": [
+        {
+          "key": "defense",
+          "ratio": 0.6,
+          "originalRatio": 0.6,
+          "stake": 60000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260913LGSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        },
+        {
+          "key": "defense2",
+          "ratio": 0.4,
+          "originalRatio": 0.4,
+          "stake": 40000,
+          "comboName": "단폴 방어 1폴",
+          "legs": 1,
+          "odds": 1.66,
+          "result": "LOSS",
+          "effectiveOdds": 0,
+          "returned": 0,
+          "picks": [
+            {
+              "gameId": "20260913LGSS0",
+              "market": "TOTAL",
+              "label": "언더 11.5",
+              "odds": 1.66
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,578 @@
+{
+  "generatedAt": "2026-09-14T16:33:45.468Z",
+  "initialBankroll": 1000000,
+  "dailyInvestment": 50000,
+  "chosen": [
+    {
+      "profile": "SAFE",
+      "mode": "MIN_OVERLAP",
+      "train": {
+        "profile": "SAFE",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 34,
+        "bothWin": 3,
+        "onlyA": 5,
+        "onlyB": 4,
+        "bothLose": 22,
+        "oneHitDays": 9,
+        "avgOverlap": 0.41,
+        "invested": 1700000,
+        "returned": 1369316,
+        "profit": -330684,
+        "roi": -19.45,
+        "finalBankroll": 669316,
+        "maxDD": 59.23,
+        "maxLosingStreak": 8,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 198009,
+            "profit": 98009,
+            "roi": 98.01
+          },
+          {
+            "month": "2026-04",
+            "days": 8,
+            "invested": 400000,
+            "returned": 33088,
+            "profit": -366912,
+            "roi": -91.73
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 566598,
+            "profit": -83402,
+            "roi": -12.83
+          },
+          {
+            "month": "2026-06",
+            "days": 11,
+            "invested": 550000,
+            "returned": 571621,
+            "profit": 21621,
+            "roi": 3.93
+          }
+        ]
+      },
+      "validation": {
+        "profile": "SAFE",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 19,
+        "bothWin": 1,
+        "onlyA": 7,
+        "onlyB": 1,
+        "bothLose": 10,
+        "oneHitDays": 8,
+        "avgOverlap": 0.58,
+        "invested": 950000,
+        "returned": 481081,
+        "profit": -468919,
+        "roi": -49.36,
+        "finalBankroll": 531081,
+        "maxDD": 46.89,
+        "maxLosingStreak": 10,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 10,
+            "invested": 500000,
+            "returned": 384521,
+            "profit": -115480,
+            "roi": -23.1
+          },
+          {
+            "month": "2026-08",
+            "days": 4,
+            "invested": 200000,
+            "returned": 51645,
+            "profit": -148355,
+            "roi": -74.18
+          },
+          {
+            "month": "2026-09",
+            "days": 5,
+            "invested": 250000,
+            "returned": 44916,
+            "profit": -205084,
+            "roi": -82.03
+          }
+        ]
+      }
+    },
+    {
+      "profile": "SAFE",
+      "mode": "ZERO_OVERLAP",
+      "train": {
+        "profile": "SAFE",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 20,
+        "bothWin": 2,
+        "onlyA": 3,
+        "onlyB": 1,
+        "bothLose": 14,
+        "oneHitDays": 4,
+        "avgOverlap": 0,
+        "invested": 1000000,
+        "returned": 714847,
+        "profit": -285153,
+        "roi": -28.52,
+        "finalBankroll": 714847,
+        "maxDD": 39.49,
+        "maxLosingStreak": 6,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 132264,
+            "profit": 82264,
+            "roi": 164.53
+          },
+          {
+            "month": "2026-04",
+            "days": 7,
+            "invested": 350000,
+            "returned": 146520,
+            "profit": -203480,
+            "roi": -58.14
+          },
+          {
+            "month": "2026-05",
+            "days": 5,
+            "invested": 250000,
+            "returned": 280415,
+            "profit": 30415,
+            "roi": 12.17
+          },
+          {
+            "month": "2026-06",
+            "days": 7,
+            "invested": 350000,
+            "returned": 155648,
+            "profit": -194352,
+            "roi": -55.53
+          }
+        ]
+      },
+      "validation": {
+        "profile": "SAFE",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 8,
+        "bothWin": 0,
+        "onlyA": 3,
+        "onlyB": 1,
+        "bothLose": 4,
+        "oneHitDays": 4,
+        "avgOverlap": 0,
+        "invested": 400000,
+        "returned": 440645,
+        "profit": 40645,
+        "roi": 10.16,
+        "finalBankroll": 1040645,
+        "maxDD": 13.27,
+        "maxLosingStreak": 3,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 5,
+            "invested": 250000,
+            "returned": 168494,
+            "profit": -81506,
+            "roi": -32.6
+          },
+          {
+            "month": "2026-08",
+            "days": 2,
+            "invested": 100000,
+            "returned": 161595,
+            "profit": 61595,
+            "roi": 61.59
+          },
+          {
+            "month": "2026-09",
+            "days": 1,
+            "invested": 50000,
+            "returned": 110556,
+            "profit": 60556,
+            "roi": 121.11
+          }
+        ]
+      }
+    },
+    {
+      "profile": "BALANCED",
+      "mode": "MIN_OVERLAP",
+      "train": {
+        "profile": "BALANCED",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 34,
+        "bothWin": 2,
+        "onlyA": 6,
+        "onlyB": 0,
+        "bothLose": 26,
+        "oneHitDays": 6,
+        "avgOverlap": 1.24,
+        "invested": 1700000,
+        "returned": 1139100,
+        "profit": -560900,
+        "roi": -32.99,
+        "finalBankroll": 439100,
+        "maxDD": 64.93,
+        "maxLosingStreak": 7,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 305614,
+            "profit": 205614,
+            "roi": 205.61
+          },
+          {
+            "month": "2026-04",
+            "days": 8,
+            "invested": 400000,
+            "returned": 297792,
+            "profit": -102208,
+            "roi": -25.55
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 292335,
+            "profit": -357665,
+            "roi": -55.03
+          },
+          {
+            "month": "2026-06",
+            "days": 11,
+            "invested": 550000,
+            "returned": 243360,
+            "profit": -306640,
+            "roi": -55.75
+          }
+        ]
+      },
+      "validation": {
+        "profile": "BALANCED",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 18,
+        "bothWin": 0,
+        "onlyA": 7,
+        "onlyB": 0,
+        "bothLose": 11,
+        "oneHitDays": 7,
+        "avgOverlap": 1.44,
+        "invested": 900000,
+        "returned": 1020434,
+        "profit": 120434,
+        "roi": 13.38,
+        "finalBankroll": 1120434,
+        "maxDD": 34.86,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 9,
+            "invested": 450000,
+            "returned": 151389,
+            "profit": -298611,
+            "roi": -66.36
+          },
+          {
+            "month": "2026-08",
+            "days": 4,
+            "invested": 200000,
+            "returned": 464805,
+            "profit": 264805,
+            "roi": 132.4
+          },
+          {
+            "month": "2026-09",
+            "days": 5,
+            "invested": 250000,
+            "returned": 404240,
+            "profit": 154240,
+            "roi": 61.7
+          }
+        ]
+      }
+    },
+    {
+      "profile": "BALANCED",
+      "mode": "ZERO_OVERLAP",
+      "train": {
+        "profile": "BALANCED",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 6,
+        "bothWin": 0,
+        "onlyA": 2,
+        "onlyB": 0,
+        "bothLose": 4,
+        "oneHitDays": 2,
+        "avgOverlap": 0,
+        "invested": 300000,
+        "returned": 27561,
+        "profit": -272439,
+        "roi": -90.81,
+        "finalBankroll": 727561,
+        "maxDD": 27.24,
+        "maxLosingStreak": 6,
+        "negativeMonths": 4,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 14696,
+            "profit": -35304,
+            "roi": -70.61
+          },
+          {
+            "month": "2026-04",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-05",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-06",
+            "days": 3,
+            "invested": 150000,
+            "returned": 12865,
+            "profit": -137135,
+            "roi": -91.42
+          }
+        ]
+      },
+      "validation": {
+        "profile": "BALANCED",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 2,
+        "bothWin": 0,
+        "onlyA": 0,
+        "onlyB": 0,
+        "bothLose": 2,
+        "oneHitDays": 0,
+        "avgOverlap": 0,
+        "invested": 100000,
+        "returned": 0,
+        "profit": -100000,
+        "roi": -100,
+        "finalBankroll": 900000,
+        "maxDD": 10,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 2,
+            "invested": 100000,
+            "returned": 0,
+            "profit": -100000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "profile": "AGGRESSIVE",
+      "mode": "MIN_OVERLAP",
+      "train": {
+        "profile": "AGGRESSIVE",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 19,
+        "bothWin": 0,
+        "onlyA": 4,
+        "onlyB": 0,
+        "bothLose": 15,
+        "oneHitDays": 4,
+        "avgOverlap": 1.53,
+        "invested": 950000,
+        "returned": 546039,
+        "profit": -403961,
+        "roi": -42.52,
+        "finalBankroll": 596039,
+        "maxDD": 48.59,
+        "maxLosingStreak": 8,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 132264,
+            "profit": 82264,
+            "roi": 164.53
+          },
+          {
+            "month": "2026-04",
+            "days": 7,
+            "invested": 350000,
+            "returned": 146520,
+            "profit": -203480,
+            "roi": -58.14
+          },
+          {
+            "month": "2026-05",
+            "days": 4,
+            "invested": 200000,
+            "returned": 151470,
+            "profit": -48530,
+            "roi": -24.27
+          },
+          {
+            "month": "2026-06",
+            "days": 7,
+            "invested": 350000,
+            "returned": 115785,
+            "profit": -234215,
+            "roi": -66.92
+          }
+        ]
+      },
+      "validation": {
+        "profile": "AGGRESSIVE",
+        "overlapMode": "MIN_OVERLAP",
+        "aRatio": 90,
+        "bRatio": 10,
+        "activeDays": 7,
+        "bothWin": 0,
+        "onlyA": 2,
+        "onlyB": 0,
+        "bothLose": 5,
+        "oneHitDays": 2,
+        "avgOverlap": 1.71,
+        "invested": 350000,
+        "returned": 312984,
+        "profit": -37016,
+        "roi": -10.58,
+        "finalBankroll": 962984,
+        "maxDD": 14.98,
+        "maxLosingStreak": 3,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 5,
+            "invested": 250000,
+            "returned": 151389,
+            "profit": -98611,
+            "roi": -39.44
+          },
+          {
+            "month": "2026-08",
+            "days": 2,
+            "invested": 100000,
+            "returned": 161595,
+            "profit": 61595,
+            "roi": 61.59
+          }
+        ]
+      }
+    },
+    {
+      "profile": "AGGRESSIVE",
+      "mode": "ZERO_OVERLAP",
+      "train": {
+        "profile": "AGGRESSIVE",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 3,
+        "bothWin": 0,
+        "onlyA": 2,
+        "onlyB": 0,
+        "bothLose": 1,
+        "oneHitDays": 2,
+        "avgOverlap": 0,
+        "invested": 150000,
+        "returned": 27561,
+        "profit": -122439,
+        "roi": -81.63,
+        "finalBankroll": 877561,
+        "maxDD": 12.24,
+        "maxLosingStreak": 3,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 14696,
+            "profit": -35304,
+            "roi": -70.61
+          },
+          {
+            "month": "2026-06",
+            "days": 2,
+            "invested": 100000,
+            "returned": 12865,
+            "profit": -87135,
+            "roi": -87.13
+          }
+        ]
+      },
+      "validation": {
+        "profile": "AGGRESSIVE",
+        "overlapMode": "ZERO_OVERLAP",
+        "aRatio": 10,
+        "bRatio": 90,
+        "activeDays": 0,
+        "bothWin": 0,
+        "onlyA": 0,
+        "onlyB": 0,
+        "bothLose": 0,
+        "oneHitDays": 0,
+        "avgOverlap": 0,
+        "invested": 0,
+        "returned": 0,
+        "profit": 0,
+        "roi": 0,
+        "finalBankroll": 1000000,
+        "maxDD": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      }
+    }
+  ]
+}

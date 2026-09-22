@@ -1,0 +1,1689 @@
+﻿import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+
+/*
+  EV용 확률 보정
+
+  화면에는 원래 모델 확률(confidence)을 그대로 표시하지만
+  EV / 등급 / 추천판정에는 50% 방향으로 축소한 확률을 사용한다.
+
+  ML       : 모델 엣지 85%만 인정
+  HANDICAP : 모델 엣지 80%만 인정
+  TOTAL    : 모델 엣지 70%만 인정
+*/
+function conservativeProbability(
+  confidence: number,
+  market: Pick["market"]
+) {
+  const factor =
+    market === "ML"
+      ? 0.85
+      : market === "HANDICAP"
+        ? 0.80
+        : 0.70;
+
+  return 0.50 +
+    (confidence - 0.50) * factor;
+}
+
+function conservativeEv(
+  confidence: number,
+  odds: number | null,
+  market: Pick["market"]
+) {
+  if (!odds || odds <= 1) {
+    return null;
+  }
+
+  const probability =
+    conservativeProbability(
+      confidence,
+      market
+    );
+
+  return probability * odds - 1;
+}
+
+function implied(odds: number | null) {
+  return odds && odds > 1 ? 1 / odds : null;
+}
+
+function clamp(value: number, min = 0.2, max = 0.8) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function fairTwoWay(
+  firstOdds: number | null,
+  secondOdds: number | null
+) {
+  const first = implied(firstOdds);
+  const second = implied(secondOdds);
+
+  if (first === null || second === null) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  const sum = first + second;
+
+  if (sum <= 0) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  return {
+    first: first / sum,
+    second: second / sum,
+  };
+}
+
+function grade(
+  confidence: number,
+  ev: number | null
+): "A" | "B" | "C" {
+  if (
+    confidence >= 0.64 &&
+    (ev ?? 0) >= 0.04
+  ) {
+    return "A";
+  }
+
+  if (
+    confidence >= 0.57 &&
+    (ev ?? 0) >= 0
+  ) {
+    return "B";
+  }
+
+  return "C";
+}
+
+function formatLine(line: number | null) {
+  if (line === null) return "";
+
+  return line > 0
+    ? `+${line}`
+    : String(line);
+}
+
+/*
+  현재 v0.2 임시 분석 모델
+
+  ML:
+  - 시장배당
+  - 홈 이점
+  - 팀 순위
+
+  핸디캡:
+  - 시장 핸디캡 확률
+  - ML 모델의 팀 우위 일부 반영
+
+  O/U:
+  - 현재는 시장 no-vig 확률 기반
+  - 추후 최근 득실점 / 선발 / 불펜 / 구장 데이터를 연결해 교체
+*/
+export function analyzeGame(
+  game: KboGame,
+  odds: OddsInput,
+  starterEdgeScore = 0,
+  teamFormEdgeScore = 0,
+  bullpenEdgeScore = 0,
+  lineupMatchupEdgeScore = 0,
+  projectedTotal: number | null = null
+): Pick[] {
+  const picks: Pick[] = [];
+
+  // ----------------------------------------------------------
+  // ML
+  // ----------------------------------------------------------
+
+  const rankEdge =
+    game.awayRank && game.homeRank
+      ? Math.max(
+          -0.08,
+          Math.min(
+            0.08,
+            (game.homeRank - game.awayRank) * 0.008
+          )
+        )
+      : 0;
+
+  const baseAway = 0.48 + rankEdge;
+
+  const mlFair = fairTwoWay(
+    odds.awayMl,
+    odds.homeMl
+  );
+
+  const awayFairMarket =
+    mlFair.first ?? 0.5;
+
+  const baseAwayProb = clamp(
+    baseAway * 0.45 +
+      awayFairMarket * 0.55
+  );
+
+  /*
+    선발 보정 v0.3
+
+    starterEdgeScore:
+    원정 선발점수 - 홈 선발점수
+
+    10점 차이 ≈ 1.8% 보정
+    20점 차이 ≈ 3.6% 보정
+
+    최대 ±5% 제한
+
+    아직 백테스트 전이므로
+    선발 비중을 보수적으로 제한한다.
+  */
+
+  const starterAdjustment =
+    Math.max(
+      -0.05,
+      Math.min(
+        0.05,
+        starterEdgeScore * 0.0018
+      )
+    );
+
+  /*
+    최근 팀 폼 보정 v0.4
+
+    teamFormEdgeScore:
+    원정 최근폼 점수 - 홈 최근폼 점수
+
+    최대 ±4%만 반영한다.
+
+    선발 + 최근폼이 동시에
+    한 방향으로 강해도 과도한 확률 상승을
+    막기 위해 제한한다.
+  */
+
+  const teamFormAdjustment =
+    Math.max(
+      -0.04,
+      Math.min(
+        0.04,
+        teamFormEdgeScore * 0.0013
+      )
+    );
+
+  /*
+    불펜 보정 v0.5
+
+    bullpenEdgeScore:
+    원정 불펜점수 - 홈 불펜점수
+
+    피로도가 낮을수록 높은 점수.
+    아직 초기 모델이므로 최대 ±2.5%만 반영.
+  */
+
+  const bullpenAdjustment =
+    Math.max(
+      -0.025,
+      Math.min(
+        0.025,
+        bullpenEdgeScore * 0.0008
+      )
+    );
+
+  /*
+    확정 라인업 + 상대 선발 매치업 보정 v0.6
+
+    lineupMatchupEdgeScore:
+    원정 타선 매치업점수 - 홈 타선 매치업점수
+
+    예:
+    +1점 = 원정 승률 약 +0.3%
+    +5점 = 원정 승률 약 +1.5%
+
+    BvP 자체가 작은 표본일 수 있으므로
+    전체 승률 영향은 최대 ±2%로 제한한다.
+  */
+
+  const lineupMatchupAdjustment =
+    Math.max(
+      -0.02,
+      Math.min(
+        0.02,
+        lineupMatchupEdgeScore *
+          0.003
+      )
+    );
+
+  const awayProb = clamp(
+    baseAwayProb +
+      starterAdjustment +
+      teamFormAdjustment +
+      bullpenAdjustment +
+      lineupMatchupAdjustment
+  );
+
+  const homeProb =
+    1 - awayProb;
+
+  const awayEv =
+    conservativeEv(
+      awayProb,
+      odds.awayMl,
+      "ML"
+    );
+
+  const homeEv =
+    conservativeEv(
+      homeProb,
+      odds.homeMl,
+      "ML"
+    );
+
+  picks.push(
+    {
+      gameId: game.gameId,
+      label: `${game.awayTeamName} 승`,
+      market: "ML",
+      odds: odds.awayMl,
+      confidence: awayProb,
+      ev: awayEv,
+      grade: grade(
+        awayProb,
+        awayEv
+      ),
+    },
+    {
+      gameId: game.gameId,
+      label: `${game.homeTeamName} 승`,
+      market: "ML",
+      odds: odds.homeMl,
+      confidence: homeProb,
+      ev: homeEv,
+      grade: grade(
+        homeProb,
+        homeEv
+      ),
+    }
+  );
+
+  // ----------------------------------------------------------
+  // HANDICAP
+  // ----------------------------------------------------------
+
+  const handicapFair = fairTwoWay(
+    odds.awayHandicap,
+    odds.homeHandicap
+  );
+
+  if (
+    handicapFair.first !== null &&
+    handicapFair.second !== null
+  ) {
+    // ML 모델과 시장 방향 차이를 소폭만 반영
+    const teamEdge =
+      awayProb - 0.5;
+
+    const awayHandicapProb =
+      clamp(
+        handicapFair.first +
+          teamEdge * 0.18,
+        0.15,
+        0.85
+      );
+
+    const homeHandicapProb =
+      1 - awayHandicapProb;
+
+    const awayHandicapEv =
+      conservativeEv(
+        awayHandicapProb,
+        odds.awayHandicap,
+        "HANDICAP"
+      );
+
+    const homeHandicapEv =
+      conservativeEv(
+        homeHandicapProb,
+        odds.homeHandicap,
+        "HANDICAP"
+      );
+
+    picks.push(
+      {
+        gameId: game.gameId,
+        label:
+          `${game.awayTeamName} ` +
+          `${formatLine(
+            odds.awayHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.awayHandicap,
+        confidence:
+          awayHandicapProb,
+        ev: awayHandicapEv,
+        grade: grade(
+          conservativeProbability(
+            awayHandicapProb,
+            "HANDICAP"
+          ),
+          awayHandicapEv
+        ),
+      },
+      {
+        gameId: game.gameId,
+        label:
+          `${game.homeTeamName} ` +
+          `${formatLine(
+            odds.homeHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.homeHandicap,
+        confidence:
+          homeHandicapProb,
+        ev: homeHandicapEv,
+        grade: grade(
+          conservativeProbability(
+            homeHandicapProb,
+            "HANDICAP"
+          ),
+          homeHandicapEv
+        ),
+      }
+    );
+  }
+
+  // ----------------------------------------------------------
+  // TOTAL
+  //
+  // projectedTotal이 있으면 배당시장이 아닌
+  // 자체 예상 총득점을 이용해 O/U 확률을 만든다.
+  //
+  // 아직 v0.1 휴리스틱 모델이며
+  // 추후 실제 경기 결과로 분산/계수를 보정한다.
+  // ----------------------------------------------------------
+
+  const totalFair = fairTwoWay(
+    odds.overOdds,
+    odds.underOdds
+  );
+
+  if (
+    odds.totalLine !== null &&
+    odds.overOdds !== null &&
+    odds.underOdds !== null
+  ) {
+    let overProb: number | null = null;
+    let underProb: number | null = null;
+
+    if (
+      projectedTotal !== null &&
+      Number.isFinite(projectedTotal)
+    ) {
+      const runEdge =
+        projectedTotal -
+        odds.totalLine;
+
+      /*
+        총득점 차이를 확률로 변환.
+
+        기준점과 예상득점이 같으면 50%.
+
+        v0.2에서는 야구 득점 변동성을 반영해
+        확률을 기존보다 50% 쪽으로 축소한다.
+
+        약 1점 차이 = 58% 전후
+        약 2점 차이 = 66% 전후
+
+        지나친 확률을 막기 위해
+        30~70% 범위로 제한.
+      */
+      overProb = clamp(
+        1 /
+          (
+            1 +
+            Math.exp(
+              -runEdge / 4.5
+            )
+          ),
+        0.35,
+        0.65
+      );
+
+      underProb =
+        1 - overProb;
+    } else if (
+      totalFair.first !== null &&
+      totalFair.second !== null
+    ) {
+      // 자체 총득점 계산이 불가능할 때만 시장확률 fallback
+      overProb =
+        totalFair.first;
+
+      underProb =
+        totalFair.second;
+    }
+
+    if (
+      overProb !== null &&
+      underProb !== null
+    ) {
+      const overEv =
+        overProb *
+          odds.overOdds -
+        1;
+
+      const underEv =
+        underProb *
+          odds.underOdds -
+        1;
+
+      picks.push(
+        {
+          gameId: game.gameId,
+          label:
+            `오버 ${odds.totalLine}`,
+          market: "TOTAL",
+          odds: odds.overOdds,
+          confidence:
+            overProb,
+          ev:
+            overEv,
+          grade:
+            grade(
+              conservativeProbability(
+                overProb,
+                "TOTAL"
+              ),
+              overEv
+            ),
+        },
+        {
+          gameId: game.gameId,
+          label:
+            `언더 ${odds.totalLine}`,
+          market: "TOTAL",
+          odds: odds.underOdds,
+          confidence:
+            underProb,
+          ev:
+            underEv,
+          grade:
+            grade(
+              conservativeProbability(
+                underProb,
+                "TOTAL"
+              ),
+              underEv
+            ),
+        }
+      );
+    }
+  }
+
+  // ----------------------------------------------------------
+  // BEST MARKET RANKING
+  //
+  // 승패 / 핸디캡 / O-U 전체를 같은 후보군에서 비교한다.
+  //
+  // 단순 EV만 비교하면 낮은 신뢰도의 고배당 픽이
+  // 과도하게 1위가 될 수 있으므로
+  // EV + 모델 확률 + 등급을 함께 반영한다.
+  // ----------------------------------------------------------
+
+  const gradeBonus = (g: Pick["grade"]) => {
+    if (g === "A") return 0.08;
+    if (g === "B") return 0.04;
+    return 0;
+  };
+
+  const bestMarketScore = (pick: Pick) => {
+    if (!pick.odds || pick.ev === null) {
+      return -999;
+    }
+
+    const evScore =
+      Math.max(-0.20, Math.min(0.30, pick.ev));
+
+    const confidenceScore =
+      (pick.confidence - 0.50) * 0.70;
+
+    /*
+      TOTAL은 아직 시장 no-vig 기반 임시 모델이므로
+      완성된 득점예측 모델이 붙기 전까지 소폭 보수적으로 평가.
+      추천 후보에서는 제외하지 않는다.
+    */
+    const marketAdjustment =
+      pick.market === "TOTAL"
+        ? -0.045
+        : pick.market === "HANDICAP"
+          ? 0.005
+          : 0;
+
+    return (
+      evScore +
+      confidenceScore +
+      gradeBonus(pick.grade) +
+      marketAdjustment
+    );
+  };
+
+  return picks.sort(
+    (a, b) =>
+      bestMarketScore(b) -
+      bestMarketScore(a)
+  );
+}
+
+export function makeAutoCombos(
+  allPicks: Pick[]
+) {
+  /*
+    자동조합 V3
+
+    기본 원칙
+    --------------------------------------------------
+    1. 실제 배당이 있는 픽만 사용
+    2. 한 경기당 가장 강한 픽 1개만 후보
+    3. 조합 내부 동일 경기 중복 금지
+    4. 확률 + EV + 등급을 함께 평가
+    5. 조합끼리는 가능한 한 경기 중복 최소화
+    6. 경기 수가 부족하면 강한 픽을 공통축으로 허용
+
+    생성 조합
+    --------------------------------------------------
+    - 안정형 2폴
+    - 확률 TOP 3폴
+    - 균형형 3폴
+    - 확률 TOP 4폴
+    - 고배당 5폴
+  */
+
+  const gradeScore = (
+    grade: Pick["grade"]
+  ) => {
+    if (grade === "A") return 0.06;
+    if (grade === "B") return 0.03;
+    return 0;
+  };
+
+
+  /*
+    픽 자체의 종합점수.
+
+    확률을 가장 크게 보고
+    EV와 등급을 보조지표로 사용한다.
+
+    EV가 비정상적으로 큰 값일 경우
+    조합 순위가 왜곡되지 않도록 범위를 제한.
+  */
+  const pickScore = (
+    pick: Pick
+  ) => {
+    const ev =
+      pick.ev === null
+        ? -0.10
+        : Math.max(
+            -0.15,
+            Math.min(
+              0.20,
+              pick.ev
+            )
+          );
+
+    return (
+      pick.confidence * 0.72 +
+      ev * 0.18 +
+      gradeScore(
+        pick.grade
+      )
+    );
+  };
+
+
+  const available =
+    allPicks
+      .filter(
+        (pick) =>
+          !!pick.odds &&
+          Number.isFinite(
+            pick.confidence
+          )
+      )
+      .sort(
+        (a, b) =>
+          pickScore(b) -
+          pickScore(a)
+      );
+
+
+  /*
+    한 경기에서 여러 시장이 있어도
+    조합 후보에는 가장 강한 픽 하나만 사용.
+
+    예:
+    LG 승
+    LG -1.5
+    언더 9.5
+
+    셋 중 종합점수가 가장 높은 것 하나.
+  */
+  const byGame =
+    new Map<
+      string,
+      Pick
+    >();
+
+  for (
+    const pick of available
+  ) {
+    if (
+      !byGame.has(
+        pick.gameId
+      )
+    ) {
+      byGame.set(
+        pick.gameId,
+        pick
+      );
+    }
+  }
+
+
+  const gamePicks =
+    [...byGame.values()]
+      .sort(
+        (a, b) =>
+          pickScore(b) -
+          pickScore(a)
+      );
+
+
+  const productOdds = (
+    picks: Pick[]
+  ) =>
+    picks.reduce(
+      (acc, pick) =>
+        acc *
+        (pick.odds ?? 1),
+      1
+    );
+
+
+  const productProbability = (
+    picks: Pick[]
+  ) =>
+    picks.reduce(
+      (acc, pick) =>
+        acc *
+        pick.confidence,
+      1
+    );
+
+
+  const averageConfidence = (
+    picks: Pick[]
+  ) => {
+    if (!picks.length) {
+      return 0;
+    }
+
+    return (
+      picks.reduce(
+        (sum, pick) =>
+          sum +
+          pick.confidence,
+        0
+      ) /
+      picks.length
+    );
+  };
+
+
+  const averageEv = (
+    picks: Pick[]
+  ) => {
+    const evs =
+      picks
+        .map(
+          (pick) =>
+            pick.ev
+        )
+        .filter(
+          (
+            ev
+          ): ev is number =>
+            ev !== null &&
+            Number.isFinite(ev)
+        );
+
+    if (!evs.length) {
+      return null;
+    }
+
+    return (
+      evs.reduce(
+        (sum, ev) =>
+          sum + ev,
+        0
+      ) /
+      evs.length
+    );
+  };
+
+
+  const makeCombo = (
+    name: string,
+    selected: Pick[],
+    style:
+      | "SAFE"
+      | "TOP"
+      | "BALANCED"
+      | "AGGRESSIVE"
+      | "HIGH_ODDS"
+  ) => ({
+    name,
+    style,
+    picks: selected,
+    odds:
+      productOdds(
+        selected
+      ),
+    probability:
+      productProbability(
+        selected
+      ),
+    averageConfidence:
+      averageConfidence(
+        selected
+      ),
+    averageEv:
+      averageEv(
+        selected
+      ),
+  });
+
+
+  /*
+    다른 조합에서 이미 사용한 경기를
+    가능한 한 뒤로 보내는 함수.
+
+    경기 수가 충분하면
+    서로 다른 조합을 만들고,
+
+    경기 수가 부족하면
+    결국 강한 픽이 공통축으로 다시 들어간다.
+  */
+  const selectWithOverlapControl = (
+    count: number,
+    usedGameIds: Set<string>,
+    source: Pick[] = gamePicks
+  ) => {
+    const fresh =
+      source.filter(
+        (pick) =>
+          !usedGameIds.has(
+            pick.gameId
+          )
+      );
+
+    const reused =
+      source.filter(
+        (pick) =>
+          usedGameIds.has(
+            pick.gameId
+          )
+      );
+
+    return [
+      ...fresh,
+      ...reused,
+    ].slice(
+      0,
+      count
+    );
+  };
+
+
+  const combos: ReturnType<
+    typeof makeCombo
+  >[] = [];
+
+
+  // --------------------------------------------------
+  // 1. 안정형 2폴
+  // 가장 강한 두 경기
+  // --------------------------------------------------
+
+  const safeTwo =
+    gamePicks.slice(
+      0,
+      2
+    );
+
+  if (
+    safeTwo.length === 2
+  ) {
+    combos.push(
+      makeCombo(
+        "안정형 2폴",
+        safeTwo,
+        "SAFE"
+      )
+    );
+  }
+
+
+  // --------------------------------------------------
+  // 2. 확률 TOP 3폴
+  // 모델 확률이 가장 높은 경기 3개
+  // --------------------------------------------------
+
+  const probabilityOrder =
+    [...gamePicks]
+      .sort(
+        (a, b) => {
+          const diff =
+            b.confidence -
+            a.confidence;
+
+          if (
+            Math.abs(diff) >
+            0.0001
+          ) {
+            return diff;
+          }
+
+          return (
+            pickScore(b) -
+            pickScore(a)
+          );
+        }
+      );
+
+  const topThree =
+    probabilityOrder.slice(
+      0,
+      3
+    );
+
+  if (
+    topThree.length === 3
+  ) {
+    combos.push(
+      makeCombo(
+        "확률 TOP 3폴",
+        topThree,
+        "TOP"
+      )
+    );
+  }
+
+
+  // --------------------------------------------------
+  // 3. 균형형 3폴
+  //
+  // TOP 3와 최대한 다른 경기를 먼저 사용.
+  // 부족하면 강한 픽을 공통축으로 재사용.
+  // --------------------------------------------------
+
+  const topThreeIds =
+    new Set(
+      topThree.map(
+        (pick) =>
+          pick.gameId
+      )
+    );
+
+  const balancedThree =
+    selectWithOverlapControl(
+      3,
+      topThreeIds
+    );
+
+  if (
+    balancedThree.length === 3
+  ) {
+    combos.push(
+      makeCombo(
+        "균형형 3폴",
+        balancedThree,
+        "BALANCED"
+      )
+    );
+  }
+
+
+  // --------------------------------------------------
+  // 4. 확률 TOP 4폴
+  //
+  // 앞선 3폴 조합과 겹치지 않는 경기를
+  // 우선 배치하고 부족하면 확률 TOP 픽 재사용.
+  // --------------------------------------------------
+
+  const usedThreeIds =
+    new Set<string>();
+
+  for (
+    const pick of [
+      ...topThree,
+      ...balancedThree,
+    ]
+  ) {
+    usedThreeIds.add(
+      pick.gameId
+    );
+  }
+
+  const topFour =
+    selectWithOverlapControl(
+      4,
+      usedThreeIds,
+      probabilityOrder
+    );
+
+  if (
+    topFour.length === 4
+  ) {
+    combos.push(
+      makeCombo(
+        "확률 TOP 4폴",
+        topFour,
+        "AGGRESSIVE"
+      )
+    );
+  }
+
+
+  // --------------------------------------------------
+  // 5. 고배당 5폴
+  //
+  // 무조건 배당만 높은 픽을 고르지는 않는다.
+  // 모델 확률이 지나치게 낮은 픽은 제외하고
+  // 그 안에서 배당 + 종합점수 순으로 선택.
+  // --------------------------------------------------
+
+  const highOddsPool =
+    gamePicks
+      .filter(
+        (pick) =>
+          pick.confidence >=
+          0.52
+      )
+      .sort(
+        (a, b) => {
+          const aOdds =
+            a.odds ?? 1;
+
+          const bOdds =
+            b.odds ?? 1;
+
+          const aScore =
+            pickScore(a) +
+            Math.min(
+              0.12,
+              Math.max(
+                0,
+                aOdds - 1.5
+              ) * 0.06
+            );
+
+          const bScore =
+            pickScore(b) +
+            Math.min(
+              0.12,
+              Math.max(
+                0,
+                bOdds - 1.5
+              ) * 0.06
+            );
+
+          return (
+            bScore -
+            aScore
+          );
+        }
+      );
+
+  const highFive =
+    highOddsPool.slice(
+      0,
+      5
+    );
+
+  if (
+    highFive.length === 5
+  ) {
+    combos.push(
+      makeCombo(
+        "고배당 5폴",
+        highFive,
+        "HIGH_ODDS"
+      )
+    );
+  }
+
+
+  return combos;
+}
+
+
+
+
+/* =========================================================
+   FLEXIBLE AUTO COMBO V4
+========================================================= */
+
+export type FlexibleAutoComboSettings = {
+  legs: number[];
+  combosPerLeg: number;
+
+  useAnchor: boolean;
+
+  minimumGrade:
+    | "A"
+    | "B"
+    | "ALL";
+
+  minimumConfidence: number;
+  minimumEv: number;
+};
+
+export function makeFlexibleAutoCombos(
+  allPicks: Pick[],
+  settings: FlexibleAutoComboSettings
+) {
+  const gradeValue = (
+    grade: Pick["grade"]
+  ) => {
+    if (grade === "A") return 3;
+    if (grade === "B") return 2;
+    return 1;
+  };
+
+  const pickScore = (
+    pick: Pick
+  ) => {
+    const ev =
+      pick.ev === null
+        ? -0.20
+        : Math.max(
+            -0.30,
+            Math.min(0.35, pick.ev)
+          );
+
+    return (
+      pick.confidence * 0.72 +
+      ev * 0.18 +
+      gradeValue(pick.grade) * 0.035
+    );
+  };
+
+  const minimumGradeValue =
+    settings.minimumGrade === "A"
+      ? 3
+      : settings.minimumGrade === "B"
+        ? 2
+        : 1;
+
+  const available =
+    allPicks
+      .filter(
+        (pick) =>
+          pick.odds !== null &&
+          pick.odds > 1 &&
+          Number.isFinite(pick.confidence) &&
+          pick.confidence >=
+            settings.minimumConfidence &&
+          (pick.ev ?? -1) >=
+            settings.minimumEv &&
+          gradeValue(pick.grade) >=
+            minimumGradeValue
+      )
+      .sort(
+        (a, b) =>
+          pickScore(b) -
+          pickScore(a)
+      );
+
+  /*
+    한 경기에서 상위 3개 시장만 조합 후보로 사용한다.
+    조합 안에서는 동일 경기 픽을 두 개 이상 넣지 않는다.
+  */
+  const picksByGame =
+    new Map<string, Pick[]>();
+
+  for (const pick of available) {
+    const current =
+      picksByGame.get(pick.gameId) || [];
+
+    if (current.length < 3) {
+      current.push(pick);
+
+      picksByGame.set(
+        pick.gameId,
+        current
+      );
+    }
+  }
+
+  const gameGroups =
+    [...picksByGame.entries()]
+      .map(
+        ([gameId, picks]) => ({
+          gameId,
+          picks:
+            [...picks].sort(
+              (a, b) =>
+                pickScore(b) -
+                pickScore(a)
+            ),
+        })
+      )
+      .sort(
+        (a, b) =>
+          pickScore(b.picks[0]) -
+          pickScore(a.picks[0])
+      );
+
+  const anchorPick =
+    available[0] || null;
+
+  const productOdds = (
+    picks: Pick[]
+  ) =>
+    picks.reduce(
+      (total, pick) =>
+        total *
+        (pick.odds ?? 1),
+      1
+    );
+
+  const productProbability = (
+    picks: Pick[]
+  ) =>
+    picks.reduce(
+      (total, pick) =>
+        total *
+        pick.confidence,
+      1
+    );
+
+  const averageConfidence = (
+    picks: Pick[]
+  ) =>
+    picks.length
+      ? picks.reduce(
+          (sum, pick) =>
+            sum +
+            pick.confidence,
+          0
+        ) / picks.length
+      : 0;
+
+  const averageEv = (
+    picks: Pick[]
+  ) => {
+    const values =
+      picks
+        .map((pick) => pick.ev)
+        .filter(
+          (value): value is number =>
+            value !== null &&
+            Number.isFinite(value)
+        );
+
+    return values.length
+      ? values.reduce(
+          (sum, value) =>
+            sum + value,
+          0
+        ) / values.length
+      : null;
+  };
+
+  const combinationKey = (
+    picks: Pick[]
+  ) =>
+    [...picks]
+      .sort(
+        (a, b) =>
+          `${a.gameId}-${a.label}`.localeCompare(
+            `${b.gameId}-${b.label}`
+          )
+      )
+      .map(
+        (pick) =>
+          `${pick.gameId}:${pick.market}:${pick.label}`
+      )
+      .join("|");
+
+  const buildCandidates = (
+    legCount: number
+  ) => {
+    const candidates: Pick[][] = [];
+
+    /*
+      동일 경기 시장 조합 규칙
+      -------------------------------------------------
+      가능: 승패 + 오버/언더
+      가능: 핸디캡 + 오버/언더
+
+      금지: 승패 + 핸디캡
+      금지: 오버 + 언더
+
+      한 경기 최대 2픽
+    */
+    const canAddPick = (
+      selected: Pick[],
+      nextPick: Pick
+    ) => {
+      const sameGame =
+        selected.filter(
+          (pick) =>
+            pick.gameId ===
+            nextPick.gameId
+        );
+
+      if (sameGame.length >= 2) {
+        return false;
+      }
+
+      /*
+        같은 시장 2개 금지.
+        TOTAL끼리 금지되므로
+        같은 경기 오버+언더도 차단된다.
+      */
+      if (
+        sameGame.some(
+          (pick) =>
+            pick.market ===
+            nextPick.market
+        )
+      ) {
+        return false;
+      }
+
+      const nextIsSide =
+        nextPick.market === "ML" ||
+        nextPick.market === "HANDICAP";
+
+      const alreadyHasSide =
+        sameGame.some(
+          (pick) =>
+            pick.market === "ML" ||
+            pick.market === "HANDICAP"
+        );
+
+      /*
+        승패와 핸디캡은 동시에 넣지 않는다.
+      */
+      if (
+        nextIsSide &&
+        alreadyHasSide
+      ) {
+        return false;
+      }
+
+      return true;
+    };
+
+    /*
+      자동 축 사용:
+      2폴 이상 모든 조합에 최고 픽 고정.
+
+      자동 축 미사용:
+      최고 픽을 강제하지 않고 독립 생성.
+    */
+    const useFixedAnchor =
+      settings.useAnchor &&
+      legCount >= 2 &&
+      anchorPick !== null;
+
+    const initialSelected: Pick[] =
+      useFixedAnchor && anchorPick
+        ? [anchorPick]
+        : [];
+
+    const candidatePool =
+      useFixedAnchor && anchorPick
+        ? available.filter(
+            (pick) =>
+              !(
+                pick.gameId ===
+                  anchorPick.gameId &&
+                pick.market ===
+                  anchorPick.market &&
+                pick.label ===
+                  anchorPick.label
+              )
+          )
+        : available;
+
+    const visit = (
+      pickIndex: number,
+      selected: Pick[]
+    ) => {
+      if (candidates.length >= 15000) {
+        return;
+      }
+
+      if (selected.length === legCount) {
+        candidates.push([...selected]);
+        return;
+      }
+
+      if (pickIndex >= candidatePool.length) {
+        return;
+      }
+
+      const remainingNeeded =
+        legCount - selected.length;
+
+      const remainingPicks =
+        candidatePool.length - pickIndex;
+
+      if (remainingPicks < remainingNeeded) {
+        return;
+      }
+
+      const nextPick =
+        candidatePool[pickIndex];
+
+      if (
+        canAddPick(
+          selected,
+          nextPick
+        )
+      ) {
+        selected.push(nextPick);
+
+        visit(
+          pickIndex + 1,
+          selected
+        );
+
+        selected.pop();
+      }
+
+      visit(
+        pickIndex + 1,
+        selected
+      );
+    };
+
+    visit(
+      0,
+      [...initialSelected]
+    );
+
+    const unique =
+      new Map<string, Pick[]>();
+
+    for (const picks of candidates) {
+      unique.set(
+        combinationKey(picks),
+        picks
+      );
+    }
+
+    return [...unique.values()];
+  };
+
+
+  const safeScore = (
+    picks: Pick[]
+  ) =>
+    averageConfidence(picks) * 100 +
+    picks.reduce(
+      (sum, pick) =>
+        sum +
+        gradeValue(pick.grade) * 2,
+      0
+    ) -
+    Math.log(
+      Math.max(1, productOdds(picks))
+    );
+
+  const balancedScore = (
+    picks: Pick[]
+  ) =>
+    picks.reduce(
+      (sum, pick) =>
+        sum + pickScore(pick),
+      0
+    ) /
+      Math.max(1, picks.length) *
+      100 +
+    (averageEv(picks) ?? -1) * 20;
+
+  const highOddsScore = (
+    picks: Pick[]
+  ) =>
+    Math.log(
+      Math.max(1, productOdds(picks))
+    ) * 14 +
+    averageConfidence(picks) * 55 +
+    (averageEv(picks) ?? -1) * 12;
+
+  type FlexibleStyle =
+    | "SAFE"
+    | "TOP"
+    | "BALANCED"
+    | "AGGRESSIVE"
+    | "HIGH_ODDS";
+
+  const makeCombo = (
+    name: string,
+    picks: Pick[],
+    style: FlexibleStyle
+  ) => ({
+    name,
+    style,
+    picks,
+    odds:
+      productOdds(picks),
+    probability:
+      productProbability(picks),
+    averageConfidence:
+      averageConfidence(picks),
+    averageEv:
+      averageEv(picks),
+  });
+
+  const results: ReturnType<
+    typeof makeCombo
+  >[] = [];
+
+  const selectedKeys =
+    new Set<string>();
+
+  /*
+    한 경기에서 사이드 1개와 TOTAL 1개를
+    함께 사용할 수 있으므로 4경기에서도
+    최대 5폴 조합 생성이 가능하다.
+  */
+  const maximumLegCount =
+    Math.min(
+      5,
+      gameGroups.reduce(
+        (total, group) => {
+          const hasSide =
+            group.picks.some(
+              (pick) =>
+                pick.market === "ML" ||
+                pick.market === "HANDICAP"
+            );
+
+          const hasTotal =
+            group.picks.some(
+              (pick) =>
+                pick.market === "TOTAL"
+            );
+
+          return (
+            total +
+            (hasSide && hasTotal ? 2 : 1)
+          );
+        },
+        0
+      )
+    );
+
+  const requestedLegs =
+    [...new Set(settings.legs)]
+      .filter(
+        (leg) =>
+          leg >= 1 &&
+          leg <= maximumLegCount
+      )
+      .sort((a, b) => a - b);
+
+  for (const legCount of requestedLegs) {
+    const candidates =
+      buildCandidates(legCount);
+
+    const rankings = [
+      {
+        title:
+          legCount === 1
+            ? "단폴 확률"
+            : "안정형",
+        style: "SAFE" as const,
+        items:
+          [...candidates].sort(
+            (a, b) =>
+              safeScore(b) -
+              safeScore(a)
+          ),
+      },
+      {
+        title:
+          legCount === 1
+            ? "단폴 종합"
+            : "균형형",
+        style: "BALANCED" as const,
+        items:
+          [...candidates].sort(
+            (a, b) =>
+              balancedScore(b) -
+              balancedScore(a)
+          ),
+      },
+      {
+        title:
+          legCount === 1
+            ? "단폴 고배당"
+            : "고배당형",
+        style: "HIGH_ODDS" as const,
+        items:
+          [...candidates].sort(
+            (a, b) =>
+              highOddsScore(b) -
+              highOddsScore(a)
+          ),
+      },
+    ];
+
+    let added = 0;
+    let round = 0;
+
+    while (
+      added < settings.combosPerLeg &&
+      round < 20
+    ) {
+      let foundInRound = false
+
+      round += 1;
+
+      for (const ranking of rankings) {
+        const picks =
+          ranking.items.find(
+            (candidate) => {
+              if (
+                selectedKeys.has(
+                  combinationKey(candidate)
+                )
+              ) {
+                return false;
+              }
+
+              /*
+                자동 축 사용:
+                buildCandidates 단계에서 최고 픽이
+                2폴 이상 모든 조합에 반드시 포함됩니다.
+
+                자동 축 미사용:
+                첫 조합은 순수 최고점 조합을 사용하고,
+                두 번째 조합부터는 최고 픽을 제외해
+                같은 축으로만 반복되는 현상을 막습니다.
+              */
+              if (
+                !settings.useAnchor &&
+                added > 0 &&
+                anchorPick &&
+                candidate.some(
+                  (pick) =>
+                    pick.gameId ===
+                      anchorPick.gameId &&
+                    pick.market ===
+                      anchorPick.market &&
+                    pick.label ===
+                      anchorPick.label
+                )
+              ) {
+                return false;
+              }
+
+              return true;
+            }
+          );
+
+        if (!picks) {
+          continue;
+        }
+
+        const key =
+          combinationKey(picks);
+
+        selectedKeys.add(key);
+
+        const sameStyleIndex =
+          results.filter(
+            (item) =>
+              item.name.startsWith(
+                `${ranking.title} ${legCount}폴`
+              )
+          ).length;
+
+        results.push(
+          makeCombo(
+            `${ranking.title} ${legCount}폴${
+              sameStyleIndex > 0
+                ? ` #${sameStyleIndex + 1}`
+                : ""
+            }`,
+            picks,
+            ranking.style
+          )
+        );
+
+        added += 1;
+        foundInRound = true;
+
+        if (
+          added >=
+          settings.combosPerLeg
+        ) {
+          break;
+        }
+      }
+
+      if (!foundInRound) {
+        break;
+      }
+    }
+  }
+
+  return results;
+}

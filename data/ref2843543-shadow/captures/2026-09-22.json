@@ -1,0 +1,1175 @@
+{
+  "generatedAt": "2026-09-21T05:25:03.599Z",
+  "lastAppendAt": "2026-09-21T05:25:03.599Z",
+  "captureDate": "2026-09-22",
+  "status": "PRE_GAME_SHADOW_CAPTURE_ONLY",
+  "referenceModel": "REF-2843543",
+  "uncertaintySpec": "WHIP_UNCERTAINTY_V3_SHADOW",
+  "provenance": {
+    "todayApi": "http://127.0.0.1:3200/api/kbo/today?date=2026-09-22",
+    "teamFormApi": "http://127.0.0.1:3200/api/kbo/team-form",
+    "starterFile": "data/kbo-h15-shadow-starter-2026.json",
+    "bullpenFile": "data/kbo-h15-shadow-bullpen-2026.json"
+  },
+  "frozenParameters": {
+    "starterEraBlend": [
+      0.5,
+      0.5
+    ],
+    "starterWeight": 0.5,
+    "bullpenEraBlend": [
+      0.4,
+      0.6
+    ],
+    "bullpenWeight": 0.75,
+    "whipMean": 1.455191,
+    "whipSd": 0.351002,
+    "uncertaintyIntercept": 2.585862,
+    "uncertaintySlope": 0.246771,
+    "uncertaintyHighCutoff": 2.717549
+  },
+  "rules": [
+    "PRE_GAME_ONLY",
+    "PER_GAME_FIRST_FREEZE",
+    "APPEND_ONLY",
+    "NO_RESULT_FIELDS",
+    "NO_RETUNE",
+    "NO_REF_MEAN_CHANGE",
+    "NO_PRODUCTION_CONFIDENCE_CHANGE",
+    "PRODUCTION_.675_UNCHANGED"
+  ],
+  "rows": [
+    {
+      "gameId": "20260922NCSS0",
+      "date": "2026-09-22",
+      "capturedAt": "2026-09-21T05:25:03.502Z",
+      "fixtureStatus": "Pre-Game",
+      "scheduledStart": "18:30",
+      "awayTeam": "NC",
+      "homeTeam": "삼성",
+      "refAwayScore": 4.386018969762511,
+      "refHomeScore": 5.115108834287532,
+      "refWinner": "HOME",
+      "refMargin": 0.7290898645250206,
+      "v3": {
+        "away": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1.05,
+          "z": -1.1543837357052094,
+          "predictedAbsError": 2.30099357115629,
+          "high": false
+        },
+        "home": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1.67,
+          "z": 0.6119879658805364,
+          "predictedAbsError": 2.736882882328306,
+          "high": true
+        }
+      },
+      "sourceHashes": {
+        "starterFileSha256": "625713ab0f835cbae4c47d053cbb9b4cb4a41a8a6fa26fe2700ba2d9f70743d8",
+        "bullpenFileSha256": "9a81384af114a326d1c4acfce18d5391db53076ab00c0894b1713cfe5376b763"
+      },
+      "inputs": {
+        "teamForm": {
+          "away": {
+            "seasonGames": 128,
+            "seasonAvgRuns": 5.0234375,
+            "seasonAvgRunsAllowed": 5.296875,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          },
+          "home": {
+            "seasonGames": 131,
+            "seasonAvgRuns": 5.717557251908397,
+            "seasonAvgRunsAllowed": 4.549618320610687,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          }
+        },
+        "starter": {
+          "away": {
+            "id": 56939,
+            "name": "클레빈저",
+            "stats": {
+              "playerId": 56939,
+              "era": 3,
+              "games": 1,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 50,
+              "innings": "3",
+              "hits": 2,
+              "homeRuns": 0,
+              "walks": 3,
+              "strikeouts": 1,
+              "runs": 1,
+              "earnedRuns": 1,
+              "whip": 1.67,
+              "avg": null,
+              "qs": 0,
+              "recent5": {
+                "games": 1,
+                "innings": 3,
+                "era": 3,
+                "whip": 1.67,
+                "strikeouts": 1,
+                "walks": 3,
+                "kbb": 0.33
+              },
+              "recent10": {
+                "games": 1,
+                "innings": 3,
+                "era": 3,
+                "whip": 1.67,
+                "strikeouts": 1,
+                "walks": 3,
+                "kbb": 0.33
+              }
+            }
+          },
+          "home": {
+            "id": 56459,
+            "name": "페덱",
+            "stats": {
+              "playerId": 56459,
+              "era": 2.93,
+              "games": 10,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 990,
+              "innings": "61 1/3",
+              "hits": 48,
+              "homeRuns": 5,
+              "walks": 13,
+              "strikeouts": 65,
+              "runs": 22,
+              "earnedRuns": 20,
+              "whip": 0.99,
+              "avg": null,
+              "qs": 8,
+              "recent5": {
+                "games": 5,
+                "innings": 31.33,
+                "era": 2.87,
+                "whip": 1.05,
+                "strikeouts": 30,
+                "walks": 5,
+                "kbb": 6
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 61.33,
+                "era": 2.93,
+                "whip": 0.99,
+                "strikeouts": 65,
+                "walks": 13,
+                "kbb": 5
+              }
+            }
+          }
+        },
+        "bullpen": {
+          "away": {
+            "season": {
+              "games": 128,
+              "appearances": 539,
+              "outs": 1437,
+              "innings": 479,
+              "pitches": 9018,
+              "hits": 465,
+              "homeRuns": 51,
+              "walks": 361,
+              "strikeouts": 460,
+              "runs": 315,
+              "earnedRuns": 276,
+              "era": 5.186,
+              "whip": 1.724,
+              "k9": 8.643,
+              "bb9": 6.783,
+              "hr9": 0.958,
+              "kbb": 1.274
+            },
+            "recent30": {
+              "games": 23,
+              "appearances": 101,
+              "outs": 272,
+              "innings": 90.667,
+              "pitches": 1653,
+              "hits": 85,
+              "homeRuns": 9,
+              "walks": 60,
+              "strikeouts": 78,
+              "runs": 48,
+              "earnedRuns": 45,
+              "era": 4.467,
+              "whip": 1.599,
+              "k9": 7.743,
+              "bb9": 5.956,
+              "hr9": 0.893,
+              "kbb": 1.3
+            },
+            "recent14": {
+              "games": 12,
+              "appearances": 60,
+              "outs": 160,
+              "innings": 53.333,
+              "pitches": 1007,
+              "hits": 55,
+              "homeRuns": 3,
+              "walks": 38,
+              "strikeouts": 38,
+              "runs": 34,
+              "earnedRuns": 33,
+              "era": 5.569,
+              "whip": 1.744,
+              "k9": 6.412,
+              "bb9": 6.412,
+              "hr9": 0.506,
+              "kbb": 1
+            }
+          },
+          "home": {
+            "season": {
+              "games": 131,
+              "appearances": 500,
+              "outs": 1391,
+              "innings": 463.667,
+              "pitches": 8139,
+              "hits": 426,
+              "homeRuns": 61,
+              "walks": 250,
+              "strikeouts": 402,
+              "runs": 230,
+              "earnedRuns": 209,
+              "era": 4.057,
+              "whip": 1.458,
+              "k9": 7.803,
+              "bb9": 4.853,
+              "hr9": 1.184,
+              "kbb": 1.608
+            },
+            "recent30": {
+              "games": 21,
+              "appearances": 77,
+              "outs": 206,
+              "innings": 68.667,
+              "pitches": 1243,
+              "hits": 65,
+              "homeRuns": 8,
+              "walks": 34,
+              "strikeouts": 52,
+              "runs": 34,
+              "earnedRuns": 34,
+              "era": 4.456,
+              "whip": 1.442,
+              "k9": 6.816,
+              "bb9": 4.456,
+              "hr9": 1.049,
+              "kbb": 1.529
+            },
+            "recent14": {
+              "games": 10,
+              "appearances": 35,
+              "outs": 101,
+              "innings": 33.667,
+              "pitches": 621,
+              "hits": 38,
+              "homeRuns": 7,
+              "walks": 16,
+              "strikeouts": 25,
+              "runs": 23,
+              "earnedRuns": 23,
+              "era": 6.149,
+              "whip": 1.604,
+              "k9": 6.683,
+              "bb9": 4.277,
+              "hr9": 1.871,
+              "kbb": 1.563
+            }
+          }
+        }
+      },
+      "components": {
+        "away": {
+          "mu": 4.386018969762511,
+          "base": 4.7865279103053435,
+          "anchor": 4.549618320610687,
+          "starterEra": 2.9000000000000004,
+          "starterIp": 6.266,
+          "bpEra": 5.312200000000001,
+          "bpIp": 2.734,
+          "starterAdj": -0.5742504664970313,
+          "bullpenAdj": 0.17374152595419862
+        },
+        "home": {
+          "mu": 5.115108834287532,
+          "base": 5.507216125954198,
+          "anchor": 5.296875,
+          "starterEra": 3,
+          "starterIp": 3.5,
+          "bpEra": 5.4158,
+          "bpIp": 5.5,
+          "starterAdj": -0.4466145833333333,
+          "bullpenAdj": 0.054507291666666645
+        }
+      }
+    },
+    {
+      "gameId": "20260922KTSK0",
+      "date": "2026-09-22",
+      "capturedAt": "2026-09-21T05:25:03.502Z",
+      "fixtureStatus": "Pre-Game",
+      "scheduledStart": "18:30",
+      "awayTeam": "KT",
+      "homeTeam": "SSG",
+      "refAwayScore": 3.589754459321901,
+      "refHomeScore": 4.383861614595568,
+      "refWinner": "HOME",
+      "refMargin": 0.7941071552736667,
+      "v3": {
+        "away": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 0.81,
+          "z": -1.8381405234158206,
+          "predictedAbsError": 2.132262224896155,
+          "high": false
+        },
+        "home": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1.27,
+          "z": -0.5276066803038156,
+          "predictedAbsError": 2.4556639718947473,
+          "high": false
+        }
+      },
+      "sourceHashes": {
+        "starterFileSha256": "625713ab0f835cbae4c47d053cbb9b4cb4a41a8a6fa26fe2700ba2d9f70743d8",
+        "bullpenFileSha256": "9a81384af114a326d1c4acfce18d5391db53076ab00c0894b1713cfe5376b763"
+      },
+      "inputs": {
+        "teamForm": {
+          "away": {
+            "seasonGames": 129,
+            "seasonAvgRuns": 5.651162790697675,
+            "seasonAvgRunsAllowed": 4.62015503875969,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          },
+          "home": {
+            "seasonGames": 132,
+            "seasonAvgRuns": 4.931818181818182,
+            "seasonAvgRunsAllowed": 5.598484848484849,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          }
+        },
+        "starter": {
+          "away": {
+            "id": 65516,
+            "name": "배제성",
+            "stats": {
+              "playerId": 65516,
+              "era": 3.67,
+              "games": 11,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 858,
+              "innings": "49",
+              "hits": 47,
+              "homeRuns": 3,
+              "walks": 28,
+              "strikeouts": 42,
+              "runs": 21,
+              "earnedRuns": 20,
+              "whip": 1.53,
+              "avg": null,
+              "qs": 2,
+              "recent5": {
+                "games": 5,
+                "innings": 26,
+                "era": 2.77,
+                "whip": 1.27,
+                "strikeouts": 22,
+                "walks": 11,
+                "kbb": 2
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 45.67,
+                "era": 3.94,
+                "whip": 1.58,
+                "strikeouts": 37,
+                "walks": 27,
+                "kbb": 1.37
+              }
+            }
+          },
+          "home": {
+            "id": 56801,
+            "name": "아빌라",
+            "stats": {
+              "playerId": 56801,
+              "era": 1.39,
+              "games": 11,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 1061,
+              "innings": "71",
+              "hits": 50,
+              "homeRuns": 0,
+              "walks": 21,
+              "strikeouts": 75,
+              "runs": 14,
+              "earnedRuns": 11,
+              "whip": 1,
+              "avg": null,
+              "qs": 10,
+              "recent5": {
+                "games": 5,
+                "innings": 36,
+                "era": 1.25,
+                "whip": 0.81,
+                "strikeouts": 35,
+                "walks": 6,
+                "kbb": 5.83
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 65,
+                "era": 1.52,
+                "whip": 1.03,
+                "strikeouts": 67,
+                "walks": 20,
+                "kbb": 3.35
+              }
+            }
+          }
+        },
+        "bullpen": {
+          "away": {
+            "season": {
+              "games": 129,
+              "appearances": 480,
+              "outs": 1371,
+              "innings": 457,
+              "pitches": 7845,
+              "hits": 468,
+              "homeRuns": 49,
+              "walks": 232,
+              "strikeouts": 404,
+              "runs": 264,
+              "earnedRuns": 233,
+              "era": 4.589,
+              "whip": 1.532,
+              "k9": 7.956,
+              "bb9": 4.569,
+              "hr9": 0.965,
+              "kbb": 1.741
+            },
+            "recent30": {
+              "games": 22,
+              "appearances": 82,
+              "outs": 226,
+              "innings": 75.333,
+              "pitches": 1308,
+              "hits": 75,
+              "homeRuns": 12,
+              "walks": 39,
+              "strikeouts": 78,
+              "runs": 49,
+              "earnedRuns": 42,
+              "era": 5.018,
+              "whip": 1.513,
+              "k9": 9.319,
+              "bb9": 4.659,
+              "hr9": 1.434,
+              "kbb": 2
+            },
+            "recent14": {
+              "games": 11,
+              "appearances": 38,
+              "outs": 109,
+              "innings": 36.333,
+              "pitches": 625,
+              "hits": 39,
+              "homeRuns": 6,
+              "walks": 15,
+              "strikeouts": 43,
+              "runs": 24,
+              "earnedRuns": 19,
+              "era": 4.706,
+              "whip": 1.486,
+              "k9": 10.651,
+              "bb9": 3.716,
+              "hr9": 1.486,
+              "kbb": 2.867
+            }
+          },
+          "home": {
+            "season": {
+              "games": 132,
+              "appearances": 532,
+              "outs": 1585,
+              "innings": 528.333,
+              "pitches": 9473,
+              "hits": 516,
+              "homeRuns": 69,
+              "walks": 341,
+              "strikeouts": 459,
+              "runs": 339,
+              "earnedRuns": 307,
+              "era": 5.23,
+              "whip": 1.622,
+              "k9": 7.819,
+              "bb9": 5.809,
+              "hr9": 1.175,
+              "kbb": 1.346
+            },
+            "recent30": {
+              "games": 19,
+              "appearances": 69,
+              "outs": 186,
+              "innings": 62,
+              "pitches": 1067,
+              "hits": 53,
+              "homeRuns": 7,
+              "walks": 38,
+              "strikeouts": 56,
+              "runs": 26,
+              "earnedRuns": 26,
+              "era": 3.774,
+              "whip": 1.468,
+              "k9": 8.129,
+              "bb9": 5.516,
+              "hr9": 1.016,
+              "kbb": 1.474
+            },
+            "recent14": {
+              "games": 8,
+              "appearances": 27,
+              "outs": 76,
+              "innings": 25.333,
+              "pitches": 408,
+              "hits": 24,
+              "homeRuns": 2,
+              "walks": 12,
+              "strikeouts": 24,
+              "runs": 6,
+              "earnedRuns": 6,
+              "era": 2.132,
+              "whip": 1.421,
+              "k9": 8.526,
+              "bb9": 4.263,
+              "hr9": 0.711,
+              "kbb": 2
+            }
+          }
+        }
+      },
+      "components": {
+        "away": {
+          "mu": 3.589754459321901,
+          "base": 5.624823819591262,
+          "anchor": 5.598484848484849,
+          "starterEra": 1.3199999999999998,
+          "starterIp": 7,
+          "bpEra": 3.3712,
+          "bpIp": 2,
+          "starterAdj": -1.6638552188552191,
+          "bullpenAdj": -0.37121414141414144
+        },
+        "home": {
+          "mu": 4.383861614595568,
+          "base": 4.7759866102889355,
+          "anchor": 4.62015503875969,
+          "starterEra": 3.2199999999999998,
+          "starterIp": 5.2,
+          "bpEra": 4.6592,
+          "bpIp": 3.8,
+          "starterAdj": -0.40448923341946613,
+          "bullpenAdj": 0.012364237726098196
+        }
+      }
+    },
+    {
+      "gameId": "20260922LTHH0",
+      "date": "2026-09-22",
+      "capturedAt": "2026-09-21T05:25:03.502Z",
+      "fixtureStatus": "Pre-Game",
+      "scheduledStart": "18:30",
+      "awayTeam": "롯데",
+      "homeTeam": "한화",
+      "refAwayScore": 4.77504258199165,
+      "refHomeScore": 5.7418011341085275,
+      "refWinner": "HOME",
+      "refMargin": 0.9667585521168771,
+      "v3": {
+        "away": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 0.89,
+          "z": -1.6102215941789504,
+          "predictedAbsError": 2.188506006982866,
+          "high": false
+        },
+        "home": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1.71,
+          "z": 0.7259474304989717,
+          "predictedAbsError": 2.765004773371662,
+          "high": true
+        }
+      },
+      "sourceHashes": {
+        "starterFileSha256": "625713ab0f835cbae4c47d053cbb9b4cb4a41a8a6fa26fe2700ba2d9f70743d8",
+        "bullpenFileSha256": "9a81384af114a326d1c4acfce18d5391db53076ab00c0894b1713cfe5376b763"
+      },
+      "inputs": {
+        "teamForm": {
+          "away": {
+            "seasonGames": 129,
+            "seasonAvgRuns": 4.751937984496124,
+            "seasonAvgRunsAllowed": 5.255813953488372,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          },
+          "home": {
+            "seasonGames": 130,
+            "seasonAvgRuns": 5.8,
+            "seasonAvgRunsAllowed": 5.7615384615384615,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          }
+        },
+        "starter": {
+          "away": {
+            "id": 56523,
+            "name": "비슬리",
+            "stats": {
+              "playerId": 56523,
+              "era": 5.06,
+              "games": 25,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 2296,
+              "innings": "137",
+              "hits": 155,
+              "homeRuns": 13,
+              "walks": 54,
+              "strikeouts": 146,
+              "runs": 81,
+              "earnedRuns": 77,
+              "whip": 1.53,
+              "avg": null,
+              "qs": 11,
+              "recent5": {
+                "games": 5,
+                "innings": 28.67,
+                "era": 7.53,
+                "whip": 1.71,
+                "strikeouts": 28,
+                "walks": 12,
+                "kbb": 2.33
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 58.67,
+                "era": 5.52,
+                "whip": 1.43,
+                "strikeouts": 55,
+                "walks": 20,
+                "kbb": 2.75
+              }
+            }
+          },
+          "home": {
+            "id": 76715,
+            "name": "류현진",
+            "stats": {
+              "playerId": 76715,
+              "era": 3.62,
+              "games": 24,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 2025,
+              "innings": "131 2/3",
+              "hits": 133,
+              "homeRuns": 8,
+              "walks": 24,
+              "strikeouts": 113,
+              "runs": 63,
+              "earnedRuns": 53,
+              "whip": 1.19,
+              "avg": null,
+              "qs": 11,
+              "recent5": {
+                "games": 5,
+                "innings": 28,
+                "era": 2.57,
+                "whip": 0.89,
+                "strikeouts": 29,
+                "walks": 4,
+                "kbb": 7.25
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 50,
+                "era": 5.04,
+                "whip": 1.36,
+                "strikeouts": 50,
+                "walks": 11,
+                "kbb": 4.55
+              }
+            }
+          }
+        },
+        "bullpen": {
+          "away": {
+            "season": {
+              "games": 129,
+              "appearances": 466,
+              "outs": 1276,
+              "innings": 425.333,
+              "pitches": 7760,
+              "hits": 462,
+              "homeRuns": 35,
+              "walks": 257,
+              "strikeouts": 363,
+              "runs": 283,
+              "earnedRuns": 254,
+              "era": 5.375,
+              "whip": 1.69,
+              "k9": 7.681,
+              "bb9": 5.438,
+              "hr9": 0.741,
+              "kbb": 1.412
+            },
+            "recent30": {
+              "games": 20,
+              "appearances": 79,
+              "outs": 198,
+              "innings": 66,
+              "pitches": 1271,
+              "hits": 83,
+              "homeRuns": 7,
+              "walks": 36,
+              "strikeouts": 66,
+              "runs": 58,
+              "earnedRuns": 52,
+              "era": 7.091,
+              "whip": 1.803,
+              "k9": 9,
+              "bb9": 4.909,
+              "hr9": 0.955,
+              "kbb": 1.833
+            },
+            "recent14": {
+              "games": 10,
+              "appearances": 39,
+              "outs": 109,
+              "innings": 36.333,
+              "pitches": 647,
+              "hits": 34,
+              "homeRuns": 3,
+              "walks": 16,
+              "strikeouts": 39,
+              "runs": 22,
+              "earnedRuns": 18,
+              "era": 4.459,
+              "whip": 1.376,
+              "k9": 9.661,
+              "bb9": 3.963,
+              "hr9": 0.743,
+              "kbb": 2.438
+            }
+          },
+          "home": {
+            "season": {
+              "games": 130,
+              "appearances": 565,
+              "outs": 1602,
+              "innings": 534,
+              "pitches": 9987,
+              "hits": 614,
+              "homeRuns": 56,
+              "walks": 360,
+              "strikeouts": 469,
+              "runs": 380,
+              "earnedRuns": 335,
+              "era": 5.646,
+              "whip": 1.824,
+              "k9": 7.904,
+              "bb9": 6.067,
+              "hr9": 0.944,
+              "kbb": 1.303
+            },
+            "recent30": {
+              "games": 22,
+              "appearances": 102,
+              "outs": 275,
+              "innings": 91.667,
+              "pitches": 1784,
+              "hits": 116,
+              "homeRuns": 9,
+              "walks": 58,
+              "strikeouts": 80,
+              "runs": 83,
+              "earnedRuns": 71,
+              "era": 6.971,
+              "whip": 1.898,
+              "k9": 7.855,
+              "bb9": 5.695,
+              "hr9": 0.884,
+              "kbb": 1.379
+            },
+            "recent14": {
+              "games": 10,
+              "appearances": 42,
+              "outs": 113,
+              "innings": 37.667,
+              "pitches": 738,
+              "hits": 46,
+              "homeRuns": 5,
+              "walks": 24,
+              "strikeouts": 37,
+              "runs": 33,
+              "earnedRuns": 33,
+              "era": 7.885,
+              "whip": 1.858,
+              "k9": 8.841,
+              "bb9": 5.735,
+              "hr9": 1.195,
+              "kbb": 1.542
+            }
+          }
+        }
+      },
+      "components": {
+        "away": {
+          "mu": 4.77504258199165,
+          "base": 5.256738223017292,
+          "anchor": 5.7615384615384615,
+          "starterEra": 3.0949999999999998,
+          "starterIp": 5.6,
+          "bpEra": 6.9894,
+          "bpIp": 3.4000000000000004,
+          "starterAdj": -0.8295897435897437,
+          "bullpenAdj": 0.3478941025641026
+        },
+        "home": {
+          "mu": 5.7418011341085275,
+          "base": 5.527906976744186,
+          "anchor": 5.255813953488372,
+          "starterEra": 6.295,
+          "starterIp": 5.734,
+          "bpEra": 4.8254,
+          "bpIp": 3.266,
+          "starterAdj": 0.3310384883720931,
+          "bullpenAdj": -0.11714433100775176
+        }
+      }
+    },
+    {
+      "gameId": "20260922OBWO0",
+      "date": "2026-09-22",
+      "capturedAt": "2026-09-21T05:25:03.502Z",
+      "fixtureStatus": "Pre-Game",
+      "scheduledStart": "18:30",
+      "awayTeam": "두산",
+      "homeTeam": "키움",
+      "refAwayScore": 5.1544311322177,
+      "refHomeScore": 3.658521377958691,
+      "refWinner": "AWAY",
+      "refMargin": 1.4959097542590087,
+      "v3": {
+        "away": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1.72,
+          "z": 0.7544372966535806,
+          "predictedAbsError": 2.772035246132501,
+          "high": true
+        },
+        "home": {
+          "usable": true,
+          "defendingStarterRecent5Whip": 1,
+          "z": -1.2968330664782535,
+          "predictedAbsError": 2.265841207352095,
+          "high": false
+        }
+      },
+      "sourceHashes": {
+        "starterFileSha256": "625713ab0f835cbae4c47d053cbb9b4cb4a41a8a6fa26fe2700ba2d9f70743d8",
+        "bullpenFileSha256": "9a81384af114a326d1c4acfce18d5391db53076ab00c0894b1713cfe5376b763"
+      },
+      "inputs": {
+        "teamForm": {
+          "away": {
+            "seasonGames": 132,
+            "seasonAvgRuns": 4.6893939393939394,
+            "seasonAvgRunsAllowed": 4.340909090909091,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          },
+          "home": {
+            "seasonGames": 134,
+            "seasonAvgRuns": 3.791044776119403,
+            "seasonAvgRunsAllowed": 5.701492537313433,
+            "leagueRunsPerTeamD1": 5.051152737752162
+          }
+        },
+        "starter": {
+          "away": {
+            "id": 52043,
+            "name": "벤자민",
+            "stats": {
+              "playerId": 52043,
+              "era": 2.41,
+              "games": 21,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 1845,
+              "innings": "115 2/3",
+              "hits": 104,
+              "homeRuns": 6,
+              "walks": 34,
+              "strikeouts": 123,
+              "runs": 39,
+              "earnedRuns": 31,
+              "whip": 1.19,
+              "avg": null,
+              "qs": 10,
+              "recent5": {
+                "games": 5,
+                "innings": 25,
+                "era": 2.16,
+                "whip": 1,
+                "strikeouts": 35,
+                "walks": 10,
+                "kbb": 3.5
+              },
+              "recent10": {
+                "games": 10,
+                "innings": 53,
+                "era": 1.7,
+                "whip": 1.04,
+                "strikeouts": 69,
+                "walks": 15,
+                "kbb": 4.6
+              }
+            }
+          },
+          "home": {
+            "id": 54362,
+            "name": "전준표",
+            "stats": {
+              "playerId": 54362,
+              "era": 3.63,
+              "games": 8,
+              "wins": null,
+              "losses": null,
+              "saves": null,
+              "holds": null,
+              "winPct": null,
+              "battersFaced": null,
+              "pitches": 737,
+              "innings": "39 2/3",
+              "hits": 34,
+              "homeRuns": 3,
+              "walks": 31,
+              "strikeouts": 21,
+              "runs": 20,
+              "earnedRuns": 16,
+              "whip": 1.64,
+              "avg": null,
+              "qs": 1,
+              "recent5": {
+                "games": 5,
+                "innings": 25,
+                "era": 4.32,
+                "whip": 1.72,
+                "strikeouts": 11,
+                "walks": 19,
+                "kbb": 0.58
+              },
+              "recent10": {
+                "games": 8,
+                "innings": 39.67,
+                "era": 3.63,
+                "whip": 1.64,
+                "strikeouts": 21,
+                "walks": 31,
+                "kbb": 0.68
+              }
+            }
+          }
+        },
+        "bullpen": {
+          "away": {
+            "season": {
+              "games": 132,
+              "appearances": 489,
+              "outs": 1441,
+              "innings": 480.333,
+              "pitches": 8601,
+              "hits": 456,
+              "homeRuns": 46,
+              "walks": 255,
+              "strikeouts": 478,
+              "runs": 250,
+              "earnedRuns": 216,
+              "era": 4.047,
+              "whip": 1.48,
+              "k9": 8.956,
+              "bb9": 4.778,
+              "hr9": 0.862,
+              "kbb": 1.875
+            },
+            "recent30": {
+              "games": 21,
+              "appearances": 82,
+              "outs": 234,
+              "innings": 78,
+              "pitches": 1400,
+              "hits": 64,
+              "homeRuns": 8,
+              "walks": 39,
+              "strikeouts": 84,
+              "runs": 39,
+              "earnedRuns": 38,
+              "era": 4.385,
+              "whip": 1.321,
+              "k9": 9.692,
+              "bb9": 4.5,
+              "hr9": 0.923,
+              "kbb": 2.154
+            },
+            "recent14": {
+              "games": 9,
+              "appearances": 41,
+              "outs": 121,
+              "innings": 40.333,
+              "pitches": 789,
+              "hits": 40,
+              "homeRuns": 5,
+              "walks": 24,
+              "strikeouts": 42,
+              "runs": 25,
+              "earnedRuns": 24,
+              "era": 5.355,
+              "whip": 1.587,
+              "k9": 9.372,
+              "bb9": 5.355,
+              "hr9": 1.116,
+              "kbb": 1.75
+            }
+          },
+          "home": {
+            "season": {
+              "games": 134,
+              "appearances": 499,
+              "outs": 1523,
+              "innings": 507.667,
+              "pitches": 9405,
+              "hits": 598,
+              "homeRuns": 68,
+              "walks": 301,
+              "strikeouts": 385,
+              "runs": 376,
+              "earnedRuns": 347,
+              "era": 6.152,
+              "whip": 1.771,
+              "k9": 6.825,
+              "bb9": 5.336,
+              "hr9": 1.206,
+              "kbb": 1.279
+            },
+            "recent30": {
+              "games": 19,
+              "appearances": 76,
+              "outs": 205,
+              "innings": 68.333,
+              "pitches": 1335,
+              "hits": 89,
+              "homeRuns": 13,
+              "walks": 43,
+              "strikeouts": 54,
+              "runs": 62,
+              "earnedRuns": 56,
+              "era": 7.376,
+              "whip": 1.932,
+              "k9": 7.112,
+              "bb9": 5.663,
+              "hr9": 1.712,
+              "kbb": 1.256
+            },
+            "recent14": {
+              "games": 7,
+              "appearances": 27,
+              "outs": 64,
+              "innings": 21.333,
+              "pitches": 416,
+              "hits": 26,
+              "homeRuns": 4,
+              "walks": 15,
+              "strikeouts": 15,
+              "runs": 18,
+              "earnedRuns": 18,
+              "era": 7.594,
+              "whip": 1.922,
+              "k9": 6.328,
+              "bb9": 6.328,
+              "hr9": 1.688,
+              "kbb": 1
+            }
+          }
+        }
+      },
+      "components": {
+        "away": {
+          "mu": 5.1544311322177,
+          "base": 5.195443238353686,
+          "anchor": 5.701492537313433,
+          "starterEra": 3.975,
+          "starterIp": 5,
+          "bpEra": 7.017200000000001,
+          "bpIp": 4,
+          "starterAdj": -0.47958126036484244,
+          "bullpenAdj": 0.4385691542288559
+        },
+        "home": {
+          "mu": 3.658521377958691,
+          "base": 4.065976933514246,
+          "anchor": 4.340909090909091,
+          "starterEra": 2.285,
+          "starterIp": 5,
+          "bpEra": 4.8318,
+          "bpIp": 4,
+          "starterAdj": -0.5710858585858586,
+          "bullpenAdj": 0.16363030303030315
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+
+function implied(odds: number | null) {
+  return odds && odds > 1 ? 1 / odds : null;
+}
+
+function grade(confidence: number, ev: number | null): "A" | "B" | "C" {
+  if (confidence >= 0.64 && (ev ?? 0) >= 0.04) return "A";
+  if (confidence >= 0.57 && (ev ?? 0) >= 0) return "B";
+  return "C";
+}
+
+// v0.1: 시장 배당 + 홈 이점 + 순위만 사용하는 보수적 초기 모델.
+// 다음 단계에서 선발 ERA/WHIP, 최근 10경기, 불펜 소모, 라인업을 연결한다.
+export function analyzeGame(game: KboGame, odds: OddsInput): Pick[] {
+  const rankEdge = game.awayRank && game.homeRank
+    ? Math.max(-0.08, Math.min(0.08, (game.homeRank - game.awayRank) * 0.008))
+    : 0;
+  const baseAway = 0.48 + rankEdge;
+  const awayMarket = implied(odds.awayMl);
+  const homeMarket = implied(odds.homeMl);
+  const vigSum = (awayMarket ?? 0) + (homeMarket ?? 0);
+  const awayFairMarket = vigSum > 0 ? (awayMarket ?? 0.5) / vigSum : 0.5;
+  const awayProb = Math.max(0.2, Math.min(0.8, baseAway * 0.45 + awayFairMarket * 0.55));
+  const homeProb = 1 - awayProb;
+
+  const awayEv = odds.awayMl ? awayProb * odds.awayMl - 1 : null;
+  const homeEv = odds.homeMl ? homeProb * odds.homeMl - 1 : null;
+  const picks: Pick[] = [
+    {
+      gameId: game.gameId,
+      label: `${game.awayTeamName} 승`,
+      market: "ML",
+      odds: odds.awayMl,
+      confidence: awayProb,
+      ev: awayEv,
+      grade: grade(awayProb, awayEv),
+    },
+    {
+      gameId: game.gameId,
+      label: `${game.homeTeamName} 승`,
+      market: "ML",
+      odds: odds.homeMl,
+      confidence: homeProb,
+      ev: homeEv,
+      grade: grade(homeProb, homeEv),
+    },
+  ];
+  return picks.sort((a, b) => (b.ev ?? -1) - (a.ev ?? -1));
+}
+
+export function makeAutoCombos(allPicks: Pick[]) {
+  const usable = allPicks.filter((p) => p.grade !== "C" && p.odds && p.ev !== null && p.ev > -0.02);
+  const byGame = new Map<string, Pick>();
+  for (const p of usable.sort((a, b) => (b.ev ?? 0) - (a.ev ?? 0))) {
+    if (!byGame.has(p.gameId)) byGame.set(p.gameId, p);
+  }
+  const picks = [...byGame.values()];
+  const combo = (name: string, count: number) => {
+    const selected = picks.slice(0, count);
+    return {
+      name,
+      picks: selected,
+      odds: selected.reduce((acc, p) => acc * (p.odds ?? 1), 1),
+    };
+  };
+  return [combo("안정형 2폴", 2), combo("균형형 3폴", 3), combo("공격형 4폴", 4)].filter((x) => x.picks.length >= 2);
+}

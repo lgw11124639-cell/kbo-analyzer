@@ -1,0 +1,482 @@
+import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+import { fetchHistoricalPitcherStats } from "@/lib/kboHistoricalPlayerStats";
+
+/* HISTORICAL_PITCHER_STATS_V1 */
+
+export const dynamic = "force-dynamic";
+
+function num(value: string | undefined) {
+  if (!value) return null;
+
+  const n = Number(
+    value.replace(/,/g, "").trim()
+  );
+
+  return Number.isFinite(n) ? n : null;
+}
+
+function clean(value: string | undefined) {
+  return value?.replace(/\s+/g, " ").trim() || "";
+}
+
+export async function GET(
+  request: Request,
+  context: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const { id } = await context.params;
+
+  const playerId = Number(id);
+
+  if (!Number.isInteger(playerId) || playerId <= 0) {
+    return NextResponse.json(
+      { error: "잘못된 선수 ID입니다." },
+      { status: 400 }
+    );
+  }
+
+  const requestUrl =
+    new URL(request.url);
+
+  const targetDate =
+    requestUrl.searchParams.get(
+      "date"
+    );
+
+  const historicalStats =
+    await fetchHistoricalPitcherStats(
+      playerId,
+      targetDate
+    );
+
+  if (historicalStats) {
+    return NextResponse.json({
+      fetchedAt:
+        new Date().toISOString(),
+
+      stats:
+        historicalStats,
+
+      historical:
+        true,
+
+      targetDate,
+    });
+  }
+
+  const url =
+    "https://www.koreabaseball.com/Record/Player/PitcherDetail/Basic.aspx" +
+    `?playerId=${playerId}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/152 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
+        "Accept-Language": "ko-KR,ko;q=0.9,en;q=0.8",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `KBO 선수 페이지 오류 (${response.status})`
+      );
+    }
+
+    const html = await response.text();
+    const $ = cheerio.load(html);
+
+    /*
+      테이블의 th 제목을 직접 읽어서
+      컬럼 순서가 조금 바뀌어도 대응하도록 한다.
+    */
+
+    const tables = $("table");
+
+    let basic:
+      | Record<string, string>
+      | null = null;
+
+    let detail:
+      | Record<string, string>
+      | null = null;
+
+    tables.each((_, table) => {
+      const headers = $(table)
+        .find("thead th")
+        .map((_, el) => clean($(el).text()))
+        .get();
+
+      const values = $(table)
+        .find("tbody tr")
+        .first()
+        .find("td")
+        .map((_, el) => clean($(el).text()))
+        .get();
+
+      if (!headers.length || !values.length) {
+        return;
+      }
+
+      const row: Record<string, string> = {};
+
+      headers.forEach((header, index) => {
+        row[header] = values[index] ?? "";
+      });
+
+      if (
+        row["ERA"] !== undefined &&
+        row["G"] !== undefined &&
+        row["W"] !== undefined
+      ) {
+        basic = row;
+      }
+
+      if (
+        row["WHIP"] !== undefined &&
+        row["AVG"] !== undefined
+      ) {
+        detail = row;
+      }
+    });
+
+    if (!basic) {
+      return NextResponse.json(
+        {
+          error: "KBO 기본 투수 기록을 찾지 못했습니다.",
+          playerId,
+        },
+        { status: 502 }
+      );
+    }
+
+    const basicRow =
+      basic as Record<string, string>;
+
+    const detailRow =
+      (detail ?? {}) as Record<string, string>;
+
+    // ========================================================
+    // 최근 10경기
+    // ========================================================
+
+    type RecentGame = {
+      date: string;
+      location: string;
+      opponent: string;
+      result: string;
+
+      era: number | null;
+      tbf: number | null;
+      innings: string | null;
+
+      hits: number | null;
+      homeRuns: number | null;
+      walks: number | null;
+      strikeouts: number | null;
+
+      runs: number | null;
+      earnedRuns: number | null;
+    };
+
+    const recentGames: RecentGame[] = [];
+
+    $("table").each((_, table) => {
+      const headers = $(table)
+        .find("thead th")
+        .map((_, el) => clean($(el).text()))
+        .get();
+
+      const isRecentTable =
+        headers.includes("일자") &&
+        headers.includes("상대") &&
+        headers.includes("ERA") &&
+        headers.includes("IP") &&
+        headers.includes("ER");
+
+      if (!isRecentTable) {
+        return;
+      }
+
+      $(table)
+        .find("tbody tr")
+        .each((_, tr) => {
+          const values = $(tr)
+            .find("td")
+            .map((_, el) => clean($(el).text()))
+            .get();
+
+          if (!values.length) {
+            return;
+          }
+
+          const row: Record<string, string> = {};
+
+          headers.forEach((header, index) => {
+            row[header] = values[index] ?? "";
+          });
+
+          // 합계 행 제외
+          if (
+            !row["일자"] ||
+            row["일자"] === "합계"
+          ) {
+            return;
+          }
+
+          recentGames.push({
+            date: row["일자"],
+            location: row["구분"] || "",
+            opponent: row["상대"] || "",
+            result: row["결과"] || "",
+
+            era: num(row["ERA"]),
+            tbf: num(row["TBF"]),
+            innings: row["IP"] || null,
+
+            hits: num(row["H"]),
+            homeRuns: num(row["HR"]),
+            walks: num(row["BB"]),
+            strikeouts: num(row["SO"]),
+
+            runs: num(row["R"]),
+            earnedRuns: num(row["ER"]),
+          });
+        });
+    });
+
+
+    // --------------------------------------------------------
+    // 최근 N경기 집계용 이닝 변환
+    // 5 1/3 -> 5.333...
+    // --------------------------------------------------------
+
+    function inningsToNumber(
+      value: string | null
+    ) {
+      if (!value) return 0;
+
+      const fractionOnly =
+        value.trim().match(
+          /^([12])\/3$/
+        );
+
+      if (fractionOnly) {
+        return Number(fractionOnly[1]) / 3;
+      }
+
+      const parts =
+        value.trim().split(/\s+/);
+
+      const whole =
+        Number(parts[0]) || 0;
+
+      if (parts.length < 2) {
+        return whole;
+      }
+
+      const fraction =
+        parts[1].split("/");
+
+      if (fraction.length !== 2) {
+        return whole;
+      }
+
+      const numerator =
+        Number(fraction[0]);
+
+      const denominator =
+        Number(fraction[1]);
+
+      if (
+        !Number.isFinite(numerator) ||
+        !Number.isFinite(denominator) ||
+        denominator === 0
+      ) {
+        return whole;
+      }
+
+      return (
+        whole +
+        numerator / denominator
+      );
+    }
+
+
+    function summarizeRecent(
+      games: RecentGame[]
+    ) {
+      if (!games.length) {
+        return null;
+      }
+
+      const ip =
+        games.reduce(
+          (sum, game) =>
+            sum +
+            inningsToNumber(
+              game.innings
+            ),
+          0
+        );
+
+      const er =
+        games.reduce(
+          (sum, game) =>
+            sum +
+            (game.earnedRuns ?? 0),
+          0
+        );
+
+      const hits =
+        games.reduce(
+          (sum, game) =>
+            sum +
+            (game.hits ?? 0),
+          0
+        );
+
+      const walks =
+        games.reduce(
+          (sum, game) =>
+            sum +
+            (game.walks ?? 0),
+          0
+        );
+
+      const strikeouts =
+        games.reduce(
+          (sum, game) =>
+            sum +
+            (game.strikeouts ?? 0),
+          0
+        );
+
+      return {
+        games: games.length,
+
+        innings:
+          Number(ip.toFixed(2)),
+
+        era:
+          ip > 0
+            ? Number(
+                (
+                  (er * 9) /
+                  ip
+                ).toFixed(2)
+              )
+            : null,
+
+        whip:
+          ip > 0
+            ? Number(
+                (
+                  (hits + walks) /
+                  ip
+                ).toFixed(2)
+              )
+            : null,
+
+        strikeouts,
+        walks,
+
+        kbb:
+          walks > 0
+            ? Number(
+                (
+                  strikeouts /
+                  walks
+                ).toFixed(2)
+              )
+            : strikeouts > 0
+              ? strikeouts
+              : null,
+      };
+    }
+
+
+    const recent5 =
+      summarizeRecent(
+        recentGames.slice(-5)
+      );
+
+    const recent10 =
+      summarizeRecent(
+        recentGames.slice(-10)
+      );
+
+
+    const stats = {
+      playerId,
+
+      era: num(basicRow["ERA"]),
+      games: num(basicRow["G"]),
+
+      wins: num(basicRow["W"]),
+      losses: num(basicRow["L"]),
+
+      saves: num(basicRow["SV"]),
+      holds: num(basicRow["HLD"]),
+
+      winPct: num(basicRow["WPCT"]),
+
+      battersFaced: num(basicRow["TBF"]),
+      pitches: num(basicRow["NP"]),
+
+      innings:
+        basicRow["IP"] || null,
+
+      hits:
+        num(basicRow["H"]),
+
+      homeRuns:
+        num(basicRow["HR"]),
+
+      walks:
+        num(detailRow["BB"]),
+
+      strikeouts:
+        num(detailRow["SO"]),
+
+      runs:
+        num(detailRow["R"]),
+
+      earnedRuns:
+        num(detailRow["ER"]),
+
+      whip:
+        num(detailRow["WHIP"]),
+
+      avg:
+        num(detailRow["AVG"]),
+
+      qs:
+        num(detailRow["QS"]),
+
+      recent5,
+      recent10,
+      recentGames,
+    };
+
+    return NextResponse.json({
+      fetchedAt: new Date().toISOString(),
+      stats,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "선발투수 기록 수집 실패",
+      },
+      { status: 500 }
+    );
+  }
+}
+

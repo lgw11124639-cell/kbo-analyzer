@@ -1,0 +1,107 @@
+{
+  "version": "V3.28",
+  "frozenStructure": {
+    "ticket1": "AB",
+    "ticket2": "ABCD",
+    "A": "HANDICAP FORM #1",
+    "B": "HANDICAP FORM #2",
+    "C": "ML",
+    "D": "TOTAL",
+    "dSelector": "partnerScore",
+    "constraint": "A/B/C/D ALL DIFFERENT GAMES",
+    "allocation": "AB share = 1 / AB odds; ABCD = remainder"
+  },
+  "discovery": {
+    "days": 3,
+    "abcdWins": 1,
+    "abcdHit": 33.33,
+    "avgABCDOdds": 19.927,
+    "avgABPct": 16.36,
+    "avgABCDPct": 83.64,
+    "roi": 551.99,
+    "profit": 165597,
+    "finalBank": 1165597,
+    "mdd": 1.69,
+    "losingStreak": 2,
+    "zeroHit": 2,
+    "abOnly": 0,
+    "both": 1,
+    "abOnlyRecovery": 0,
+    "monthly": [
+      {
+        "month": "2026-04",
+        "days": 3,
+        "roi": 551.99,
+        "profit": 165597
+      }
+    ]
+  },
+  "internal": {
+    "days": 10,
+    "abcdWins": 3,
+    "abcdHit": 30,
+    "avgABCDOdds": 19.652,
+    "avgABPct": 15.31,
+    "avgABCDPct": 84.69,
+    "roi": 369.83,
+    "profit": 369827,
+    "finalBank": 1369827,
+    "mdd": 4,
+    "losingStreak": 4,
+    "zeroHit": 7,
+    "abOnly": 0,
+    "both": 3,
+    "abOnlyRecovery": 0,
+    "monthly": [
+      {
+        "month": "2026-05",
+        "days": 5,
+        "roi": 196.71,
+        "profit": 98354
+      },
+      {
+        "month": "2026-06",
+        "days": 5,
+        "roi": 542.95,
+        "profit": 271473
+      }
+    ]
+  },
+  "final": {
+    "days": 13,
+    "abcdWins": 1,
+    "abcdHit": 7.69,
+    "avgABCDOdds": 16.443,
+    "avgABPct": 18.58,
+    "avgABCDPct": 81.42,
+    "roi": 71.6,
+    "profit": 93078,
+    "finalBank": 1093078,
+    "mdd": 7,
+    "losingStreak": 3,
+    "zeroHit": 10,
+    "abOnly": 2,
+    "both": 1,
+    "abOnlyRecovery": 100,
+    "monthly": [
+      {
+        "month": "2026-07",
+        "days": 7,
+        "roi": -71.43,
+        "profit": -50000
+      },
+      {
+        "month": "2026-08",
+        "days": 2,
+        "roi": -100,
+        "profit": -20000
+      },
+      {
+        "month": "2026-09",
+        "days": 4,
+        "roi": 407.7,
+        "profit": 163078
+      }
+    ]
+  }
+}

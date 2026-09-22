@@ -1,0 +1,234 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const dynamic = "force-dynamic";
+
+type Row = {
+  date: string;
+  month?: string;
+  gameId: string;
+  market: "ML" | "HANDICAP" | "TOTAL" | string;
+  label: string;
+  grade: string;
+  confidence: number;
+  ev: number | null;
+  odds: number | null;
+  passesCurrentFilter?: boolean;
+  result: "WIN" | "LOSS" | "PUSH" | "VOID" | string;
+  profit?: number;
+};
+
+const BACKTEST_END = "2026-09-13";
+
+function pct(n: number, d: number) {
+  return d > 0 ? Number(((n / d) * 100).toFixed(1)) : null;
+}
+
+function returnRate(rows: Row[]) {
+  const settled = rows.filter(
+    (r) => r.result === "WIN" || r.result === "LOSS"
+  );
+
+  if (!settled.length) return null;
+
+  const profit = settled.reduce((sum, r) => {
+    if (typeof r.profit === "number") {
+      return sum + r.profit;
+    }
+
+    const odds =
+      typeof r.odds === "number" && r.odds > 1
+        ? r.odds
+        : 1;
+
+    return (
+      sum +
+      (r.result === "WIN"
+        ? 10000 * (odds - 1)
+        : -10000)
+    );
+  }, 0);
+
+  return Number(
+    ((profit / (settled.length * 10000)) * 100).toFixed(1)
+  );
+}
+
+function summarize(rows: Row[]) {
+  const settled = rows.filter(
+    (r) => r.result === "WIN" || r.result === "LOSS"
+  );
+  const wins = settled.filter((r) => r.result === "WIN").length;
+  const losses = settled.filter((r) => r.result === "LOSS").length;
+
+  return {
+    count: settled.length,
+    wins,
+    losses,
+    hitRate: pct(wins, settled.length),
+    returnRate: returnRate(settled),
+  };
+}
+
+function pickScore(r: Row) {
+  const grade =
+    r.grade === "A"
+      ? 0.08
+      : r.grade === "B"
+        ? 0.04
+        : 0;
+
+  const confidence =
+    typeof r.confidence === "number"
+      ? r.confidence
+      : 0;
+
+  const ev =
+    typeof r.ev === "number"
+      ? Math.max(-0.20, Math.min(0.30, r.ev))
+      : -0.20;
+
+  return confidence * 0.72 + ev * 0.18 + grade * 0.10;
+}
+
+function groupSummary(rows: Row[], key: (r: Row) => string) {
+  const map = new Map<string, Row[]>();
+
+  for (const row of rows) {
+    const k = key(row);
+    const list = map.get(k) || [];
+    list.push(row);
+    map.set(k, list);
+  }
+
+  return [...map.entries()]
+    .map(([name, list]) => ({
+      name,
+      ...summarize(list),
+    }));
+}
+
+export async function GET() {
+  try {
+    const file = path.join(
+      process.cwd(),
+      "data",
+      "kbo-backtest-2026-all-candidates-lineup-base.json"
+    );
+
+    const raw = JSON.parse(
+      await fs.readFile(file, "utf8")
+    );
+
+    const allRows: Row[] =
+      Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.results)
+          ? raw.results
+          : [];
+
+    const rows = allRows.filter(
+      (r) =>
+        r.date <= BACKTEST_END &&
+        (r.result === "WIN" || r.result === "LOSS")
+    );
+
+    const recommendations = rows.filter(
+      (r) => r.passesCurrentFilter === true
+    );
+
+    const games = new Set(
+      rows.map((r) => r.gameId)
+    );
+
+    const byDate = new Map<string, Row[]>();
+
+    for (const row of recommendations) {
+      const list = byDate.get(row.date) || [];
+      list.push(row);
+      byDate.set(row.date, list);
+    }
+
+    const dailyTop = [...byDate.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([, list]) =>
+        [...list].sort(
+          (a, b) => pickScore(b) - pickScore(a)
+        )[0]
+      )
+      .filter(Boolean);
+
+    const markets = groupSummary(
+      recommendations,
+      (r) =>
+        r.market === "ML"
+          ? "승패"
+          : r.market === "HANDICAP"
+            ? "핸디캡"
+            : "오버/언더"
+    );
+
+    const grades = ["A", "B", "C"].map((grade) => ({
+      name: grade,
+      ...summarize(
+        recommendations.filter((r) => r.grade === grade)
+      ),
+    }));
+
+    const buckets = [
+      { name: "55% 미만", min: 0, max: 0.55 },
+      { name: "55~60%", min: 0.55, max: 0.60 },
+      { name: "60~65%", min: 0.60, max: 0.65 },
+      { name: "65~70%", min: 0.65, max: 0.70 },
+      { name: "70~75%", min: 0.70, max: 0.75 },
+      { name: "75% 이상", min: 0.75, max: 1.01 },
+    ].map((b) => ({
+      name: b.name,
+      ...summarize(
+        recommendations.filter(
+          (r) =>
+            typeof r.confidence === "number" &&
+            r.confidence >= b.min &&
+            r.confidence < b.max
+        )
+      ),
+    }));
+
+    const monthly = groupSummary(
+      recommendations,
+      (r) => r.month || r.date.slice(0, 7)
+    ).sort((a, b) => a.name.localeCompare(b.name));
+
+    return NextResponse.json(
+      {
+        backtest: {
+          start: "2026-03-28",
+          end: BACKTEST_END,
+          analyzedGames: games.size,
+          recommendations: summarize(recommendations),
+          dailyTop: summarize(dailyTop),
+          recommendationDays: byDate.size,
+          markets,
+          grades,
+          buckets,
+          monthly,
+        },
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("[stats/report]", error);
+
+    return NextResponse.json(
+      {
+        error: "통계 데이터를 불러오지 못했습니다.",
+      },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,987 @@
+{
+  "version": 1,
+  "liveStart": "2026-09-16",
+  "combos": [
+    {
+      "id": "v0.1:2026-09-18:HIGH_ODDS:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "HIGH_ODDS",
+      "leg": 2,
+      "name": "AI 고배당형 2폴",
+      "odds": 3.3425,
+      "probability": 0.31246431221310955,
+      "averageConfidence": 0.5602006415228478,
+      "averageEv": -0.009948495185495843,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "TOTAL",
+          "label": "오버 7.5",
+          "grade": "C",
+          "confidence": 0.5233164098038501,
+          "ev": -0.013825960092252454,
+          "odds": 1.91
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5970848732418456,
+          "ev": -0.006071030278739231,
+          "odds": 1.75
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "WIN",
+        "LOSS"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:HIGH_ODDS:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "HIGH_ODDS",
+      "leg": 3,
+      "name": "AI 고배당형 3폴",
+      "odds": 6.049925,
+      "probability": 0.15918285702548818,
+      "averageConfidence": 0.5432815348074177,
+      "averageEv": -0.0343107673956311,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "TOTAL",
+          "label": "오버 7.5",
+          "grade": "C",
+          "confidence": 0.5233164098038501,
+          "ev": -0.013825960092252454,
+          "odds": 1.91
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5970848732418456,
+          "ev": -0.006071030278739231,
+          "odds": 1.75
+        },
+        {
+          "gameId": "20260918LGKT0",
+          "awayTeamName": "LG",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5094433213765576,
+          "ev": -0.08303531181590162,
+          "odds": 1.81
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "WIN",
+        "LOSS",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:HIGH_ODDS:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "HIGH_ODDS",
+      "leg": 4,
+      "name": "AI 고배당형 4폴",
+      "odds": 10.647868,
+      "probability": 0.08585731477223983,
+      "averageConfidence": 0.542301856280387,
+      "averageEv": -0.04360932677134058,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "TOTAL",
+          "label": "오버 7.5",
+          "grade": "C",
+          "confidence": 0.5233164098038501,
+          "ev": -0.013825960092252454,
+          "odds": 1.91
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5970848732418456,
+          "ev": -0.006071030278739231,
+          "odds": 1.75
+        },
+        {
+          "gameId": "20260918LGKT0",
+          "awayTeamName": "LG",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5094433213765576,
+          "ev": -0.08303531181590162,
+          "odds": 1.81
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "TOTAL",
+          "label": "오버 9.5",
+          "grade": "C",
+          "confidence": 0.5393628206992946,
+          "ev": -0.071505004898469,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "WIN",
+        "LOSS",
+        "WIN",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:SAFE:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "SAFE",
+      "leg": 2,
+      "name": "AI 안전형 2폴",
+      "odds": 2.0196,
+      "probability": 0.4402538207187026,
+      "averageConfidence": 0.664317818160565,
+      "averageEv": -0.0762699236171791,
+      "picks": [
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "HANDICAP",
+          "label": "NC +1.5",
+          "grade": "C",
+          "confidence": 0.6316935510130731,
+          "ev": -0.033508866949998106,
+          "odds": 1.53
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "C",
+          "confidence": 0.6969420853080569,
+          "ev": -0.1190309802843601,
+          "odds": 1.32
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "LOSS",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:44:52.889Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:SAFE:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "SAFE",
+      "leg": 3,
+      "name": "AI 안전형 3폴",
+      "odds": 2.8880280000000003,
+      "probability": 0.25553728301288076,
+      "averageConfidence": 0.6363557859071927,
+      "averageEv": -0.10750749521057257,
+      "picks": [
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "HANDICAP",
+          "label": "NC +1.5",
+          "grade": "C",
+          "confidence": 0.6316935510130731,
+          "ev": -0.033508866949998106,
+          "odds": 1.53
+        },
+        {
+          "gameId": "20260918LGKT0",
+          "awayTeamName": "LG",
+          "homeTeamName": "KT",
+          "market": "HANDICAP",
+          "label": "LG +1.5",
+          "grade": "C",
+          "confidence": 0.580431721400448,
+          "ev": -0.1699826383973595,
+          "odds": 1.43
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "C",
+          "confidence": 0.6969420853080569,
+          "ev": -0.1190309802843601,
+          "odds": 1.32
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "LOSS",
+        "WIN",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:44:52.889Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:SAFE:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "SAFE",
+      "leg": 4,
+      "name": "AI 안전형 4폴",
+      "odds": 4.59196452,
+      "probability": 0.14442091108060548,
+      "averageConfidence": 0.618558268001823,
+      "averageEv": -0.10986275569364368,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "ML",
+          "label": "두산 승",
+          "grade": "C",
+          "confidence": 0.5651657142857143,
+          "ev": -0.116928537142857,
+          "odds": 1.59
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "HANDICAP",
+          "label": "NC +1.5",
+          "grade": "C",
+          "confidence": 0.6316935510130731,
+          "ev": -0.033508866949998106,
+          "odds": 1.53
+        },
+        {
+          "gameId": "20260918LGKT0",
+          "awayTeamName": "LG",
+          "homeTeamName": "KT",
+          "market": "HANDICAP",
+          "label": "LG +1.5",
+          "grade": "C",
+          "confidence": 0.580431721400448,
+          "ev": -0.1699826383973595,
+          "odds": 1.43
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "C",
+          "confidence": 0.6969420853080569,
+          "ev": -0.1190309802843601,
+          "odds": 1.32
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "PUSH",
+        "LOSS",
+        "WIN",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:VALUE:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "VALUE",
+      "leg": 2,
+      "name": "AI 가치형 2폴",
+      "odds": 2.0196,
+      "probability": 0.4402538207187026,
+      "averageConfidence": 0.664317818160565,
+      "averageEv": -0.0762699236171791,
+      "picks": [
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "HANDICAP",
+          "label": "NC +1.5",
+          "grade": "C",
+          "confidence": 0.6316935510130731,
+          "ev": -0.033508866949998106,
+          "odds": 1.53
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "C",
+          "confidence": 0.6969420853080569,
+          "ev": -0.1190309802843601,
+          "odds": 1.32
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "LOSS",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:44:52.889Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:VALUE:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "VALUE",
+      "leg": 3,
+      "name": "AI 가치형 3폴",
+      "odds": 4.4121,
+      "probability": 0.21776952933815233,
+      "averageConfidence": 0.6057811227845842,
+      "averageEv": -0.04630932355178393,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "TOTAL",
+          "label": "오버 7.5",
+          "grade": "C",
+          "confidence": 0.5233164098038501,
+          "ev": -0.013825960092252454,
+          "odds": 1.91
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5970848732418456,
+          "ev": -0.006071030278739231,
+          "odds": 1.75
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "C",
+          "confidence": 0.6969420853080569,
+          "ev": -0.1190309802843601,
+          "odds": 1.32
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "WIN",
+        "LOSS",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-18:VALUE:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-18",
+      "mode": "VALUE",
+      "leg": 4,
+      "name": "AI 가치형 4폴",
+      "odds": 10.118416,
+      "probability": 0.09226296558942293,
+      "averageConfidence": 0.5518040053883024,
+      "averageEv": -0.04050682285846102,
+      "picks": [
+        {
+          "gameId": "20260918WOOB0",
+          "awayTeamName": "키움",
+          "homeTeamName": "두산",
+          "market": "TOTAL",
+          "label": "오버 7.5",
+          "grade": "C",
+          "confidence": 0.5233164098038501,
+          "ev": -0.013825960092252454,
+          "odds": 1.91
+        },
+        {
+          "gameId": "20260918NCLT0",
+          "awayTeamName": "NC",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5970848732418456,
+          "ev": -0.006071030278739231,
+          "odds": 1.75
+        },
+        {
+          "gameId": "20260918LGKT0",
+          "awayTeamName": "LG",
+          "homeTeamName": "KT",
+          "market": "ML",
+          "label": "KT 승",
+          "grade": "C",
+          "confidence": 0.5474519178082192,
+          "ev": -0.0706252961643834,
+          "odds": 1.72
+        },
+        {
+          "gameId": "20260918SSHH0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "한화",
+          "market": "TOTAL",
+          "label": "오버 9.5",
+          "grade": "C",
+          "confidence": 0.5393628206992946,
+          "ev": -0.071505004898469,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-17T21:53:06.879Z",
+      "capturedAt": "2026-09-18T09:07:56.115Z",
+      "result": "LOSS",
+      "pickResults": [
+        "WIN",
+        "LOSS",
+        "LOSS",
+        "WIN"
+      ],
+      "effectiveOdds": 0,
+      "settledAt": "2026-09-18T13:52:20.413Z"
+    },
+    {
+      "id": "v0.1:2026-09-19:HIGH_ODDS:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "HIGH_ODDS",
+      "leg": 2,
+      "name": "AI 고배당형 2폴",
+      "odds": 3.7239999999999998,
+      "probability": 0.3172723677892985,
+      "averageConfidence": 0.5632699531939531,
+      "averageEv": 0.0504949265322322,
+      "picks": [
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "언더 9.5",
+          "grade": "C",
+          "confidence": 0.562449964279598,
+          "ev": 0.03305845249186534,
+          "odds": 1.9
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:45:23.951Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:HIGH_ODDS:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "HIGH_ODDS",
+      "leg": 3,
+      "name": "AI 고배당형 3폴",
+      "odds": 6.77768,
+      "probability": 0.18790905971649188,
+      "averageConfidence": 0.5729346964828993,
+      "averageEv": 0.042844807427970956,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "언더 9.5",
+          "grade": "C",
+          "confidence": 0.562449964279598,
+          "ev": 0.03305845249186534,
+          "odds": 1.9
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:45:23.951Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:HIGH_ODDS:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "HIGH_ODDS",
+      "leg": 4,
+      "name": "AI 고배당형 4폴",
+      "odds": 11.9287168,
+      "probability": 0.10955209687946472,
+      "averageConfidence": 0.5754525058786579,
+      "averageEv": 0.033177824911637566,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "언더 9.5",
+          "grade": "C",
+          "confidence": 0.562449964279598,
+          "ev": 0.03305845249186534,
+          "odds": 1.9
+        },
+        {
+          "gameId": "20260919HTNC0",
+          "awayTeamName": "KIA",
+          "homeTeamName": "NC",
+          "market": "ML",
+          "label": "KIA 승",
+          "grade": "B",
+          "confidence": 0.583005934065934,
+          "ev": 0.004176877362637388,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:45:23.951Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:SAFE:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "SAFE",
+      "leg": 2,
+      "name": "AI 안전형 2폴",
+      "odds": 2.0276,
+      "probability": 0.43957057444518505,
+      "averageConfidence": 0.6636829951876312,
+      "averageEv": -0.09064500788729324,
+      "picks": [
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "B",
+          "confidence": 0.633607362924282,
+          "ev": -0.09192193744125321,
+          "odds": 1.48
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "ML",
+          "label": "KT 승",
+          "grade": "A",
+          "confidence": 0.6937586274509804,
+          "ev": -0.08936807833333327,
+          "odds": 1.37
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:SAFE:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "SAFE",
+      "leg": 3,
+      "name": "AI 안전형 3폴",
+      "odds": 3.568576,
+      "probability": 0.2562722533423143,
+      "averageConfidence": 0.6367906414803989,
+      "averageEv": -0.05903771280398303,
+      "picks": [
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "B",
+          "confidence": 0.633607362924282,
+          "ev": -0.09192193744125321,
+          "odds": 1.48
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "ML",
+          "label": "KT 승",
+          "grade": "A",
+          "confidence": 0.6937586274509804,
+          "ev": -0.08936807833333327,
+          "odds": 1.37
+        },
+        {
+          "gameId": "20260919HTNC0",
+          "awayTeamName": "KIA",
+          "homeTeamName": "NC",
+          "market": "ML",
+          "label": "KIA 승",
+          "grade": "B",
+          "confidence": 0.583005934065934,
+          "ev": 0.004176877362637388,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:SAFE:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "SAFE",
+      "leg": 4,
+      "name": "AI 안전형 4폴",
+      "odds": 6.494808320000001,
+      "probability": 0.151780876766934,
+      "averageConfidence": 0.625659026875497,
+      "averageEv": -0.03739214229812515,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "ML",
+          "label": "삼성 승",
+          "grade": "B",
+          "confidence": 0.633607362924282,
+          "ev": -0.09192193744125321,
+          "odds": 1.48
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "ML",
+          "label": "KT 승",
+          "grade": "A",
+          "confidence": 0.6937586274509804,
+          "ev": -0.08936807833333327,
+          "odds": 1.37
+        },
+        {
+          "gameId": "20260919HTNC0",
+          "awayTeamName": "KIA",
+          "homeTeamName": "NC",
+          "market": "ML",
+          "label": "KIA 승",
+          "grade": "B",
+          "confidence": 0.583005934065934,
+          "ev": 0.004176877362637388,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:VALUE:2",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "VALUE",
+      "leg": 2,
+      "name": "AI 가치형 2폴",
+      "odds": 3.5672,
+      "probability": 0.3340902687355864,
+      "averageConfidence": 0.5781770625845499,
+      "averageEv": 0.047737984896023766,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:VALUE:3",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "VALUE",
+      "leg": 3,
+      "name": "AI 가치형 3폴",
+      "odds": 6.278272,
+      "probability": 0.19477660918652948,
+      "averageConfidence": 0.579786686411678,
+      "averageEv": 0.03321761571822831,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        },
+        {
+          "gameId": "20260919HTNC0",
+          "awayTeamName": "KIA",
+          "homeTeamName": "NC",
+          "market": "ML",
+          "label": "KIA 승",
+          "grade": "B",
+          "confidence": 0.583005934065934,
+          "ev": 0.004176877362637388,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    },
+    {
+      "id": "v0.1:2026-09-19:VALUE:4",
+      "engineVersion": "v0.1",
+      "source": "LIVE",
+      "date": "2026-09-19",
+      "mode": "VALUE",
+      "leg": 4,
+      "name": "AI 가치형 4폴",
+      "odds": 11.9287168,
+      "probability": 0.10955209687946472,
+      "averageConfidence": 0.5754525058786579,
+      "averageEv": 0.033177824911637566,
+      "picks": [
+        {
+          "gameId": "20260919HHLG0",
+          "awayTeamName": "한화",
+          "homeTeamName": "LG",
+          "market": "TOTAL",
+          "label": "오버 8.5",
+          "grade": "C",
+          "confidence": 0.5922641830607915,
+          "ev": 0.027544569219448478,
+          "odds": 1.82
+        },
+        {
+          "gameId": "20260919SSLT0",
+          "awayTeamName": "삼성",
+          "homeTeamName": "롯데",
+          "market": "TOTAL",
+          "label": "언더 10.5",
+          "grade": "C",
+          "confidence": 0.5640899421083083,
+          "ev": 0.06793140057259905,
+          "odds": 1.96
+        },
+        {
+          "gameId": "20260919OBKT0",
+          "awayTeamName": "두산",
+          "homeTeamName": "KT",
+          "market": "TOTAL",
+          "label": "언더 9.5",
+          "grade": "C",
+          "confidence": 0.562449964279598,
+          "ev": 0.03305845249186534,
+          "odds": 1.9
+        },
+        {
+          "gameId": "20260919HTNC0",
+          "awayTeamName": "KIA",
+          "homeTeamName": "NC",
+          "market": "ML",
+          "label": "KIA 승",
+          "grade": "B",
+          "confidence": 0.583005934065934,
+          "ev": 0.004176877362637388,
+          "odds": 1.76
+        }
+      ],
+      "firstCapturedAt": "2026-09-18T15:01:33.556Z",
+      "capturedAt": "2026-09-19T07:51:18.955Z",
+      "result": "PENDING"
+    }
+  ]
+}

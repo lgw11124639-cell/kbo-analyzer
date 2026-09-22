@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-09-14T17:07:46.486Z",
+  "final": "LOCKED",
+  "rules": {
+    "candidate": "EV >= 3% and < 10%",
+    "ml": "-FORM -LINEUP -BULLPEN",
+    "handicap": "+FORM",
+    "score": "50% normalized EV + 50% edge signal"
+  },
+  "scales": {
+    "ML": {
+      "FORM": 17.709089526337934,
+      "LINEUP": 9.228749363527806,
+      "BULLPEN": 18.90630651200614
+    },
+    "HANDICAP": {
+      "FORM": 17.6689172380097
+    }
+  },
+  "discovery": {
+    "top1": {
+      "bets": 6,
+      "wins": 1,
+      "losses": 5,
+      "hit": 16.67,
+      "avgOdds": 2.638,
+      "profit": -29000,
+      "roi": -48.33
+    },
+    "rank2": {
+      "bets": 1,
+      "wins": 1,
+      "losses": 0,
+      "hit": 100,
+      "avgOdds": 2.18,
+      "profit": 11800,
+      "roi": 118
+    },
+    "top12": {
+      "bets": 7,
+      "wins": 2,
+      "losses": 5,
+      "hit": 28.57,
+      "avgOdds": 2.573,
+      "profit": -17200,
+      "roi": -24.57
+    },
+    "top1Monthly": [
+      {
+        "month": "2026-04",
+        "bets": 6,
+        "wins": 1,
+        "losses": 5,
+        "hit": 16.67,
+        "avgOdds": 2.638,
+        "profit": -29000,
+        "roi": -48.33
+      }
+    ],
+    "rank2Monthly": [
+      {
+        "month": "2026-04",
+        "bets": 1,
+        "wins": 1,
+        "losses": 0,
+        "hit": 100,
+        "avgOdds": 2.18,
+        "profit": 11800,
+        "roi": 118
+      }
+    ]
+  },
+  "internal": {
+    "top1": {
+      "bets": 16,
+      "wins": 7,
+      "losses": 9,
+      "hit": 43.75,
+      "avgOdds": 2.714,
+      "profit": 31100,
+      "roi": 19.44
+    },
+    "rank2": {
+      "bets": 4,
+      "wins": 2,
+      "losses": 2,
+      "hit": 50,
+      "avgOdds": 1.887,
+      "profit": -4300,
+      "roi": -10.75
+    },
+    "top12": {
+      "bets": 20,
+      "wins": 9,
+      "losses": 11,
+      "hit": 45,
+      "avgOdds": 2.549,
+      "profit": 26800,
+      "roi": 13.4
+    },
+    "top1Monthly": [
+      {
+        "month": "2026-05",
+        "bets": 6,
+        "wins": 4,
+        "losses": 2,
+        "hit": 66.67,
+        "avgOdds": 2.772,
+        "profit": 49900,
+        "roi": 83.17
+      },
+      {
+        "month": "2026-06",
+        "bets": 10,
+        "wins": 3,
+        "losses": 7,
+        "hit": 30,
+        "avgOdds": 2.68,
+        "profit": -18800,
+        "roi": -18.8
+      }
+    ],
+    "rank2Monthly": [
+      {
+        "month": "2026-05",
+        "bets": 2,
+        "wins": 2,
+        "losses": 0,
+        "hit": 100,
+        "avgOdds": 1.785,
+        "profit": 15700,
+        "roi": 78.5
+      },
+      {
+        "month": "2026-06",
+        "bets": 2,
+        "wins": 0,
+        "losses": 2,
+        "hit": 0,
+        "avgOdds": 1.99,
+        "profit": -20000,
+        "roi": -100
+      }
+    ]
+  },
+  "pass": false
+}

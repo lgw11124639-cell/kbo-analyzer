@@ -1,0 +1,228 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "ML_ANY": {
+      "bets": 10,
+      "wins": 3,
+      "hit": 30,
+      "avgOdds": 4.293,
+      "roi": 38.12,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 75,
+      "sameGame": 4,
+      "differentGame": 6
+    },
+    "ML_EV_POS": {
+      "bets": 6,
+      "wins": 3,
+      "hit": 50,
+      "avgOdds": 4.725,
+      "roi": 148.7,
+      "anchorHitDays": 3,
+      "partnerHitWhenAnchorHit": 100,
+      "sameGame": 0,
+      "differentGame": 6
+    },
+    "ML_CONF50": {
+      "bets": 10,
+      "wins": 2,
+      "hit": 20,
+      "avgOdds": 4.206,
+      "roi": -21.73,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 50,
+      "sameGame": 5,
+      "differentGame": 5
+    },
+    "HANDI_ANY": {
+      "bets": 10,
+      "wins": 3,
+      "hit": 30,
+      "avgOdds": 3.308,
+      "roi": -7.39,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 75,
+      "sameGame": 3,
+      "differentGame": 7
+    },
+    "HANDI_EV_POS": {
+      "bets": 1,
+      "wins": 0,
+      "hit": 0,
+      "avgOdds": 8.153,
+      "roi": -100,
+      "anchorHitDays": 0,
+      "partnerHitWhenAnchorHit": 0,
+      "sameGame": 0,
+      "differentGame": 1
+    },
+    "OVER_ANY": {
+      "bets": 10,
+      "wins": 1,
+      "hit": 10,
+      "avgOdds": 4.572,
+      "roi": -61.04,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 25,
+      "sameGame": 0,
+      "differentGame": 10
+    },
+    "OVER_EV_POS": {
+      "bets": 3,
+      "wins": 0,
+      "hit": 0,
+      "avgOdds": 4.956,
+      "roi": -100,
+      "anchorHitDays": 1,
+      "partnerHitWhenAnchorHit": 0,
+      "sameGame": 0,
+      "differentGame": 3
+    },
+    "UNDER_ANY": {
+      "bets": 10,
+      "wins": 1,
+      "hit": 10,
+      "avgOdds": 4.422,
+      "roi": -50.26,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 25,
+      "sameGame": 3,
+      "differentGame": 7
+    },
+    "UNDER_EV_POS": {
+      "bets": 2,
+      "wins": 0,
+      "hit": 0,
+      "avgOdds": 4.481,
+      "roi": -100,
+      "anchorHitDays": 1,
+      "partnerHitWhenAnchorHit": 0,
+      "sameGame": 0,
+      "differentGame": 2
+    },
+    "ANY_EV_POS": {
+      "bets": 8,
+      "wins": 2,
+      "hit": 25,
+      "avgOdds": 4.647,
+      "roi": 11.71,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 50,
+      "sameGame": 0,
+      "differentGame": 8
+    }
+  },
+  "internal": {
+    "ML_ANY": {
+      "bets": 35,
+      "wins": 10,
+      "hit": 28.57,
+      "avgOdds": 3.952,
+      "roi": 10.28,
+      "anchorHitDays": 16,
+      "partnerHitWhenAnchorHit": 62.5,
+      "sameGame": 19,
+      "differentGame": 16
+    },
+    "ML_EV_POS": {
+      "bets": 14,
+      "wins": 2,
+      "hit": 14.29,
+      "avgOdds": 4.792,
+      "roi": -41.27,
+      "anchorHitDays": 5,
+      "partnerHitWhenAnchorHit": 40,
+      "sameGame": 3,
+      "differentGame": 11
+    },
+    "ML_CONF50": {
+      "bets": 35,
+      "wins": 12,
+      "hit": 34.29,
+      "avgOdds": 3.886,
+      "roi": 33.42,
+      "anchorHitDays": 16,
+      "partnerHitWhenAnchorHit": 75,
+      "sameGame": 21,
+      "differentGame": 14
+    },
+    "HANDI_ANY": {
+      "bets": 35,
+      "wins": 8,
+      "hit": 22.86,
+      "avgOdds": 3.16,
+      "roi": -30.18,
+      "anchorHitDays": 16,
+      "partnerHitWhenAnchorHit": 50,
+      "sameGame": 5,
+      "differentGame": 30
+    },
+    "HANDI_EV_POS": {
+      "bets": 20,
+      "wins": 5,
+      "hit": 25,
+      "avgOdds": 6.897,
+      "roi": 56.05,
+      "anchorHitDays": 11,
+      "partnerHitWhenAnchorHit": 45.45,
+      "sameGame": 0,
+      "differentGame": 20
+    },
+    "OVER_ANY": {
+      "bets": 35,
+      "wins": 8,
+      "hit": 22.86,
+      "avgOdds": 4.343,
+      "roi": -0.13,
+      "anchorHitDays": 16,
+      "partnerHitWhenAnchorHit": 50,
+      "sameGame": 9,
+      "differentGame": 26
+    },
+    "OVER_EV_POS": {
+      "bets": 6,
+      "wins": 1,
+      "hit": 16.67,
+      "avgOdds": 4.313,
+      "roi": -44.33,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 25,
+      "sameGame": 3,
+      "differentGame": 3
+    },
+    "UNDER_ANY": {
+      "bets": 35,
+      "wins": 9,
+      "hit": 25.71,
+      "avgOdds": 4.407,
+      "roi": 15.25,
+      "anchorHitDays": 16,
+      "partnerHitWhenAnchorHit": 56.25,
+      "sameGame": 3,
+      "differentGame": 32
+    },
+    "UNDER_EV_POS": {
+      "bets": 8,
+      "wins": 3,
+      "hit": 37.5,
+      "avgOdds": 4.183,
+      "roi": 64.9,
+      "anchorHitDays": 4,
+      "partnerHitWhenAnchorHit": 75,
+      "sameGame": 0,
+      "differentGame": 8
+    },
+    "ANY_EV_POS": {
+      "bets": 29,
+      "wins": 6,
+      "hit": 20.69,
+      "avgOdds": 5.2,
+      "roi": -10.95,
+      "anchorHitDays": 12,
+      "partnerHitWhenAnchorHit": 50,
+      "sameGame": 5,
+      "differentGame": 24
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{
+  "/api/kbo/pitcher/[id]/route": "app/api/kbo/pitcher/[id]/route.js"
+}

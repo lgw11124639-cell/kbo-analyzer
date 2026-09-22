@@ -1,0 +1,1298 @@
+﻿import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+
+export const dynamic = "force-dynamic";
+
+
+type LineupPlayer = {
+  order: number;
+  position: string;
+  name: string;
+};
+
+
+type RecentForm = {
+  games: number;
+  pa: number;
+  ab: number;
+
+  runs: number;
+  hits: number;
+
+  doubles: number;
+  triples: number;
+
+  hr: number;
+  rbi: number;
+
+  bb: number;
+  hbp: number;
+  so: number;
+
+  avg: number | null;
+  obpApprox: number | null;
+  slg: number | null;
+  opsApprox: number | null;
+};
+
+type HitterStats = {
+  avg: number | null;
+  g: number | null;
+  pa: number | null;
+  ab: number | null;
+
+  runs: number | null;
+  hits: number | null;
+
+  doubles: number | null;
+  triples: number | null;
+
+  hr: number | null;
+  rbi: number | null;
+
+  bb: number | null;
+  so: number | null;
+
+  obp: number | null;
+  slg: number | null;
+  ops: number | null;
+
+  recent5: RecentForm | null;
+  recent10: RecentForm | null;
+};
+
+
+type EnrichedPlayer = LineupPlayer & {
+  playerId: number | null;
+
+  stats: HitterStats | null;
+
+  score: number | null;
+};
+
+
+function normalizeTeamName(
+  value: string | null | undefined
+) {
+  return (value ?? "")
+    .replace(/\s+/g, "")
+    .replace("두산베어스", "두산")
+    .replace("LG트윈스", "LG")
+    .replace("삼성라이온즈", "삼성")
+    .replace("KIA타이거즈", "KIA")
+    .replace("한화이글스", "한화")
+    .replace("롯데자이언츠", "롯데")
+    .replace("KT위즈", "KT")
+    .replace("NC다이노스", "NC")
+    .replace("SSG랜더스", "SSG")
+    .replace("키움히어로즈", "키움");
+}
+
+
+function text(
+  value: string
+) {
+  return value
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
+function num(
+  value: string | undefined
+) {
+  if (!value) {
+    return null;
+  }
+
+  const cleaned =
+    value
+      .replace(/,/g, "")
+      .replace(/[^0-9.-]/g, "")
+      .trim();
+
+  if (
+    !cleaned ||
+    cleaned === "-"
+  ) {
+    return null;
+  }
+
+  const parsed =
+    Number(cleaned);
+
+  return Number.isFinite(parsed)
+    ? parsed
+    : null;
+}
+
+
+async function fetchHtml(
+  url: string
+) {
+  const response =
+    await fetch(
+      url,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+
+          "Accept-Language":
+            "ko-KR,ko;q=0.9",
+        },
+
+        cache:
+          "no-store",
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `HTTP ${response.status}`
+    );
+  }
+
+  return response.text();
+}
+
+
+function playerIdFromHref(
+  href: string | undefined
+) {
+  if (!href) {
+    return null;
+  }
+
+  const match =
+    href.match(
+      /playerId=(\d+)/i
+    );
+
+  return match
+    ? Number(match[1])
+    : null;
+}
+
+
+async function findPlayerId(
+  name: string,
+  team: string
+) {
+  try {
+    const searchUrl =
+      new URL(
+        "https://www.koreabaseball.com/Player/Search.aspx"
+      );
+
+    searchUrl.searchParams.set(
+      "searchWord",
+      name
+    );
+
+    const html =
+      await fetchHtml(
+        searchUrl.toString()
+      );
+
+    const $ =
+      cheerio.load(html);
+
+    const candidates:
+      Array<{
+        name: string;
+        team: string;
+        playerId: number | null;
+      }> = [];
+
+    $("table tbody tr").each(
+      (_, row) => {
+        const cells =
+          $(row).find("td");
+
+        if (
+          cells.length < 3
+        ) {
+          return;
+        }
+
+        const nameCell =
+          $(cells[1]);
+
+        const playerName =
+          text(
+            nameCell.text()
+          );
+
+        const teamName =
+          normalizeTeamName(
+            $(cells[2])
+              .text()
+              .trim()
+          );
+
+        const href =
+          nameCell
+            .find("a")
+            .first()
+            .attr("href");
+
+        candidates.push({
+          name:
+            playerName,
+
+          team:
+            teamName,
+
+          playerId:
+            playerIdFromHref(
+              href
+            ),
+        });
+      }
+    );
+
+    const exact =
+      candidates.find(
+        (player) =>
+          player.name === name &&
+          player.team === team &&
+          player.playerId
+      ) ??
+      candidates.find(
+        (player) =>
+          player.name === name &&
+          player.playerId
+      );
+
+    return (
+      exact?.playerId ??
+      null
+    );
+
+  } catch {
+    return null;
+  }
+}
+
+
+function parseTables(
+  html: string
+) {
+  const $ =
+    cheerio.load(html);
+
+  const tables:
+    Array<{
+      headers: string[];
+      rows: string[][];
+    }> = [];
+
+  $("table").each(
+    (_, table) => {
+      const headers =
+        $(table)
+          .find("thead th")
+          .map(
+            (_, th) =>
+              text(
+                $(th).text()
+              )
+          )
+          .get();
+
+      const rows =
+        $(table)
+          .find("tbody tr")
+          .map(
+            (_, tr) => {
+              const cells =
+                $(tr)
+                  .find("th,td")
+                  .map(
+                    (_, td) =>
+                      text(
+                        $(td).text()
+                      )
+                  )
+                  .get();
+
+              return cells.length
+                ? [cells]
+                : [];
+            }
+          )
+          .get() as string[][];
+
+      if (
+        headers.length &&
+        rows.length
+      ) {
+        tables.push({
+          headers,
+          rows,
+        });
+      }
+    }
+  );
+
+  return tables;
+}
+
+
+function findSeasonRow(
+  tables: Array<{
+    headers: string[];
+    rows: string[][];
+  }>,
+  requiredHeaders: string[]
+) {
+  for (
+    const table of tables
+  ) {
+    const normalized =
+      table.headers.map(
+        (header) =>
+          header.toUpperCase()
+      );
+
+    const matched =
+      requiredHeaders.every(
+        (required) =>
+          normalized.includes(
+            required.toUpperCase()
+          )
+      );
+
+    if (!matched) {
+      continue;
+    }
+
+    for (
+      let i =
+        table.rows.length - 1;
+      i >= 0;
+      i--
+    ) {
+      const row =
+        table.rows[i];
+
+      if (
+        !row ||
+        row.length <
+          table.headers.length
+      ) {
+        continue;
+      }
+
+      const result:
+        Record<string,string> = {};
+
+      table.headers.forEach(
+        (header,index) => {
+          result[
+            header.toUpperCase()
+          ] =
+            row[index] ?? "";
+        }
+      );
+
+      return result;
+    }
+  }
+
+  return null;
+}
+
+
+function recentFormFromTables(
+  tables: Array<{
+    headers: string[];
+    rows: string[][];
+  }>,
+  limit: number
+): RecentForm | null {
+
+  for (
+    const table of tables
+  ) {
+    const headers =
+      table.headers.map(
+        (header) =>
+          header
+            .replace(/\s+/g, "")
+            .trim()
+      );
+
+    const required = [
+      "일자",
+      "상대",
+      "PA",
+      "AB",
+      "H",
+      "HR",
+      "BB",
+      "SO",
+    ];
+
+    const matched =
+      required.every(
+        (requiredHeader) =>
+          headers.includes(
+            requiredHeader
+          )
+      );
+
+    if (!matched) {
+      continue;
+    }
+
+
+    const parsed =
+      table.rows
+        .map(
+          (cells) => {
+            const row:
+              Record<string,string> =
+              {};
+
+            headers.forEach(
+              (
+                header,
+                index
+              ) => {
+                row[header] =
+                  cells[index] ??
+                  "";
+              }
+            );
+
+            return {
+              pa:
+                num(row.PA) ?? 0,
+
+              ab:
+                num(row.AB) ?? 0,
+
+              runs:
+                num(row.R) ?? 0,
+
+              hits:
+                num(row.H) ?? 0,
+
+              doubles:
+                num(
+                  row["2B"]
+                ) ?? 0,
+
+              triples:
+                num(
+                  row["3B"]
+                ) ?? 0,
+
+              hr:
+                num(row.HR) ?? 0,
+
+              rbi:
+                num(row.RBI) ?? 0,
+
+              bb:
+                num(row.BB) ?? 0,
+
+              hbp:
+                num(row.HBP) ?? 0,
+
+              so:
+                num(row.SO) ?? 0,
+            };
+          }
+        )
+        .slice(-limit);
+
+
+    if (
+      parsed.length === 0
+    ) {
+      return null;
+    }
+
+
+    const pa =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.pa,
+        0
+      );
+
+    const ab =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.ab,
+        0
+      );
+
+    const hits =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.hits,
+        0
+      );
+
+    const doubles =
+      parsed.reduce(
+        (sum, game) =>
+          sum +
+          game.doubles,
+        0
+      );
+
+    const triples =
+      parsed.reduce(
+        (sum, game) =>
+          sum +
+          game.triples,
+        0
+      );
+
+    const hr =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.hr,
+        0
+      );
+
+    const bb =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.bb,
+        0
+      );
+
+    const hbp =
+      parsed.reduce(
+        (sum, game) =>
+          sum + game.hbp,
+        0
+      );
+
+
+    const avg =
+      ab > 0
+        ? hits / ab
+        : null;
+
+
+    /*
+      최근경기 표에는 SF가 없으므로
+      최근 OBP는 근사치.
+    */
+    const obpApprox =
+      pa > 0
+        ? (
+            hits +
+            bb +
+            hbp
+          ) / pa
+        : null;
+
+
+    const singles =
+      Math.max(
+        0,
+        hits -
+        doubles -
+        triples -
+        hr
+      );
+
+
+    const totalBases =
+      singles +
+      doubles * 2 +
+      triples * 3 +
+      hr * 4;
+
+
+    const slg =
+      ab > 0
+        ? totalBases / ab
+        : null;
+
+
+    const opsApprox =
+      obpApprox !== null &&
+      slg !== null
+        ? obpApprox + slg
+        : null;
+
+
+    return {
+      games:
+        parsed.length,
+
+      pa,
+      ab,
+
+      runs:
+        parsed.reduce(
+          (sum, game) =>
+            sum +
+            game.runs,
+          0
+        ),
+
+      hits,
+
+      doubles,
+      triples,
+
+      hr,
+
+      rbi:
+        parsed.reduce(
+          (sum, game) =>
+            sum +
+            game.rbi,
+          0
+        ),
+
+      bb,
+      hbp,
+
+      so:
+        parsed.reduce(
+          (sum, game) =>
+            sum +
+            game.so,
+          0
+        ),
+
+      avg,
+      obpApprox,
+      slg,
+      opsApprox,
+    };
+  }
+
+
+  return null;
+}
+
+async function fetchHitterStats(
+  playerId: number
+): Promise<HitterStats | null> {
+  try {
+    const url =
+      `https://www.koreabaseball.com/Record/Player/HitterDetail/Basic.aspx?playerId=${playerId}`;
+
+    const html =
+      await fetchHtml(url);
+
+    const tables =
+      parseTables(html);
+
+    const basic =
+      findSeasonRow(
+        tables,
+        [
+          "AVG",
+          "G",
+          "PA",
+          "AB",
+          "H",
+          "HR",
+        ]
+      );
+
+    const advanced =
+      findSeasonRow(
+        tables,
+        [
+          "BB",
+          "SO",
+          "SLG",
+          "OBP",
+          "OPS",
+        ]
+      );
+
+    if (
+      !basic &&
+      !advanced
+    ) {
+      return null;
+    }
+
+
+    const recent5 =
+      recentFormFromTables(
+        tables,
+        5
+      );
+
+    const recent10 =
+      recentFormFromTables(
+        tables,
+        10
+      );
+
+
+    return {
+      avg:
+        num(
+          basic?.AVG ??
+          advanced?.AVG
+        ),
+
+      g:
+        num(basic?.G),
+
+      pa:
+        num(basic?.PA),
+
+      ab:
+        num(basic?.AB),
+
+      runs:
+        num(basic?.R),
+
+      hits:
+        num(basic?.H),
+
+      doubles:
+        num(
+          basic?.["2B"]
+        ),
+
+      triples:
+        num(
+          basic?.["3B"]
+        ),
+
+      hr:
+        num(basic?.HR),
+
+      rbi:
+        num(basic?.RBI),
+
+      bb:
+        num(advanced?.BB),
+
+      so:
+        num(advanced?.SO),
+
+      obp:
+        num(advanced?.OBP),
+
+      slg:
+        num(advanced?.SLG),
+
+      ops:
+        num(advanced?.OPS),
+
+      recent5,
+      recent10,
+    };
+
+  } catch {
+    return null;
+  }
+}
+
+
+function orderWeight(
+  order: number
+) {
+  switch (order) {
+    case 1:
+      return 1.08;
+
+    case 2:
+      return 1.10;
+
+    case 3:
+      return 1.13;
+
+    case 4:
+      return 1.16;
+
+    case 5:
+      return 1.12;
+
+    case 6:
+      return 1.00;
+
+    case 7:
+      return 0.94;
+
+    case 8:
+      return 0.90;
+
+    case 9:
+      return 0.88;
+
+    default:
+      return 1;
+  }
+}
+
+
+function hitterScore(
+  stats: HitterStats | null,
+  order: number
+) {
+  if (!stats) {
+    return null;
+  }
+
+  /*
+    타선점수 v0.1
+
+    리그 평균 근처를 대략 50점으로 놓는 초기 휴리스틱.
+    OPS 비중을 가장 크게 두고
+    OBP / SLG를 별도 보정.
+
+    아직 백테스트 전이므로
+    모델 반영 폭은 나중에 제한적으로 사용.
+  */
+
+  const ops =
+    stats.ops ?? 0.700;
+
+  const obp =
+    stats.obp ?? 0.320;
+
+  const slg =
+    stats.slg ?? 0.380;
+
+  const pa =
+    stats.pa ?? 0;
+
+  const sampleFactor =
+    Math.max(
+      0.55,
+      Math.min(
+        1,
+        pa / 250
+      )
+    );
+
+  const raw =
+    50 +
+    (ops - 0.700) *
+      90 +
+    (obp - 0.320) *
+      35 +
+    (slg - 0.380) *
+      25;
+
+  const regressed =
+    50 +
+    (
+      raw - 50
+    ) *
+      sampleFactor;
+
+  /*
+    개인 타자 score에는
+    타순 가중치를 적용하지 않는다.
+
+    타순 가중치는 lineupSummary()에서
+    팀 타선 집계 시 한 번만 적용한다.
+  */
+
+  return Number(
+    Math.max(
+      0,
+      Math.min(
+        100,
+        regressed
+      )
+    ).toFixed(1)
+  );
+}
+
+
+async function enrichLineup(
+  lineup: LineupPlayer[],
+  team: string
+): Promise<EnrichedPlayer[]> {
+  return Promise.all(
+    lineup.map(
+      async (
+        player
+      ) => {
+        const playerId =
+          await findPlayerId(
+            player.name,
+            team
+          );
+
+        if (!playerId) {
+          return {
+            ...player,
+
+            playerId:
+              null,
+
+            stats:
+              null,
+
+            score:
+              null,
+          };
+        }
+
+        const stats =
+          await fetchHitterStats(
+            playerId
+          );
+
+        return {
+          ...player,
+
+          playerId,
+
+          stats,
+
+          score:
+            hitterScore(
+              stats,
+              player.order
+            ),
+        };
+      }
+    )
+  );
+}
+
+
+function lineupSummary(
+  players: EnrichedPlayer[]
+) {
+  const valid =
+    players.filter(
+      (
+        player
+      ): player is EnrichedPlayer & {
+        score: number;
+      } =>
+        typeof player.score ===
+        "number"
+    );
+
+  if (!valid.length) {
+    return {
+      playerCount: 0,
+      score: null,
+      avgOps: null,
+      avgObp: null,
+      avgSlg: null,
+      totalHr: 0,
+    };
+  }
+
+  let weightedScore = 0;
+  let totalWeight = 0;
+
+  let opsSum = 0;
+  let opsCount = 0;
+
+  let obpSum = 0;
+  let obpCount = 0;
+
+  let slgSum = 0;
+  let slgCount = 0;
+
+  let totalHr = 0;
+
+  for (
+    const player of valid
+  ) {
+    const weight =
+      orderWeight(
+        player.order
+      );
+
+    weightedScore +=
+      player.score *
+      weight;
+
+    totalWeight +=
+      weight;
+
+    if (
+      typeof player.stats?.ops ===
+      "number"
+    ) {
+      opsSum +=
+        player.stats.ops;
+
+      opsCount++;
+    }
+
+    if (
+      typeof player.stats?.obp ===
+      "number"
+    ) {
+      obpSum +=
+        player.stats.obp;
+
+      obpCount++;
+    }
+
+    if (
+      typeof player.stats?.slg ===
+      "number"
+    ) {
+      slgSum +=
+        player.stats.slg;
+
+      slgCount++;
+    }
+
+    if (
+      typeof player.stats?.hr ===
+      "number"
+    ) {
+      totalHr +=
+        player.stats.hr;
+    }
+  }
+
+  return {
+    playerCount:
+      valid.length,
+
+    score:
+      Number(
+        (
+          weightedScore /
+          totalWeight
+        ).toFixed(1)
+      ),
+
+    avgOps:
+      opsCount
+        ? Number(
+            (
+              opsSum /
+              opsCount
+            ).toFixed(3)
+          )
+        : null,
+
+    avgObp:
+      obpCount
+        ? Number(
+            (
+              obpSum /
+              obpCount
+            ).toFixed(3)
+          )
+        : null,
+
+    avgSlg:
+      slgCount
+        ? Number(
+            (
+              slgSum /
+              slgCount
+            ).toFixed(3)
+          )
+        : null,
+
+    totalHr,
+  };
+}
+
+
+export async function GET(
+  request: Request
+) {
+  const url =
+    new URL(request.url);
+
+  const away =
+    normalizeTeamName(
+      url.searchParams.get(
+        "away"
+      )
+    );
+
+  const home =
+    normalizeTeamName(
+      url.searchParams.get(
+        "home"
+      )
+    );
+
+  const date =
+    url.searchParams.get(
+      "date"
+    );
+
+  if (
+    !away ||
+    !home ||
+    !date
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "away, home, date 파라미터가 필요합니다.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  try {
+    const origin =
+      new URL(
+        request.url
+      ).origin;
+
+    const lineupUrl =
+      `${origin}/api/kbo/lineup?away=${encodeURIComponent(away)}&home=${encodeURIComponent(home)}&date=${encodeURIComponent(date)}`;
+
+    const response =
+      await fetch(
+        lineupUrl,
+        {
+          cache:
+            "no-store",
+        }
+      );
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          error:
+            "라인업 API 호출 실패",
+        },
+        {
+          status: 502,
+        }
+      );
+    }
+
+    const lineupData =
+      await response.json();
+
+    const awayLineup:
+      LineupPlayer[] =
+        Array.isArray(
+          lineupData?.away?.lineup
+        )
+          ? lineupData.away.lineup
+          : [];
+
+    const homeLineup:
+      LineupPlayer[] =
+        Array.isArray(
+          lineupData?.home?.lineup
+        )
+          ? lineupData.home.lineup
+          : [];
+
+    const [
+      awayPlayers,
+      homePlayers,
+    ] =
+      await Promise.all([
+        enrichLineup(
+          awayLineup,
+          away
+        ),
+
+        enrichLineup(
+          homeLineup,
+          home
+        ),
+      ]);
+
+    const awaySummary =
+      lineupSummary(
+        awayPlayers
+      );
+
+    const homeSummary =
+      lineupSummary(
+        homePlayers
+      );
+
+    const edge =
+      typeof awaySummary.score ===
+          "number" &&
+      typeof homeSummary.score ===
+          "number"
+        ? Number(
+            (
+              awaySummary.score -
+              homeSummary.score
+            ).toFixed(1)
+          )
+        : null;
+
+    return NextResponse.json({
+      fetchedAt:
+        new Date()
+          .toISOString(),
+
+      date,
+
+      away: {
+        team:
+          away,
+
+        confirmed:
+          lineupData?.away
+            ?.confirmed ??
+          false,
+
+        summary:
+          awaySummary,
+
+        players:
+          awayPlayers,
+      },
+
+      home: {
+        team:
+          home,
+
+        confirmed:
+          lineupData?.home
+            ?.confirmed ??
+          false,
+
+        summary:
+          homeSummary,
+
+        players:
+          homePlayers,
+      },
+
+      edge,
+    });
+
+  } catch (
+    error
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "unknown error",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
+

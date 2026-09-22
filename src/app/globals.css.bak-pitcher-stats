@@ -1,0 +1,39 @@
+*{box-sizing:border-box}html,body{margin:0;background:#f4f7fb;color:#172033;font-family:Arial,"Noto Sans KR",sans-serif}button,input{font:inherit}.shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh}.sidebar{background:#0f1b2d;color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:24px}.brand{font-size:18px;display:flex;gap:7px;align-items:center}.brand small{font-size:11px;color:#7fa6d7}.sidebar nav{display:grid;gap:7px}.sidebar nav a{padding:11px 12px;border-radius:10px;color:#b7c6dc}.sidebar nav a.active{background:#2b72e8;color:#fff;font-weight:700}.collector{margin-top:auto;border:1px solid #263b58;border-radius:12px;padding:12px;display:grid;gap:8px;font-size:12px;color:#a9bad1}.collector b{color:#fff}.collector span:nth-of-type(-n+2){color:#68d4a3}.content{padding:24px;min-width:0}header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}h1{margin:0;font-size:27px}header p,.sectionTitle p{margin:5px 0 0;color:#758197;font-size:13px}.headerActions{display:flex;gap:8px}.headerActions input,.headerActions button{border:1px solid #d9e1ec;background:white;border-radius:10px;padding:10px 12px}.gameGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.gameCard{background:#fff;border:1px solid #dfe6ef;border-radius:14px;padding:14px;box-shadow:0 2px 8px #15233b0b}.cardTop{display:flex;gap:8px;align-items:center;font-size:12px;color:#78859a}.cardTop b{font-size:14px;color:#172033}.status{margin-left:auto;background:#f0f4f9;border-radius:999px;padding:4px 8px}.matchup{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:9px;margin:18px 0 8px}.matchup strong{display:block;font-size:20px}.matchup small{color:#8390a3}.matchup em{font-size:11px;color:#9aa5b4;font-style:normal}.right{text-align:right}.starters{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#536075;border-top:1px solid #eef2f6;padding-top:10px}.scoreLine{text-align:center;font-weight:800;font-size:18px;margin-top:5px}.oddsRow{display:grid;grid-template-columns:1fr 1fr .8fr;gap:6px;margin-top:11px}.oddsRow label{font-size:10px;color:#748195}.oddsRow input{width:100%;border:1px solid #dfe6ef;border-radius:8px;padding:8px;margin-top:3px}.recommend{margin-top:10px;border-radius:9px;padding:9px 10px;display:flex;align-items:center;gap:7px;font-size:12px;background:#f2f6fb}.recommend span{color:#68778d}.recommend small{margin-left:auto}.gradeA{background:#e9f8ef}.gradeB{background:#eef5ff}.gradeC{background:#f4f5f7}.comboSection{margin-top:22px}.sectionTitle{display:flex;justify-content:space-between;align-items:end}.sectionTitle h2{margin:0}.comboGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}.comboCard,.emptyCombo,.nextBox{background:#fff;border:1px solid #dfe6ef;border-radius:14px;padding:15px}.comboCard h3{margin:0;font-size:16px}.comboCard>strong{display:block;font-size:27px;margin:7px 0}.comboCard ol{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px}.comboCard li{display:grid;grid-template-columns:1fr auto auto;gap:7px;font-size:13px;align-items:center}.comboCard li em{font-style:normal;background:#e9f8ef;border-radius:6px;padding:2px 5px}.comboCard button{width:100%;border:0;border-radius:8px;padding:9px;color:#8290a4}.emptyCombo{color:#7c899c}.nextBox{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px}.nextBox small{color:#718096}.error{background:#fff0f0;border:1px solid #ffd3d3;color:#a43c3c;padding:12px;border-radius:10px;margin-bottom:12px}.loading{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:35px;text-align:center;color:#718096}@media(max-width:1050px){.gameGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.comboGrid{grid-template-columns:1fr 1fr}}@media(max-width:760px){.shell{display:block}.sidebar{padding:12px}.sidebar nav,.collector{display:none}.content{padding:12px}header{align-items:flex-start;flex-direction:column}.gameGrid,.comboGrid{grid-template-columns:1fr}.headerActions{width:100%}.headerActions input{flex:1}.matchup strong{font-size:18px}}
+
+.oddsMarkets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.marketBlock {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.marketTitle {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+.marketBlock .oddsRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.marketBlock .oddsRow label {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .marketBlock .oddsRow {
+    grid-template-columns: 1fr;
+  }
+}
+

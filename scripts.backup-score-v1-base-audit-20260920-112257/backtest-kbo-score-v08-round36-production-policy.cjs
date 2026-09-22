@@ -1,0 +1,18819 @@
+const fs = require("fs");
+
+const OLD_PATH =
+  "data/kbo-backtest-2026-all-candidates-lineup-base.json";
+
+const V06_PATH =
+  "data/kbo-score-features-v06.json";
+
+const oldRoot =
+  JSON.parse(fs.readFileSync(OLD_PATH, "utf8"));
+
+const v06Root =
+  JSON.parse(fs.readFileSync(V06_PATH, "utf8"));
+
+const oldRows =
+  Array.isArray(oldRoot)
+    ? oldRoot
+    : oldRoot.results ?? [];
+
+const v06Games =
+  Array.isArray(v06Root)
+    ? v06Root
+    : v06Root.games ?? [];
+
+function num(v) {
+  if (
+    v === null ||
+    v === undefined ||
+    v === ""
+  ) return null;
+
+  const n = Number(v);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+function clamp(v, lo, hi) {
+  return Math.max(
+    lo,
+    Math.min(hi, v)
+  );
+}
+
+function splitOf(g) {
+  const month =
+    Number(
+      String(g.date).slice(5, 7)
+    );
+
+  if (month <= 4)
+    return "DISCOVERY";
+
+  if (month <= 6)
+    return "INTERNAL";
+
+  return "FINAL";
+}
+
+/*
+ * 동일 실제경기의 ML/HANDICAP/TOTAL 후보가
+ * 여러 행 있으므로 gameId 기준 하나만 사용.
+ */
+const gameMap =
+  new Map();
+
+for (const r of oldRows) {
+  if (
+    !r?.gameId ||
+    !Number.isFinite(Number(r.awayScore)) ||
+    !Number.isFinite(Number(r.homeScore))
+  ) {
+    continue;
+  }
+
+  if (!gameMap.has(r.gameId))
+    gameMap.set(r.gameId, r);
+}
+
+const games =
+  [...gameMap.values()]
+    .sort(
+      (a,b) =>
+        String(a.date).localeCompare(
+          String(b.date)
+        ) ||
+        String(a.gameId).localeCompare(
+          String(b.gameId)
+        )
+    );
+
+console.log(
+  "UNIQUE SETTLED GAMES:",
+  games.length
+);
+
+/*
+ * V0.3 원본과 동일:
+ * 당일 경기 결과를 당일 league 평균에
+ * 절대 포함하지 않는다.
+ */
+function buildLeagueAverages(
+  priorGames
+) {
+  const PRIOR_RUNS = 4.50;
+
+  let completedGames = 0;
+  let totalRuns = 0;
+
+  const byDate =
+    new Map();
+
+  let i = 0;
+
+  while (i < games.length) {
+    const date =
+      games[i].date;
+
+    let j = i;
+
+    while (
+      j < games.length &&
+      games[j].date === date
+    ) {
+      j++;
+    }
+
+    const teamGamesBefore =
+      completedGames * 2;
+
+    const leagueRuns =
+      (
+        PRIOR_RUNS *
+          priorGames +
+        totalRuns
+      ) /
+      (
+        priorGames +
+        teamGamesBefore
+      );
+
+    byDate.set(
+      date,
+      leagueRuns
+    );
+
+    for (
+      let k = i;
+      k < j;
+      k++
+    ) {
+      totalRuns +=
+        Number(
+          games[k].awayScore
+        ) +
+        Number(
+          games[k].homeScore
+        );
+
+      completedGames++;
+    }
+
+    i = j;
+  }
+
+  return byDate;
+}
+
+function blendedEra(
+  season,
+  recent
+) {
+  season = num(season);
+  recent = num(recent);
+
+  if (
+    season === null &&
+    recent === null
+  ) {
+    return null;
+  }
+
+  if (
+    season !== null &&
+    recent !== null
+  ) {
+    return (
+      season * 0.60 +
+      recent * 0.40
+    );
+  }
+
+  return season ?? recent;
+}
+
+const leagueP80 =
+  buildLeagueAverages(80);
+
+/*
+ * EXACT V0.3
+ * P80 / W0.40 / STARTER
+ */
+function v03Base(g) {
+  const x =
+    g.scoreModelInputs;
+
+  if (!x)
+    return null;
+
+  const ar =
+    num(x.awayAvgRuns);
+
+  const ara =
+    num(
+      x.awayAvgRunsAllowed
+    );
+
+  const hr =
+    num(x.homeAvgRuns);
+
+  const hra =
+    num(
+      x.homeAvgRunsAllowed
+    );
+
+  if (
+    ar === null ||
+    ara === null ||
+    hr === null ||
+    hra === null
+  ) {
+    return null;
+  }
+
+  const league =
+    leagueP80.get(g.date);
+
+  if (
+    !Number.isFinite(league)
+  ) {
+    return null;
+  }
+
+  const awayTeamExpectation =
+    (ar + hra) / 2;
+
+  const homeTeamExpectation =
+    (hr + ara) / 2;
+
+  let away =
+    league * 0.60 +
+    awayTeamExpectation *
+      0.40;
+
+  let home =
+    league * 0.60 +
+    homeTeamExpectation *
+      0.40;
+
+  const homeEra =
+    blendedEra(
+      x.homeStarterEra,
+      x.homeStarterRecent5Era
+    );
+
+  const awayEra =
+    blendedEra(
+      x.awayStarterEra,
+      x.awayStarterRecent5Era
+    );
+
+  const eraNeutral =
+    league;
+
+  if (homeEra !== null) {
+    away += clamp(
+      (
+        homeEra -
+        eraNeutral
+      ) * 0.09,
+      -0.40,
+      0.40
+    );
+  }
+
+  if (awayEra !== null) {
+    home += clamp(
+      (
+        awayEra -
+        eraNeutral
+      ) * 0.09,
+      -0.40,
+      0.40
+    );
+  }
+
+  return {
+    away:
+      clamp(
+        away,
+        2.25,
+        7.25
+      ),
+
+    home:
+      clamp(
+        home,
+        2.25,
+        7.25
+      )
+  };
+}
+
+/*
+ * 원본 후보행에서 ML 양쪽 배당을 찾는다.
+ */
+const rowsByGame =
+  new Map();
+
+for (const r of oldRows) {
+  if (!rowsByGame.has(r.gameId))
+    rowsByGame.set(
+      r.gameId,
+      []
+    );
+
+  rowsByGame
+    .get(r.gameId)
+    .push(r);
+}
+
+function noVigMlProb(g) {
+  const rows =
+    rowsByGame.get(
+      g.gameId
+    ) ?? [];
+
+  const ml =
+    rows.filter(
+      r =>
+        r.market === "ML" &&
+        Number(r.odds) > 1
+    );
+
+  if (ml.length < 2)
+    return null;
+
+  let awayOdds = null;
+  let homeOdds = null;
+
+  for (const r of ml) {
+    const label =
+      String(
+        r.label ?? ""
+      );
+
+    if (
+      label.includes(
+        String(g.awayTeam)
+      )
+    ) {
+      awayOdds =
+        Number(r.odds);
+    }
+
+    if (
+      label.includes(
+        String(g.homeTeam)
+      )
+    ) {
+      homeOdds =
+        Number(r.odds);
+    }
+  }
+
+  /*
+   * label 매칭이 안 되는 경우
+   * confidence 방향으로 추측하지 않는다.
+   */
+  if (
+    !awayOdds ||
+    !homeOdds
+  ) {
+    return null;
+  }
+
+  const ia =
+    1 / awayOdds;
+
+  const ih =
+    1 / homeOdds;
+
+  const sum =
+    ia + ih;
+
+  return {
+    away:
+      ia / sum,
+    home:
+      ih / sum
+  };
+}
+
+/*
+ * V0.3 champion:
+ * FORM 0
+ * MARKET 4.5
+ */
+function champion(g) {
+  const base =
+    v03Base(g);
+
+  if (!base)
+    return null;
+
+  const market =
+    noVigMlProb(g);
+
+  let shift = 0;
+
+  if (market) {
+    const marketEdge =
+      (
+        market.away -
+        0.50
+      ) * 2;
+
+    shift +=
+      marketEdge * 4.50;
+  }
+
+  return {
+    away:
+      clamp(
+        base.away +
+          shift / 2,
+        1.75,
+        7.75
+      ),
+
+    home:
+      clamp(
+        base.home -
+          shift / 2,
+        1.75,
+        7.75
+      )
+  };
+}
+
+function evaluate(split) {
+  let n = 0;
+
+  let teamErr = 0;
+  let totalErr = 0;
+  let diffErr = 0;
+
+  let within1 = 0;
+  let within2 = 0;
+
+  let winnerHit = 0;
+  let winnerN = 0;
+
+  for (const g of games) {
+    if (
+      splitOf(g) !== split
+    ) {
+      continue;
+    }
+
+    const p =
+      champion(g);
+
+    if (!p)
+      continue;
+
+    const actualAway =
+      Number(g.awayScore);
+
+    const actualHome =
+      Number(g.homeScore);
+
+    const awayErr =
+      Math.abs(
+        p.away -
+        actualAway
+      );
+
+    const homeErr =
+      Math.abs(
+        p.home -
+        actualHome
+      );
+
+    teamErr +=
+      (
+        awayErr +
+        homeErr
+      ) / 2;
+
+    totalErr +=
+      Math.abs(
+        (
+          p.away +
+          p.home
+        ) -
+        (
+          actualAway +
+          actualHome
+        )
+      );
+
+    diffErr +=
+      Math.abs(
+        (
+          p.away -
+          p.home
+        ) -
+        (
+          actualAway -
+          actualHome
+        )
+      );
+
+    if (
+      awayErr <= 1 &&
+      homeErr <= 1
+    ) {
+      within1++;
+    }
+
+    if (
+      awayErr <= 2 &&
+      homeErr <= 2
+    ) {
+      within2++;
+    }
+
+    const predDiff =
+      p.away - p.home;
+
+    const actualDiff =
+      actualAway -
+      actualHome;
+
+    if (
+      actualDiff !== 0 &&
+      predDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(predDiff) ===
+        Math.sign(actualDiff)
+      ) {
+        winnerHit++;
+      }
+    }
+
+    n++;
+  }
+
+  return {
+    n,
+
+    teamMAE:
+      teamErr / n,
+
+    totalMAE:
+      totalErr / n,
+
+    diffMAE:
+      diffErr / n,
+
+    within1:
+      within1 / n,
+
+    within2:
+      within2 / n,
+
+    winnerAcc:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null
+  };
+}
+
+const discovery =
+  evaluate(
+    "DISCOVERY"
+  );
+
+const internal =
+  evaluate(
+    "INTERNAL"
+  );
+
+const avgTeamMAE =
+  (
+    discovery.teamMAE +
+    internal.teamMAE
+  ) / 2;
+
+const TARGET =
+  2.520940321359977;
+
+console.log();
+console.log(
+  "===== EXACT V03 BRIDGE ====="
+);
+
+console.log(
+  "DISCOVERY:",
+  discovery
+);
+
+console.log(
+  "INTERNAL:",
+  internal
+);
+
+console.log(
+  "AVG TEAM MAE:",
+  avgTeamMAE
+);
+
+console.log(
+  "TARGET:",
+  TARGET
+);
+
+console.log(
+  "REPRO DELTA:",
+  avgTeamMAE -
+    TARGET
+);
+
+/*
+ * V06는 여기부터 추가 피처 전용.
+ * 베이스 입력으로 절대 사용하지 않는다.
+ */
+const v06Map =
+  new Map(
+    v06Games.map(
+      g => [
+        g.gameId,
+        g
+      ]
+    )
+  );
+
+let joinedD = 0;
+let joinedI = 0;
+
+for (const g of games) {
+  if (!champion(g))
+    continue;
+
+  if (!v06Map.has(g.gameId))
+    continue;
+
+  if (
+    splitOf(g) ===
+    "DISCOVERY"
+  ) {
+    joinedD++;
+  }
+
+  if (
+    splitOf(g) ===
+    "INTERNAL"
+  ) {
+    joinedI++;
+  }
+}
+
+console.log();
+console.log(
+  "===== V06 FEATURE JOIN ====="
+);
+
+console.log(
+  "DISCOVERY JOINED:",
+  joinedD
+);
+
+console.log(
+  "INTERNAL JOINED:",
+  joinedI
+);
+
+/*
+=========================================================
+V0.7 ROUND 1
+DIRECT TEAM SCORE CORRECTION
+
+BASE:
+  exact V0.3 champion
+
+TRAIN:
+  DISCOVERY + INTERNAL ONLY
+
+FINAL:
+  NOT EVALUATED
+
+Unlike previous margin-only experiments,
+away/home score corrections are independent.
+=========================================================
+*/
+
+console.log();
+console.log("===== V0.7 ROUND 1 / DIRECT SCORE MODEL =====");
+
+const V07_FEATURES = [
+  {
+    name:"R5_OFFENSE",
+    away:"awayTeamForm.recent5.avgRuns",
+    home:"homeTeamForm.recent5.avgRuns",
+    center:"league"
+  },
+  {
+    name:"R5_DEFENSE",
+    away:"awayTeamForm.recent5.avgRunsAllowed",
+    home:"homeTeamForm.recent5.avgRunsAllowed",
+    center:"league"
+  },
+  {
+    name:"R10_OFFENSE",
+    away:"awayTeamForm.recent10.avgRuns",
+    home:"homeTeamForm.recent10.avgRuns",
+    center:"league"
+  },
+  {
+    name:"R10_DEFENSE",
+    away:"awayTeamForm.recent10.avgRunsAllowed",
+    home:"homeTeamForm.recent10.avgRunsAllowed",
+    center:"league"
+  },
+  {
+    name:"R20_OFFENSE",
+    away:"awayTeamForm.recent20.avgRuns",
+    home:"homeTeamForm.recent20.avgRuns",
+    center:"league"
+  },
+  {
+    name:"R20_DEFENSE",
+    away:"awayTeamForm.recent20.avgRunsAllowed",
+    home:"homeTeamForm.recent20.avgRunsAllowed",
+    center:"league"
+  },
+  {
+    name:"VENUE_OFFENSE",
+    away:"awayTeamForm.awayAvgRuns",
+    home:"homeTeamForm.homeAvgRuns",
+    center:"league"
+  },
+  {
+    name:"VENUE_DEFENSE",
+    away:"awayTeamForm.awayAvgRunsAllowed",
+    home:"homeTeamForm.homeAvgRunsAllowed",
+    center:"league"
+  }
+];
+
+const V07_COEFS = [
+  -0.30,
+  -0.20,
+  -0.10,
+  -0.05,
+  0.05,
+  0.10,
+  0.20,
+  0.30
+];
+
+function v07DirectPredictor(feature, coef) {
+  return g => {
+    const base = champion(g);
+
+    if (!base)
+      return null;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (!x)
+      return base;
+
+    const getPath = (obj, path) => {
+      const value = path
+        .split(".")
+        .reduce(
+          (cur, key) =>
+            cur == null
+              ? null
+              : cur[key],
+          obj
+        );
+
+      if (
+        value === null ||
+        value === undefined ||
+        value === ""
+      ) {
+        return null;
+      }
+
+      const n = Number(value);
+
+      return Number.isFinite(n)
+        ? n
+        : null;
+    };
+
+    const av =
+      getPath(
+        x,
+        feature.away
+      );
+
+    const hv =
+      getPath(
+        x,
+        feature.home
+      );
+
+    const league =
+      getPath(
+        x,
+        "environment.leagueRunsPerTeamD1"
+      );
+
+    if (
+      av === null ||
+      hv === null ||
+      league === null
+    ) {
+      return base;
+    }
+
+    /*
+      각 팀을 league 기준으로
+      독립적으로 움직인다.
+
+      예:
+      최근 공격 6.0 / league 4.5
+      coef +0.10
+      => 해당 팀 예상득점 +0.15
+
+      TOTAL도 자연스럽게 변한다.
+    */
+
+    const awaySignal =
+      clamp(
+        av - league,
+        -4,
+        4
+      );
+
+    const homeSignal =
+      clamp(
+        hv - league,
+        -4,
+        4
+      );
+
+    return {
+      away:
+        clamp(
+          base.away +
+          awaySignal * coef,
+          1.50,
+          8.00
+        ),
+
+      home:
+        clamp(
+          base.home +
+          homeSignal * coef,
+          1.50,
+          8.00
+        )
+    };
+  };
+}
+
+
+function evaluatePredictor(split, predictor) {
+  let n = 0;
+
+  let teamErr = 0;
+  let totalErr = 0;
+  let diffErr = 0;
+
+  let within1 = 0;
+  let within2 = 0;
+
+  let winnerHit = 0;
+  let winnerN = 0;
+
+  for (const g of games) {
+    if (
+      splitOf(g) !== split
+    ) {
+      continue;
+    }
+
+    const p =
+      predictor(g);
+
+    if (!p)
+      continue;
+
+    const actualAway =
+      Number(g.awayScore);
+
+    const actualHome =
+      Number(g.homeScore);
+
+    if (
+      !Number.isFinite(actualAway) ||
+      !Number.isFinite(actualHome)
+    ) {
+      continue;
+    }
+
+    const awayErr =
+      Math.abs(
+        p.away -
+        actualAway
+      );
+
+    const homeErr =
+      Math.abs(
+        p.home -
+        actualHome
+      );
+
+    teamErr +=
+      (
+        awayErr +
+        homeErr
+      ) / 2;
+
+    totalErr +=
+      Math.abs(
+        (
+          p.away +
+          p.home
+        ) -
+        (
+          actualAway +
+          actualHome
+        )
+      );
+
+    diffErr +=
+      Math.abs(
+        (
+          p.away -
+          p.home
+        ) -
+        (
+          actualAway -
+          actualHome
+        )
+      );
+
+    if (
+      awayErr <= 1 &&
+      homeErr <= 1
+    ) {
+      within1++;
+    }
+
+    if (
+      awayErr <= 2 &&
+      homeErr <= 2
+    ) {
+      within2++;
+    }
+
+    const predDiff =
+      p.away -
+      p.home;
+
+    const actualDiff =
+      actualAway -
+      actualHome;
+
+    if (
+      actualDiff !== 0 &&
+      predDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(predDiff) ===
+        Math.sign(actualDiff)
+      ) {
+        winnerHit++;
+      }
+    }
+
+    n++;
+  }
+
+  return {
+    n,
+
+    teamMAE:
+      n
+        ? teamErr / n
+        : null,
+
+    totalMAE:
+      n
+        ? totalErr / n
+        : null,
+
+    diffMAE:
+      n
+        ? diffErr / n
+        : null,
+
+    within1:
+      n
+        ? within1 / n
+        : null,
+
+    within2:
+      n
+        ? within2 / n
+        : null,
+
+    winnerAcc:
+      winnerN
+        ? winnerHit / winnerN
+        : null
+  };
+}
+
+const V07_BASE_D =
+  evaluatePredictor(
+    "DISCOVERY",
+    champion
+  );
+
+const V07_BASE_I =
+  evaluatePredictor(
+    "INTERNAL",
+    champion
+  );
+
+const V07_BASE_AVG =
+  (
+    V07_BASE_D.teamMAE +
+    V07_BASE_I.teamMAE
+  ) / 2;
+
+console.log();
+console.log("===== BASELINE LOCK =====");
+
+console.log(
+  "D",
+  V07_BASE_D.n,
+  V07_BASE_D.teamMAE
+);
+
+console.log(
+  "I",
+  V07_BASE_I.n,
+  V07_BASE_I.teamMAE
+);
+
+console.log(
+  "AVG",
+  V07_BASE_AVG
+);
+
+console.log(
+  "TARGET",
+  2.520940321359977
+);
+
+console.log(
+  "REPRO DELTA",
+  V07_BASE_AVG -
+    2.520940321359977
+);
+
+const v07Results = [];
+
+for (const feature of V07_FEATURES) {
+  for (const coef of V07_COEFS) {
+
+    const predictor =
+      v07DirectPredictor(
+        feature,
+        coef
+      );
+
+    const d =
+      evaluatePredictor(
+        "DISCOVERY",
+        predictor
+      );
+
+    const i =
+      evaluatePredictor(
+        "INTERNAL",
+        predictor
+      );
+
+    const avgTeam =
+      (
+        d.teamMAE +
+        i.teamMAE
+      ) / 2;
+
+    const avgTotal =
+      (
+        d.totalMAE +
+        i.totalMAE
+      ) / 2;
+
+    const avgDiff =
+      (
+        d.diffMAE +
+        i.diffMAE
+      ) / 2;
+
+    const avgWinner =
+      (
+        d.winnerAcc +
+        i.winnerAcc
+      ) / 2;
+
+    v07Results.push({
+      name:feature.name,
+      coef,
+
+      d,
+      i,
+
+      avgTeam,
+      avgTotal,
+      avgDiff,
+      avgWinner,
+
+      dDelta:
+        d.teamMAE -
+        V07_BASE_D.teamMAE,
+
+      iDelta:
+        i.teamMAE -
+        V07_BASE_I.teamMAE,
+
+      avgDelta:
+        avgTeam -
+        V07_BASE_AVG
+    });
+  }
+}
+
+v07Results.sort(
+  (a,b) =>
+    a.avgTeam -
+    b.avgTeam
+);
+
+console.log();
+console.log("===== V0.7 FAMILY BEST =====");
+
+for (const feature of V07_FEATURES) {
+
+  const family =
+    v07Results
+      .filter(
+        x =>
+          x.name ===
+          feature.name
+      )
+      .sort(
+        (a,b) =>
+          a.avgTeam -
+          b.avgTeam
+      );
+
+  const r =
+    family[0];
+
+  const robust =
+    r.dDelta < 0 &&
+    r.iDelta < 0;
+
+  console.log(
+    robust
+      ? "ROBUST"
+      : "FAIL",
+    r.name,
+    "coef=" + r.coef,
+    "D=" +
+      r.d.teamMAE.toFixed(6),
+    "DΔ=" +
+      r.dDelta.toFixed(6),
+    "I=" +
+      r.i.teamMAE.toFixed(6),
+    "IΔ=" +
+      r.iDelta.toFixed(6),
+    "AVG=" +
+      r.avgTeam.toFixed(6),
+    "AVGΔ=" +
+      r.avgDelta.toFixed(6),
+    "TOTAL=" +
+      r.avgTotal.toFixed(6),
+    "DIFF=" +
+      r.avgDiff.toFixed(6),
+    "W=" +
+      (
+        r.avgWinner *
+        100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+console.log();
+console.log("===== V0.7 ROBUST RANKING =====");
+
+const robust =
+  v07Results
+    .filter(
+      r =>
+        r.dDelta < 0 &&
+        r.iDelta < 0
+    )
+    .sort(
+      (a,b) =>
+        a.avgTeam -
+        b.avgTeam
+    );
+
+for (
+  let n = 0;
+  n < Math.min(
+    robust.length,
+    20
+  );
+  n++
+) {
+  const r =
+    robust[n];
+
+  console.log(
+    `${n + 1}.`,
+    r.name,
+    "coef=" + r.coef,
+    "AVG=" +
+      r.avgTeam.toFixed(6),
+    "AVGΔ=" +
+      r.avgDelta.toFixed(6),
+    "DΔ=" +
+      r.dDelta.toFixed(6),
+    "IΔ=" +
+      r.iDelta.toFixed(6),
+    "TOTAL=" +
+      r.avgTotal.toFixed(6),
+    "DIFF=" +
+      r.avgDiff.toFixed(6),
+    "W=" +
+      (
+        r.avgWinner *
+        100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+console.log();
+
+if (robust.length) {
+  console.log(
+    "BEST V0.7 ROUND1:",
+    robust[0].name,
+    "coef=" + robust[0].coef,
+    "AVG=" + robust[0].avgTeam
+  );
+} else {
+  console.log(
+    "BEST V0.7 ROUND1: NONE"
+  );
+}
+
+console.log();
+
+console.log();
+console.log("===== V0.7 ROUND 2 / COMBINATIONS =====");
+
+/*
+  Round 1 frozen coefficients.
+  No coefficient retuning here.
+*/
+
+const R2 = {
+  R5_DEFENSE: {
+    name: "R5_DEFENSE",
+    away: "awayTeamForm.recent5.avgRunsAllowed",
+    home: "homeTeamForm.recent5.avgRunsAllowed",
+    center: "league",
+    coef: 0.20
+  },
+
+  VENUE_OFFENSE: {
+    name: "VENUE_OFFENSE",
+    away: "awayTeamForm.awayAvgRuns",
+    home: "homeTeamForm.homeAvgRuns",
+    center: "league",
+    coef: -0.20
+  },
+
+  VENUE_DEFENSE: {
+    name: "VENUE_DEFENSE",
+    away: "awayTeamForm.awayAvgRunsAllowed",
+    home: "homeTeamForm.homeAvgRunsAllowed",
+    center: "league",
+    coef: -0.10
+  },
+
+  R10_OFFENSE: {
+    name: "R10_OFFENSE",
+    away: "awayTeamForm.recent10.avgRuns",
+    home: "homeTeamForm.recent10.avgRuns",
+    center: "league",
+    coef: -0.05
+  },
+
+  R20_OFFENSE: {
+    name: "R20_OFFENSE",
+    away: "awayTeamForm.recent20.avgRuns",
+    home: "homeTeamForm.recent20.avgRuns",
+    center: "league",
+    coef: -0.05
+  }
+};
+
+function r2Predictor(features) {
+  const predictors =
+    features.map(
+      f =>
+        v07DirectPredictor(
+          f,
+          f.coef
+        )
+    );
+
+  return g => {
+    const base =
+      champion(g);
+
+    if (!base)
+      return null;
+
+    let away =
+      base.away;
+
+    let home =
+      base.home;
+
+    for (const predictor of predictors) {
+      const one =
+        predictor(g);
+
+      if (!one)
+        continue;
+
+      /*
+        v07DirectPredictor returns
+        champion + this feature's correction.
+
+        Add only its correction so multiple
+        features stack without adding champion twice.
+      */
+
+      away +=
+        one.away -
+        base.away;
+
+      home +=
+        one.home -
+        base.home;
+    }
+
+    return {
+      away:
+        clamp(
+          away,
+          1.50,
+          8.00
+        ),
+
+      home:
+        clamp(
+          home,
+          1.50,
+          8.00
+        )
+    };
+  };
+}
+
+const R2_COMBOS = [
+  {
+    name: "R5D",
+    features: [
+      R2.R5_DEFENSE
+    ]
+  },
+
+  {
+    name: "R5D + VENUE_OFF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.VENUE_OFFENSE
+    ]
+  },
+
+  {
+    name: "R5D + VENUE_DEF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.VENUE_DEFENSE
+    ]
+  },
+
+  {
+    name: "R5D + R10_OFF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.R10_OFFENSE
+    ]
+  },
+
+  {
+    name: "R5D + R20_OFF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.R20_OFFENSE
+    ]
+  },
+
+  {
+    name: "R5D + VENUE_OFF + VENUE_DEF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.VENUE_OFFENSE,
+      R2.VENUE_DEFENSE
+    ]
+  },
+
+  {
+    name: "R5D + VENUE_OFF + R10_OFF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.VENUE_OFFENSE,
+      R2.R10_OFFENSE
+    ]
+  },
+
+  {
+    name: "R5D + VENUE_OFF + R20_OFF",
+    features: [
+      R2.R5_DEFENSE,
+      R2.VENUE_OFFENSE,
+      R2.R20_OFFENSE
+    ]
+  }
+];
+
+const r2BaseD =
+  evaluatePredictor(
+    "DISCOVERY",
+    champion
+  );
+
+const r2BaseI =
+  evaluatePredictor(
+    "INTERNAL",
+    champion
+  );
+
+const r2BaseAvg =
+  (
+    r2BaseD.teamMAE +
+    r2BaseI.teamMAE
+  ) / 2;
+
+const r2Rows = [];
+
+for (const combo of R2_COMBOS) {
+  const predictor =
+    r2Predictor(
+      combo.features
+    );
+
+  const d =
+    evaluatePredictor(
+      "DISCOVERY",
+      predictor
+    );
+
+  const i =
+    evaluatePredictor(
+      "INTERNAL",
+      predictor
+    );
+
+  const avg =
+    (
+      d.teamMAE +
+      i.teamMAE
+    ) / 2;
+
+  r2Rows.push({
+    name: combo.name,
+    d,
+    i,
+    avg,
+
+    dDelta:
+      d.teamMAE -
+      r2BaseD.teamMAE,
+
+    iDelta:
+      i.teamMAE -
+      r2BaseI.teamMAE,
+
+    avgDelta:
+      avg -
+      r2BaseAvg,
+
+    total:
+      (
+        d.totalMAE +
+        i.totalMAE
+      ) / 2,
+
+    diff:
+      (
+        d.diffMAE +
+        i.diffMAE
+      ) / 2,
+
+    winner:
+      (
+        d.winnerAcc +
+        i.winnerAcc
+      ) / 2,
+
+    within1:
+      (
+        d.within1 +
+        i.within1
+      ) / 2,
+
+    within2:
+      (
+        d.within2 +
+        i.within2
+      ) / 2
+  });
+}
+
+r2Rows.sort(
+  (a,b) =>
+    a.avg -
+    b.avg
+);
+
+console.log();
+console.log("===== ROUND 2 RANKING =====");
+
+for (
+  let idx = 0;
+  idx < r2Rows.length;
+  idx++
+) {
+  const r =
+    r2Rows[idx];
+
+  const robust =
+    r.dDelta < 0 &&
+    r.iDelta < 0;
+
+  console.log(
+    `${idx + 1}.`,
+    robust
+      ? "ROBUST"
+      : "FAIL",
+    r.name,
+    "AVG=" +
+      r.avg.toFixed(6),
+    "AVGΔ=" +
+      r.avgDelta.toFixed(6),
+    "D=" +
+      r.d.teamMAE.toFixed(6),
+    "DΔ=" +
+      r.dDelta.toFixed(6),
+    "I=" +
+      r.i.teamMAE.toFixed(6),
+    "IΔ=" +
+      r.iDelta.toFixed(6),
+    "TOTAL=" +
+      r.total.toFixed(6),
+    "DIFF=" +
+      r.diff.toFixed(6),
+    "±1=" +
+      (
+        r.within1 *
+        100
+      ).toFixed(1) +
+      "%",
+    "±2=" +
+      (
+        r.within2 *
+        100
+      ).toFixed(1) +
+      "%",
+    "W=" +
+      (
+        r.winner *
+        100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+const r2Robust =
+  r2Rows.filter(
+    r =>
+      r.dDelta < 0 &&
+      r.iDelta < 0
+  );
+
+console.log();
+
+if (r2Robust.length) {
+  console.log(
+    "BEST V0.7 ROUND2:",
+    r2Robust[0].name,
+    "AVG=" +
+      r2Robust[0].avg,
+    "AVG_DELTA=" +
+      r2Robust[0].avgDelta
+  );
+} else {
+  console.log(
+    "BEST V0.7 ROUND2: NONE"
+  );
+}
+
+
+console.log();
+console.log("===== V0.7 ROUND 3 / STARTER LINEUP BULLPEN =====");
+
+/*
+  Frozen Round2 champion:
+  R5_DEFENSE   +0.20
+  VENUE_OFF    -0.20
+  VENUE_DEF    -0.10
+
+  Final/Audit is NOT evaluated.
+*/
+
+const R3_BASE_FEATURES = [
+  R2.R5_DEFENSE,
+  R2.VENUE_OFFENSE,
+  R2.VENUE_DEFENSE
+];
+
+const r3BasePredictor =
+  r2Predictor(R3_BASE_FEATURES);
+
+const r3Get = (obj, path) => {
+  const v = path
+    .split(".")
+    .reduce(
+      (cur, key) =>
+        cur == null
+          ? null
+          : cur[key],
+      obj
+    );
+
+  if (
+    v === null ||
+    v === undefined ||
+    v === ""
+  ) return null;
+
+  const n = Number(v);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+};
+
+/*
+  All signals are applied to OPPONENT scoring.
+
+  opposing starter worse -> batting team score up
+  stronger lineup       -> own score up
+  bullpen fatigue       -> opponent score up
+*/
+
+const R3_FEATURES = [
+  {
+    name: "STARTER_WHIP",
+    kind: "opponent",
+    awayPath: "starter.away.whip",
+    homePath: "starter.home.whip",
+    center: 1.40,
+    scale: 1.0,
+    coefs: [-0.30,-0.20,-0.10,-0.05,0.05,0.10,0.20,0.30]
+  },
+
+  {
+    name: "STARTER_RECENT5_ERA",
+    kind: "opponent",
+    awayPath: "starter.away.recent5.era",
+    homePath: "starter.home.recent5.era",
+    center: 4.50,
+    scale: 0.25,
+    coefs: [-0.30,-0.20,-0.10,-0.05,0.05,0.10,0.20,0.30]
+  },
+
+  {
+    name: "LINEUP_OPS",
+    kind: "own",
+    awayPath: "lineup.away.avgOps",
+    homePath: "lineup.home.avgOps",
+    center: 0.700,
+    scale: 5.0,
+    coefs: [-0.30,-0.20,-0.10,-0.05,0.05,0.10,0.20,0.30]
+  },
+
+  {
+    name: "LINEUP_OBP",
+    kind: "own",
+    awayPath: "lineup.away.avgObp",
+    homePath: "lineup.home.avgObp",
+    center: 0.330,
+    scale: 8.0,
+    coefs: [-0.30,-0.20,-0.10,-0.05,0.05,0.10,0.20,0.30]
+  },
+
+  {
+    name: "BULLPEN_FATIGUE",
+    kind: "opponent",
+    awayPath: "bullpen.awayFatigue",
+    homePath: "bullpen.homeFatigue",
+    center: 50,
+    scale: 0.02,
+    coefs: [-0.30,-0.20,-0.10,-0.05,0.05,0.10,0.20,0.30]
+  }
+];
+
+function r3Predictor(feature, coef) {
+  return g => {
+    const base =
+      r3BasePredictor(g);
+
+    if (!base)
+      return null;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (!x)
+      return base;
+
+    const av =
+      r3Get(
+        x,
+        feature.awayPath
+      );
+
+    const hv =
+      r3Get(
+        x,
+        feature.homePath
+      );
+
+    if (
+      av === null ||
+      hv === null
+    ) {
+      return base;
+    }
+
+    const aSignal =
+      clamp(
+        (av - feature.center) *
+        feature.scale,
+        -3,
+        3
+      );
+
+    const hSignal =
+      clamp(
+        (hv - feature.center) *
+        feature.scale,
+        -3,
+        3
+      );
+
+    let away = base.away;
+    let home = base.home;
+
+    if (feature.kind === "own") {
+      away += aSignal * coef;
+      home += hSignal * coef;
+    } else {
+      /*
+        away starter affects HOME scoring.
+        home starter affects AWAY scoring.
+      */
+      home += aSignal * coef;
+      away += hSignal * coef;
+    }
+
+    return {
+      away: clamp(away, 1.50, 8.00),
+      home: clamp(home, 1.50, 8.00)
+    };
+  };
+}
+
+const r3BaseD =
+  evaluatePredictor(
+    "DISCOVERY",
+    r3BasePredictor
+  );
+
+const r3BaseI =
+  evaluatePredictor(
+    "INTERNAL",
+    r3BasePredictor
+  );
+
+const r3BaseAvg =
+  (
+    r3BaseD.teamMAE +
+    r3BaseI.teamMAE
+  ) / 2;
+
+console.log(
+  "ROUND3 BASE",
+  "D=" + r3BaseD.teamMAE,
+  "I=" + r3BaseI.teamMAE,
+  "AVG=" + r3BaseAvg
+);
+
+console.log(
+  "ROUND2 TARGET",
+  2.501071010917739
+);
+
+console.log(
+  "ROUND2 REPRO DELTA",
+  r3BaseAvg -
+  2.501071010917739
+);
+
+const r3Rows = [];
+
+for (const feature of R3_FEATURES) {
+  for (const coef of feature.coefs) {
+    const predictor =
+      r3Predictor(
+        feature,
+        coef
+      );
+
+    const d =
+      evaluatePredictor(
+        "DISCOVERY",
+        predictor
+      );
+
+    const i =
+      evaluatePredictor(
+        "INTERNAL",
+        predictor
+      );
+
+    const avg =
+      (
+        d.teamMAE +
+        i.teamMAE
+      ) / 2;
+
+    r3Rows.push({
+      name: feature.name,
+      coef,
+      d,
+      i,
+      avg,
+
+      dDelta:
+        d.teamMAE -
+        r3BaseD.teamMAE,
+
+      iDelta:
+        i.teamMAE -
+        r3BaseI.teamMAE,
+
+      avgDelta:
+        avg -
+        r3BaseAvg,
+
+      total:
+        (
+          d.totalMAE +
+          i.totalMAE
+        ) / 2,
+
+      diff:
+        (
+          d.diffMAE +
+          i.diffMAE
+        ) / 2,
+
+      winner:
+        (
+          d.winnerAcc +
+          i.winnerAcc
+        ) / 2
+    });
+  }
+}
+
+console.log();
+console.log("===== ROUND 3 FAMILY BEST =====");
+
+for (const feature of R3_FEATURES) {
+  const family =
+    r3Rows
+      .filter(
+        r =>
+          r.name === feature.name
+      )
+      .sort(
+        (a,b) =>
+          a.avg - b.avg
+      );
+
+  const r = family[0];
+
+  const robust =
+    r.dDelta < 0 &&
+    r.iDelta < 0;
+
+  console.log(
+    robust ? "ROBUST" : "FAIL",
+    r.name,
+    "coef=" + r.coef,
+    "AVG=" + r.avg.toFixed(6),
+    "AVGΔ=" + r.avgDelta.toFixed(6),
+    "DΔ=" + r.dDelta.toFixed(6),
+    "IΔ=" + r.iDelta.toFixed(6),
+    "TOTAL=" + r.total.toFixed(6),
+    "DIFF=" + r.diff.toFixed(6),
+    "W=" +
+      (r.winner * 100).toFixed(1) +
+      "%"
+  );
+}
+
+console.log();
+console.log("===== ROUND 3 ROBUST RANKING =====");
+
+const r3Robust =
+  r3Rows
+    .filter(
+      r =>
+        r.dDelta < 0 &&
+        r.iDelta < 0
+    )
+    .sort(
+      (a,b) =>
+        a.avg - b.avg
+    );
+
+for (
+  let i = 0;
+  i < Math.min(20, r3Robust.length);
+  i++
+) {
+  const r = r3Robust[i];
+
+  console.log(
+    `${i + 1}.`,
+    r.name,
+    "coef=" + r.coef,
+    "AVG=" + r.avg.toFixed(6),
+    "AVGΔ=" + r.avgDelta.toFixed(6),
+    "DΔ=" + r.dDelta.toFixed(6),
+    "IΔ=" + r.iDelta.toFixed(6),
+    "TOTAL=" + r.total.toFixed(6),
+    "DIFF=" + r.diff.toFixed(6),
+    "W=" +
+      (r.winner * 100).toFixed(1) +
+      "%"
+  );
+}
+
+console.log();
+
+if (r3Robust.length) {
+  console.log(
+    "BEST V0.7 ROUND3:",
+    r3Robust[0].name,
+    "coef=" + r3Robust[0].coef,
+    "AVG=" + r3Robust[0].avg,
+    "AVG_DELTA=" +
+      r3Robust[0].avgDelta
+  );
+} else {
+  console.log(
+    "BEST V0.7 ROUND3: NONE"
+  );
+}
+
+console.log(
+  "ROUND3 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+console.log(
+  "ROUND2 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+console.log(
+  "V0.7 FINAL HOLDOUT: NOT EVALUATED"
+);
+
+
+
+console.log(
+  "FINAL HOLDOUT: NOT TOUCHED"
+);
+
+console.log();
+console.log("===== V0.7 ROUND 4 / ROBUST COMBINATION =====");
+
+/*
+  Frozen Round3 base:
+  R5_DEFENSE   +0.20
+  VENUE_OFF    -0.20
+  VENUE_DEF    -0.10
+
+  Frozen Round3 additions:
+  BULLPEN_FATIGUE -0.30
+  LINEUP_OPS       -0.30
+  LINEUP_OBP       -0.30
+
+  No coefficient retuning.
+  Final/Audit NOT evaluated.
+*/
+
+const R4_FIXED = {
+  BULLPEN_FATIGUE: {
+    name: "BULLPEN_FATIGUE",
+    kind: "opponent",
+    awayPath: "bullpen.awayFatigue",
+    homePath: "bullpen.homeFatigue",
+    center: 50,
+    scale: 0.02,
+    coef: -0.30
+  },
+
+  LINEUP_OPS: {
+    name: "LINEUP_OPS",
+    kind: "own",
+    awayPath: "lineup.away.avgOps",
+    homePath: "lineup.home.avgOps",
+    center: 0.700,
+    scale: 5.0,
+    coef: -0.30
+  },
+
+  LINEUP_OBP: {
+    name: "LINEUP_OBP",
+    kind: "own",
+    awayPath: "lineup.away.avgObp",
+    homePath: "lineup.home.avgObp",
+    center: 0.330,
+    scale: 8.0,
+    coef: -0.30
+  }
+};
+
+function applyR4Feature(score, x, feature) {
+  const av =
+    r3Get(x, feature.awayPath);
+
+  const hv =
+    r3Get(x, feature.homePath);
+
+  if (
+    av === null ||
+    hv === null
+  ) {
+    return score;
+  }
+
+  const aSignal =
+    clamp(
+      (av - feature.center) *
+      feature.scale,
+      -3,
+      3
+    );
+
+  const hSignal =
+    clamp(
+      (hv - feature.center) *
+      feature.scale,
+      -3,
+      3
+    );
+
+  let away = score.away;
+  let home = score.home;
+
+  if (feature.kind === "own") {
+    away +=
+      aSignal *
+      feature.coef;
+
+    home +=
+      hSignal *
+      feature.coef;
+  } else {
+    /*
+      Away bullpen affects HOME scoring.
+      Home bullpen affects AWAY scoring.
+    */
+    home +=
+      aSignal *
+      feature.coef;
+
+    away +=
+      hSignal *
+      feature.coef;
+  }
+
+  return {
+    away: clamp(
+      away,
+      1.50,
+      8.00
+    ),
+    home: clamp(
+      home,
+      1.50,
+      8.00
+    )
+  };
+}
+
+function r4Predictor(features) {
+  return g => {
+    const base =
+      r3BasePredictor(g);
+
+    if (!base)
+      return null;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (!x)
+      return base;
+
+    let score = {
+      away: base.away,
+      home: base.home
+    };
+
+    for (const feature of features) {
+      score =
+        applyR4Feature(
+          score,
+          x,
+          feature
+        );
+    }
+
+    return score;
+  };
+}
+
+const R4_COMBOS = [
+  {
+    name: "BULLPEN",
+    features: [
+      R4_FIXED.BULLPEN_FATIGUE
+    ]
+  },
+
+  {
+    name: "BULLPEN + OPS",
+    features: [
+      R4_FIXED.BULLPEN_FATIGUE,
+      R4_FIXED.LINEUP_OPS
+    ]
+  },
+
+  {
+    name: "BULLPEN + OBP",
+    features: [
+      R4_FIXED.BULLPEN_FATIGUE,
+      R4_FIXED.LINEUP_OBP
+    ]
+  },
+
+  {
+    name: "BULLPEN + OPS + OBP",
+    features: [
+      R4_FIXED.BULLPEN_FATIGUE,
+      R4_FIXED.LINEUP_OPS,
+      R4_FIXED.LINEUP_OBP
+    ]
+  }
+];
+
+const r4BasePredictor =
+  r4Predictor([
+    R4_FIXED.BULLPEN_FATIGUE
+  ]);
+
+const r4BaseD =
+  evaluatePredictor(
+    "DISCOVERY",
+    r4BasePredictor
+  );
+
+const r4BaseI =
+  evaluatePredictor(
+    "INTERNAL",
+    r4BasePredictor
+  );
+
+const r4BaseAvg =
+  (
+    r4BaseD.teamMAE +
+    r4BaseI.teamMAE
+  ) / 2;
+
+console.log(
+  "ROUND4 CURRENT BASE = BULLPEN"
+);
+
+console.log(
+  "D=" + r4BaseD.teamMAE,
+  "I=" + r4BaseI.teamMAE,
+  "AVG=" + r4BaseAvg
+);
+
+console.log(
+  "ROUND3 TARGET",
+  2.4869630376576177
+);
+
+console.log(
+  "ROUND3 REPRO DELTA",
+  r4BaseAvg -
+  2.4869630376576177
+);
+
+const r4Results = [];
+
+for (const combo of R4_COMBOS) {
+  const predictor =
+    r4Predictor(
+      combo.features
+    );
+
+  const d =
+    evaluatePredictor(
+      "DISCOVERY",
+      predictor
+    );
+
+  const i =
+    evaluatePredictor(
+      "INTERNAL",
+      predictor
+    );
+
+  const avg =
+    (
+      d.teamMAE +
+      i.teamMAE
+    ) / 2;
+
+  const total =
+    (
+      d.totalMAE +
+      i.totalMAE
+    ) / 2;
+
+  const diff =
+    (
+      d.diffMAE +
+      i.diffMAE
+    ) / 2;
+
+  const winner =
+    (
+      d.winnerAcc +
+      i.winnerAcc
+    ) / 2;
+
+  r4Results.push({
+    name: combo.name,
+    d,
+    i,
+    avg,
+    total,
+    diff,
+    winner,
+
+    dDelta:
+      d.teamMAE -
+      r4BaseD.teamMAE,
+
+    iDelta:
+      i.teamMAE -
+      r4BaseI.teamMAE,
+
+    avgDelta:
+      avg -
+      r4BaseAvg
+  });
+}
+
+r4Results.sort(
+  (a,b) =>
+    a.avg - b.avg
+);
+
+console.log();
+console.log(
+  "===== ROUND 4 RESULTS ====="
+);
+
+for (const r of r4Results) {
+  const isBase =
+    r.name === "BULLPEN";
+
+  const robust =
+    isBase ||
+    (
+      r.dDelta < 0 &&
+      r.iDelta < 0 &&
+      r.avgDelta < 0
+    );
+
+  console.log(
+    isBase
+      ? "BASE"
+      : robust
+        ? "ROBUST"
+        : "FAIL",
+
+    r.name,
+
+    "AVG=" +
+      r.avg.toFixed(6),
+
+    "AVGΔ=" +
+      r.avgDelta.toFixed(6),
+
+    "D=" +
+      r.d.teamMAE.toFixed(6),
+
+    "DΔ=" +
+      r.dDelta.toFixed(6),
+
+    "I=" +
+      r.i.teamMAE.toFixed(6),
+
+    "IΔ=" +
+      r.iDelta.toFixed(6),
+
+    "TOTAL=" +
+      r.total.toFixed(6),
+
+    "DIFF=" +
+      r.diff.toFixed(6),
+
+    "W=" +
+      (
+        r.winner * 100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+const r4Robust =
+  r4Results.filter(
+    r =>
+      r.name !== "BULLPEN" &&
+      r.dDelta < 0 &&
+      r.iDelta < 0 &&
+      r.avgDelta < 0
+  );
+
+console.log();
+console.log(
+  "===== ROUND 4 DECISION ====="
+);
+
+if (r4Robust.length) {
+  const best =
+    r4Robust[0];
+
+  console.log(
+    "BEST V0.7 ROUND4:",
+    best.name,
+    "AVG=" + best.avg,
+    "AVG_DELTA_VS_BULLPEN=" +
+      best.avgDelta
+  );
+} else {
+  console.log(
+    "BEST V0.7 ROUND4: BULLPEN ONLY"
+  );
+}
+
+console.log(
+  "ROUND4 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+console.log();
+console.log("===== V0.7 ROUND 5 / STABILITY CHECK =====");
+
+/*
+  NO RETUNING.
+  Compare only:
+
+  A = BULLPEN + OPS
+  B = BULLPEN + OPS + OBP
+
+  Discovery/Internal only.
+  Final/Audit is NOT evaluated.
+*/
+
+const R5_A_NAME =
+  "BULLPEN + OPS";
+
+const R5_B_NAME =
+  "BULLPEN + OPS + OBP";
+
+const R5_A =
+  r4Predictor([
+    R4_FIXED.BULLPEN_FATIGUE,
+    R4_FIXED.LINEUP_OPS
+  ]);
+
+const R5_B =
+  r4Predictor([
+    R4_FIXED.BULLPEN_FATIGUE,
+    R4_FIXED.LINEUP_OPS,
+    R4_FIXED.LINEUP_OBP
+  ]);
+
+function r5Period(date) {
+  const d = String(date || "");
+
+  if (d.startsWith("2026-03"))
+    return "2026-03";
+
+  if (d.startsWith("2026-04"))
+    return "2026-04";
+
+  if (d.startsWith("2026-05"))
+    return "2026-05";
+
+  if (d.startsWith("2026-06"))
+    return "2026-06";
+
+  return null;
+}
+
+function r5Actual(g) {
+  const away =
+    Number(g.awayScore);
+
+  const home =
+    Number(g.homeScore);
+
+  if (
+    !Number.isFinite(away) ||
+    !Number.isFinite(home)
+  ) {
+    return null;
+  }
+
+  return {
+    away,
+    home
+  };
+}
+
+function r5EvaluateFilter(
+  predictor,
+  filter
+) {
+  let n = 0;
+
+  let teamAbs = 0;
+  let totalAbs = 0;
+  let diffAbs = 0;
+
+  let winnerN = 0;
+  let winnerHit = 0;
+
+  let within1 = 0;
+  let within2 = 0;
+
+  for (const g of games) {
+    if (!filter(g))
+      continue;
+
+    const actual =
+      r5Actual(g);
+
+    if (!actual)
+      continue;
+
+    const pred =
+      predictor(g);
+
+    if (!pred)
+      continue;
+
+    const pa =
+      Number(pred.away);
+
+    const ph =
+      Number(pred.home);
+
+    if (
+      !Number.isFinite(pa) ||
+      !Number.isFinite(ph)
+    ) {
+      continue;
+    }
+
+    n++;
+
+    const ae =
+      Math.abs(
+        pa - actual.away
+      );
+
+    const he =
+      Math.abs(
+        ph - actual.home
+      );
+
+    teamAbs +=
+      ae + he;
+
+    totalAbs +=
+      Math.abs(
+        (pa + ph) -
+        (
+          actual.away +
+          actual.home
+        )
+      );
+
+    diffAbs +=
+      Math.abs(
+        (ph - pa) -
+        (
+          actual.home -
+          actual.away
+        )
+      );
+
+    if (
+      ae <= 1 &&
+      he <= 1
+    ) {
+      within1++;
+    }
+
+    if (
+      ae <= 2 &&
+      he <= 2
+    ) {
+      within2++;
+    }
+
+    const actualDiff =
+      actual.home -
+      actual.away;
+
+    const predDiff =
+      ph - pa;
+
+    if (actualDiff !== 0) {
+      winnerN++;
+
+      if (
+        Math.sign(actualDiff) ===
+        Math.sign(predDiff)
+      ) {
+        winnerHit++;
+      }
+    }
+  }
+
+  if (!n) {
+    return {
+      n: 0,
+      teamMAE: NaN,
+      totalMAE: NaN,
+      diffMAE: NaN,
+      within1: NaN,
+      within2: NaN,
+      winnerAcc: NaN
+    };
+  }
+
+  return {
+    n,
+
+    teamMAE:
+      teamAbs /
+      (n * 2),
+
+    totalMAE:
+      totalAbs / n,
+
+    diffMAE:
+      diffAbs / n,
+
+    within1:
+      within1 / n,
+
+    within2:
+      within2 / n,
+
+    winnerAcc:
+      winnerN
+        ? winnerHit / winnerN
+        : NaN
+  };
+}
+
+function r5Print(
+  label,
+  a,
+  b
+) {
+  const delta =
+    b.teamMAE -
+    a.teamMAE;
+
+  const winner =
+    delta < 0
+      ? "OPS+OBP"
+      : delta > 0
+        ? "OPS"
+        : "TIE";
+
+  console.log(
+    label,
+
+    "n=" + a.n,
+
+    "OPS=" +
+      a.teamMAE.toFixed(6),
+
+    "OPS+OBP=" +
+      b.teamMAE.toFixed(6),
+
+    "Δ(B-A)=" +
+      delta.toFixed(6),
+
+    "WIN=" +
+      winner,
+
+    "| OPS TOTAL=" +
+      a.totalMAE.toFixed(6),
+
+    "DIFF=" +
+      a.diffMAE.toFixed(6),
+
+    "±1=" +
+      (
+        a.within1 * 100
+      ).toFixed(1) +
+      "%",
+
+    "±2=" +
+      (
+        a.within2 * 100
+      ).toFixed(1) +
+      "%",
+
+    "W=" +
+      (
+        a.winnerAcc * 100
+      ).toFixed(1) +
+      "%",
+
+    "| BOTH TOTAL=" +
+      b.totalMAE.toFixed(6),
+
+    "DIFF=" +
+      b.diffMAE.toFixed(6),
+
+    "±1=" +
+      (
+        b.within1 * 100
+      ).toFixed(1) +
+      "%",
+
+    "±2=" +
+      (
+        b.within2 * 100
+      ).toFixed(1) +
+      "%",
+
+    "W=" +
+      (
+        b.winnerAcc * 100
+      ).toFixed(1) +
+      "%"
+  );
+
+  return {
+    delta,
+    winner
+  };
+}
+
+console.log();
+console.log(
+  "===== MONTHLY STABILITY ====="
+);
+
+const months = [
+  "2026-03",
+  "2026-04",
+  "2026-05",
+  "2026-06"
+];
+
+let monthOpsWins = 0;
+let monthBothWins = 0;
+
+for (const month of months) {
+  const filter =
+    g =>
+      r5Period(g.date) === month;
+
+  const a =
+    r5EvaluateFilter(
+      R5_A,
+      filter
+    );
+
+  const b =
+    r5EvaluateFilter(
+      R5_B,
+      filter
+    );
+
+  const result =
+    r5Print(
+      month,
+      a,
+      b
+    );
+
+  if (result.winner === "OPS")
+    monthOpsWins++;
+
+  if (result.winner === "OPS+OBP")
+    monthBothWins++;
+}
+
+console.log();
+console.log(
+  "MONTH WINS",
+  "OPS=" + monthOpsWins,
+  "OPS+OBP=" + monthBothWins
+);
+
+/*
+  Chronological walk-forward style folds.
+
+  Fold 1:
+  March -> April evaluation
+
+  Fold 2:
+  Mar-Apr -> May evaluation
+
+  Fold 3:
+  Mar-May -> June evaluation
+
+  Since coefficients are already frozen,
+  these are pure chronological evaluation
+  windows, not retraining/tuning windows.
+*/
+
+const folds = [
+  {
+    name: "WF1 APR",
+    month: "2026-04"
+  },
+  {
+    name: "WF2 MAY",
+    month: "2026-05"
+  },
+  {
+    name: "WF3 JUN",
+    month: "2026-06"
+  }
+];
+
+console.log();
+console.log(
+  "===== WALK-FORWARD STABILITY ====="
+);
+
+let wfOpsWins = 0;
+let wfBothWins = 0;
+
+for (const fold of folds) {
+  const filter =
+    g =>
+      r5Period(g.date) ===
+      fold.month;
+
+  const a =
+    r5EvaluateFilter(
+      R5_A,
+      filter
+    );
+
+  const b =
+    r5EvaluateFilter(
+      R5_B,
+      filter
+    );
+
+  const result =
+    r5Print(
+      fold.name,
+      a,
+      b
+    );
+
+  if (result.winner === "OPS")
+    wfOpsWins++;
+
+  if (result.winner === "OPS+OBP")
+    wfBothWins++;
+}
+
+console.log();
+console.log(
+  "WF WINS",
+  "OPS=" + wfOpsWins,
+  "OPS+OBP=" + wfBothWins
+);
+
+console.log();
+console.log(
+  "===== FULL D/I CHECK ====="
+);
+
+const fullFilter =
+  g => {
+    const p =
+      r5Period(g.date);
+
+    return (
+      p === "2026-03" ||
+      p === "2026-04" ||
+      p === "2026-05" ||
+      p === "2026-06"
+    );
+  };
+
+const fullA =
+  r5EvaluateFilter(
+    R5_A,
+    fullFilter
+  );
+
+const fullB =
+  r5EvaluateFilter(
+    R5_B,
+    fullFilter
+  );
+
+r5Print(
+  "MAR-JUN",
+  fullA,
+  fullB
+);
+
+console.log();
+console.log(
+  "===== ROUND 5 DECISION ====="
+);
+
+/*
+  OBP must show repeatable benefit.
+  Tiny full-sample MAE improvement alone
+  is NOT enough.
+
+  Require:
+  - OPS+OBP wins >= 3 of 4 months
+  - OPS+OBP wins >= 2 of 3 WF windows
+
+  Otherwise prefer simpler OPS model.
+*/
+
+if (
+  monthBothWins >= 3 &&
+  wfBothWins >= 2 &&
+  fullB.teamMAE <
+    fullA.teamMAE
+) {
+  console.log(
+    "ROUND5 WINNER:",
+    R5_B_NAME
+  );
+
+  console.log(
+    "KEEP OBP: YES"
+  );
+} else {
+  console.log(
+    "ROUND5 WINNER:",
+    R5_A_NAME
+  );
+
+  console.log(
+    "KEEP OBP: NO"
+  );
+}
+
+console.log(
+  "ROUND5 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+console.log();
+console.log("===== V0.7 ROUND 6 / NEW INDEPENDENT FEATURES =====");
+
+/*
+  FROZEN BASE:
+  V0.3 Champion
+  + R5_DEFENSE       +0.20
+  + VENUE_OFFENSE    -0.20
+  + VENUE_DEFENSE    -0.10
+  + BULLPEN_FATIGUE  -0.30
+  + LINEUP_OPS       -0.30
+
+  OBP rejected in Round5.
+
+  Round6:
+  screen new features ONE AT A TIME.
+
+  Final/Audit NOT evaluated.
+*/
+
+const R6_BASE =
+  r4Predictor([
+    R4_FIXED.BULLPEN_FATIGUE,
+    R4_FIXED.LINEUP_OPS
+  ]);
+
+const r6Get = (obj, path) => {
+  const v = path
+    .split(".")
+    .reduce(
+      (cur, key) =>
+        cur == null
+          ? null
+          : cur[key],
+      obj
+    );
+
+  if (
+    v === null ||
+    v === undefined ||
+    v === ""
+  ) return null;
+
+  const n = Number(v);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+};
+
+/*
+  We derive neutral centers ONLY from Discovery.
+
+  This avoids using Internal to define
+  the feature center.
+*/
+
+function r6DiscoveryCenter(
+  awayPath,
+  homePath
+) {
+  const vals = [];
+
+  for (const g of games) {
+    const month =
+      Number(
+        String(g.date).slice(5, 7)
+      );
+
+    if (month > 4)
+      continue;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (!x)
+      continue;
+
+    const a =
+      r6Get(x, awayPath);
+
+    const h =
+      r6Get(x, homePath);
+
+    if (a !== null)
+      vals.push(a);
+
+    if (h !== null)
+      vals.push(h);
+  }
+
+  if (!vals.length)
+    return null;
+
+  return (
+    vals.reduce(
+      (sum, v) => sum + v,
+      0
+    ) / vals.length
+  );
+}
+
+const R6_FEATURES = [
+  {
+    name: "STARTER_RECENT5_WHIP",
+    kind: "opponent",
+    awayPath:
+      "starter.away.recent5.whip",
+    homePath:
+      "starter.home.recent5.whip",
+    scale: 1.0,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "STARTER_RECENT5_KBB",
+    kind: "opponentInverse",
+    awayPath:
+      "starter.away.recent5.kbb",
+    homePath:
+      "starter.home.recent5.kbb",
+    scale: 0.20,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "STARTER_SEASON_WHIP",
+    kind: "opponent",
+    awayPath:
+      "starter.away.whip",
+    homePath:
+      "starter.home.whip",
+    scale: 1.0,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "STARTER_QS",
+    kind: "opponentInverse",
+    awayPath:
+      "starter.away.qs",
+    homePath:
+      "starter.home.qs",
+    scale: 0.10,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "REST_DAYS",
+    kind: "own",
+    awayPath:
+      "awayTeamForm.restDays",
+    homePath:
+      "homeTeamForm.restDays",
+    scale: 0.20,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "RECENT5_WINRATE",
+    kind: "own",
+    awayPath:
+      "awayTeamForm.recent5.winRate",
+    homePath:
+      "homeTeamForm.recent5.winRate",
+    scale: 1.0,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  },
+
+  {
+    name: "RECENT10_WINRATE",
+    kind: "own",
+    awayPath:
+      "awayTeamForm.recent10.winRate",
+    homePath:
+      "homeTeamForm.recent10.winRate",
+    scale: 1.0,
+    coefs: [
+      -0.30,-0.20,-0.10,-0.05,
+       0.05, 0.10, 0.20, 0.30
+    ]
+  }
+];
+
+for (const f of R6_FEATURES) {
+  f.center =
+    r6DiscoveryCenter(
+      f.awayPath,
+      f.homePath
+    );
+}
+
+console.log();
+console.log(
+  "===== DISCOVERY-FROZEN CENTERS ====="
+);
+
+for (const f of R6_FEATURES) {
+  console.log(
+    f.name,
+    "CENTER=" + f.center
+  );
+}
+
+function r6Predictor(
+  feature,
+  coef
+) {
+  return g => {
+    const base =
+      R6_BASE(g);
+
+    if (!base)
+      return null;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (
+      !x ||
+      feature.center === null
+    ) {
+      return base;
+    }
+
+    const av =
+      r6Get(
+        x,
+        feature.awayPath
+      );
+
+    const hv =
+      r6Get(
+        x,
+        feature.homePath
+      );
+
+    if (
+      av === null ||
+      hv === null
+    ) {
+      return base;
+    }
+
+    let aSignal =
+      (av - feature.center) *
+      feature.scale;
+
+    let hSignal =
+      (hv - feature.center) *
+      feature.scale;
+
+    aSignal =
+      clamp(
+        aSignal,
+        -3,
+        3
+      );
+
+    hSignal =
+      clamp(
+        hSignal,
+        -3,
+        3
+      );
+
+    /*
+      Inverse:
+      higher KBB / QS = better starter,
+      therefore opponent scoring should
+      move in opposite direction.
+    */
+    if (
+      feature.kind ===
+      "opponentInverse"
+    ) {
+      aSignal *= -1;
+      hSignal *= -1;
+    }
+
+    let away = base.away;
+    let home = base.home;
+
+    if (feature.kind === "own") {
+      away +=
+        aSignal * coef;
+
+      home +=
+        hSignal * coef;
+    } else {
+      /*
+        away starter -> home offense
+        home starter -> away offense
+      */
+      home +=
+        aSignal * coef;
+
+      away +=
+        hSignal * coef;
+    }
+
+    return {
+      away:
+        clamp(
+          away,
+          1.50,
+          8.00
+        ),
+
+      home:
+        clamp(
+          home,
+          1.50,
+          8.00
+        )
+    };
+  };
+}
+
+const r6BaseD =
+  evaluatePredictor(
+    "DISCOVERY",
+    R6_BASE
+  );
+
+const r6BaseI =
+  evaluatePredictor(
+    "INTERNAL",
+    R6_BASE
+  );
+
+const r6BaseAvg =
+  (
+    r6BaseD.teamMAE +
+    r6BaseI.teamMAE
+  ) / 2;
+
+console.log();
+console.log(
+  "===== ROUND6 BASE ====="
+);
+
+console.log(
+  "D=" + r6BaseD.teamMAE,
+  "I=" + r6BaseI.teamMAE,
+  "AVG=" + r6BaseAvg
+);
+
+console.log(
+  "EXPECTED ROUND5 BASE ≈ 2.477933"
+);
+
+const r6Rows = [];
+
+for (const feature of R6_FEATURES) {
+  if (feature.center === null) {
+    console.log(
+      "NO DATA:",
+      feature.name
+    );
+
+    continue;
+  }
+
+  for (const coef of feature.coefs) {
+    const predictor =
+      r6Predictor(
+        feature,
+        coef
+      );
+
+    const d =
+      evaluatePredictor(
+        "DISCOVERY",
+        predictor
+      );
+
+    const i =
+      evaluatePredictor(
+        "INTERNAL",
+        predictor
+      );
+
+    const avg =
+      (
+        d.teamMAE +
+        i.teamMAE
+      ) / 2;
+
+    r6Rows.push({
+      name: feature.name,
+      coef,
+      d,
+      i,
+      avg,
+
+      dDelta:
+        d.teamMAE -
+        r6BaseD.teamMAE,
+
+      iDelta:
+        i.teamMAE -
+        r6BaseI.teamMAE,
+
+      avgDelta:
+        avg -
+        r6BaseAvg,
+
+      total:
+        (
+          d.totalMAE +
+          i.totalMAE
+        ) / 2,
+
+      diff:
+        (
+          d.diffMAE +
+          i.diffMAE
+        ) / 2,
+
+      winner:
+        (
+          d.winnerAcc +
+          i.winnerAcc
+        ) / 2
+    });
+  }
+}
+
+console.log();
+console.log(
+  "===== ROUND 6 FAMILY BEST ====="
+);
+
+for (const feature of R6_FEATURES) {
+  const rows =
+    r6Rows
+      .filter(
+        r =>
+          r.name ===
+          feature.name
+      )
+      .sort(
+        (a,b) =>
+          a.avg - b.avg
+      );
+
+  if (!rows.length)
+    continue;
+
+  const r = rows[0];
+
+  const robust =
+    r.dDelta < 0 &&
+    r.iDelta < 0 &&
+    r.avgDelta < 0;
+
+  console.log(
+    robust
+      ? "ROBUST"
+      : "FAIL",
+
+    r.name,
+
+    "coef=" + r.coef,
+
+    "AVG=" +
+      r.avg.toFixed(6),
+
+    "AVGΔ=" +
+      r.avgDelta.toFixed(6),
+
+    "DΔ=" +
+      r.dDelta.toFixed(6),
+
+    "IΔ=" +
+      r.iDelta.toFixed(6),
+
+    "TOTAL=" +
+      r.total.toFixed(6),
+
+    "DIFF=" +
+      r.diff.toFixed(6),
+
+    "W=" +
+      (
+        r.winner * 100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+const robustRows =
+  r6Rows
+    .filter(
+      r =>
+        r.dDelta < 0 &&
+        r.iDelta < 0 &&
+        r.avgDelta < 0
+    )
+    .sort(
+      (a,b) =>
+        a.avg - b.avg
+    );
+
+console.log();
+console.log(
+  "===== ROUND 6 ROBUST RANKING ====="
+);
+
+if (!robustRows.length) {
+  console.log(
+    "NO ROBUST NEW FEATURE"
+  );
+} else {
+  for (
+    let i = 0;
+    i <
+      Math.min(
+        robustRows.length,
+        20
+      );
+    i++
+  ) {
+    const r =
+      robustRows[i];
+
+    console.log(
+      `${i + 1}.`,
+      r.name,
+      "coef=" + r.coef,
+      "AVG=" +
+        r.avg.toFixed(6),
+      "AVGΔ=" +
+        r.avgDelta.toFixed(6),
+      "DΔ=" +
+        r.dDelta.toFixed(6),
+      "IΔ=" +
+        r.iDelta.toFixed(6),
+      "TOTAL=" +
+        r.total.toFixed(6),
+      "DIFF=" +
+        r.diff.toFixed(6),
+      "W=" +
+        (
+          r.winner * 100
+        ).toFixed(1) +
+        "%"
+    );
+  }
+}
+
+console.log();
+
+if (robustRows.length) {
+  const best =
+    robustRows[0];
+
+  console.log(
+    "BEST V0.7 ROUND6:",
+    best.name,
+    "coef=" + best.coef,
+    "AVG=" + best.avg,
+    "AVG_DELTA=" +
+      best.avgDelta
+  );
+} else {
+  console.log(
+    "BEST V0.7 ROUND6: KEEP ROUND5 BASE"
+  );
+}
+
+console.log(
+  "ROUND6 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+console.log();
+console.log("===== V0.7 ROUND 7 / ROBUST COMBINATION CHECK =====");
+
+/*
+  NO RETUNING.
+
+  Frozen Round6 winner:
+    RECENT5_WINRATE +0.30
+
+  Test additions:
+    REST_DAYS +0.30
+    RECENT10_WINRATE +0.30
+
+  Final/Audit NOT evaluated.
+*/
+
+const R7_R5 =
+  R6_FEATURES.find(
+    f => f.name === "RECENT5_WINRATE"
+  );
+
+const R7_REST =
+  R6_FEATURES.find(
+    f => f.name === "REST_DAYS"
+  );
+
+const R7_R10 =
+  R6_FEATURES.find(
+    f => f.name === "RECENT10_WINRATE"
+  );
+
+function r7Signal(
+  x,
+  feature,
+  side
+) {
+  if (
+    !x ||
+    !feature ||
+    feature.center === null
+  ) return null;
+
+  const path =
+    side === "away"
+      ? feature.awayPath
+      : feature.homePath;
+
+  const v =
+    r6Get(x, path);
+
+  if (v === null)
+    return null;
+
+  return clamp(
+    (v - feature.center) *
+      feature.scale,
+    -3,
+    3
+  );
+}
+
+function r7Predictor(
+  useRest,
+  useR10
+) {
+  return g => {
+    /*
+      Start from frozen Round5 base:
+      V03 + R5D + venue + bullpen + OPS
+    */
+    const base =
+      R6_BASE(g);
+
+    if (!base)
+      return null;
+
+    const x =
+      v06Map.get(g.gameId);
+
+    if (!x)
+      return base;
+
+    let away =
+      base.away;
+
+    let home =
+      base.home;
+
+    /*
+      Frozen Round6 winner
+      RECENT5_WINRATE +0.30
+    */
+    const r5a =
+      r7Signal(
+        x,
+        R7_R5,
+        "away"
+      );
+
+    const r5h =
+      r7Signal(
+        x,
+        R7_R5,
+        "home"
+      );
+
+    if (
+      r5a !== null &&
+      r5h !== null
+    ) {
+      away += r5a * 0.30;
+      home += r5h * 0.30;
+    }
+
+    /*
+      Optional REST_DAYS +0.30
+    */
+    if (useRest) {
+      const a =
+        r7Signal(
+          x,
+          R7_REST,
+          "away"
+        );
+
+      const h =
+        r7Signal(
+          x,
+          R7_REST,
+          "home"
+        );
+
+      if (
+        a !== null &&
+        h !== null
+      ) {
+        away += a * 0.30;
+        home += h * 0.30;
+      }
+    }
+
+    /*
+      Optional RECENT10_WINRATE +0.30
+    */
+    if (useR10) {
+      const a =
+        r7Signal(
+          x,
+          R7_R10,
+          "away"
+        );
+
+      const h =
+        r7Signal(
+          x,
+          R7_R10,
+          "home"
+        );
+
+      if (
+        a !== null &&
+        h !== null
+      ) {
+        away += a * 0.30;
+        home += h * 0.30;
+      }
+    }
+
+    return {
+      away:
+        clamp(
+          away,
+          1.50,
+          8.00
+        ),
+
+      home:
+        clamp(
+          home,
+          1.50,
+          8.00
+        )
+    };
+  };
+}
+
+const R7_MODELS = [
+  {
+    name: "R5_WINRATE",
+    predictor:
+      r7Predictor(
+        false,
+        false
+      )
+  },
+  {
+    name:
+      "R5_WINRATE + REST",
+    predictor:
+      r7Predictor(
+        true,
+        false
+      )
+  },
+  {
+    name:
+      "R5_WINRATE + R10_WINRATE",
+    predictor:
+      r7Predictor(
+        false,
+        true
+      )
+  },
+  {
+    name:
+      "R5_WINRATE + REST + R10_WINRATE",
+    predictor:
+      r7Predictor(
+        true,
+        true
+      )
+  }
+];
+
+const r7Rows = [];
+
+for (const model of R7_MODELS) {
+  const d =
+    evaluatePredictor(
+      "DISCOVERY",
+      model.predictor
+    );
+
+  const i =
+    evaluatePredictor(
+      "INTERNAL",
+      model.predictor
+    );
+
+  r7Rows.push({
+    name: model.name,
+    d,
+    i,
+
+    avg:
+      (
+        d.teamMAE +
+        i.teamMAE
+      ) / 2,
+
+    total:
+      (
+        d.totalMAE +
+        i.totalMAE
+      ) / 2,
+
+    diff:
+      (
+        d.diffMAE +
+        i.diffMAE
+      ) / 2,
+
+    winner:
+      (
+        d.winnerAcc +
+        i.winnerAcc
+      ) / 2
+  });
+}
+
+const r7Base =
+  r7Rows.find(
+    r =>
+      r.name ===
+      "R5_WINRATE"
+  );
+
+console.log();
+console.log(
+  "===== ROUND7 BASE REPRO ====="
+);
+
+console.log(
+  "D=" +
+    r7Base.d.teamMAE,
+
+  "I=" +
+    r7Base.i.teamMAE,
+
+  "AVG=" +
+    r7Base.avg
+);
+
+console.log(
+  "ROUND6 TARGET=" +
+    2.4724680867305495
+);
+
+console.log(
+  "ROUND6 REPRO DELTA=" +
+    (
+      r7Base.avg -
+      2.4724680867305495
+    )
+);
+
+console.log();
+console.log(
+  "===== ROUND 7 RESULTS ====="
+);
+
+for (const r of r7Rows) {
+  const dDelta =
+    r.d.teamMAE -
+    r7Base.d.teamMAE;
+
+  const iDelta =
+    r.i.teamMAE -
+    r7Base.i.teamMAE;
+
+  const avgDelta =
+    r.avg -
+    r7Base.avg;
+
+  const robust =
+    r.name ===
+      "R5_WINRATE"
+      ? true
+      : (
+          dDelta < 0 &&
+          iDelta < 0 &&
+          avgDelta < 0
+        );
+
+  console.log(
+    robust
+      ? "ROBUST"
+      : "FAIL",
+
+    r.name,
+
+    "AVG=" +
+      r.avg.toFixed(6),
+
+    "AVGΔ=" +
+      avgDelta.toFixed(6),
+
+    "D=" +
+      r.d.teamMAE.toFixed(6),
+
+    "DΔ=" +
+      dDelta.toFixed(6),
+
+    "I=" +
+      r.i.teamMAE.toFixed(6),
+
+    "IΔ=" +
+      iDelta.toFixed(6),
+
+    "TOTAL=" +
+      r.total.toFixed(6),
+
+    "DIFF=" +
+      r.diff.toFixed(6),
+
+    "W=" +
+      (
+        r.winner * 100
+      ).toFixed(1) +
+      "%"
+  );
+}
+
+const r7Robust =
+  r7Rows
+    .filter(r => {
+      if (
+        r.name ===
+        "R5_WINRATE"
+      ) return true;
+
+      return (
+        r.d.teamMAE <
+          r7Base.d.teamMAE &&
+        r.i.teamMAE <
+          r7Base.i.teamMAE &&
+        r.avg <
+          r7Base.avg
+      );
+    })
+    .sort(
+      (a,b) =>
+        a.avg - b.avg
+    );
+
+console.log();
+console.log(
+  "===== ROUND 7 ROBUST RANKING ====="
+);
+
+r7Robust.forEach(
+  (r, idx) => {
+    console.log(
+      `${idx + 1}.`,
+      r.name,
+      "AVG=" +
+        r.avg.toFixed(6),
+      "D=" +
+        r.d.teamMAE.toFixed(6),
+      "I=" +
+        r.i.teamMAE.toFixed(6),
+      "TOTAL=" +
+        r.total.toFixed(6),
+      "DIFF=" +
+        r.diff.toFixed(6),
+      "W=" +
+        (
+          r.winner * 100
+        ).toFixed(1) +
+        "%"
+    );
+  }
+);
+
+const r7Best =
+  r7Robust[0];
+
+console.log();
+
+console.log(
+  "BEST V0.7 ROUND7:",
+  r7Best.name,
+  "AVG=" +
+    r7Best.avg
+);
+
+console.log(
+  "ROUND7 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+console.log();
+console.log("===== V0.7 ROUND 8 / STABILITY CHECK =====");
+
+/*
+  NO RETUNING.
+  NO FINAL/AUDIT.
+
+  A = R5_WINRATE
+  B = R5_WINRATE + REST
+  C = R5_WINRATE + REST + R10_WINRATE
+
+  Check:
+    - monthly Mar/Apr/May/Jun
+    - chronological Apr/May/Jun
+    - full Mar-Jun weighted metrics
+*/
+
+const R8_MODELS = [
+  {
+    name: "A_R5",
+    predictor: r7Predictor(false, false)
+  },
+  {
+    name: "B_R5_REST",
+    predictor: r7Predictor(true, false)
+  },
+  {
+    name: "C_R5_REST_R10",
+    predictor: r7Predictor(true, true)
+  }
+];
+
+function r8EvaluateRange(
+  predictor,
+  startDate,
+  endDate
+) {
+  let teamErr = 0;
+  let totalErr = 0;
+  let diffErr = 0;
+  let winnerCorrect = 0;
+  let winnerN = 0;
+  let within1 = 0;
+  let within2 = 0;
+  let n = 0;
+
+  for (const g of games) {
+    if (
+      String(g.date) < startDate ||
+      String(g.date) > endDate
+    ) continue;
+
+    const p = predictor(g);
+
+    if (!p)
+      continue;
+
+    const actualAway =
+      Number(g.awayScore);
+
+    const actualHome =
+      Number(g.homeScore);
+
+    if (
+      !Number.isFinite(actualAway) ||
+      !Number.isFinite(actualHome)
+    ) continue;
+
+    const aeAway =
+      Math.abs(
+        p.away - actualAway
+      );
+
+    const aeHome =
+      Math.abs(
+        p.home - actualHome
+      );
+
+    teamErr +=
+      (aeAway + aeHome) / 2;
+
+    totalErr +=
+      Math.abs(
+        (p.away + p.home) -
+        (actualAway + actualHome)
+      );
+
+    diffErr +=
+      Math.abs(
+        (p.home - p.away) -
+        (actualHome - actualAway)
+      );
+
+    if (
+      aeAway <= 1 &&
+      aeHome <= 1
+    ) {
+      within1++;
+    }
+
+    if (
+      aeAway <= 2 &&
+      aeHome <= 2
+    ) {
+      within2++;
+    }
+
+    const predDiff =
+      p.home - p.away;
+
+    const actualDiff =
+      actualHome - actualAway;
+
+    if (
+      predDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(predDiff) ===
+        Math.sign(actualDiff)
+      ) {
+        winnerCorrect++;
+      }
+    }
+
+    n++;
+  }
+
+  return {
+    n,
+
+    teamMAE:
+      n
+        ? teamErr / n
+        : null,
+
+    totalMAE:
+      n
+        ? totalErr / n
+        : null,
+
+    diffMAE:
+      n
+        ? diffErr / n
+        : null,
+
+    within1:
+      n
+        ? within1 / n
+        : null,
+
+    within2:
+      n
+        ? within2 / n
+        : null,
+
+    winnerAcc:
+      winnerN
+        ? winnerCorrect / winnerN
+        : null
+  };
+}
+
+function r8Fmt(v) {
+  return Number.isFinite(v)
+    ? v.toFixed(6)
+    : "NA";
+}
+
+function r8Pct(v) {
+  return Number.isFinite(v)
+    ? (v * 100).toFixed(1) + "%"
+    : "NA";
+}
+
+const R8_WINDOWS = [
+  {
+    name: "2026-03",
+    start: "2026-03-01",
+    end: "2026-03-31"
+  },
+  {
+    name: "2026-04",
+    start: "2026-04-01",
+    end: "2026-04-30"
+  },
+  {
+    name: "2026-05",
+    start: "2026-05-01",
+    end: "2026-05-31"
+  },
+  {
+    name: "2026-06",
+    start: "2026-06-01",
+    end: "2026-06-30"
+  }
+];
+
+console.log();
+console.log(
+  "===== ROUND8 MONTHLY ====="
+);
+
+const monthlyWins = {
+  A_R5: 0,
+  B_R5_REST: 0,
+  C_R5_REST_R10: 0
+};
+
+for (const w of R8_WINDOWS) {
+  const rows =
+    R8_MODELS.map(m => ({
+      name: m.name,
+      result:
+        r8EvaluateRange(
+          m.predictor,
+          w.start,
+          w.end
+        )
+    }));
+
+  rows.sort(
+    (a,b) =>
+      a.result.teamMAE -
+      b.result.teamMAE
+  );
+
+  if (rows.length) {
+    monthlyWins[
+      rows[0].name
+    ]++;
+  }
+
+  console.log();
+  console.log(
+    "---",
+    w.name,
+    "---"
+  );
+
+  for (const r of rows) {
+    console.log(
+      r.name,
+      "n=" + r.result.n,
+      "TEAM=" +
+        r8Fmt(
+          r.result.teamMAE
+        ),
+      "TOTAL=" +
+        r8Fmt(
+          r.result.totalMAE
+        ),
+      "DIFF=" +
+        r8Fmt(
+          r.result.diffMAE
+        ),
+      "±1=" +
+        r8Pct(
+          r.result.within1
+        ),
+      "±2=" +
+        r8Pct(
+          r.result.within2
+        ),
+      "W=" +
+        r8Pct(
+          r.result.winnerAcc
+        )
+    );
+  }
+
+  console.log(
+    "WINNER=" +
+      rows[0].name
+  );
+}
+
+console.log();
+console.log(
+  "MONTHLY WINS:",
+  monthlyWins
+);
+
+/*
+  Chronological forward windows.
+  No future data used for selection here;
+  this is stability reporting only.
+*/
+const R8_WF = [
+  {
+    name: "APR",
+    start: "2026-04-01",
+    end: "2026-04-30"
+  },
+  {
+    name: "MAY",
+    start: "2026-05-01",
+    end: "2026-05-31"
+  },
+  {
+    name: "JUN",
+    start: "2026-06-01",
+    end: "2026-06-30"
+  }
+];
+
+console.log();
+console.log(
+  "===== ROUND8 CHRONOLOGICAL WINDOWS ====="
+);
+
+const wfWins = {
+  A_R5: 0,
+  B_R5_REST: 0,
+  C_R5_REST_R10: 0
+};
+
+for (const w of R8_WF) {
+  const rows =
+    R8_MODELS.map(m => ({
+      name: m.name,
+      result:
+        r8EvaluateRange(
+          m.predictor,
+          w.start,
+          w.end
+        )
+    }))
+    .sort(
+      (a,b) =>
+        a.result.teamMAE -
+        b.result.teamMAE
+    );
+
+  wfWins[
+    rows[0].name
+  ]++;
+
+  console.log(
+    w.name,
+    "WINNER=" +
+      rows[0].name,
+    rows
+      .map(
+        r =>
+          r.name +
+          "=" +
+          r8Fmt(
+            r.result.teamMAE
+          )
+      )
+      .join(" | ")
+  );
+}
+
+console.log(
+  "WF WINS:",
+  wfWins
+);
+
+console.log();
+console.log(
+  "===== ROUND8 FULL MAR-JUN ====="
+);
+
+const fullRows =
+  R8_MODELS
+    .map(m => ({
+      name: m.name,
+      result:
+        r8EvaluateRange(
+          m.predictor,
+          "2026-03-01",
+          "2026-06-30"
+        )
+    }))
+    .sort(
+      (a,b) =>
+        a.result.teamMAE -
+        b.result.teamMAE
+    );
+
+for (const r of fullRows) {
+  console.log(
+    r.name,
+    "n=" + r.result.n,
+    "TEAM=" +
+      r8Fmt(
+        r.result.teamMAE
+      ),
+    "TOTAL=" +
+      r8Fmt(
+        r.result.totalMAE
+      ),
+    "DIFF=" +
+      r8Fmt(
+        r.result.diffMAE
+      ),
+    "±1=" +
+      r8Pct(
+        r.result.within1
+      ),
+    "±2=" +
+      r8Pct(
+        r.result.within2
+      ),
+    "W=" +
+      r8Pct(
+        r.result.winnerAcc
+      )
+  );
+}
+
+const r8Winner =
+  fullRows[0];
+
+console.log();
+console.log(
+  "ROUND8 FULL WINNER:",
+  r8Winner.name,
+  "TEAM=" +
+    r8Winner.result.teamMAE
+);
+
+console.log(
+  "ROUND8 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+console.log();
+console.log("===== V0.7 ROUND 9 / ERROR DIAGNOSTICS =====");
+
+/*
+  DIAGNOSTIC ONLY.
+  NO RETUNING.
+  NO MODEL SELECTION.
+  NO FINAL/AUDIT.
+
+  Frozen model:
+    R5_WINRATE
+    + REST
+    + R10_WINRATE
+
+  Base underneath already contains:
+    V03 champion
+    + R5 defense
+    + venue offense
+    + venue defense
+    + bullpen
+    + lineup OPS
+*/
+
+const R9_MODEL =
+  r7Predictor(true, true);
+
+function r9Num(v) {
+  const n = Number(v);
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+function r9Row(g) {
+  const p = R9_MODEL(g);
+
+  if (!p)
+    return null;
+
+  const actualAway =
+    r9Num(g.awayScore);
+
+  const actualHome =
+    r9Num(g.homeScore);
+
+  if (
+    actualAway === null ||
+    actualHome === null
+  ) return null;
+
+  const x =
+    v06Map.get(g.gameId);
+
+  const awayErr =
+    Math.abs(
+      p.away - actualAway
+    );
+
+  const homeErr =
+    Math.abs(
+      p.home - actualHome
+    );
+
+  const predTotal =
+    p.away + p.home;
+
+  const actualTotal =
+    actualAway + actualHome;
+
+  const predDiff =
+    p.home - p.away;
+
+  const actualDiff =
+    actualHome - actualAway;
+
+  const awayR5Whip =
+    x
+      ? r6Get(
+          x,
+          "starter.away.recent5.whip"
+        )
+      : null;
+
+  const homeR5Whip =
+    x
+      ? r6Get(
+          x,
+          "starter.home.recent5.whip"
+        )
+      : null;
+
+  return {
+    g,
+    p,
+    x,
+
+    actualAway,
+    actualHome,
+
+    awayErr,
+    homeErr,
+
+    teamErr:
+      (awayErr + homeErr) / 2,
+
+    predTotal,
+    actualTotal,
+
+    totalErr:
+      Math.abs(
+        predTotal - actualTotal
+      ),
+
+    diffErr:
+      Math.abs(
+        predDiff - actualDiff
+      ),
+
+    winnerCorrect:
+      predDiff !== 0 &&
+      actualDiff !== 0
+        ? Math.sign(predDiff) ===
+          Math.sign(actualDiff)
+        : null,
+
+    bothWithin1:
+      awayErr <= 1 &&
+      homeErr <= 1,
+
+    bothWithin2:
+      awayErr <= 2 &&
+      homeErr <= 2,
+
+    starterRecentBoth:
+      awayR5Whip !== null &&
+      homeR5Whip !== null
+  };
+}
+
+const R9_ROWS =
+  games
+    .filter(g => {
+      const m =
+        Number(
+          String(g.date).slice(5, 7)
+        );
+
+      return m >= 3 && m <= 6;
+    })
+    .map(r9Row)
+    .filter(Boolean);
+
+function r9Metrics(rows) {
+  if (!rows.length) {
+    return {
+      n: 0,
+      teamMAE: null,
+      awayMAE: null,
+      homeMAE: null,
+      totalMAE: null,
+      diffMAE: null,
+      within1: null,
+      within2: null,
+      winnerAcc: null
+    };
+  }
+
+  const mean = fn =>
+    rows.reduce(
+      (sum, r) =>
+        sum + fn(r),
+      0
+    ) / rows.length;
+
+  const winnerRows =
+    rows.filter(
+      r =>
+        r.winnerCorrect !== null
+    );
+
+  return {
+    n: rows.length,
+
+    teamMAE:
+      mean(r => r.teamErr),
+
+    awayMAE:
+      mean(r => r.awayErr),
+
+    homeMAE:
+      mean(r => r.homeErr),
+
+    totalMAE:
+      mean(r => r.totalErr),
+
+    diffMAE:
+      mean(r => r.diffErr),
+
+    within1:
+      mean(
+        r =>
+          r.bothWithin1
+            ? 1
+            : 0
+      ),
+
+    within2:
+      mean(
+        r =>
+          r.bothWithin2
+            ? 1
+            : 0
+      ),
+
+    winnerAcc:
+      winnerRows.length
+        ? winnerRows.filter(
+            r =>
+              r.winnerCorrect
+          ).length /
+          winnerRows.length
+        : null
+  };
+}
+
+function r9F(v) {
+  return Number.isFinite(v)
+    ? v.toFixed(3)
+    : "NA";
+}
+
+function r9P(v) {
+  return Number.isFinite(v)
+    ? (v * 100).toFixed(1) + "%"
+    : "NA";
+}
+
+function r9Print(
+  name,
+  rows
+) {
+  const m =
+    r9Metrics(rows);
+
+  console.log(
+    name,
+    "n=" + m.n,
+    "TEAM=" + r9F(m.teamMAE),
+    "AWAY=" + r9F(m.awayMAE),
+    "HOME=" + r9F(m.homeMAE),
+    "TOTAL=" + r9F(m.totalMAE),
+    "DIFF=" + r9F(m.diffMAE),
+    "±1=" + r9P(m.within1),
+    "±2=" + r9P(m.within2),
+    "W=" + r9P(m.winnerAcc)
+  );
+}
+
+console.log();
+console.log(
+  "===== ROUND9 BASE ====="
+);
+
+r9Print(
+  "FULL_MAR_JUN",
+  R9_ROWS
+);
+
+/*
+  --------------------------------------------------
+  1. HOME / AWAY SIDE ERROR
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 HOME VS AWAY ERROR ====="
+);
+
+const full =
+  r9Metrics(R9_ROWS);
+
+console.log(
+  "AWAY_MAE=" +
+    r9F(full.awayMAE),
+
+  "HOME_MAE=" +
+    r9F(full.homeMAE),
+
+  "HOME_MINUS_AWAY=" +
+    r9F(
+      full.homeMAE -
+      full.awayMAE
+    )
+);
+
+/*
+  --------------------------------------------------
+  2. PREDICTED TOTAL BUCKET
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 PREDICTED TOTAL BUCKET ====="
+);
+
+const predBuckets = [
+  ["PRED_LT_7", -Infinity, 7],
+  ["PRED_7_8", 7, 9],
+  ["PRED_9_10", 9, 11],
+  ["PRED_11_PLUS", 11, Infinity]
+];
+
+for (
+  const [name, lo, hi]
+  of predBuckets
+) {
+  r9Print(
+    name,
+    R9_ROWS.filter(
+      r =>
+        r.predTotal >= lo &&
+        r.predTotal < hi
+    )
+  );
+}
+
+/*
+  --------------------------------------------------
+  3. ACTUAL TOTAL BUCKET
+  Diagnostic only — actual result is NOT a predictor.
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 ACTUAL TOTAL BUCKET / DIAGNOSTIC ONLY ====="
+);
+
+const actualBuckets = [
+  ["ACTUAL_0_6", -Infinity, 7],
+  ["ACTUAL_7_9", 7, 10],
+  ["ACTUAL_10_12", 10, 13],
+  ["ACTUAL_13_PLUS", 13, Infinity]
+];
+
+for (
+  const [name, lo, hi]
+  of actualBuckets
+) {
+  r9Print(
+    name,
+    R9_ROWS.filter(
+      r =>
+        r.actualTotal >= lo &&
+        r.actualTotal < hi
+    )
+  );
+}
+
+/*
+  --------------------------------------------------
+  4. STARTER RECENT DATA COVERAGE
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 STARTER RECENT COVERAGE ====="
+);
+
+r9Print(
+  "STARTER_RECENT_BOTH",
+  R9_ROWS.filter(
+    r => r.starterRecentBoth
+  )
+);
+
+r9Print(
+  "STARTER_RECENT_MISSING",
+  R9_ROWS.filter(
+    r => !r.starterRecentBoth
+  )
+);
+
+/*
+  --------------------------------------------------
+  5. ACTUAL MARGIN / CLOSE VS BLOWOUT
+  Diagnostic only.
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 ACTUAL MARGIN / DIAGNOSTIC ONLY ====="
+);
+
+r9Print(
+  "CLOSE_0_2",
+  R9_ROWS.filter(
+    r =>
+      Math.abs(
+        r.actualHome -
+        r.actualAway
+      ) <= 2
+  )
+);
+
+r9Print(
+  "MARGIN_3_5",
+  R9_ROWS.filter(r => {
+    const d =
+      Math.abs(
+        r.actualHome -
+        r.actualAway
+      );
+
+    return d >= 3 && d <= 5;
+  })
+);
+
+r9Print(
+  "BLOWOUT_6_PLUS",
+  R9_ROWS.filter(
+    r =>
+      Math.abs(
+        r.actualHome -
+        r.actualAway
+      ) >= 6
+  )
+);
+
+/*
+  --------------------------------------------------
+  6. MONTHLY
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 MONTHLY ====="
+);
+
+for (
+  const month of [3,4,5,6]
+) {
+  r9Print(
+    "MONTH_" +
+      String(month).padStart(2, "0"),
+
+    R9_ROWS.filter(
+      r =>
+        Number(
+          String(
+            r.g.date
+          ).slice(5,7)
+        ) === month
+    )
+  );
+}
+
+/*
+  --------------------------------------------------
+  7. WORST 20 GAMES
+  --------------------------------------------------
+*/
+
+console.log();
+console.log(
+  "===== ROUND9 WORST 20 ====="
+);
+
+const worst =
+  [...R9_ROWS]
+    .sort(
+      (a,b) =>
+        b.teamErr -
+        a.teamErr
+    )
+    .slice(0,20);
+
+for (const r of worst) {
+  console.log(
+    r.g.date,
+    r.g.gameId,
+    `${r.g.awayTeam}@${r.g.homeTeam}`,
+    "PRED=" +
+      r.p.away.toFixed(1) +
+      ":" +
+      r.p.home.toFixed(1),
+    "ACTUAL=" +
+      r.actualAway +
+      ":" +
+      r.actualHome,
+    "TEAM_ERR=" +
+      r.teamErr.toFixed(3),
+    "TOTAL_ERR=" +
+      r.totalErr.toFixed(3),
+    "STARTER_R5=" +
+      (
+        r.starterRecentBoth
+          ? "YES"
+          : "NO"
+      )
+  );
+}
+
+console.log();
+console.log(
+  "ROUND9 MODEL CHANGED: NO"
+);
+
+console.log(
+  "ROUND9 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+/*
+==================================================
+SCORE MODEL ROUND 21 — ERROR CAUSE DIAGNOSTIC
+
+BASE:
+  Frozen V0.7 Round7
+  R5_WINRATE + REST + R10_WINRATE
+
+NO MODEL CHANGE.
+NO COEFFICIENT TUNING.
+NO FINAL/AUDIT.
+
+Purpose:
+  Find what separates normal-error games
+  from large-error games.
+
+Investigate:
+  - recent scoring volatility
+  - recent allowed-runs volatility proxy
+  - recent-vs-season shift
+  - venue offense/defense deviation
+  - rest-day asymmetry
+  - predicted total / predicted margin
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND21 — ERROR CAUSE DIAGNOSTIC"
+);
+console.log(
+  "=================================================="
+);
+
+const SR21_MODEL =
+  r7Predictor(
+    true,
+    true
+  );
+
+
+function SR21_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR21_abs(
+  value
+) {
+  const n =
+    SR21_num(
+      value
+    );
+
+  return n === null
+    ? null
+    : Math.abs(n);
+}
+
+
+function SR21_avgAvailable(
+  values
+) {
+  const clean =
+    values.filter(
+      value =>
+        value !== null &&
+        Number.isFinite(
+          value
+        )
+    );
+
+  if (!clean.length) {
+    return null;
+  }
+
+  return (
+    clean.reduce(
+      (a, b) =>
+        a + b,
+      0
+    ) /
+    clean.length
+  );
+}
+
+
+function SR21_sideFeatures(
+  form
+) {
+  if (!form) {
+    return null;
+  }
+
+  const seasonRuns =
+    SR21_num(
+      form.seasonAvgRuns
+    );
+
+  const seasonAllowed =
+    SR21_num(
+      form.seasonAvgRunsAllowed
+    );
+
+  const r5Runs =
+    SR21_num(
+      form.recent5?.avgRuns
+    );
+
+  const r10Runs =
+    SR21_num(
+      form.recent10?.avgRuns
+    );
+
+  const r20Runs =
+    SR21_num(
+      form.recent20?.avgRuns
+    );
+
+  const r5Allowed =
+    SR21_num(
+      form.recent5?.avgRunsAllowed
+    );
+
+  const r10Allowed =
+    SR21_num(
+      form.recent10?.avgRunsAllowed
+    );
+
+  const r20Allowed =
+    SR21_num(
+      form.recent20?.avgRunsAllowed
+    );
+
+  const homeRuns =
+    SR21_num(
+      form.homeAvgRuns
+    );
+
+  const awayRuns =
+    SR21_num(
+      form.awayAvgRuns
+    );
+
+  const homeAllowed =
+    SR21_num(
+      form.homeAvgRunsAllowed
+    );
+
+  const awayAllowed =
+    SR21_num(
+      form.awayAvgRunsAllowed
+    );
+
+  /*
+    This is not true standard deviation.
+    It is a D-1 safe instability proxy using
+    disagreement between recent windows.
+  */
+  const offenseWindowSpread =
+    (
+      r5Runs !== null &&
+      r10Runs !== null &&
+      r20Runs !== null
+    )
+      ? (
+          Math.max(
+            r5Runs,
+            r10Runs,
+            r20Runs
+          ) -
+          Math.min(
+            r5Runs,
+            r10Runs,
+            r20Runs
+          )
+        )
+      : null;
+
+  const defenseWindowSpread =
+    (
+      r5Allowed !== null &&
+      r10Allowed !== null &&
+      r20Allowed !== null
+    )
+      ? (
+          Math.max(
+            r5Allowed,
+            r10Allowed,
+            r20Allowed
+          ) -
+          Math.min(
+            r5Allowed,
+            r10Allowed,
+            r20Allowed
+          )
+        )
+      : null;
+
+  const recentOffenseShift =
+    (
+      r5Runs !== null &&
+      seasonRuns !== null
+    )
+      ? r5Runs -
+        seasonRuns
+      : null;
+
+  const recentDefenseShift =
+    (
+      r5Allowed !== null &&
+      seasonAllowed !== null
+    )
+      ? r5Allowed -
+        seasonAllowed
+      : null;
+
+  const venueOffenseGap =
+    (
+      homeRuns !== null &&
+      awayRuns !== null
+    )
+      ? Math.abs(
+          homeRuns -
+          awayRuns
+        )
+      : null;
+
+  const venueDefenseGap =
+    (
+      homeAllowed !== null &&
+      awayAllowed !== null
+    )
+      ? Math.abs(
+          homeAllowed -
+          awayAllowed
+        )
+      : null;
+
+  return {
+    offenseWindowSpread,
+    defenseWindowSpread,
+
+    recentOffenseShift:
+      SR21_abs(
+        recentOffenseShift
+      ),
+
+    recentDefenseShift:
+      SR21_abs(
+        recentDefenseShift
+      ),
+
+    venueOffenseGap,
+    venueDefenseGap,
+
+    restDays:
+      SR21_num(
+        form.restDays
+      ),
+
+    seasonGames:
+      SR21_num(
+        form.seasonGames
+      ),
+  };
+}
+
+
+function SR21_row(
+  g
+) {
+  const split =
+    splitOf(
+      g
+    );
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    return null;
+  }
+
+  const p =
+    SR21_MODEL(
+      g
+    );
+
+  if (
+    !p ||
+    !Number.isFinite(
+      p.away
+    ) ||
+    !Number.isFinite(
+      p.home
+    )
+  ) {
+    return null;
+  }
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+  if (
+    !Number.isFinite(
+      actualAway
+    ) ||
+    !Number.isFinite(
+      actualHome
+    )
+  ) {
+    return null;
+  }
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (!x) {
+    return null;
+  }
+
+  const awayF =
+    SR21_sideFeatures(
+      x.awayTeamForm
+    );
+
+  const homeF =
+    SR21_sideFeatures(
+      x.homeTeamForm
+    );
+
+  const awayErr =
+    Math.abs(
+      p.away -
+      actualAway
+    );
+
+  const homeErr =
+    Math.abs(
+      p.home -
+      actualHome
+    );
+
+  const teamErr =
+    (
+      awayErr +
+      homeErr
+    ) / 2;
+
+  const predTotal =
+    p.away +
+    p.home;
+
+  const actualTotal =
+    actualAway +
+    actualHome;
+
+  const predDiff =
+    p.away -
+    p.home;
+
+  const actualDiff =
+    actualAway -
+    actualHome;
+
+  const restGap =
+    (
+      awayF?.restDays !== null &&
+      awayF?.restDays !== undefined &&
+      homeF?.restDays !== null &&
+      homeF?.restDays !== undefined
+    )
+      ? Math.abs(
+          awayF.restDays -
+          homeF.restDays
+        )
+      : null;
+
+  return {
+    split,
+
+    date:
+      g.date,
+
+    gameId:
+      g.gameId,
+
+    awayTeam:
+      g.awayTeam,
+
+    homeTeam:
+      g.homeTeam,
+
+    predAway:
+      p.away,
+
+    predHome:
+      p.home,
+
+    actualAway,
+    actualHome,
+
+    awayErr,
+    homeErr,
+    teamErr,
+
+    totalErr:
+      Math.abs(
+        predTotal -
+        actualTotal
+      ),
+
+    diffErr:
+      Math.abs(
+        predDiff -
+        actualDiff
+      ),
+
+    predTotal,
+
+    predMargin:
+      Math.abs(
+        predDiff
+      ),
+
+    offenseSpread:
+      SR21_avgAvailable([
+        awayF?.offenseWindowSpread ??
+          null,
+        homeF?.offenseWindowSpread ??
+          null,
+      ]),
+
+    defenseSpread:
+      SR21_avgAvailable([
+        awayF?.defenseWindowSpread ??
+          null,
+        homeF?.defenseWindowSpread ??
+          null,
+      ]),
+
+    offenseShift:
+      SR21_avgAvailable([
+        awayF?.recentOffenseShift ??
+          null,
+        homeF?.recentOffenseShift ??
+          null,
+      ]),
+
+    defenseShift:
+      SR21_avgAvailable([
+        awayF?.recentDefenseShift ??
+          null,
+        homeF?.recentDefenseShift ??
+          null,
+      ]),
+
+    venueOffenseGap:
+      SR21_avgAvailable([
+        awayF?.venueOffenseGap ??
+          null,
+        homeF?.venueOffenseGap ??
+          null,
+      ]),
+
+    venueDefenseGap:
+      SR21_avgAvailable([
+        awayF?.venueDefenseGap ??
+          null,
+        homeF?.venueDefenseGap ??
+          null,
+      ]),
+
+    restGap,
+
+    sampleGames:
+      SR21_avgAvailable([
+        awayF?.seasonGames ??
+          null,
+        homeF?.seasonGames ??
+          null,
+      ]),
+  };
+}
+
+
+const SR21_ROWS =
+  games
+    .map(
+      SR21_row
+    )
+    .filter(Boolean);
+
+
+function SR21_mean(
+  rows,
+  key
+) {
+  const values =
+    rows
+      .map(
+        row =>
+          SR21_num(
+            row[key]
+          )
+      )
+      .filter(
+        value =>
+          value !== null
+      );
+
+  if (!values.length) {
+    return null;
+  }
+
+  return (
+    values.reduce(
+      (a, b) =>
+        a + b,
+      0
+    ) /
+    values.length
+  );
+}
+
+
+function SR21_stat(
+  rows
+) {
+  return {
+    n:
+      rows.length,
+
+    teamMAE:
+      SR21_mean(
+        rows,
+        "teamErr"
+      ),
+
+    totalMAE:
+      SR21_mean(
+        rows,
+        "totalErr"
+      ),
+
+    diffMAE:
+      SR21_mean(
+        rows,
+        "diffErr"
+      ),
+  };
+}
+
+
+function SR21_printStat(
+  name,
+  rows
+) {
+  const s =
+    SR21_stat(
+      rows
+    );
+
+  console.log(
+    `${name} ` +
+    `N=${s.n} ` +
+    `TEAM=${
+      s.teamMAE === null
+        ? "NA"
+        : s.teamMAE.toFixed(3)
+    } ` +
+    `TOTAL=${
+      s.totalMAE === null
+        ? "NA"
+        : s.totalMAE.toFixed(3)
+    } ` +
+    `DIFF=${
+      s.diffMAE === null
+        ? "NA"
+        : s.diffMAE.toFixed(3)
+    }`
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR21 BASE REPRO ====="
+);
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  SR21_printStat(
+    split,
+    SR21_ROWS.filter(
+      row =>
+        row.split === split
+    )
+  );
+}
+
+
+/*
+==================================================
+ERROR BUCKETS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR21 ERROR BUCKETS ====="
+);
+
+const SR21_ERROR_BUCKETS = [
+  [
+    "ERR_LT_1.5",
+    0,
+    1.5,
+  ],
+  [
+    "ERR_1.5_2.5",
+    1.5,
+    2.5,
+  ],
+  [
+    "ERR_2.5_3.5",
+    2.5,
+    3.5,
+  ],
+  [
+    "ERR_3.5_5.0",
+    3.5,
+    5.0,
+  ],
+  [
+    "ERR_5_PLUS",
+    5.0,
+    Infinity,
+  ],
+];
+
+for (
+  const [
+    name,
+    lo,
+    hi,
+  ]
+  of SR21_ERROR_BUCKETS
+) {
+  const rows =
+    SR21_ROWS.filter(
+      row =>
+        row.teamErr >= lo &&
+        row.teamErr < hi
+    );
+
+  console.log();
+  SR21_printStat(
+    name,
+    rows
+  );
+
+  console.log(
+    "  offenseSpread=",
+    SR21_mean(
+      rows,
+      "offenseSpread"
+    )?.toFixed(3) ??
+      "NA",
+
+    "defenseSpread=",
+    SR21_mean(
+      rows,
+      "defenseSpread"
+    )?.toFixed(3) ??
+      "NA",
+
+    "offenseShift=",
+    SR21_mean(
+      rows,
+      "offenseShift"
+    )?.toFixed(3) ??
+      "NA",
+
+    "defenseShift=",
+    SR21_mean(
+      rows,
+      "defenseShift"
+    )?.toFixed(3) ??
+      "NA",
+
+    "venueOffGap=",
+    SR21_mean(
+      rows,
+      "venueOffenseGap"
+    )?.toFixed(3) ??
+      "NA",
+
+    "venueDefGap=",
+    SR21_mean(
+      rows,
+      "venueDefenseGap"
+    )?.toFixed(3) ??
+      "NA",
+
+    "restGap=",
+    SR21_mean(
+      rows,
+      "restGap"
+    )?.toFixed(3) ??
+      "NA"
+  );
+}
+
+
+/*
+==================================================
+FEATURE QUARTILE-LIKE BANDS
+Use fixed interpretable thresholds only.
+No tuning.
+==================================================
+*/
+
+function SR21_featureBands(
+  title,
+  key,
+  bands
+) {
+  console.log();
+  console.log(
+    `===== SR21 ${title} =====`
+  );
+
+  for (
+    const [
+      name,
+      lo,
+      hi,
+    ]
+    of bands
+  ) {
+    const rows =
+      SR21_ROWS.filter(
+        row => {
+          const value =
+            SR21_num(
+              row[key]
+            );
+
+          return (
+            value !== null &&
+            value >= lo &&
+            value < hi
+          );
+        }
+      );
+
+    SR21_printStat(
+      name,
+      rows
+    );
+  }
+}
+
+
+SR21_featureBands(
+  "OFFENSE WINDOW SPREAD",
+  "offenseSpread",
+  [
+    [
+      "OFF_SPREAD_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "OFF_SPREAD_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "OFF_SPREAD_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "OFF_SPREAD_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "DEFENSE WINDOW SPREAD",
+  "defenseSpread",
+  [
+    [
+      "DEF_SPREAD_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "DEF_SPREAD_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "DEF_SPREAD_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "DEF_SPREAD_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "RECENT OFFENSE SHIFT",
+  "offenseShift",
+  [
+    [
+      "OFF_SHIFT_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "OFF_SHIFT_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "OFF_SHIFT_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "OFF_SHIFT_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "RECENT DEFENSE SHIFT",
+  "defenseShift",
+  [
+    [
+      "DEF_SHIFT_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "DEF_SHIFT_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "DEF_SHIFT_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "DEF_SHIFT_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "VENUE OFFENSE GAP",
+  "venueOffenseGap",
+  [
+    [
+      "VENUE_OFF_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "VENUE_OFF_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "VENUE_OFF_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "VENUE_OFF_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "VENUE DEFENSE GAP",
+  "venueDefenseGap",
+  [
+    [
+      "VENUE_DEF_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "VENUE_DEF_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "VENUE_DEF_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "VENUE_DEF_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "REST GAP",
+  "restGap",
+  [
+    [
+      "REST_GAP_0",
+      0,
+      0.5,
+    ],
+    [
+      "REST_GAP_1",
+      0.5,
+      1.5,
+    ],
+    [
+      "REST_GAP_2_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "PREDICTED TOTAL",
+  "predTotal",
+  [
+    [
+      "PRED_TOTAL_LT_8",
+      0,
+      8,
+    ],
+    [
+      "PRED_TOTAL_8_9",
+      8,
+      9,
+    ],
+    [
+      "PRED_TOTAL_9_10",
+      9,
+      10,
+    ],
+    [
+      "PRED_TOTAL_10_PLUS",
+      10,
+      Infinity,
+    ],
+  ]
+);
+
+
+SR21_featureBands(
+  "PREDICTED MARGIN",
+  "predMargin",
+  [
+    [
+      "PRED_MARGIN_LT_0.5",
+      0,
+      0.5,
+    ],
+    [
+      "PRED_MARGIN_0.5_1.0",
+      0.5,
+      1.0,
+    ],
+    [
+      "PRED_MARGIN_1.0_1.5",
+      1.0,
+      1.5,
+    ],
+    [
+      "PRED_MARGIN_1.5_PLUS",
+      1.5,
+      Infinity,
+    ],
+  ]
+);
+
+
+/*
+==================================================
+DISCOVERY vs INTERNAL feature direction
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR21 D/I HIGH-RISK CHECK ====="
+);
+
+const SR21_RISK_RULES = [
+  [
+    "OFF_SPREAD>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.offenseSpread
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "DEF_SPREAD>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.defenseSpread
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "OFF_SHIFT>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.offenseShift
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "DEF_SHIFT>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.defenseShift
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "VENUE_OFF>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.venueOffenseGap
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "VENUE_DEF>=1.0",
+    row =>
+      (
+        SR21_num(
+          row.venueDefenseGap
+        ) ?? -1
+      ) >= 1.0,
+  ],
+
+  [
+    "REST_GAP>=2",
+    row =>
+      (
+        SR21_num(
+          row.restGap
+        ) ?? -1
+      ) >= 2.0,
+  ],
+];
+
+
+for (
+  const [
+    name,
+    fn,
+  ]
+  of SR21_RISK_RULES
+) {
+  console.log();
+  console.log(
+    `--- ${name} ---`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const rows =
+      SR21_ROWS.filter(
+        row =>
+          row.split === split &&
+          fn(
+            row
+          )
+      );
+
+    SR21_printStat(
+      split,
+      rows
+    );
+  }
+}
+
+
+/*
+==================================================
+WORST GAMES
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR21 WORST 25 ====="
+);
+
+const SR21_WORST =
+  [
+    ...SR21_ROWS
+  ]
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.teamErr -
+        a.teamErr
+    )
+    .slice(
+      0,
+      25
+    );
+
+for (
+  const row
+  of SR21_WORST
+) {
+  console.log(
+    row.split,
+    row.date,
+    row.gameId,
+    `${row.awayTeam}@${row.homeTeam}`,
+    `PRED=${row.predAway.toFixed(1)}:${row.predHome.toFixed(1)}`,
+    `ACTUAL=${row.actualAway}:${row.actualHome}`,
+    `TEAM_ERR=${row.teamErr.toFixed(3)}`,
+    `OFF_SP=${row.offenseSpread?.toFixed(2) ?? "NA"}`,
+    `DEF_SP=${row.defenseSpread?.toFixed(2) ?? "NA"}`,
+    `OFF_SHIFT=${row.offenseShift?.toFixed(2) ?? "NA"}`,
+    `DEF_SHIFT=${row.defenseShift?.toFixed(2) ?? "NA"}`,
+    `VEN_OFF=${row.venueOffenseGap?.toFixed(2) ?? "NA"}`,
+    `VEN_DEF=${row.venueDefenseGap?.toFixed(2) ?? "NA"}`,
+    `REST_GAP=${row.restGap?.toFixed(1) ?? "NA"}`
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND21 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND21 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 22
+VENUE SAMPLE RELIABILITY DIAGNOSTIC
+
+BASE:
+  Frozen V0.7 Round7
+
+NO MODEL CHANGE.
+NO TUNING.
+NO FINAL/AUDIT.
+
+Question:
+  Are home/away split features unreliable
+  when venue sample size is very small?
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND22 — VENUE SAMPLE RELIABILITY"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR22_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+const SR22_ROWS =
+  SR21_ROWS.map(
+    row => {
+      const x =
+        v06Map.get(
+          row.gameId
+        );
+
+      if (!x) {
+        return null;
+      }
+
+      const awayForm =
+        x.awayTeamForm;
+
+      const homeForm =
+        x.homeTeamForm;
+
+      const awayVenueGames =
+        SR22_num(
+          awayForm?.awayGames
+        );
+
+      const homeVenueGames =
+        SR22_num(
+          homeForm?.homeGames
+        );
+
+      const minVenueGames =
+        (
+          awayVenueGames !== null &&
+          homeVenueGames !== null
+        )
+          ? Math.min(
+              awayVenueGames,
+              homeVenueGames
+            )
+          : null;
+
+      const avgVenueGames =
+        (
+          awayVenueGames !== null &&
+          homeVenueGames !== null
+        )
+          ? (
+              awayVenueGames +
+              homeVenueGames
+            ) / 2
+          : null;
+
+      return {
+        ...row,
+
+        awayVenueGames,
+        homeVenueGames,
+        minVenueGames,
+        avgVenueGames,
+      };
+    }
+  )
+  .filter(Boolean);
+
+
+function SR22_mean(
+  rows,
+  key
+) {
+  const values =
+    rows
+      .map(
+        row =>
+          SR22_num(
+            row[key]
+          )
+      )
+      .filter(
+        value =>
+          value !== null
+      );
+
+  if (!values.length) {
+    return null;
+  }
+
+  return (
+    values.reduce(
+      (a, b) =>
+        a + b,
+      0
+    ) /
+    values.length
+  );
+}
+
+
+function SR22_print(
+  name,
+  rows
+) {
+  console.log(
+    `${name} ` +
+    `N=${rows.length} ` +
+    `TEAM=${
+      SR22_mean(
+        rows,
+        "teamErr"
+      )?.toFixed(3) ??
+      "NA"
+    } ` +
+    `TOTAL=${
+      SR22_mean(
+        rows,
+        "totalErr"
+      )?.toFixed(3) ??
+      "NA"
+    } ` +
+    `DIFF=${
+      SR22_mean(
+        rows,
+        "diffErr"
+      )?.toFixed(3) ??
+      "NA"
+    } ` +
+    `VEN_OFF=${
+      SR22_mean(
+        rows,
+        "venueOffenseGap"
+      )?.toFixed(3) ??
+      "NA"
+    } ` +
+    `VEN_DEF=${
+      SR22_mean(
+        rows,
+        "venueDefenseGap"
+      )?.toFixed(3) ??
+      "NA"
+    }`
+  );
+}
+
+
+/*
+==================================================
+BASE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 BASE ====="
+);
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  SR22_print(
+    split,
+    SR22_ROWS.filter(
+      row =>
+        row.split === split
+    )
+  );
+}
+
+
+/*
+==================================================
+MIN VENUE GAMES
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 MIN VENUE SAMPLE ====="
+);
+
+const SR22_BANDS = [
+  [
+    "MIN_0",
+    0,
+    1,
+  ],
+  [
+    "MIN_1",
+    1,
+    2,
+  ],
+  [
+    "MIN_2",
+    2,
+    3,
+  ],
+  [
+    "MIN_3_4",
+    3,
+    5,
+  ],
+  [
+    "MIN_5_9",
+    5,
+    10,
+  ],
+  [
+    "MIN_10_PLUS",
+    10,
+    Infinity,
+  ],
+];
+
+for (
+  const [
+    name,
+    lo,
+    hi,
+  ]
+  of SR22_BANDS
+) {
+  const rows =
+    SR22_ROWS.filter(
+      row => {
+        const n =
+          SR22_num(
+            row.minVenueGames
+          );
+
+        return (
+          n !== null &&
+          n >= lo &&
+          n < hi
+        );
+      }
+    );
+
+  SR22_print(
+    name,
+    rows
+  );
+}
+
+
+/*
+==================================================
+THRESHOLD VIEW
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 VENUE SAMPLE THRESHOLDS ====="
+);
+
+for (
+  const threshold
+  of [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    10,
+  ]
+) {
+  const low =
+    SR22_ROWS.filter(
+      row =>
+        (
+          SR22_num(
+            row.minVenueGames
+          ) ?? 999
+        ) <
+        threshold
+    );
+
+  const high =
+    SR22_ROWS.filter(
+      row =>
+        (
+          SR22_num(
+            row.minVenueGames
+          ) ?? -1
+        ) >=
+        threshold
+    );
+
+  console.log();
+  console.log(
+    `--- THRESHOLD ${threshold} ---`
+  );
+
+  SR22_print(
+    `<${threshold}`,
+    low
+  );
+
+  SR22_print(
+    `>=${threshold}`,
+    high
+  );
+}
+
+
+/*
+==================================================
+DISCOVERY / INTERNAL DIRECTION
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 D/I SAMPLE CHECK ====="
+);
+
+for (
+  const threshold
+  of [
+    2,
+    3,
+    5,
+  ]
+) {
+  console.log();
+  console.log(
+    `--- MIN VENUE < ${threshold} ---`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    SR22_print(
+      split,
+      SR22_ROWS.filter(
+        row =>
+          row.split === split &&
+          (
+            SR22_num(
+              row.minVenueGames
+            ) ?? 999
+          ) <
+            threshold
+      )
+    );
+  }
+
+  console.log(
+    `--- MIN VENUE >= ${threshold} ---`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    SR22_print(
+      split,
+      SR22_ROWS.filter(
+        row =>
+          row.split === split &&
+          (
+            SR22_num(
+              row.minVenueGames
+            ) ?? -1
+          ) >=
+            threshold
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+EARLY EXTREME VENUE GAP
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 EXTREME VENUE GAP ====="
+);
+
+for (
+  const threshold
+  of [
+    1.0,
+    1.5,
+    2.0,
+    3.0,
+    5.0,
+  ]
+) {
+  const rows =
+    SR22_ROWS.filter(
+      row =>
+        (
+          (
+            SR22_num(
+              row.venueOffenseGap
+            ) ?? 0
+          ) >= threshold
+        ) ||
+        (
+          (
+            SR22_num(
+              row.venueDefenseGap
+            ) ?? 0
+          ) >= threshold
+        )
+    );
+
+  SR22_print(
+    `VEN_GAP>=${threshold.toFixed(1)}`,
+    rows
+  );
+}
+
+
+/*
+==================================================
+LOW SAMPLE + EXTREME GAP
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 LOW SAMPLE + EXTREME GAP ====="
+);
+
+for (
+  const sample
+  of [
+    2,
+    3,
+    5,
+  ]
+) {
+  const rows =
+    SR22_ROWS.filter(
+      row =>
+        (
+          SR22_num(
+            row.minVenueGames
+          ) ?? 999
+        ) <
+          sample &&
+        (
+          (
+            SR22_num(
+              row.venueOffenseGap
+            ) ?? 0
+          ) >= 1.5 ||
+          (
+            SR22_num(
+              row.venueDefenseGap
+            ) ?? 0
+          ) >= 1.5
+        )
+    );
+
+  SR22_print(
+    `MIN<${sample} + GAP>=1.5`,
+    rows
+  );
+}
+
+
+/*
+==================================================
+WORST LOW-SAMPLE VENUE GAMES
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR22 WORST LOW-SAMPLE 20 ====="
+);
+
+const SR22_worst =
+  SR22_ROWS
+    .filter(
+      row =>
+        (
+          SR22_num(
+            row.minVenueGames
+          ) ?? 999
+        ) < 5
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.teamErr -
+        a.teamErr
+    )
+    .slice(
+      0,
+      20
+    );
+
+for (
+  const row
+  of SR22_worst
+) {
+  console.log(
+    row.split,
+    row.date,
+    row.gameId,
+    `${row.awayTeam}@${row.homeTeam}`,
+    `MIN_VEN=${row.minVenueGames}`,
+    `A_VEN=${row.awayVenueGames}`,
+    `H_VEN=${row.homeVenueGames}`,
+    `VEN_OFF=${row.venueOffenseGap?.toFixed(2) ?? "NA"}`,
+    `VEN_DEF=${row.venueDefenseGap?.toFixed(2) ?? "NA"}`,
+    `TEAM_ERR=${row.teamErr.toFixed(3)}`
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND22 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND22 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 23
+VENUE SAMPLE SHRINKAGE TEST
+
+BASE:
+  Frozen V0.7 Round7
+
+Test only venue reliability treatment.
+
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND23 — VENUE SHRINKAGE TEST"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR23_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR23_blend(
+  venueValue,
+  seasonValue,
+  weight
+) {
+  const venue =
+    SR23_num(
+      venueValue
+    );
+
+  const season =
+    SR23_num(
+      seasonValue
+    );
+
+  if (
+    venue === null
+  ) {
+    return seasonValue;
+  }
+
+  if (
+    season === null
+  ) {
+    return venueValue;
+  }
+
+  return (
+    season +
+    (
+      venue -
+      season
+    ) *
+    weight
+  );
+}
+
+
+function SR23_weight(
+  n,
+  mode
+) {
+  const games =
+    Math.max(
+      0,
+      SR23_num(
+        n
+      ) ?? 0
+    );
+
+  if (
+    mode === "BASE"
+  ) {
+    return 1;
+  }
+
+  if (
+    mode === "LINEAR5"
+  ) {
+    return Math.min(
+      1,
+      games / 5
+    );
+  }
+
+  if (
+    mode === "HARD5"
+  ) {
+    return games >= 5
+      ? 1
+      : 0;
+  }
+
+  if (
+    mode === "BAYES5"
+  ) {
+    return (
+      games /
+      (
+        games +
+        5
+      )
+    );
+  }
+
+  return 1;
+}
+
+
+function SR23_adjustV06(
+  x,
+  mode
+) {
+  if (
+    !x ||
+    mode === "BASE"
+  ) {
+    return x;
+  }
+
+  /*
+    Deep enough clone for form objects.
+  */
+  const copy = {
+    ...x,
+
+    awayTeamForm: {
+      ...(x.awayTeamForm ?? {}),
+    },
+
+    homeTeamForm: {
+      ...(x.homeTeamForm ?? {}),
+    },
+  };
+
+
+  const away =
+    copy.awayTeamForm;
+
+  const home =
+    copy.homeTeamForm;
+
+
+  const awayWeight =
+    SR23_weight(
+      away.awayGames,
+      mode
+    );
+
+  const homeWeight =
+    SR23_weight(
+      home.homeGames,
+      mode
+    );
+
+
+  /*
+    Away team:
+      current game's relevant venue split = AWAY
+  */
+  away.awayAvgRuns =
+    SR23_blend(
+      away.awayAvgRuns,
+      away.seasonAvgRuns,
+      awayWeight
+    );
+
+  away.awayAvgRunsAllowed =
+    SR23_blend(
+      away.awayAvgRunsAllowed,
+      away.seasonAvgRunsAllowed,
+      awayWeight
+    );
+
+
+  /*
+    Home team:
+      current game's relevant venue split = HOME
+  */
+  home.homeAvgRuns =
+    SR23_blend(
+      home.homeAvgRuns,
+      home.seasonAvgRuns,
+      homeWeight
+    );
+
+  home.homeAvgRunsAllowed =
+    SR23_blend(
+      home.homeAvgRunsAllowed,
+      home.seasonAvgRunsAllowed,
+      homeWeight
+    );
+
+
+  return copy;
+}
+
+
+function SR23_predict(
+  g,
+  mode
+) {
+  if (
+    mode === "BASE"
+  ) {
+    return SR21_MODEL(
+      g
+    );
+  }
+
+  const original =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (!original) {
+    return SR21_MODEL(
+      g
+    );
+  }
+
+  const adjusted =
+    SR23_adjustV06(
+      original,
+      mode
+    );
+
+  /*
+    Temporarily substitute only this game's
+    historical-safe V06 feature object.
+
+    Restore immediately after prediction.
+  */
+  v06Map.set(
+    g.gameId,
+    adjusted
+  );
+
+  let prediction =
+    null;
+
+  try {
+    prediction =
+      SR21_MODEL(
+        g
+      );
+  } finally {
+    v06Map.set(
+      g.gameId,
+      original
+    );
+  }
+
+  return prediction;
+}
+
+
+function SR23_rowsFor(
+  mode
+) {
+  const rows =
+    [];
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+    const pred =
+      SR23_predict(
+        g,
+        mode
+      );
+
+    if (
+      !pred ||
+      !Number.isFinite(
+        pred.away
+      ) ||
+      !Number.isFinite(
+        pred.home
+      )
+    ) {
+      continue;
+    }
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+    const x =
+      v06Map.get(
+        g.gameId
+      );
+
+    if (!x) {
+      continue;
+    }
+
+    const aVenue =
+      SR23_num(
+        x.awayTeamForm?.awayGames
+      );
+
+    const hVenue =
+      SR23_num(
+        x.homeTeamForm?.homeGames
+      );
+
+    const minVenue =
+      (
+        aVenue !== null &&
+        hVenue !== null
+      )
+        ? Math.min(
+            aVenue,
+            hVenue
+          )
+        : null;
+
+    const teamErr =
+      (
+        Math.abs(
+          pred.away -
+          actualAway
+        ) +
+        Math.abs(
+          pred.home -
+          actualHome
+        )
+      ) / 2;
+
+    const totalErr =
+      Math.abs(
+        (
+          pred.away +
+          pred.home
+        ) -
+        (
+          actualAway +
+          actualHome
+        )
+      );
+
+    const diffErr =
+      Math.abs(
+        (
+          pred.away -
+          pred.home
+        ) -
+        (
+          actualAway -
+          actualHome
+        )
+      );
+
+    let winnerHit =
+      null;
+
+    const predDiff =
+      pred.away -
+      pred.home;
+
+    const actualDiff =
+      actualAway -
+      actualHome;
+
+    if (
+      predDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerHit =
+        Math.sign(
+          predDiff
+        ) ===
+        Math.sign(
+          actualDiff
+        );
+    }
+
+    rows.push({
+      mode,
+      split,
+
+      date:
+        g.date,
+
+      gameId:
+        g.gameId,
+
+      awayTeam:
+        g.awayTeam,
+
+      homeTeam:
+        g.homeTeam,
+
+      predAway:
+        pred.away,
+
+      predHome:
+        pred.home,
+
+      actualAway,
+      actualHome,
+
+      teamErr,
+      totalErr,
+      diffErr,
+
+      winnerHit,
+
+      minVenue,
+    });
+  }
+
+  return rows;
+}
+
+
+function SR23_mean(
+  rows,
+  key
+) {
+  const values =
+    rows
+      .map(
+        row =>
+          SR23_num(
+            row[key]
+          )
+      )
+      .filter(
+        value =>
+          value !== null
+      );
+
+  if (!values.length) {
+    return null;
+  }
+
+  return (
+    values.reduce(
+      (a, b) =>
+        a + b,
+      0
+    ) /
+    values.length
+  );
+}
+
+
+function SR23_stat(
+  rows
+) {
+  const winnerRows =
+    rows.filter(
+      row =>
+        row.winnerHit !== null
+    );
+
+  return {
+    n:
+      rows.length,
+
+    team:
+      SR23_mean(
+        rows,
+        "teamErr"
+      ),
+
+    total:
+      SR23_mean(
+        rows,
+        "totalErr"
+      ),
+
+    diff:
+      SR23_mean(
+        rows,
+        "diffErr"
+      ),
+
+    winner:
+      winnerRows.length
+        ? (
+            winnerRows.filter(
+              row =>
+                row.winnerHit
+            ).length /
+            winnerRows.length
+          )
+        : null,
+  };
+}
+
+
+function SR23_print(
+  name,
+  rows
+) {
+  const x =
+    SR23_stat(
+      rows
+    );
+
+  console.log(
+    `${name} ` +
+    `N=${x.n} ` +
+    `TEAM=${
+      x.team === null
+        ? "NA"
+        : x.team.toFixed(6)
+    } ` +
+    `TOTAL=${
+      x.total === null
+        ? "NA"
+        : x.total.toFixed(6)
+    } ` +
+    `DIFF=${
+      x.diff === null
+        ? "NA"
+        : x.diff.toFixed(6)
+    } ` +
+    `W=${
+      x.winner === null
+        ? "NA"
+        : (
+            x.winner *
+            100
+          ).toFixed(2) +
+          "%"
+    }`
+  );
+}
+
+
+const SR23_MODES = [
+  "BASE",
+  "LINEAR5",
+  "HARD5",
+  "BAYES5",
+];
+
+
+const SR23_ALL =
+  new Map();
+
+for (
+  const mode
+  of SR23_MODES
+) {
+  SR23_ALL.set(
+    mode,
+    SR23_rowsFor(
+      mode
+    )
+  );
+}
+
+
+/*
+==================================================
+BASELINE REPRO
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 BASE REPRO ====="
+);
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  SR23_print(
+    split,
+    SR23_ALL
+      .get(
+        "BASE"
+      )
+      .filter(
+        row =>
+          row.split === split
+      )
+  );
+}
+
+
+/*
+==================================================
+MODE RESULTS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 MODEL RESULTS ====="
+);
+
+for (
+  const mode
+  of SR23_MODES
+) {
+  console.log();
+  console.log(
+    `--- ${mode} ---`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const rows =
+      SR23_ALL
+        .get(
+          mode
+        )
+        .filter(
+          row =>
+            row.split === split
+        );
+
+    SR23_print(
+      split,
+      rows
+    );
+  }
+}
+
+
+/*
+==================================================
+DELTA VS BASE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 DELTA VS BASE ====="
+);
+
+for (
+  const mode
+  of SR23_MODES.filter(
+    x =>
+      x !== "BASE"
+  )
+) {
+  console.log();
+  console.log(
+    `--- ${mode} ---`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const baseRows =
+      SR23_ALL
+        .get(
+          "BASE"
+        )
+        .filter(
+          row =>
+            row.split === split
+        );
+
+    const newRows =
+      SR23_ALL
+        .get(
+          mode
+        )
+        .filter(
+          row =>
+            row.split === split
+        );
+
+    const base =
+      SR23_stat(
+        baseRows
+      );
+
+    const newer =
+      SR23_stat(
+        newRows
+      );
+
+    console.log(
+      split,
+      `TEAM_DELTA=${
+        (
+          newer.team -
+          base.team
+        ).toFixed(6)
+      }`,
+      `TOTAL_DELTA=${
+        (
+          newer.total -
+          base.total
+        ).toFixed(6)
+      }`,
+      `DIFF_DELTA=${
+        (
+          newer.diff -
+          base.diff
+        ).toFixed(6)
+      }`,
+      `W_DELTA=${
+        (
+          (
+            newer.winner -
+            base.winner
+          ) *
+          100
+        ).toFixed(2)
+      }pp`
+    );
+  }
+}
+
+
+/*
+==================================================
+LOW-SAMPLE EFFECT
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 LOW VENUE SAMPLE ====="
+);
+
+for (
+  const mode
+  of SR23_MODES
+) {
+  const rows =
+    SR23_ALL
+      .get(
+        mode
+      );
+
+  console.log();
+  console.log(
+    `--- ${mode} ---`
+  );
+
+  SR23_print(
+    "MIN<5",
+    rows.filter(
+      row =>
+        (
+          SR23_num(
+            row.minVenue
+          ) ?? 999
+        ) < 5
+    )
+  );
+
+  SR23_print(
+    "MIN>=5",
+    rows.filter(
+      row =>
+        (
+          SR23_num(
+            row.minVenue
+          ) ?? -1
+        ) >= 5
+    )
+  );
+}
+
+
+/*
+==================================================
+MONTHLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 MONTHLY ====="
+);
+
+for (
+  const mode
+  of SR23_MODES
+) {
+  console.log();
+  console.log(
+    `--- ${mode} ---`
+  );
+
+  const rows =
+    SR23_ALL.get(
+      mode
+    );
+
+  for (
+    const month
+    of [
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+    ]
+  ) {
+    SR23_print(
+      month,
+      rows.filter(
+        row =>
+          String(
+            row.date
+          ).slice(
+            0,
+            7
+          ) === month
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+D/I AVERAGE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR23 D/I AVERAGE ====="
+);
+
+for (
+  const mode
+  of SR23_MODES
+) {
+  const rows =
+    SR23_ALL.get(
+      mode
+    );
+
+  const d =
+    SR23_stat(
+      rows.filter(
+        x =>
+          x.split ===
+            "DISCOVERY"
+      )
+    );
+
+  const i =
+    SR23_stat(
+      rows.filter(
+        x =>
+          x.split ===
+            "INTERNAL"
+      )
+    );
+
+  console.log(
+    mode,
+    `AVG_TEAM=${
+      (
+        (
+          d.team +
+          i.team
+        ) / 2
+      ).toFixed(6)
+    }`,
+    `AVG_TOTAL=${
+      (
+        (
+          d.total +
+          i.total
+        ) / 2
+      ).toFixed(6)
+    }`,
+    `AVG_DIFF=${
+      (
+        (
+          d.diff +
+          i.diff
+        ) / 2
+      ).toFixed(6)
+    }`
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND23 MODEL CHANGE: TEST ONLY"
+);
+
+console.log(
+  "SCORE ROUND23 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 24
+PREDICTION CALIBRATION
+
+BASE:
+  Frozen V0.7 Round7
+
+TRAIN:
+  Discovery only
+
+VALIDATE:
+  Internal untouched
+
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND24 — SCORE CALIBRATION"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR24_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR24_baseRows() {
+  const rows = [];
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+    const pred =
+      SR21_MODEL(
+        g
+      );
+
+    if (
+      !pred ||
+      !Number.isFinite(
+        pred.away
+      ) ||
+      !Number.isFinite(
+        pred.home
+      )
+    ) {
+      continue;
+    }
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+    rows.push({
+      split,
+      date:
+        g.date,
+      gameId:
+        g.gameId,
+      awayTeam:
+        g.awayTeam,
+      homeTeam:
+        g.homeTeam,
+
+      predAway:
+        pred.away,
+      predHome:
+        pred.home,
+
+      actualAway,
+      actualHome,
+    });
+  }
+
+  return rows;
+}
+
+
+const SR24_BASE =
+  SR24_baseRows();
+
+
+const SR24_D =
+  SR24_BASE.filter(
+    row =>
+      row.split ===
+        "DISCOVERY"
+  );
+
+
+function SR24_mean(
+  values
+) {
+  const clean =
+    values.filter(
+      Number.isFinite
+    );
+
+  if (!clean.length) {
+    return null;
+  }
+
+  return (
+    clean.reduce(
+      (a, b) =>
+        a + b,
+      0
+    ) /
+    clean.length
+  );
+}
+
+
+/*
+==================================================
+DISCOVERY BIAS
+==================================================
+*/
+
+const SR24_ALL_RESIDUALS =
+  SR24_D.flatMap(
+    row => [
+      row.actualAway -
+        row.predAway,
+      row.actualHome -
+        row.predHome,
+    ]
+  );
+
+
+const SR24_GLOBAL_BIAS =
+  SR24_mean(
+    SR24_ALL_RESIDUALS
+  );
+
+
+const SR24_AWAY_BIAS =
+  SR24_mean(
+    SR24_D.map(
+      row =>
+        row.actualAway -
+        row.predAway
+    )
+  );
+
+
+const SR24_HOME_BIAS =
+  SR24_mean(
+    SR24_D.map(
+      row =>
+        row.actualHome -
+        row.predHome
+    )
+  );
+
+
+console.log();
+console.log(
+  "===== SR24 DISCOVERY BIAS ====="
+);
+
+console.log(
+  "GLOBAL_BIAS:",
+  SR24_GLOBAL_BIAS
+);
+
+console.log(
+  "AWAY_BIAS:",
+  SR24_AWAY_BIAS
+);
+
+console.log(
+  "HOME_BIAS:",
+  SR24_HOME_BIAS
+);
+
+
+/*
+==================================================
+OLS AFFINE FIT
+y = a + b*x
+==================================================
+*/
+
+function SR24_fitAffine(
+  pairs
+) {
+  const clean =
+    pairs.filter(
+      p =>
+        Number.isFinite(
+          p.x
+        ) &&
+        Number.isFinite(
+          p.y
+        )
+    );
+
+  const n =
+    clean.length;
+
+  const meanX =
+    SR24_mean(
+      clean.map(
+        p =>
+          p.x
+      )
+    );
+
+  const meanY =
+    SR24_mean(
+      clean.map(
+        p =>
+          p.y
+      )
+    );
+
+  let cov = 0;
+  let variance = 0;
+
+  for (
+    const p
+    of clean
+  ) {
+    cov +=
+      (
+        p.x -
+        meanX
+      ) *
+      (
+        p.y -
+        meanY
+      );
+
+    variance +=
+      (
+        p.x -
+        meanX
+      ) ** 2;
+  }
+
+  const b =
+    variance > 0
+      ? cov /
+        variance
+      : 1;
+
+  const a =
+    meanY -
+    b *
+      meanX;
+
+  return {
+    n,
+    a,
+    b,
+  };
+}
+
+
+const SR24_SHARED_FIT =
+  SR24_fitAffine(
+    SR24_D.flatMap(
+      row => [
+        {
+          x:
+            row.predAway,
+          y:
+            row.actualAway,
+        },
+        {
+          x:
+            row.predHome,
+          y:
+            row.actualHome,
+        },
+      ]
+    )
+  );
+
+
+const SR24_AWAY_FIT =
+  SR24_fitAffine(
+    SR24_D.map(
+      row => ({
+        x:
+          row.predAway,
+        y:
+          row.actualAway,
+      })
+    )
+  );
+
+
+const SR24_HOME_FIT =
+  SR24_fitAffine(
+    SR24_D.map(
+      row => ({
+        x:
+          row.predHome,
+        y:
+          row.actualHome,
+      })
+    )
+  );
+
+
+console.log();
+console.log(
+  "===== SR24 AFFINE FIT ====="
+);
+
+console.log(
+  "SHARED:",
+  SR24_SHARED_FIT
+);
+
+console.log(
+  "AWAY:",
+  SR24_AWAY_FIT
+);
+
+console.log(
+  "HOME:",
+  SR24_HOME_FIT
+);
+
+
+/*
+==================================================
+PREDICT MODES
+==================================================
+*/
+
+function SR24_apply(
+  row,
+  mode
+) {
+  if (
+    mode === "BASE"
+  ) {
+    return {
+      away:
+        row.predAway,
+      home:
+        row.predHome,
+    };
+  }
+
+  if (
+    mode === "GLOBAL_BIAS"
+  ) {
+    return {
+      away:
+        row.predAway +
+        SR24_GLOBAL_BIAS,
+
+      home:
+        row.predHome +
+        SR24_GLOBAL_BIAS,
+    };
+  }
+
+  if (
+    mode === "SIDE_BIAS"
+  ) {
+    return {
+      away:
+        row.predAway +
+        SR24_AWAY_BIAS,
+
+      home:
+        row.predHome +
+        SR24_HOME_BIAS,
+    };
+  }
+
+  if (
+    mode === "AFFINE_SHARED"
+  ) {
+    return {
+      away:
+        SR24_SHARED_FIT.a +
+        SR24_SHARED_FIT.b *
+        row.predAway,
+
+      home:
+        SR24_SHARED_FIT.a +
+        SR24_SHARED_FIT.b *
+        row.predHome,
+    };
+  }
+
+  if (
+    mode === "AFFINE_SIDE"
+  ) {
+    return {
+      away:
+        SR24_AWAY_FIT.a +
+        SR24_AWAY_FIT.b *
+        row.predAway,
+
+      home:
+        SR24_HOME_FIT.a +
+        SR24_HOME_FIT.b *
+        row.predHome,
+    };
+  }
+
+  return {
+    away:
+      row.predAway,
+    home:
+      row.predHome,
+  };
+}
+
+
+function SR24_eval(
+  rows,
+  mode
+) {
+  let teamErr = 0;
+  let totalErr = 0;
+  let diffErr = 0;
+
+  let winnerN = 0;
+  let winnerHit = 0;
+
+  let n = 0;
+
+  for (
+    const row
+    of rows
+  ) {
+    const p =
+      SR24_apply(
+        row,
+        mode
+      );
+
+    const awayErr =
+      Math.abs(
+        p.away -
+        row.actualAway
+      );
+
+    const homeErr =
+      Math.abs(
+        p.home -
+        row.actualHome
+      );
+
+    teamErr +=
+      (
+        awayErr +
+        homeErr
+      ) / 2;
+
+    totalErr +=
+      Math.abs(
+        (
+          p.away +
+          p.home
+        ) -
+        (
+          row.actualAway +
+          row.actualHome
+        )
+      );
+
+    const predDiff =
+      p.away -
+      p.home;
+
+    const actualDiff =
+      row.actualAway -
+      row.actualHome;
+
+    diffErr +=
+      Math.abs(
+        predDiff -
+        actualDiff
+      );
+
+    if (
+      predDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(
+          predDiff
+        ) ===
+        Math.sign(
+          actualDiff
+        )
+      ) {
+        winnerHit++;
+      }
+    }
+
+    n++;
+  }
+
+  return {
+    n,
+
+    teamMAE:
+      teamErr /
+      n,
+
+    totalMAE:
+      totalErr /
+      n,
+
+    diffMAE:
+      diffErr /
+      n,
+
+    winnerAcc:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null,
+  };
+}
+
+
+function SR24_print(
+  name,
+  stat
+) {
+  console.log(
+    `${name} ` +
+    `N=${stat.n} ` +
+    `TEAM=${stat.teamMAE.toFixed(6)} ` +
+    `TOTAL=${stat.totalMAE.toFixed(6)} ` +
+    `DIFF=${stat.diffMAE.toFixed(6)} ` +
+    `W=${
+      stat.winnerAcc === null
+        ? "NA"
+        : (
+            stat.winnerAcc *
+            100
+          ).toFixed(2) +
+          "%"
+    }`
+  );
+}
+
+
+const SR24_MODES = [
+  "BASE",
+  "GLOBAL_BIAS",
+  "SIDE_BIAS",
+  "AFFINE_SHARED",
+  "AFFINE_SIDE",
+];
+
+
+console.log();
+console.log(
+  "===== SR24 DISCOVERY ====="
+);
+
+for (
+  const mode
+  of SR24_MODES
+) {
+  SR24_print(
+    mode,
+    SR24_eval(
+      SR24_BASE.filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      ),
+      mode
+    )
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR24 INTERNAL ====="
+);
+
+for (
+  const mode
+  of SR24_MODES
+) {
+  SR24_print(
+    mode,
+    SR24_eval(
+      SR24_BASE.filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      ),
+      mode
+    )
+  );
+}
+
+
+/*
+==================================================
+D/I AVERAGE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR24 D/I AVERAGE ====="
+);
+
+for (
+  const mode
+  of SR24_MODES
+) {
+  const d =
+    SR24_eval(
+      SR24_BASE.filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      ),
+      mode
+    );
+
+  const i =
+    SR24_eval(
+      SR24_BASE.filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      ),
+      mode
+    );
+
+  console.log(
+    mode,
+
+    `AVG_TEAM=${
+      (
+        (
+          d.teamMAE +
+          i.teamMAE
+        ) / 2
+      ).toFixed(6)
+    }`,
+
+    `AVG_TOTAL=${
+      (
+        (
+          d.totalMAE +
+          i.totalMAE
+        ) / 2
+      ).toFixed(6)
+    }`,
+
+    `AVG_DIFF=${
+      (
+        (
+          d.diffMAE +
+          i.diffMAE
+        ) / 2
+      ).toFixed(6)
+    }`
+  );
+}
+
+
+/*
+==================================================
+PREDICTION SCORE BANDS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR24 SCORE BAND RESIDUAL ====="
+);
+
+const SR24_BANDS = [
+  [
+    "PRED_LT_3.5",
+    0,
+    3.5,
+  ],
+  [
+    "PRED_3.5_4.5",
+    3.5,
+    4.5,
+  ],
+  [
+    "PRED_4.5_5.5",
+    4.5,
+    5.5,
+  ],
+  [
+    "PRED_5.5_PLUS",
+    5.5,
+    Infinity,
+  ],
+];
+
+
+for (
+  const [
+    name,
+    lo,
+    hi
+  ]
+  of SR24_BANDS
+) {
+  const observations =
+    SR24_D.flatMap(
+      row => [
+        {
+          pred:
+            row.predAway,
+          actual:
+            row.actualAway,
+        },
+        {
+          pred:
+            row.predHome,
+          actual:
+            row.actualHome,
+        },
+      ]
+    )
+    .filter(
+      x =>
+        x.pred >= lo &&
+        x.pred < hi
+    );
+
+  const residual =
+    SR24_mean(
+      observations.map(
+        x =>
+          x.actual -
+          x.pred
+      )
+    );
+
+  const mae =
+    SR24_mean(
+      observations.map(
+        x =>
+          Math.abs(
+            x.actual -
+            x.pred
+          )
+      )
+    );
+
+  console.log(
+    name,
+    `N=${observations.length}`,
+    `BIAS=${
+      residual === null
+        ? "NA"
+        : residual.toFixed(4)
+    }`,
+    `MAE=${
+      mae === null
+        ? "NA"
+        : mae.toFixed(4)
+    }`
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND24 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND24 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 25
+OMITTED PREGAME FEATURE SCREEN
+
+BASE:
+  Frozen V0.7 Round7
+
+Historical-safe sources only:
+  awayTeamForm
+  homeTeamForm
+  starter
+  bullpen
+  lineup
+  vsStarter
+  context
+  environment
+
+EXCLUDED:
+  market
+  existingSignals
+  target
+
+NO MODEL CHANGE.
+NO COEFFICIENT TUNING.
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND25 — OMITTED FEATURE SCREEN"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR25_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR25_flattenNumeric(
+  value,
+  prefix = "",
+  out = {}
+) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return out;
+  }
+
+  if (
+    typeof value === "number"
+  ) {
+    if (
+      Number.isFinite(
+        value
+      )
+    ) {
+      out[prefix] =
+        value;
+    }
+
+    return out;
+  }
+
+  if (
+    typeof value === "string"
+  ) {
+    const trimmed =
+      value.trim();
+
+    if (
+      trimmed !== "" &&
+      /^-?\d+(\.\d+)?$/.test(
+        trimmed
+      )
+    ) {
+      const n =
+        Number(
+          trimmed
+        );
+
+      if (
+        Number.isFinite(
+          n
+        )
+      ) {
+        out[prefix] =
+          n;
+      }
+    }
+
+    return out;
+  }
+
+  if (
+    Array.isArray(
+      value
+    )
+  ) {
+    return out;
+  }
+
+  if (
+    typeof value === "object"
+  ) {
+    for (
+      const [
+        key,
+        child
+      ]
+      of Object.entries(
+        value
+      )
+    ) {
+      const next =
+        prefix
+          ? `${prefix}.${key}`
+          : key;
+
+      SR25_flattenNumeric(
+        child,
+        next,
+        out
+      );
+    }
+  }
+
+  return out;
+}
+
+
+function SR25_corr(
+  pairs
+) {
+  const clean =
+    pairs.filter(
+      p =>
+        Number.isFinite(
+          p.x
+        ) &&
+        Number.isFinite(
+          p.y
+        )
+    );
+
+  const n =
+    clean.length;
+
+  if (
+    n < 15
+  ) {
+    return {
+      n,
+      r: null,
+    };
+  }
+
+  const meanX =
+    clean.reduce(
+      (sum, p) =>
+        sum + p.x,
+      0
+    ) / n;
+
+  const meanY =
+    clean.reduce(
+      (sum, p) =>
+        sum + p.y,
+      0
+    ) / n;
+
+  let num = 0;
+  let denX = 0;
+  let denY = 0;
+
+  for (
+    const p
+    of clean
+  ) {
+    const dx =
+      p.x -
+      meanX;
+
+    const dy =
+      p.y -
+      meanY;
+
+    num +=
+      dx *
+      dy;
+
+    denX +=
+      dx *
+      dx;
+
+    denY +=
+      dy *
+      dy;
+  }
+
+  if (
+    denX <= 0 ||
+    denY <= 0
+  ) {
+    return {
+      n,
+      r: null,
+    };
+  }
+
+  return {
+    n,
+
+    r:
+      num /
+      Math.sqrt(
+        denX *
+        denY
+      ),
+  };
+}
+
+
+/*
+==================================================
+TEAM-LEVEL OBSERVATIONS
+
+Residual:
+  actual team runs - predicted team runs
+
+Positive:
+  model underpredicted scoring.
+
+Negative:
+  model overpredicted scoring.
+==================================================
+*/
+
+const SR25_OBS =
+  [];
+
+
+for (
+  const g
+  of games
+) {
+  const split =
+    splitOf(
+      g
+    );
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    continue;
+  }
+
+  const prediction =
+    SR21_MODEL(
+      g
+    );
+
+  if (
+    !prediction ||
+    !Number.isFinite(
+      prediction.away
+    ) ||
+    !Number.isFinite(
+      prediction.home
+    )
+  ) {
+    continue;
+  }
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+  if (
+    !Number.isFinite(
+      actualAway
+    ) ||
+    !Number.isFinite(
+      actualHome
+    )
+  ) {
+    continue;
+  }
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (!x) {
+    continue;
+  }
+
+
+  /*
+  ----------------------------------------------
+  Common non-market objects
+  ----------------------------------------------
+  */
+
+  const common =
+    SR25_flattenNumeric({
+      bullpen:
+        x.bullpen,
+
+      lineup:
+        x.lineup,
+
+      vsStarter:
+        x.vsStarter,
+
+      context:
+        x.context,
+
+      environment:
+        x.environment,
+    });
+
+
+  /*
+  ----------------------------------------------
+  Away observation
+  ----------------------------------------------
+  */
+
+  const awayFeatures = {
+    ...common,
+
+    ...SR25_flattenNumeric(
+      x.awayTeamForm,
+      "teamForm"
+    ),
+
+    ...SR25_flattenNumeric(
+      x.starter?.away ??
+      x.starter?.awayStarter ??
+      null,
+      "starter"
+    ),
+  };
+
+
+  SR25_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "AWAY",
+
+    team:
+      g.awayTeam,
+
+    opponent:
+      g.homeTeam,
+
+    predicted:
+      prediction.away,
+
+    actual:
+      actualAway,
+
+    residual:
+      actualAway -
+      prediction.away,
+
+    absError:
+      Math.abs(
+        actualAway -
+        prediction.away
+      ),
+
+    features:
+      awayFeatures,
+  });
+
+
+  /*
+  ----------------------------------------------
+  Home observation
+  ----------------------------------------------
+  */
+
+  const homeFeatures = {
+    ...common,
+
+    ...SR25_flattenNumeric(
+      x.homeTeamForm,
+      "teamForm"
+    ),
+
+    ...SR25_flattenNumeric(
+      x.starter?.home ??
+      x.starter?.homeStarter ??
+      null,
+      "starter"
+    ),
+  };
+
+
+  SR25_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "HOME",
+
+    team:
+      g.homeTeam,
+
+    opponent:
+      g.awayTeam,
+
+    predicted:
+      prediction.home,
+
+    actual:
+      actualHome,
+
+    residual:
+      actualHome -
+      prediction.home,
+
+    absError:
+      Math.abs(
+        actualHome -
+        prediction.home
+      ),
+
+    features:
+      homeFeatures,
+  });
+}
+
+
+/*
+==================================================
+AVAILABLE FEATURE KEYS
+==================================================
+*/
+
+const SR25_KEYS =
+  [
+    ...new Set(
+      SR25_OBS.flatMap(
+        row =>
+          Object.keys(
+            row.features
+          )
+      )
+    ),
+  ]
+    .filter(
+      key =>
+        !key.includes(
+          "playerId"
+        ) &&
+        !key.endsWith(
+          ".id"
+        ) &&
+        !key.toLowerCase().includes(
+          "year"
+        )
+    )
+    .sort();
+
+
+console.log();
+console.log(
+  "TEAM OBS:",
+  SR25_OBS.length
+);
+
+console.log(
+  "NUMERIC FEATURE KEYS:",
+  SR25_KEYS.length
+);
+
+
+/*
+==================================================
+CORRELATION SCREEN
+
+Discovery:
+  feature vs signed residual
+
+Internal:
+  same exact feature,
+  validation only.
+
+Candidate:
+  reasonable coverage
+  + same direction
+==================================================
+*/
+
+const SR25_RESULTS =
+  [];
+
+
+for (
+  const key
+  of SR25_KEYS
+) {
+  const discoveryPairs =
+    SR25_OBS
+      .filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+      .map(
+        row => ({
+          x:
+            SR25_num(
+              row.features[
+                key
+              ]
+            ),
+
+          y:
+            row.residual,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null
+      );
+
+
+  const internalPairs =
+    SR25_OBS
+      .filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      )
+      .map(
+        row => ({
+          x:
+            SR25_num(
+              row.features[
+                key
+              ]
+            ),
+
+          y:
+            row.residual,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null
+      );
+
+
+  const d =
+    SR25_corr(
+      discoveryPairs
+    );
+
+  const i =
+    SR25_corr(
+      internalPairs
+    );
+
+
+  if (
+    d.r === null ||
+    i.r === null
+  ) {
+    continue;
+  }
+
+
+  const sameDirection =
+    Math.sign(
+      d.r
+    ) ===
+    Math.sign(
+      i.r
+    );
+
+
+  SR25_RESULTS.push({
+    key,
+
+    dN:
+      d.n,
+
+    dR:
+      d.r,
+
+    iN:
+      i.n,
+
+    iR:
+      i.r,
+
+    sameDirection,
+
+    score:
+      sameDirection
+        ? Math.min(
+            Math.abs(
+              d.r
+            ),
+            Math.abs(
+              i.r
+            )
+          )
+        : -1,
+  });
+}
+
+
+/*
+==================================================
+TOP SAME-DIRECTION SIGNALS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR25 ROBUST SIGNED RESIDUAL SIGNALS ====="
+);
+
+
+const SR25_ROBUST =
+  SR25_RESULTS
+    .filter(
+      row =>
+        row.sameDirection &&
+        row.dN >= 50 &&
+        row.iN >= 100
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.score -
+        a.score
+    )
+    .slice(
+      0,
+      40
+    );
+
+
+for (
+  const row
+  of SR25_ROBUST
+) {
+  console.log(
+    row.key,
+    `D_N=${row.dN}`,
+    `D_R=${row.dR.toFixed(4)}`,
+    `I_N=${row.iN}`,
+    `I_R=${row.iR.toFixed(4)}`,
+    `MIN_ABS_R=${row.score.toFixed(4)}`
+  );
+}
+
+
+/*
+==================================================
+ERROR MAGNITUDE SCREEN
+
+Can a feature identify unpredictable games?
+feature vs absolute error.
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR25 ABS ERROR SIGNALS ====="
+);
+
+
+const SR25_ABS_RESULTS =
+  [];
+
+
+for (
+  const key
+  of SR25_KEYS
+) {
+  const dp =
+    SR25_OBS
+      .filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+      .map(
+        row => ({
+          x:
+            SR25_num(
+              row.features[
+                key
+              ]
+            ),
+
+          y:
+            row.absError,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null
+      );
+
+
+  const ip =
+    SR25_OBS
+      .filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      )
+      .map(
+        row => ({
+          x:
+            SR25_num(
+              row.features[
+                key
+              ]
+            ),
+
+          y:
+            row.absError,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null
+      );
+
+
+  const d =
+    SR25_corr(
+      dp
+    );
+
+  const i =
+    SR25_corr(
+      ip
+    );
+
+
+  if (
+    d.r === null ||
+    i.r === null
+  ) {
+    continue;
+  }
+
+  const same =
+    Math.sign(
+      d.r
+    ) ===
+    Math.sign(
+      i.r
+    );
+
+
+  if (
+    !same ||
+    d.n < 50 ||
+    i.n < 100
+  ) {
+    continue;
+  }
+
+
+  SR25_ABS_RESULTS.push({
+    key,
+
+    dN:
+      d.n,
+
+    dR:
+      d.r,
+
+    iN:
+      i.n,
+
+    iR:
+      i.r,
+
+    score:
+      Math.min(
+        Math.abs(
+          d.r
+        ),
+        Math.abs(
+          i.r
+        )
+      ),
+  });
+}
+
+
+SR25_ABS_RESULTS
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      b.score -
+      a.score
+  )
+  .slice(
+    0,
+    30
+  )
+  .forEach(
+    row => {
+      console.log(
+        row.key,
+        `D_N=${row.dN}`,
+        `D_R=${row.dR.toFixed(4)}`,
+        `I_N=${row.iN}`,
+        `I_R=${row.iR.toFixed(4)}`,
+        `MIN_ABS_R=${row.score.toFixed(4)}`
+      );
+    }
+  );
+
+
+/*
+==================================================
+STARTER-ONLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR25 STARTER ONLY ====="
+);
+
+
+SR25_ROBUST
+  .filter(
+    row =>
+      row.key.startsWith(
+        "starter."
+      )
+  )
+  .forEach(
+    row => {
+      console.log(
+        row.key,
+        `D_R=${row.dR.toFixed(4)}`,
+        `I_R=${row.iR.toFixed(4)}`,
+        `D_N=${row.dN}`,
+        `I_N=${row.iN}`
+      );
+    }
+  );
+
+
+/*
+==================================================
+LINEUP / BULLPEN / VS STARTER
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR25 OTHER FAMILIES ====="
+);
+
+
+for (
+  const family
+  of [
+    "lineup.",
+    "bullpen.",
+    "vsStarter.",
+    "teamForm.",
+    "context.",
+    "environment.",
+  ]
+) {
+  console.log();
+  console.log(
+    `--- ${family} ---`
+  );
+
+  SR25_ROBUST
+    .filter(
+      row =>
+        row.key.startsWith(
+          family
+        )
+    )
+    .slice(
+      0,
+      12
+    )
+    .forEach(
+      row => {
+        console.log(
+          row.key,
+          `D_R=${row.dR.toFixed(4)}`,
+          `I_R=${row.iR.toFixed(4)}`,
+          `D_N=${row.dN}`,
+          `I_N=${row.iN}`
+        );
+      }
+    );
+}
+
+
+/*
+==================================================
+TOP FEATURES RAW COVERAGE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR25 TOP 20 COVERAGE ====="
+);
+
+
+SR25_ROBUST
+  .slice(
+    0,
+    20
+  )
+  .forEach(
+    row => {
+      console.log(
+        row.key,
+        `D=${row.dN}`,
+        `I=${row.iN}`
+      );
+    }
+  );
+
+
+console.log();
+console.log(
+  "SCORE ROUND25 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND25 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 26
+OFFENSE-ORIENTED FEATURE SCREEN
+
+Correct orientation:
+
+AWAY runs:
+  own team form
+  own away lineup
+  HOME starter
+  HOME bullpen
+  away-vs-home-starter
+
+HOME runs:
+  own team form
+  own home lineup
+  AWAY starter
+  AWAY bullpen
+  home-vs-away-starter
+
+NO MODEL CHANGE.
+NO COEFFICIENT TUNING.
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND26 — ORIENTED FEATURE SCREEN"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR26_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR26_flatten(
+  value,
+  prefix = "",
+  out = {}
+) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return out;
+  }
+
+  if (
+    typeof value === "number"
+  ) {
+    if (
+      Number.isFinite(
+        value
+      )
+    ) {
+      out[prefix] =
+        value;
+    }
+
+    return out;
+  }
+
+  if (
+    typeof value === "string"
+  ) {
+    const trimmed =
+      value.trim();
+
+    if (
+      trimmed !== "" &&
+      /^-?\d+(\.\d+)?$/.test(
+        trimmed
+      )
+    ) {
+      const n =
+        Number(
+          trimmed
+        );
+
+      if (
+        Number.isFinite(
+          n
+        )
+      ) {
+        out[prefix] =
+          n;
+      }
+    }
+
+    return out;
+  }
+
+  if (
+    Array.isArray(
+      value
+    )
+  ) {
+    return out;
+  }
+
+  if (
+    typeof value === "object"
+  ) {
+    for (
+      const [
+        key,
+        child
+      ]
+      of Object.entries(
+        value
+      )
+    ) {
+      const next =
+        prefix
+          ? `${prefix}.${key}`
+          : key;
+
+      SR26_flatten(
+        child,
+        next,
+        out
+      );
+    }
+  }
+
+  return out;
+}
+
+
+function SR26_corr(
+  pairs
+) {
+  const clean =
+    pairs.filter(
+      p =>
+        Number.isFinite(
+          p.x
+        ) &&
+        Number.isFinite(
+          p.y
+        )
+    );
+
+  const n =
+    clean.length;
+
+  if (
+    n < 15
+  ) {
+    return {
+      n,
+      r: null,
+    };
+  }
+
+  const meanX =
+    clean.reduce(
+      (sum, p) =>
+        sum + p.x,
+      0
+    ) / n;
+
+  const meanY =
+    clean.reduce(
+      (sum, p) =>
+        sum + p.y,
+      0
+    ) / n;
+
+  let numerator = 0;
+  let dx2 = 0;
+  let dy2 = 0;
+
+  for (
+    const p
+    of clean
+  ) {
+    const dx =
+      p.x -
+      meanX;
+
+    const dy =
+      p.y -
+      meanY;
+
+    numerator +=
+      dx *
+      dy;
+
+    dx2 +=
+      dx *
+      dx;
+
+    dy2 +=
+      dy *
+      dy;
+  }
+
+  if (
+    dx2 <= 0 ||
+    dy2 <= 0
+  ) {
+    return {
+      n,
+      r: null,
+    };
+  }
+
+  return {
+    n,
+
+    r:
+      numerator /
+      Math.sqrt(
+        dx2 *
+        dy2
+      ),
+  };
+}
+
+
+function SR26_getStarter(
+  starter,
+  side
+) {
+  if (!starter) {
+    return null;
+  }
+
+  if (
+    side === "away"
+  ) {
+    return (
+      starter.away ??
+      starter.awayStarter ??
+      null
+    );
+  }
+
+  return (
+    starter.home ??
+    starter.homeStarter ??
+    null
+  );
+}
+
+
+function SR26_getLineup(
+  lineup,
+  side
+) {
+  if (!lineup) {
+    return null;
+  }
+
+  return (
+    lineup[
+      side
+    ] ??
+    null
+  );
+}
+
+
+/*
+==================================================
+BUILD CORRECTLY ORIENTED TEAM OFFENSE OBS
+==================================================
+*/
+
+const SR26_OBS = [];
+
+
+for (
+  const g
+  of games
+) {
+  const split =
+    splitOf(
+      g
+    );
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    continue;
+  }
+
+  const pred =
+    SR21_MODEL(
+      g
+    );
+
+  if (
+    !pred ||
+    !Number.isFinite(
+      pred.away
+    ) ||
+    !Number.isFinite(
+      pred.home
+    )
+  ) {
+    continue;
+  }
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+  if (
+    !Number.isFinite(
+      actualAway
+    ) ||
+    !Number.isFinite(
+      actualHome
+    )
+  ) {
+    continue;
+  }
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (!x) {
+    continue;
+  }
+
+
+  /*
+  ==================================================
+  AWAY TEAM OFFENSE
+  ==================================================
+  */
+
+  const awayFeatures = {
+    ...SR26_flatten(
+      x.awayTeamForm,
+      "ownForm"
+    ),
+
+    ...SR26_flatten(
+      x.homeTeamForm,
+      "oppForm"
+    ),
+
+    ...SR26_flatten(
+      SR26_getLineup(
+        x.lineup,
+        "away"
+      ),
+      "ownLineup"
+    ),
+
+    ...SR26_flatten(
+      SR26_getStarter(
+        x.starter,
+        "home"
+      ),
+      "oppStarter"
+    ),
+
+    ...SR26_flatten(
+      x.vsStarter
+        ?.awayVsHomeStarter ??
+      null,
+      "vsStarter"
+    ),
+
+    ...SR26_flatten(
+      {
+        opponentBullpenFatigue:
+          x.bullpen
+            ?.homeFatigue ??
+          null,
+      },
+      "bullpen"
+    ),
+
+    ...SR26_flatten(
+      x.environment,
+      "environment"
+    ),
+
+    ...SR26_flatten(
+      x.context,
+      "context"
+    ),
+  };
+
+
+  SR26_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "AWAY",
+
+    team:
+      g.awayTeam,
+
+    opponent:
+      g.homeTeam,
+
+    predicted:
+      pred.away,
+
+    actual:
+      actualAway,
+
+    residual:
+      actualAway -
+      pred.away,
+
+    absError:
+      Math.abs(
+        actualAway -
+        pred.away
+      ),
+
+    features:
+      awayFeatures,
+  });
+
+
+  /*
+  ==================================================
+  HOME TEAM OFFENSE
+  ==================================================
+  */
+
+  const homeFeatures = {
+    ...SR26_flatten(
+      x.homeTeamForm,
+      "ownForm"
+    ),
+
+    ...SR26_flatten(
+      x.awayTeamForm,
+      "oppForm"
+    ),
+
+    ...SR26_flatten(
+      SR26_getLineup(
+        x.lineup,
+        "home"
+      ),
+      "ownLineup"
+    ),
+
+    ...SR26_flatten(
+      SR26_getStarter(
+        x.starter,
+        "away"
+      ),
+      "oppStarter"
+    ),
+
+    ...SR26_flatten(
+      x.vsStarter
+        ?.homeVsAwayStarter ??
+      null,
+      "vsStarter"
+    ),
+
+    ...SR26_flatten(
+      {
+        opponentBullpenFatigue:
+          x.bullpen
+            ?.awayFatigue ??
+          null,
+      },
+      "bullpen"
+    ),
+
+    ...SR26_flatten(
+      x.environment,
+      "environment"
+    ),
+
+    ...SR26_flatten(
+      x.context,
+      "context"
+    ),
+  };
+
+
+  SR26_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "HOME",
+
+    team:
+      g.homeTeam,
+
+    opponent:
+      g.awayTeam,
+
+    predicted:
+      pred.home,
+
+    actual:
+      actualHome,
+
+    residual:
+      actualHome -
+      pred.home,
+
+    absError:
+      Math.abs(
+        actualHome -
+        pred.home
+      ),
+
+    features:
+      homeFeatures,
+  });
+}
+
+
+/*
+==================================================
+FEATURE KEYS
+==================================================
+*/
+
+const SR26_KEYS =
+  [
+    ...new Set(
+      SR26_OBS.flatMap(
+        row =>
+          Object.keys(
+            row.features
+          )
+      )
+    ),
+  ]
+    .filter(
+      key =>
+        !key.includes(
+          "playerId"
+        ) &&
+        !key.endsWith(
+          ".id"
+        ) &&
+        !key
+          .toLowerCase()
+          .includes(
+            "year"
+          )
+    )
+    .sort();
+
+
+console.log();
+console.log(
+  "TEAM OBS:",
+  SR26_OBS.length
+);
+
+console.log(
+  "NUMERIC FEATURE KEYS:",
+  SR26_KEYS.length
+);
+
+
+/*
+==================================================
+SIGNED RESIDUAL CORRELATION
+==================================================
+*/
+
+const SR26_SIGNED = [];
+
+
+for (
+  const key
+  of SR26_KEYS
+) {
+  const d =
+    SR26_corr(
+      SR26_OBS
+        .filter(
+          row =>
+            row.split ===
+              "DISCOVERY"
+        )
+        .map(
+          row => ({
+            x:
+              SR26_num(
+                row.features[
+                  key
+                ]
+              ),
+
+            y:
+              row.residual,
+          })
+        )
+        .filter(
+          p =>
+            p.x !== null
+        )
+    );
+
+
+  const i =
+    SR26_corr(
+      SR26_OBS
+        .filter(
+          row =>
+            row.split ===
+              "INTERNAL"
+        )
+        .map(
+          row => ({
+            x:
+              SR26_num(
+                row.features[
+                  key
+                ]
+              ),
+
+            y:
+              row.residual,
+          })
+        )
+        .filter(
+          p =>
+            p.x !== null
+        )
+    );
+
+
+  if (
+    d.r === null ||
+    i.r === null
+  ) {
+    continue;
+  }
+
+
+  const sameDirection =
+    Math.sign(
+      d.r
+    ) ===
+    Math.sign(
+      i.r
+    );
+
+
+  SR26_SIGNED.push({
+    key,
+
+    dN:
+      d.n,
+
+    dR:
+      d.r,
+
+    iN:
+      i.n,
+
+    iR:
+      i.r,
+
+    sameDirection,
+
+    robustScore:
+      sameDirection
+        ? Math.min(
+            Math.abs(
+              d.r
+            ),
+            Math.abs(
+              i.r
+            )
+          )
+        : -1,
+  });
+}
+
+
+const SR26_ROBUST =
+  SR26_SIGNED
+    .filter(
+      row =>
+        row.sameDirection &&
+        row.dN >= 50 &&
+        row.iN >= 100
+    )
+    .sort(
+      (
+        a,
+        b
+      ) =>
+        b.robustScore -
+        a.robustScore
+    );
+
+
+console.log();
+console.log(
+  "===== SR26 ROBUST SIGNED SIGNALS ====="
+);
+
+
+for (
+  const row
+  of SR26_ROBUST.slice(
+    0,
+    40
+  )
+) {
+  console.log(
+    row.key,
+    `D_N=${row.dN}`,
+    `D_R=${row.dR.toFixed(4)}`,
+    `I_N=${row.iN}`,
+    `I_R=${row.iR.toFixed(4)}`,
+    `MIN_R=${row.robustScore.toFixed(4)}`
+  );
+}
+
+
+/*
+==================================================
+ABS ERROR CORRELATION
+==================================================
+*/
+
+const SR26_ABS = [];
+
+
+for (
+  const key
+  of SR26_KEYS
+) {
+  const d =
+    SR26_corr(
+      SR26_OBS
+        .filter(
+          row =>
+            row.split ===
+              "DISCOVERY"
+        )
+        .map(
+          row => ({
+            x:
+              SR26_num(
+                row.features[
+                  key
+                ]
+              ),
+
+            y:
+              row.absError,
+          })
+        )
+        .filter(
+          p =>
+            p.x !== null
+        )
+    );
+
+
+  const i =
+    SR26_corr(
+      SR26_OBS
+        .filter(
+          row =>
+            row.split ===
+              "INTERNAL"
+        )
+        .map(
+          row => ({
+            x:
+              SR26_num(
+                row.features[
+                  key
+                ]
+              ),
+
+            y:
+              row.absError,
+          })
+        )
+        .filter(
+          p =>
+            p.x !== null
+        )
+    );
+
+
+  if (
+    d.r === null ||
+    i.r === null
+  ) {
+    continue;
+  }
+
+
+  const same =
+    Math.sign(
+      d.r
+    ) ===
+    Math.sign(
+      i.r
+    );
+
+
+  if (
+    !same ||
+    d.n < 50 ||
+    i.n < 100
+  ) {
+    continue;
+  }
+
+
+  SR26_ABS.push({
+    key,
+
+    dN:
+      d.n,
+
+    dR:
+      d.r,
+
+    iN:
+      i.n,
+
+    iR:
+      i.r,
+
+    robustScore:
+      Math.min(
+        Math.abs(
+          d.r
+        ),
+        Math.abs(
+          i.r
+        )
+      ),
+  });
+}
+
+
+SR26_ABS.sort(
+  (
+    a,
+    b
+  ) =>
+    b.robustScore -
+    a.robustScore
+);
+
+
+console.log();
+console.log(
+  "===== SR26 ROBUST ABS ERROR SIGNALS ====="
+);
+
+
+for (
+  const row
+  of SR26_ABS.slice(
+    0,
+    30
+  )
+) {
+  console.log(
+    row.key,
+    `D_N=${row.dN}`,
+    `D_R=${row.dR.toFixed(4)}`,
+    `I_N=${row.iN}`,
+    `I_R=${row.iR.toFixed(4)}`,
+    `MIN_R=${row.robustScore.toFixed(4)}`
+  );
+}
+
+
+/*
+==================================================
+FAMILY VIEW
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR26 FAMILY VIEW ====="
+);
+
+
+for (
+  const family
+  of [
+    "environment.",
+    "ownForm.",
+    "oppForm.",
+    "oppStarter.",
+    "ownLineup.",
+    "bullpen.",
+    "vsStarter.",
+    "context.",
+  ]
+) {
+  console.log();
+  console.log(
+    `--- ${family} ---`
+  );
+
+  const rows =
+    SR26_ROBUST
+      .filter(
+        row =>
+          row.key.startsWith(
+            family
+          )
+      )
+      .slice(
+        0,
+        15
+      );
+
+  if (!rows.length) {
+    console.log(
+      "NO ROBUST SIGNAL"
+    );
+
+    continue;
+  }
+
+  for (
+    const row
+    of rows
+  ) {
+    console.log(
+      row.key,
+      `D_R=${row.dR.toFixed(4)}`,
+      `I_R=${row.iR.toFixed(4)}`,
+      `D_N=${row.dN}`,
+      `I_N=${row.iN}`
+    );
+  }
+}
+
+
+/*
+==================================================
+TOP 15 CANDIDATES SUMMARY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR26 TOP 15 MODEL CANDIDATES ====="
+);
+
+
+for (
+  const row
+  of SR26_ROBUST.slice(
+    0,
+    15
+  )
+) {
+  console.log(
+    `${row.key} ` +
+    `D=${row.dR.toFixed(4)} ` +
+    `I=${row.iR.toFixed(4)} ` +
+    `SCORE=${row.robustScore.toFixed(4)}`
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND26 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND26 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 27
+SINGLE FEATURE RESIDUAL CORRECTION
+
+BASE:
+  Frozen V0.7 Round7
+
+Train correction:
+  Discovery only
+
+Validate:
+  Internal untouched
+
+Candidates:
+  LEAGUE_D1
+  OWN_VENUE_RUNS
+  OWN_SEASON_RUNS
+  OPP_VENUE_ALLOWED
+  OPP_R10_ALLOWED
+
+NO COMBINATIONS YET.
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND27 — SINGLE FEATURE CORRECTION"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR27_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR27_candidateFeatures(
+  x,
+  side
+) {
+  if (!x) {
+    return null;
+  }
+
+  const own =
+    side === "AWAY"
+      ? x.awayTeamForm
+      : x.homeTeamForm;
+
+  const opp =
+    side === "AWAY"
+      ? x.homeTeamForm
+      : x.awayTeamForm;
+
+
+  const ownVenueRuns =
+    side === "AWAY"
+      ? SR27_num(
+          own?.awayAvgRuns
+        )
+      : SR27_num(
+          own?.homeAvgRuns
+        );
+
+
+  const oppVenueAllowed =
+    side === "AWAY"
+      ? SR27_num(
+          opp?.homeAvgRunsAllowed
+        )
+      : SR27_num(
+          opp?.awayAvgRunsAllowed
+        );
+
+
+  return {
+    LEAGUE_D1:
+      SR27_num(
+        x.environment
+          ?.leagueRunsPerTeamD1
+      ),
+
+    OWN_VENUE_RUNS:
+      ownVenueRuns,
+
+    OWN_SEASON_RUNS:
+      SR27_num(
+        own?.seasonAvgRuns
+      ),
+
+    OPP_VENUE_ALLOWED:
+      oppVenueAllowed,
+
+    OPP_R10_ALLOWED:
+      SR27_num(
+        opp?.recent10
+          ?.avgRunsAllowed
+      ),
+  };
+}
+
+
+/*
+==================================================
+TEAM OBSERVATIONS
+==================================================
+*/
+
+const SR27_OBS = [];
+
+
+for (
+  const g
+  of games
+) {
+  const split =
+    splitOf(
+      g
+    );
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    continue;
+  }
+
+  const pred =
+    SR21_MODEL(
+      g
+    );
+
+  if (
+    !pred ||
+    !Number.isFinite(
+      pred.away
+    ) ||
+    !Number.isFinite(
+      pred.home
+    )
+  ) {
+    continue;
+  }
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+  if (
+    !Number.isFinite(
+      actualAway
+    ) ||
+    !Number.isFinite(
+      actualHome
+    )
+  ) {
+    continue;
+  }
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (!x) {
+    continue;
+  }
+
+
+  SR27_OBS.push({
+    split,
+    date:
+      g.date,
+    gameId:
+      g.gameId,
+    side:
+      "AWAY",
+
+    predicted:
+      pred.away,
+
+    actual:
+      actualAway,
+
+    residual:
+      actualAway -
+      pred.away,
+
+    features:
+      SR27_candidateFeatures(
+        x,
+        "AWAY"
+      ),
+  });
+
+
+  SR27_OBS.push({
+    split,
+    date:
+      g.date,
+    gameId:
+      g.gameId,
+    side:
+      "HOME",
+
+    predicted:
+      pred.home,
+
+    actual:
+      actualHome,
+
+    residual:
+      actualHome -
+      pred.home,
+
+    features:
+      SR27_candidateFeatures(
+        x,
+        "HOME"
+      ),
+  });
+}
+
+
+/*
+==================================================
+FIT:
+residual = intercept + beta*x
+
+Discovery only.
+==================================================
+*/
+
+function SR27_fit(
+  feature
+) {
+  const rows =
+    SR27_OBS
+      .filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+      .map(
+        row => ({
+          x:
+            SR27_num(
+              row.features?.[
+                feature
+              ]
+            ),
+
+          y:
+            row.residual,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null &&
+          Number.isFinite(
+            p.y
+          )
+      );
+
+
+  const n =
+    rows.length;
+
+  if (
+    n < 20
+  ) {
+    return null;
+  }
+
+
+  const meanX =
+    rows.reduce(
+      (sum, p) =>
+        sum + p.x,
+      0
+    ) /
+    n;
+
+
+  const meanY =
+    rows.reduce(
+      (sum, p) =>
+        sum + p.y,
+      0
+    ) /
+    n;
+
+
+  let cov = 0;
+  let variance = 0;
+
+
+  for (
+    const p
+    of rows
+  ) {
+    const dx =
+      p.x -
+      meanX;
+
+    const dy =
+      p.y -
+      meanY;
+
+    cov +=
+      dx *
+      dy;
+
+    variance +=
+      dx *
+      dx;
+  }
+
+
+  if (
+    variance <= 0
+  ) {
+    return null;
+  }
+
+
+  const beta =
+    cov /
+    variance;
+
+
+  /*
+    Centered correction only.
+
+    We intentionally do NOT add mean residual
+    because Round24 global bias failed.
+
+    correction =
+      beta * (x - discoveryMeanX)
+  */
+
+  return {
+    feature,
+    n,
+    meanX,
+    beta,
+  };
+}
+
+
+const SR27_FEATURES = [
+  "LEAGUE_D1",
+  "OWN_VENUE_RUNS",
+  "OWN_SEASON_RUNS",
+  "OPP_VENUE_ALLOWED",
+  "OPP_R10_ALLOWED",
+];
+
+
+const SR27_FITS =
+  new Map();
+
+
+for (
+  const feature
+  of SR27_FEATURES
+) {
+  SR27_FITS.set(
+    feature,
+    SR27_fit(
+      feature
+    )
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR27 DISCOVERY FITS ====="
+);
+
+
+for (
+  const feature
+  of SR27_FEATURES
+) {
+  const fit =
+    SR27_FITS.get(
+      feature
+    );
+
+  console.log(
+    feature,
+    fit
+  );
+}
+
+
+/*
+==================================================
+GAME EVALUATION
+==================================================
+*/
+
+function SR27_correct(
+  base,
+  x,
+  side,
+  feature
+) {
+  const fit =
+    SR27_FITS.get(
+      feature
+    );
+
+  if (!fit) {
+    return base;
+  }
+
+  const features =
+    SR27_candidateFeatures(
+      x,
+      side
+    );
+
+  const value =
+    SR27_num(
+      features?.[
+        feature
+      ]
+    );
+
+
+  if (
+    value === null
+  ) {
+    return base;
+  }
+
+
+  return (
+    base +
+    fit.beta *
+    (
+      value -
+      fit.meanX
+    )
+  );
+}
+
+
+function SR27_rows(
+  feature = null
+) {
+  const rows = [];
+
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+
+    const base =
+      SR21_MODEL(
+        g
+      );
+
+
+    if (
+      !base ||
+      !Number.isFinite(
+        base.away
+      ) ||
+      !Number.isFinite(
+        base.home
+      )
+    ) {
+      continue;
+    }
+
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+
+    const x =
+      v06Map.get(
+        g.gameId
+      );
+
+
+    if (!x) {
+      continue;
+    }
+
+
+    const away =
+      feature === null
+        ? base.away
+        : SR27_correct(
+            base.away,
+            x,
+            "AWAY",
+            feature
+          );
+
+
+    const home =
+      feature === null
+        ? base.home
+        : SR27_correct(
+            base.home,
+            x,
+            "HOME",
+            feature
+          );
+
+
+    rows.push({
+      split,
+      date:
+        g.date,
+
+      away,
+      home,
+
+      actualAway,
+      actualHome,
+    });
+  }
+
+
+  return rows;
+}
+
+
+function SR27_stat(
+  rows
+) {
+  let team = 0;
+  let total = 0;
+  let diff = 0;
+
+  let winnerN = 0;
+  let winnerHit = 0;
+
+
+  for (
+    const row
+    of rows
+  ) {
+    team +=
+      (
+        Math.abs(
+          row.away -
+          row.actualAway
+        ) +
+        Math.abs(
+          row.home -
+          row.actualHome
+        )
+      ) / 2;
+
+
+    total +=
+      Math.abs(
+        (
+          row.away +
+          row.home
+        ) -
+        (
+          row.actualAway +
+          row.actualHome
+        )
+      );
+
+
+    const predDiff =
+      row.away -
+      row.home;
+
+    const actualDiff =
+      row.actualAway -
+      row.actualHome;
+
+
+    diff +=
+      Math.abs(
+        predDiff -
+        actualDiff
+      );
+
+
+    if (
+      predDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(
+          predDiff
+        ) ===
+        Math.sign(
+          actualDiff
+        )
+      ) {
+        winnerHit++;
+      }
+    }
+  }
+
+
+  const n =
+    rows.length;
+
+
+  return {
+    n,
+
+    team:
+      team /
+      n,
+
+    total:
+      total /
+      n,
+
+    diff:
+      diff /
+      n,
+
+    winner:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null,
+  };
+}
+
+
+function SR27_print(
+  name,
+  rows
+) {
+  const s =
+    SR27_stat(
+      rows
+    );
+
+
+  console.log(
+    `${name} ` +
+    `N=${s.n} ` +
+    `TEAM=${s.team.toFixed(6)} ` +
+    `TOTAL=${s.total.toFixed(6)} ` +
+    `DIFF=${s.diff.toFixed(6)} ` +
+    `W=${
+      s.winner === null
+        ? "NA"
+        : (
+            s.winner *
+            100
+          ).toFixed(2) +
+          "%"
+    }`
+  );
+}
+
+
+/*
+==================================================
+BASE
+==================================================
+*/
+
+const SR27_BASE =
+  SR27_rows(
+    null
+  );
+
+
+console.log();
+console.log(
+  "===== SR27 BASE ====="
+);
+
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  SR27_print(
+    split,
+    SR27_BASE.filter(
+      row =>
+        row.split === split
+    )
+  );
+}
+
+
+/*
+==================================================
+SINGLE FEATURE RESULTS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR27 SINGLE FEATURE RESULTS ====="
+);
+
+
+const SR27_SUMMARY = [];
+
+
+for (
+  const feature
+  of SR27_FEATURES
+) {
+  const rows =
+    SR27_rows(
+      feature
+    );
+
+
+  console.log();
+  console.log(
+    `--- ${feature} ---`
+  );
+
+
+  const dRows =
+    rows.filter(
+      row =>
+        row.split ===
+          "DISCOVERY"
+    );
+
+
+  const iRows =
+    rows.filter(
+      row =>
+        row.split ===
+          "INTERNAL"
+    );
+
+
+  const baseD =
+    SR27_stat(
+      SR27_BASE.filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+    );
+
+
+  const baseI =
+    SR27_stat(
+      SR27_BASE.filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      )
+    );
+
+
+  const d =
+    SR27_stat(
+      dRows
+    );
+
+
+  const i =
+    SR27_stat(
+      iRows
+    );
+
+
+  SR27_print(
+    "DISCOVERY",
+    dRows
+  );
+
+
+  SR27_print(
+    "INTERNAL",
+    iRows
+  );
+
+
+  console.log(
+    "DELTA",
+    `D_TEAM=${(
+      d.team -
+      baseD.team
+    ).toFixed(6)}`,
+    `I_TEAM=${(
+      i.team -
+      baseI.team
+    ).toFixed(6)}`,
+    `D_TOTAL=${(
+      d.total -
+      baseD.total
+    ).toFixed(6)}`,
+    `I_TOTAL=${(
+      i.total -
+      baseI.total
+    ).toFixed(6)}`
+  );
+
+
+  SR27_SUMMARY.push({
+    feature,
+
+    dTeam:
+      d.team,
+
+    iTeam:
+      i.team,
+
+    dDelta:
+      d.team -
+      baseD.team,
+
+    iDelta:
+      i.team -
+      baseI.team,
+
+    avg:
+      (
+        d.team +
+        i.team
+      ) / 2,
+  });
+}
+
+
+/*
+==================================================
+RANKING
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR27 RANKING ====="
+);
+
+
+SR27_SUMMARY
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      a.avg -
+      b.avg
+  )
+  .forEach(
+    (
+      row,
+      index
+    ) => {
+      console.log(
+        `${index + 1}.`,
+        row.feature,
+        `AVG=${row.avg.toFixed(6)}`,
+        `DΔ=${row.dDelta.toFixed(6)}`,
+        `IΔ=${row.iDelta.toFixed(6)}`,
+        `ROBUST=${
+          row.dDelta < 0 &&
+          row.iDelta < 0
+            ? "YES"
+            : "NO"
+        }`
+      );
+    }
+  );
+
+
+/*
+==================================================
+MONTHLY FOR ROBUST ONLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR27 ROBUST MONTHLY ====="
+);
+
+
+for (
+  const result
+  of SR27_SUMMARY.filter(
+    row =>
+      row.dDelta < 0 &&
+      row.iDelta < 0
+  )
+) {
+  console.log();
+  console.log(
+    `--- ${result.feature} ---`
+  );
+
+
+  const rows =
+    SR27_rows(
+      result.feature
+    );
+
+
+  for (
+    const month
+    of [
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+    ]
+  ) {
+    SR27_print(
+      month,
+      rows.filter(
+        row =>
+          String(
+            row.date
+          ).slice(
+            0,
+            7
+          ) === month
+      )
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND27 MODEL CHANGE: TEST ONLY"
+);
+
+console.log(
+  "SCORE ROUND27 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 28
+SEQUENTIAL RESIDUAL CORRECTION
+
+STEP 1:
+  Frozen candidate from Round27:
+  LEAGUE_D1
+
+STEP 2:
+  Refit remaining residual using ONE feature:
+
+  OPP_VENUE_ALLOWED
+  OWN_SEASON_RUNS
+  OWN_VENUE_RUNS
+
+Discovery fit only.
+Internal validation untouched.
+
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND28 — SEQUENTIAL CORRECTION"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR28_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+/*
+==================================================
+ROUND27 LEAGUE FIT
+==================================================
+*/
+
+const SR28_LEAGUE_FIT =
+  SR27_FITS.get(
+    "LEAGUE_D1"
+  );
+
+
+console.log();
+console.log(
+  "===== SR28 LEAGUE FIT ====="
+);
+
+console.log(
+  SR28_LEAGUE_FIT
+);
+
+
+/*
+==================================================
+FIRST-STAGE CORRECTION
+==================================================
+*/
+
+function SR28_leagueCorrection(
+  x
+) {
+  if (
+    !x ||
+    !SR28_LEAGUE_FIT
+  ) {
+    return 0;
+  }
+
+  const value =
+    SR28_num(
+      x.environment
+        ?.leagueRunsPerTeamD1
+    );
+
+  if (
+    value === null
+  ) {
+    return 0;
+  }
+
+  return (
+    SR28_LEAGUE_FIT.beta *
+    (
+      value -
+      SR28_LEAGUE_FIT.meanX
+    )
+  );
+}
+
+
+/*
+==================================================
+BUILD FIRST-STAGE TEAM OBS
+
+Residual after LEAGUE_D1.
+==================================================
+*/
+
+const SR28_OBS = [];
+
+
+for (
+  const g
+  of games
+) {
+  const split =
+    splitOf(
+      g
+    );
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    continue;
+  }
+
+
+  const base =
+    SR21_MODEL(
+      g
+    );
+
+
+  if (
+    !base ||
+    !Number.isFinite(
+      base.away
+    ) ||
+    !Number.isFinite(
+      base.home
+    )
+  ) {
+    continue;
+  }
+
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+
+  if (
+    !Number.isFinite(
+      actualAway
+    ) ||
+    !Number.isFinite(
+      actualHome
+    )
+  ) {
+    continue;
+  }
+
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+
+  if (!x) {
+    continue;
+  }
+
+
+  const leagueAdj =
+    SR28_leagueCorrection(
+      x
+    );
+
+
+  const away1 =
+    base.away +
+    leagueAdj;
+
+
+  const home1 =
+    base.home +
+    leagueAdj;
+
+
+  const awayFeatures =
+    SR27_candidateFeatures(
+      x,
+      "AWAY"
+    );
+
+
+  const homeFeatures =
+    SR27_candidateFeatures(
+      x,
+      "HOME"
+    );
+
+
+  SR28_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "AWAY",
+
+    stage1:
+      away1,
+
+    actual:
+      actualAway,
+
+    residual:
+      actualAway -
+      away1,
+
+    features:
+      awayFeatures,
+  });
+
+
+  SR28_OBS.push({
+    split,
+
+    gameId:
+      g.gameId,
+
+    date:
+      g.date,
+
+    side:
+      "HOME",
+
+    stage1:
+      home1,
+
+    actual:
+      actualHome,
+
+    residual:
+      actualHome -
+      home1,
+
+    features:
+      homeFeatures,
+  });
+}
+
+
+/*
+==================================================
+FIT SECOND FEATURE ON REMAINING DISCOVERY RESIDUAL
+==================================================
+*/
+
+function SR28_fitSecond(
+  feature
+) {
+  const rows =
+    SR28_OBS
+      .filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+      .map(
+        row => ({
+          x:
+            SR28_num(
+              row.features?.[
+                feature
+              ]
+            ),
+
+          y:
+            row.residual,
+        })
+      )
+      .filter(
+        p =>
+          p.x !== null &&
+          Number.isFinite(
+            p.y
+          )
+      );
+
+
+  const n =
+    rows.length;
+
+
+  if (
+    n < 20
+  ) {
+    return null;
+  }
+
+
+  const meanX =
+    rows.reduce(
+      (sum, row) =>
+        sum +
+        row.x,
+      0
+    ) /
+    n;
+
+
+  const meanY =
+    rows.reduce(
+      (sum, row) =>
+        sum +
+        row.y,
+      0
+    ) /
+    n;
+
+
+  let covariance = 0;
+  let variance = 0;
+
+
+  for (
+    const row
+    of rows
+  ) {
+    const dx =
+      row.x -
+      meanX;
+
+    const dy =
+      row.y -
+      meanY;
+
+
+    covariance +=
+      dx *
+      dy;
+
+
+    variance +=
+      dx *
+      dx;
+  }
+
+
+  if (
+    variance <= 0
+  ) {
+    return null;
+  }
+
+
+  return {
+    feature,
+
+    n,
+
+    meanX,
+
+    beta:
+      covariance /
+      variance,
+  };
+}
+
+
+const SR28_SECOND_FEATURES = [
+  "OPP_VENUE_ALLOWED",
+  "OWN_SEASON_RUNS",
+  "OWN_VENUE_RUNS",
+];
+
+
+const SR28_SECOND_FITS =
+  new Map();
+
+
+for (
+  const feature
+  of SR28_SECOND_FEATURES
+) {
+  SR28_SECOND_FITS.set(
+    feature,
+    SR28_fitSecond(
+      feature
+    )
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR28 SECOND-STAGE FITS ====="
+);
+
+
+for (
+  const feature
+  of SR28_SECOND_FEATURES
+) {
+  console.log(
+    feature,
+    SR28_SECOND_FITS.get(
+      feature
+    )
+  );
+}
+
+
+/*
+==================================================
+SECOND CORRECTION
+==================================================
+*/
+
+function SR28_secondCorrection(
+  x,
+  side,
+  feature
+) {
+  const fit =
+    SR28_SECOND_FITS.get(
+      feature
+    );
+
+
+  if (
+    !fit
+  ) {
+    return 0;
+  }
+
+
+  const features =
+    SR27_candidateFeatures(
+      x,
+      side
+    );
+
+
+  const value =
+    SR28_num(
+      features?.[
+        feature
+      ]
+    );
+
+
+  if (
+    value === null
+  ) {
+    return 0;
+  }
+
+
+  return (
+    fit.beta *
+    (
+      value -
+      fit.meanX
+    )
+  );
+}
+
+
+/*
+==================================================
+GENERATE GAME ROWS
+==================================================
+*/
+
+function SR28_rows(
+  secondFeature = null
+) {
+  const rows = [];
+
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+
+    const base =
+      SR21_MODEL(
+        g
+      );
+
+
+    if (
+      !base ||
+      !Number.isFinite(
+        base.away
+      ) ||
+      !Number.isFinite(
+        base.home
+      )
+    ) {
+      continue;
+    }
+
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+
+    const x =
+      v06Map.get(
+        g.gameId
+      );
+
+
+    if (
+      !x
+    ) {
+      continue;
+    }
+
+
+    const common =
+      SR28_leagueCorrection(
+        x
+      );
+
+
+    let away =
+      base.away +
+      common;
+
+
+    let home =
+      base.home +
+      common;
+
+
+    if (
+      secondFeature
+    ) {
+      away +=
+        SR28_secondCorrection(
+          x,
+          "AWAY",
+          secondFeature
+        );
+
+
+      home +=
+        SR28_secondCorrection(
+          x,
+          "HOME",
+          secondFeature
+        );
+    }
+
+
+    rows.push({
+      split,
+
+      date:
+        g.date,
+
+      gameId:
+        g.gameId,
+
+      away,
+      home,
+
+      actualAway,
+      actualHome,
+    });
+  }
+
+
+  return rows;
+}
+
+
+/*
+==================================================
+STAT
+==================================================
+*/
+
+function SR28_stat(
+  rows
+) {
+  let team = 0;
+  let total = 0;
+  let diff = 0;
+
+  let winnerN = 0;
+  let winnerHit = 0;
+
+
+  for (
+    const row
+    of rows
+  ) {
+    team +=
+      (
+        Math.abs(
+          row.away -
+          row.actualAway
+        ) +
+        Math.abs(
+          row.home -
+          row.actualHome
+        )
+      ) / 2;
+
+
+    total +=
+      Math.abs(
+        (
+          row.away +
+          row.home
+        ) -
+        (
+          row.actualAway +
+          row.actualHome
+        )
+      );
+
+
+    const predDiff =
+      row.away -
+      row.home;
+
+
+    const actualDiff =
+      row.actualAway -
+      row.actualHome;
+
+
+    diff +=
+      Math.abs(
+        predDiff -
+        actualDiff
+      );
+
+
+    if (
+      predDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerN++;
+
+
+      if (
+        Math.sign(
+          predDiff
+        ) ===
+        Math.sign(
+          actualDiff
+        )
+      ) {
+        winnerHit++;
+      }
+    }
+  }
+
+
+  return {
+    n:
+      rows.length,
+
+    team:
+      team /
+      rows.length,
+
+    total:
+      total /
+      rows.length,
+
+    diff:
+      diff /
+      rows.length,
+
+    winner:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null,
+  };
+}
+
+
+function SR28_print(
+  name,
+  rows
+) {
+  const stat =
+    SR28_stat(
+      rows
+    );
+
+
+  console.log(
+    `${name} ` +
+    `N=${stat.n} ` +
+    `TEAM=${stat.team.toFixed(6)} ` +
+    `TOTAL=${stat.total.toFixed(6)} ` +
+    `DIFF=${stat.diff.toFixed(6)} ` +
+    `W=${
+      stat.winner === null
+        ? "NA"
+        : (
+            stat.winner *
+            100
+          ).toFixed(2) +
+          "%"
+    }`
+  );
+}
+
+
+/*
+==================================================
+BASE ROUND7
+==================================================
+*/
+
+function SR28_baseRows() {
+  const rows = [];
+
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+
+    const p =
+      SR21_MODEL(
+        g
+      );
+
+
+    if (
+      !p ||
+      !Number.isFinite(
+        p.away
+      ) ||
+      !Number.isFinite(
+        p.home
+      )
+    ) {
+      continue;
+    }
+
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+
+    rows.push({
+      split,
+
+      date:
+        g.date,
+
+      away:
+        p.away,
+
+      home:
+        p.home,
+
+      actualAway,
+      actualHome,
+    });
+  }
+
+
+  return rows;
+}
+
+
+const SR28_BASE =
+  SR28_baseRows();
+
+
+const SR28_LEAGUE =
+  SR28_rows(
+    null
+  );
+
+
+console.log();
+console.log(
+  "===== SR28 BASE VS LEAGUE ====="
+);
+
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `--- ${split} ---`
+  );
+
+
+  SR28_print(
+    "ROUND7",
+    SR28_BASE.filter(
+      row =>
+        row.split ===
+          split
+    )
+  );
+
+
+  SR28_print(
+    "LEAGUE_D1",
+    SR28_LEAGUE.filter(
+      row =>
+        row.split ===
+          split
+    )
+  );
+}
+
+
+/*
+==================================================
+SECOND-STAGE RESULTS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR28 SECOND-STAGE RESULTS ====="
+);
+
+
+const SR28_RESULTS = [];
+
+
+for (
+  const feature
+  of SR28_SECOND_FEATURES
+) {
+  const rows =
+    SR28_rows(
+      feature
+    );
+
+
+  console.log();
+  console.log(
+    `--- LEAGUE_D1 + ${feature} ---`
+  );
+
+
+  const dRows =
+    rows.filter(
+      row =>
+        row.split ===
+          "DISCOVERY"
+    );
+
+
+  const iRows =
+    rows.filter(
+      row =>
+        row.split ===
+          "INTERNAL"
+    );
+
+
+  const leagueD =
+    SR28_stat(
+      SR28_LEAGUE.filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+    );
+
+
+  const leagueI =
+    SR28_stat(
+      SR28_LEAGUE.filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      )
+    );
+
+
+  const d =
+    SR28_stat(
+      dRows
+    );
+
+
+  const i =
+    SR28_stat(
+      iRows
+    );
+
+
+  SR28_print(
+    "DISCOVERY",
+    dRows
+  );
+
+
+  SR28_print(
+    "INTERNAL",
+    iRows
+  );
+
+
+  console.log(
+    "DELTA_VS_LEAGUE",
+    `D_TEAM=${(
+      d.team -
+      leagueD.team
+    ).toFixed(6)}`,
+    `I_TEAM=${(
+      i.team -
+      leagueI.team
+    ).toFixed(6)}`,
+    `D_TOTAL=${(
+      d.total -
+      leagueD.total
+    ).toFixed(6)}`,
+    `I_TOTAL=${(
+      i.total -
+      leagueI.total
+    ).toFixed(6)}`,
+    `D_DIFF=${(
+      d.diff -
+      leagueD.diff
+    ).toFixed(6)}`,
+    `I_DIFF=${(
+      i.diff -
+      leagueI.diff
+    ).toFixed(6)}`
+  );
+
+
+  SR28_RESULTS.push({
+    feature,
+
+    dTeam:
+      d.team,
+
+    iTeam:
+      i.team,
+
+    avgTeam:
+      (
+        d.team +
+        i.team
+      ) / 2,
+
+    dDelta:
+      d.team -
+      leagueD.team,
+
+    iDelta:
+      i.team -
+      leagueI.team,
+
+    dTotalDelta:
+      d.total -
+      leagueD.total,
+
+    iTotalDelta:
+      i.total -
+      leagueI.total,
+
+    dDiffDelta:
+      d.diff -
+      leagueD.diff,
+
+    iDiffDelta:
+      i.diff -
+      leagueI.diff,
+  });
+}
+
+
+/*
+==================================================
+RANKING
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR28 RANKING ====="
+);
+
+
+SR28_RESULTS
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      a.avgTeam -
+      b.avgTeam
+  )
+  .forEach(
+    (
+      row,
+      index
+    ) => {
+      console.log(
+        `${index + 1}.`,
+        `LEAGUE_D1 + ${row.feature}`,
+        `AVG_TEAM=${row.avgTeam.toFixed(6)}`,
+        `DΔ=${row.dDelta.toFixed(6)}`,
+        `IΔ=${row.iDelta.toFixed(6)}`,
+        `ROBUST=${
+          row.dDelta < 0 &&
+          row.iDelta < 0
+            ? "YES"
+            : "NO"
+        }`
+      );
+    }
+  );
+
+
+/*
+==================================================
+MONTHLY ROBUST ONLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR28 ROBUST MONTHLY ====="
+);
+
+
+for (
+  const result
+  of SR28_RESULTS.filter(
+    row =>
+      row.dDelta < 0 &&
+      row.iDelta < 0
+  )
+) {
+  console.log();
+  console.log(
+    `--- LEAGUE_D1 + ${result.feature} ---`
+  );
+
+
+  const rows =
+    SR28_rows(
+      result.feature
+    );
+
+
+  for (
+    const month
+    of [
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+    ]
+  ) {
+    SR28_print(
+      month,
+      rows.filter(
+        row =>
+          String(
+            row.date
+          ).slice(
+            0,
+            7
+          ) === month
+      )
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND28 MODEL CHANGE: TEST ONLY"
+);
+
+console.log(
+  "SCORE ROUND28 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 29
+OWN_SEASON_RUNS MARGIN CONTROL
+
+BASE:
+  Round7
+  + LEAGUE_D1
+  + OWN_SEASON_RUNS
+
+Problem from Round28:
+  TEAM MAE improved
+  TOTAL improved
+  winner accuracy declined
+
+Idea:
+  decompose OWN_SEASON correction into:
+
+  common correction
+    -> total movement
+
+  differential correction
+    -> margin movement
+
+Test fixed margin multipliers:
+  0.00
+  0.25
+  0.50
+  0.75
+  1.00
+
+Discovery fit only.
+Internal validation.
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND29 — MARGIN CONTROL"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR29_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+/*
+==================================================
+FEATURES
+==================================================
+*/
+
+function SR29_features(
+  x,
+  side
+) {
+  const own =
+    side === "AWAY"
+      ? x?.awayTeamForm
+      : x?.homeTeamForm;
+
+  return {
+    league:
+      SR29_num(
+        x?.environment
+          ?.leagueRunsPerTeamD1
+      ),
+
+    seasonRuns:
+      SR29_num(
+        own?.seasonAvgRuns
+      ),
+  };
+}
+
+
+/*
+==================================================
+BUILD DISCOVERY TEAM OBS
+==================================================
+*/
+
+const SR29_DISC_TEAM = [];
+
+
+for (
+  const g
+  of games
+) {
+  if (
+    splitOf(g) !==
+      "DISCOVERY"
+  ) {
+    continue;
+  }
+
+  const pred =
+    SR21_MODEL(g);
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (
+    !pred ||
+    !x
+  ) {
+    continue;
+  }
+
+  const actualAway =
+    Number(
+      g.awayScore
+    );
+
+  const actualHome =
+    Number(
+      g.homeScore
+    );
+
+  if (
+    !Number.isFinite(actualAway) ||
+    !Number.isFinite(actualHome)
+  ) {
+    continue;
+  }
+
+
+  const af =
+    SR29_features(
+      x,
+      "AWAY"
+    );
+
+  const hf =
+    SR29_features(
+      x,
+      "HOME"
+    );
+
+
+  SR29_DISC_TEAM.push({
+    predicted:
+      pred.away,
+
+    actual:
+      actualAway,
+
+    league:
+      af.league,
+
+    seasonRuns:
+      af.seasonRuns,
+  });
+
+
+  SR29_DISC_TEAM.push({
+    predicted:
+      pred.home,
+
+    actual:
+      actualHome,
+
+    league:
+      hf.league,
+
+    seasonRuns:
+      hf.seasonRuns,
+  });
+}
+
+
+/*
+==================================================
+GENERIC CENTERED FIT
+
+residual = beta * (x - meanX)
+
+No intercept.
+Round24 global bias already failed.
+==================================================
+*/
+
+function SR29_fit(
+  rows,
+  key,
+  residualFn
+) {
+  const clean =
+    rows
+      .map(
+        row => ({
+          x:
+            SR29_num(
+              row[key]
+            ),
+
+          y:
+            residualFn(
+              row
+            ),
+        })
+      )
+      .filter(
+        row =>
+          row.x !== null &&
+          Number.isFinite(
+            row.y
+          )
+      );
+
+
+  const n =
+    clean.length;
+
+
+  const meanX =
+    clean.reduce(
+      (sum, row) =>
+        sum + row.x,
+      0
+    ) / n;
+
+
+  let cov = 0;
+  let variance = 0;
+
+
+  for (
+    const row
+    of clean
+  ) {
+    const dx =
+      row.x -
+      meanX;
+
+    cov +=
+      dx *
+      row.y;
+
+    variance +=
+      dx *
+      dx;
+  }
+
+
+  return {
+    n,
+    meanX,
+
+    beta:
+      variance > 0
+        ? cov /
+          variance
+        : 0,
+  };
+}
+
+
+/*
+==================================================
+STAGE 1 — LEAGUE
+==================================================
+*/
+
+const SR29_LEAGUE_FIT =
+  SR29_fit(
+    SR29_DISC_TEAM,
+    "league",
+    row =>
+      row.actual -
+      row.predicted
+  );
+
+
+function SR29_leagueCorrection(
+  feature
+) {
+  if (
+    feature === null
+  ) {
+    return 0;
+  }
+
+  return (
+    SR29_LEAGUE_FIT.beta *
+    (
+      feature -
+      SR29_LEAGUE_FIT.meanX
+    )
+  );
+}
+
+
+/*
+==================================================
+STAGE 2 — OWN SEASON RUNS
+Fit residual AFTER league correction.
+==================================================
+*/
+
+const SR29_SEASON_FIT =
+  SR29_fit(
+    SR29_DISC_TEAM,
+    "seasonRuns",
+    row => {
+      const leagueCorr =
+        SR29_leagueCorrection(
+          row.league
+        );
+
+      return (
+        row.actual -
+        (
+          row.predicted +
+          leagueCorr
+        )
+      );
+    }
+  );
+
+
+function SR29_seasonCorrection(
+  feature
+) {
+  if (
+    feature === null
+  ) {
+    return 0;
+  }
+
+  return (
+    SR29_SEASON_FIT.beta *
+    (
+      feature -
+      SR29_SEASON_FIT.meanX
+    )
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR29 FITS ====="
+);
+
+console.log(
+  "LEAGUE:",
+  SR29_LEAGUE_FIT
+);
+
+console.log(
+  "OWN_SEASON:",
+  SR29_SEASON_FIT
+);
+
+
+/*
+==================================================
+PREDICT
+
+Season correction decomposition:
+
+awayRaw = season correction away
+homeRaw = season correction home
+
+common =
+  (awayRaw + homeRaw) / 2
+
+differential =
+  (awayRaw - homeRaw) / 2
+
+away =
+  leagueAway
+  + common
+  + differential * marginFactor
+
+home =
+  leagueHome
+  + common
+  - differential * marginFactor
+==================================================
+*/
+
+function SR29_predict(
+  g,
+  marginFactor
+) {
+  const base =
+    SR21_MODEL(g);
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (
+    !base ||
+    !x
+  ) {
+    return null;
+  }
+
+
+  const af =
+    SR29_features(
+      x,
+      "AWAY"
+    );
+
+  const hf =
+    SR29_features(
+      x,
+      "HOME"
+    );
+
+
+  const awayLeague =
+    SR29_leagueCorrection(
+      af.league
+    );
+
+  const homeLeague =
+    SR29_leagueCorrection(
+      hf.league
+    );
+
+
+  const awaySeason =
+    SR29_seasonCorrection(
+      af.seasonRuns
+    );
+
+  const homeSeason =
+    SR29_seasonCorrection(
+      hf.seasonRuns
+    );
+
+
+  const common =
+    (
+      awaySeason +
+      homeSeason
+    ) / 2;
+
+
+  const differential =
+    (
+      awaySeason -
+      homeSeason
+    ) / 2;
+
+
+  return {
+    away:
+      base.away +
+      awayLeague +
+      common +
+      differential *
+        marginFactor,
+
+    home:
+      base.home +
+      homeLeague +
+      common -
+      differential *
+        marginFactor,
+  };
+}
+
+
+/*
+==================================================
+EVALUATION
+==================================================
+*/
+
+function SR29_eval(
+  marginFactor,
+  split
+) {
+  let n = 0;
+
+  let team = 0;
+  let total = 0;
+  let diff = 0;
+
+  let winnerN = 0;
+  let winnerHit = 0;
+
+
+  for (
+    const g
+    of games
+  ) {
+    if (
+      splitOf(g) !== split
+    ) {
+      continue;
+    }
+
+
+    const p =
+      SR29_predict(
+        g,
+        marginFactor
+      );
+
+
+    if (!p) {
+      continue;
+    }
+
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+
+    if (
+      !Number.isFinite(actualAway) ||
+      !Number.isFinite(actualHome)
+    ) {
+      continue;
+    }
+
+
+    team +=
+      (
+        Math.abs(
+          p.away -
+          actualAway
+        ) +
+        Math.abs(
+          p.home -
+          actualHome
+        )
+      ) / 2;
+
+
+    total +=
+      Math.abs(
+        (
+          p.away +
+          p.home
+        ) -
+        (
+          actualAway +
+          actualHome
+        )
+      );
+
+
+    const predictedDiff =
+      p.away -
+      p.home;
+
+    const actualDiff =
+      actualAway -
+      actualHome;
+
+
+    diff +=
+      Math.abs(
+        predictedDiff -
+        actualDiff
+      );
+
+
+    if (
+      predictedDiff !== 0 &&
+      actualDiff !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(
+          predictedDiff
+        ) ===
+        Math.sign(
+          actualDiff
+        )
+      ) {
+        winnerHit++;
+      }
+    }
+
+
+    n++;
+  }
+
+
+  return {
+    n,
+
+    team:
+      team / n,
+
+    total:
+      total / n,
+
+    diff:
+      diff / n,
+
+    winner:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null,
+  };
+}
+
+
+function SR29_print(
+  name,
+  stat
+) {
+  console.log(
+    `${name} ` +
+    `N=${stat.n} ` +
+    `TEAM=${stat.team.toFixed(6)} ` +
+    `TOTAL=${stat.total.toFixed(6)} ` +
+    `DIFF=${stat.diff.toFixed(6)} ` +
+    `W=${(
+      stat.winner *
+      100
+    ).toFixed(2)}%`
+  );
+}
+
+
+/*
+==================================================
+ROUND7 REFERENCE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR29 ROUND7 REFERENCE ====="
+);
+
+console.log(
+  "DISCOVERY TEAM=2.364614 TOTAL=3.289028 DIFF=3.543186 W=57.28%"
+);
+
+console.log(
+  "INTERNAL TEAM=2.562956 TOTAL=3.619940 DIFF=3.690390 W=61.38%"
+);
+
+
+/*
+==================================================
+MARGIN FACTOR RESULTS
+==================================================
+*/
+
+const SR29_FACTORS = [
+  0.00,
+  0.25,
+  0.50,
+  0.75,
+  1.00,
+];
+
+
+const SR29_RESULTS = [];
+
+
+console.log();
+console.log(
+  "===== SR29 RESULTS ====="
+);
+
+
+for (
+  const factor
+  of SR29_FACTORS
+) {
+  console.log();
+  console.log(
+    `--- MARGIN_FACTOR=${factor.toFixed(2)} ---`
+  );
+
+
+  const d =
+    SR29_eval(
+      factor,
+      "DISCOVERY"
+    );
+
+
+  const i =
+    SR29_eval(
+      factor,
+      "INTERNAL"
+    );
+
+
+  SR29_print(
+    "DISCOVERY",
+    d
+  );
+
+  SR29_print(
+    "INTERNAL",
+    i
+  );
+
+
+  SR29_RESULTS.push({
+    factor,
+    d,
+    i,
+
+    avgTeam:
+      (
+        d.team +
+        i.team
+      ) / 2,
+
+    avgTotal:
+      (
+        d.total +
+        i.total
+      ) / 2,
+
+    avgDiff:
+      (
+        d.diff +
+        i.diff
+      ) / 2,
+
+    avgWinner:
+      (
+        d.winner +
+        i.winner
+      ) / 2,
+  });
+}
+
+
+/*
+==================================================
+RANKING BY TEAM MAE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR29 TEAM MAE RANKING ====="
+);
+
+
+[
+  ...SR29_RESULTS
+]
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      a.avgTeam -
+      b.avgTeam
+  )
+  .forEach(
+    (
+      row,
+      index
+    ) => {
+      console.log(
+        `${index + 1}.`,
+        `FACTOR=${row.factor.toFixed(2)}`,
+        `AVG_TEAM=${row.avgTeam.toFixed(6)}`,
+        `AVG_TOTAL=${row.avgTotal.toFixed(6)}`,
+        `AVG_DIFF=${row.avgDiff.toFixed(6)}`,
+        `AVG_W=${(
+          row.avgWinner *
+          100
+        ).toFixed(2)}%`
+      );
+    }
+  );
+
+
+/*
+==================================================
+MONTHLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR29 MONTHLY ====="
+);
+
+
+function SR29_monthEval(
+  marginFactor,
+  month
+) {
+  let n = 0;
+  let team = 0;
+  let total = 0;
+  let diff = 0;
+  let winnerN = 0;
+  let winnerHit = 0;
+
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(g);
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+
+    if (
+      String(
+        g.date
+      ).slice(
+        0,
+        7
+      ) !== month
+    ) {
+      continue;
+    }
+
+
+    const p =
+      SR29_predict(
+        g,
+        marginFactor
+      );
+
+
+    if (!p) {
+      continue;
+    }
+
+
+    const a =
+      Number(
+        g.awayScore
+      );
+
+    const h =
+      Number(
+        g.homeScore
+      );
+
+
+    if (
+      !Number.isFinite(a) ||
+      !Number.isFinite(h)
+    ) {
+      continue;
+    }
+
+
+    team +=
+      (
+        Math.abs(
+          p.away -
+          a
+        ) +
+        Math.abs(
+          p.home -
+          h
+        )
+      ) / 2;
+
+
+    total +=
+      Math.abs(
+        p.away +
+        p.home -
+        a -
+        h
+      );
+
+
+    const pd =
+      p.away -
+      p.home;
+
+    const ad =
+      a -
+      h;
+
+
+    diff +=
+      Math.abs(
+        pd -
+        ad
+      );
+
+
+    if (
+      pd !== 0 &&
+      ad !== 0
+    ) {
+      winnerN++;
+
+      if (
+        Math.sign(pd) ===
+        Math.sign(ad)
+      ) {
+        winnerHit++;
+      }
+    }
+
+
+    n++;
+  }
+
+
+  return {
+    n,
+
+    team:
+      team / n,
+
+    total:
+      total / n,
+
+    diff:
+      diff / n,
+
+    winner:
+      winnerN
+        ? winnerHit /
+          winnerN
+        : null,
+  };
+}
+
+
+for (
+  const factor
+  of SR29_FACTORS
+) {
+  console.log();
+  console.log(
+    `--- FACTOR ${factor.toFixed(2)} ---`
+  );
+
+
+  for (
+    const month
+    of [
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+    ]
+  ) {
+    SR29_print(
+      month,
+      SR29_monthEval(
+        factor,
+        month
+      )
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND29 MODEL CHANGE: TEST ONLY"
+);
+
+console.log(
+  "SCORE ROUND29 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE MODEL ROUND 30
+V0.8 CANDIDATE A STABILITY
+
+Candidate A:
+  Frozen Round7
+  + LEAGUE_D1 correction
+  + OWN_SEASON_RUNS common-only correction
+  + margin factor 0.00
+
+Important:
+  OWN_SEASON_RUNS changes TOTAL only.
+  It does NOT change predicted margin.
+
+Compare:
+  ROUND7
+  LEAGUE_D1
+  V0.8 CANDIDATE A
+
+Metrics:
+  TEAM MAE
+  TOTAL MAE
+  DIFF MAE
+  Winner accuracy
+  team score ±1
+  team score ±2
+  large-error rate
+  monthly
+  two-month windows
+
+NO NEW FIT.
+NO TUNING.
+NO FINAL/AUDIT.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND30 — V0.8 CANDIDATE A STABILITY"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR30_num(
+  value
+) {
+  const n =
+    Number(
+      value
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+/*
+==================================================
+PREDICTORS
+==================================================
+*/
+
+function SR30_predictRound7(
+  g
+) {
+  return SR21_MODEL(
+    g
+  );
+}
+
+
+function SR30_predictLeague(
+  g
+) {
+  const base =
+    SR21_MODEL(
+      g
+    );
+
+  const x =
+    v06Map.get(
+      g.gameId
+    );
+
+  if (
+    !base ||
+    !x
+  ) {
+    return null;
+  }
+
+  const corr =
+    SR29_leagueCorrection(
+      SR30_num(
+        x.environment
+          ?.leagueRunsPerTeamD1
+      )
+    );
+
+  return {
+    away:
+      base.away +
+      corr,
+
+    home:
+      base.home +
+      corr,
+  };
+}
+
+
+function SR30_predictCandidate(
+  g
+) {
+  return SR29_predict(
+    g,
+    0.00
+  );
+}
+
+
+const SR30_MODELS = [
+  {
+    name:
+      "ROUND7",
+
+    predict:
+      SR30_predictRound7,
+  },
+
+  {
+    name:
+      "LEAGUE_D1",
+
+    predict:
+      SR30_predictLeague,
+  },
+
+  {
+    name:
+      "V08_CANDIDATE_A",
+
+    predict:
+      SR30_predictCandidate,
+  },
+];
+
+
+/*
+==================================================
+BUILD GAME ROWS
+==================================================
+*/
+
+function SR30_rows(
+  predict
+) {
+  const rows =
+    [];
+
+  for (
+    const g
+    of games
+  ) {
+    const split =
+      splitOf(
+        g
+      );
+
+    if (
+      split !== "DISCOVERY" &&
+      split !== "INTERNAL"
+    ) {
+      continue;
+    }
+
+    const p =
+      predict(
+        g
+      );
+
+    if (
+      !p ||
+      !Number.isFinite(
+        p.away
+      ) ||
+      !Number.isFinite(
+        p.home
+      )
+    ) {
+      continue;
+    }
+
+    const actualAway =
+      Number(
+        g.awayScore
+      );
+
+    const actualHome =
+      Number(
+        g.homeScore
+      );
+
+    if (
+      !Number.isFinite(
+        actualAway
+      ) ||
+      !Number.isFinite(
+        actualHome
+      )
+    ) {
+      continue;
+    }
+
+    const awayErr =
+      Math.abs(
+        p.away -
+        actualAway
+      );
+
+    const homeErr =
+      Math.abs(
+        p.home -
+        actualHome
+      );
+
+    const predDiff =
+      p.away -
+      p.home;
+
+    const actualDiff =
+      actualAway -
+      actualHome;
+
+    rows.push({
+      split,
+
+      date:
+        g.date,
+
+      gameId:
+        g.gameId,
+
+      awayTeam:
+        g.awayTeam,
+
+      homeTeam:
+        g.homeTeam,
+
+      predAway:
+        p.away,
+
+      predHome:
+        p.home,
+
+      actualAway,
+      actualHome,
+
+      awayErr,
+      homeErr,
+
+      teamErr:
+        (
+          awayErr +
+          homeErr
+        ) / 2,
+
+      totalErr:
+        Math.abs(
+          (
+            p.away +
+            p.home
+          ) -
+          (
+            actualAway +
+            actualHome
+          )
+        ),
+
+      diffErr:
+        Math.abs(
+          predDiff -
+          actualDiff
+        ),
+
+      winnerHit:
+        (
+          predDiff !== 0 &&
+          actualDiff !== 0
+        )
+          ? (
+              Math.sign(
+                predDiff
+              ) ===
+              Math.sign(
+                actualDiff
+              )
+            )
+          : null,
+    });
+  }
+
+  return rows;
+}
+
+
+/*
+==================================================
+STAT
+==================================================
+*/
+
+function SR30_stat(
+  rows
+) {
+  if (
+    !rows.length
+  ) {
+    return null;
+  }
+
+  const n =
+    rows.length;
+
+  const teamScores =
+    rows.flatMap(
+      row => [
+        row.awayErr,
+        row.homeErr,
+      ]
+    );
+
+  const winnerRows =
+    rows.filter(
+      row =>
+        row.winnerHit !== null
+    );
+
+  const mean =
+    key =>
+      rows.reduce(
+        (
+          sum,
+          row
+        ) =>
+          sum +
+          row[key],
+        0
+      ) / n;
+
+  return {
+    n,
+
+    team:
+      mean(
+        "teamErr"
+      ),
+
+    total:
+      mean(
+        "totalErr"
+      ),
+
+    diff:
+      mean(
+        "diffErr"
+      ),
+
+    winner:
+      winnerRows.length
+        ? (
+            winnerRows.filter(
+              row =>
+                row.winnerHit
+            ).length /
+            winnerRows.length
+          )
+        : null,
+
+    within1:
+      teamScores.filter(
+        err =>
+          err <= 1
+      ).length /
+      teamScores.length,
+
+    within2:
+      teamScores.filter(
+        err =>
+          err <= 2
+      ).length /
+      teamScores.length,
+
+    err4plus:
+      teamScores.filter(
+        err =>
+          err >= 4
+      ).length /
+      teamScores.length,
+
+    err6plus:
+      teamScores.filter(
+        err =>
+          err >= 6
+      ).length /
+      teamScores.length,
+  };
+}
+
+
+function SR30_print(
+  name,
+  rows
+) {
+  const s =
+    SR30_stat(
+      rows
+    );
+
+  if (!s) {
+    console.log(
+      `${name} N=0`
+    );
+
+    return;
+  }
+
+  console.log(
+    `${name} ` +
+    `N=${s.n} ` +
+    `TEAM=${s.team.toFixed(6)} ` +
+    `TOTAL=${s.total.toFixed(6)} ` +
+    `DIFF=${s.diff.toFixed(6)} ` +
+    `W=${(
+      s.winner *
+      100
+    ).toFixed(2)}% ` +
+    `±1=${(
+      s.within1 *
+      100
+    ).toFixed(1)}% ` +
+    `±2=${(
+      s.within2 *
+      100
+    ).toFixed(1)}% ` +
+    `ERR4+=${(
+      s.err4plus *
+      100
+    ).toFixed(1)}% ` +
+    `ERR6+=${(
+      s.err6plus *
+      100
+    ).toFixed(1)}%`
+  );
+}
+
+
+/*
+==================================================
+CACHE
+==================================================
+*/
+
+const SR30_DATA =
+  new Map();
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  SR30_DATA.set(
+    model.name,
+    SR30_rows(
+      model.predict
+    )
+  );
+}
+
+
+/*
+==================================================
+DISCOVERY / INTERNAL
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 DISCOVERY / INTERNAL ====="
+);
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  console.log();
+  console.log(
+    `--- ${model.name} ---`
+  );
+
+  const rows =
+    SR30_DATA.get(
+      model.name
+    );
+
+  SR30_print(
+    "DISCOVERY",
+    rows.filter(
+      row =>
+        row.split ===
+          "DISCOVERY"
+    )
+  );
+
+  SR30_print(
+    "INTERNAL",
+    rows.filter(
+      row =>
+        row.split ===
+          "INTERNAL"
+    )
+  );
+}
+
+
+/*
+==================================================
+D/I AVERAGE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 D/I AVERAGE ====="
+);
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  const rows =
+    SR30_DATA.get(
+      model.name
+    );
+
+  const d =
+    SR30_stat(
+      rows.filter(
+        row =>
+          row.split ===
+            "DISCOVERY"
+      )
+    );
+
+  const i =
+    SR30_stat(
+      rows.filter(
+        row =>
+          row.split ===
+            "INTERNAL"
+      )
+    );
+
+  console.log(
+    model.name,
+    `AVG_TEAM=${(
+      (
+        d.team +
+        i.team
+      ) / 2
+    ).toFixed(6)}`,
+    `AVG_TOTAL=${(
+      (
+        d.total +
+        i.total
+      ) / 2
+    ).toFixed(6)}`,
+    `AVG_DIFF=${(
+      (
+        d.diff +
+        i.diff
+      ) / 2
+    ).toFixed(6)}`,
+    `AVG_W=${(
+      (
+        d.winner +
+        i.winner
+      ) /
+      2 *
+      100
+    ).toFixed(2)}%`
+  );
+}
+
+
+/*
+==================================================
+MONTHLY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 MONTHLY ====="
+);
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  console.log();
+  console.log(
+    `--- ${model.name} ---`
+  );
+
+  const rows =
+    SR30_DATA.get(
+      model.name
+    );
+
+  for (
+    const month
+    of [
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+    ]
+  ) {
+    SR30_print(
+      month,
+      rows.filter(
+        row =>
+          String(
+            row.date
+          ).slice(
+            0,
+            7
+          ) === month
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+TWO-MONTH WINDOWS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 TWO-MONTH WINDOWS ====="
+);
+
+const SR30_WINDOWS = [
+  {
+    name:
+      "MAR_APR",
+
+    months: [
+      "2026-03",
+      "2026-04",
+    ],
+  },
+
+  {
+    name:
+      "APR_MAY",
+
+    months: [
+      "2026-04",
+      "2026-05",
+    ],
+  },
+
+  {
+    name:
+      "MAY_JUN",
+
+    months: [
+      "2026-05",
+      "2026-06",
+    ],
+  },
+];
+
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  console.log();
+  console.log(
+    `--- ${model.name} ---`
+  );
+
+  const rows =
+    SR30_DATA.get(
+      model.name
+    );
+
+  for (
+    const window
+    of SR30_WINDOWS
+  ) {
+    SR30_print(
+      window.name,
+      rows.filter(
+        row =>
+          window.months.includes(
+            String(
+              row.date
+            ).slice(
+              0,
+              7
+            )
+          )
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+TAIL COMPARISON
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 LARGE ERROR COUNTS ====="
+);
+
+for (
+  const model
+  of SR30_MODELS
+) {
+  const rows =
+    SR30_DATA.get(
+      model.name
+    );
+
+  const scores =
+    rows.flatMap(
+      row => [
+        row.awayErr,
+        row.homeErr,
+      ]
+    );
+
+  console.log(
+    model.name,
+    `TEAM_SCORES=${scores.length}`,
+    `ERR>=4=${
+      scores.filter(
+        e =>
+          e >= 4
+      ).length
+    }`,
+    `ERR>=6=${
+      scores.filter(
+        e =>
+          e >= 6
+      ).length
+    }`,
+    `ERR>=8=${
+      scores.filter(
+        e =>
+          e >= 8
+      ).length
+    }`
+  );
+}
+
+
+/*
+==================================================
+WORST 15 CANDIDATE A
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR30 CANDIDATE A WORST 15 ====="
+);
+
+[
+  ...SR30_DATA.get(
+    "V08_CANDIDATE_A"
+  )
+]
+  .sort(
+    (
+      a,
+      b
+    ) =>
+      b.teamErr -
+      a.teamErr
+  )
+  .slice(
+    0,
+    15
+  )
+  .forEach(
+    row => {
+      console.log(
+        row.split,
+        row.date,
+        row.gameId,
+        `${row.awayTeam}@${row.homeTeam}`,
+        `PRED=${row.predAway.toFixed(1)}:${row.predHome.toFixed(1)}`,
+        `ACTUAL=${row.actualAway}:${row.actualHome}`,
+        `TEAM_ERR=${row.teamErr.toFixed(3)}`
+      );
+    }
+  );
+
+
+console.log();
+console.log(
+  "SCORE ROUND30 CANDIDATE: V0.8 A"
+);
+
+console.log(
+  "SCORE ROUND30 PRODUCTION CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND30 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE ROUND32
+V0.8 A — MARKET DIRECTION DIAGNOSTIC
+
+MODEL:
+  FROZEN V0.8 CANDIDATE A
+
+NO SCORE MODEL CHANGE.
+NO COEFFICIENT TUNING.
+NO FINAL/AUDIT.
+
+Purpose:
+
+  projected scores
+      ↓
+  ML direction
+  HANDICAP direction
+  TOTAL direction
+
+Discovery / Internal only.
+
+EDGE:
+
+ML
+  abs(predicted away - predicted home)
+
+HANDICAP
+  predicted cover margin
+
+TOTAL
+  abs(predicted total - market total line)
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND32 — V0.8 MARKET DIRECTION"
+);
+console.log(
+  "=================================================="
+);
+
+
+const SR32_MODEL =
+  SR30_predictCandidate;
+
+
+const SR32_BT =
+  JSON.parse(
+    fs.readFileSync(
+      "data/kbo-backtest-2026-all-candidates-lineup-base.json",
+      "utf8"
+    )
+  );
+
+
+const SR32_SOURCE =
+  Array.isArray(
+    SR32_BT?.results
+  )
+    ? SR32_BT.results
+    : [];
+
+
+const SR32_BY_GAME =
+  new Map();
+
+
+for (
+  const row
+  of SR32_SOURCE
+) {
+  if (
+    !SR32_BY_GAME.has(
+      row.gameId
+    )
+  ) {
+    SR32_BY_GAME.set(
+      row.gameId,
+      []
+    );
+  }
+
+  SR32_BY_GAME
+    .get(
+      row.gameId
+    )
+    .push(
+      row
+    );
+}
+
+
+function SR32_num(
+  value
+) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const n =
+    Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+
+function SR32_line(
+  label
+) {
+  const m =
+    String(
+      label ?? ""
+    ).match(
+      /([+-]?\d+(?:\.\d+)?)/
+    );
+
+  return m
+    ? Number(m[1])
+    : null;
+}
+
+
+function SR32_side(
+  row,
+  g
+) {
+  const label =
+    String(
+      row?.label ?? ""
+    );
+
+  if (
+    label.includes(
+      String(g.awayTeam)
+    )
+  ) {
+    return "AWAY";
+  }
+
+  if (
+    label.includes(
+      String(g.homeTeam)
+    )
+  ) {
+    return "HOME";
+  }
+
+  return null;
+}
+
+
+function SR32_odds(
+  row
+) {
+  const n =
+    SR32_num(
+      row?.odds
+    );
+
+  return (
+    n !== null &&
+    n > 1
+  )
+    ? n
+    : null;
+}
+
+
+function SR32_profit(
+  hit,
+  odds
+) {
+  if (
+    hit === null ||
+    odds === null
+  ) {
+    return null;
+  }
+
+  return hit
+    ? odds - 1
+    : -1;
+}
+
+
+/*
+==================================================
+BUILD MARKET PICKS
+==================================================
+*/
+
+const SR32_ROWS =
+  [];
+
+
+for (
+  const g
+  of games
+) {
+  const split =
+    splitOf(g);
+
+  if (
+    split !== "DISCOVERY" &&
+    split !== "INTERNAL"
+  ) {
+    continue;
+  }
+
+
+  const pred =
+    SR32_MODEL(g);
+
+  if (!pred) {
+    continue;
+  }
+
+
+  const actualAway =
+    SR32_num(
+      g.awayScore
+    );
+
+  const actualHome =
+    SR32_num(
+      g.homeScore
+    );
+
+  if (
+    actualAway === null ||
+    actualHome === null
+  ) {
+    continue;
+  }
+
+
+  const source =
+    SR32_BY_GAME.get(
+      g.gameId
+    ) ?? [];
+
+
+  /*
+  ================================================
+  ML
+  ================================================
+  */
+
+  const mlRows =
+    source.filter(
+      row =>
+        row.market === "ML"
+    );
+
+
+  if (
+    mlRows.length
+  ) {
+    const predictedSide =
+      pred.away > pred.home
+        ? "AWAY"
+        : pred.home > pred.away
+          ? "HOME"
+          : null;
+
+
+    if (predictedSide) {
+      const selected =
+        mlRows.find(
+          row =>
+            SR32_side(
+              row,
+              g
+            ) ===
+            predictedSide
+        );
+
+
+      if (selected) {
+        const actualSide =
+          actualAway > actualHome
+            ? "AWAY"
+            : actualHome > actualAway
+              ? "HOME"
+              : null;
+
+        const hit =
+          actualSide === null
+            ? null
+            : actualSide ===
+              predictedSide;
+
+        const odds =
+          SR32_odds(
+            selected
+          );
+
+        SR32_ROWS.push({
+          split,
+          date:
+            String(g.date),
+          month:
+            String(g.date)
+              .slice(0, 7),
+          gameId:
+            g.gameId,
+          market:
+            "ML",
+          side:
+            predictedSide,
+          edge:
+            Math.abs(
+              pred.away -
+              pred.home
+            ),
+          hit,
+          odds,
+          profit:
+            SR32_profit(
+              hit,
+              odds
+            ),
+          predAway:
+            pred.away,
+          predHome:
+            pred.home,
+          actualAway,
+          actualHome,
+          label:
+            selected.label,
+        });
+      }
+    }
+  }
+
+
+  /*
+  ================================================
+  HANDICAP
+  ================================================
+
+  각 실제 핸디캡 row에 대해
+
+  AWAY:
+    predAway + line - predHome
+
+  HOME:
+    predHome + line - predAway
+
+  값이 가장 큰 side를 선택한다.
+  ================================================
+  */
+
+  const handicapRows =
+    source.filter(
+      row =>
+        row.market ===
+        "HANDICAP"
+    );
+
+
+  const handicapCandidates =
+    [];
+
+
+  for (
+    const row
+    of handicapRows
+  ) {
+    const side =
+      SR32_side(
+        row,
+        g
+      );
+
+    const line =
+      SR32_line(
+        row.label
+      );
+
+    if (
+      !side ||
+      line === null
+    ) {
+      continue;
+    }
+
+
+    const coverMargin =
+      side === "AWAY"
+        ? (
+            pred.away +
+            line -
+            pred.home
+          )
+        : (
+            pred.home +
+            line -
+            pred.away
+          );
+
+
+    handicapCandidates.push({
+      row,
+      side,
+      line,
+      coverMargin,
+    });
+  }
+
+
+  if (
+    handicapCandidates.length
+  ) {
+    handicapCandidates.sort(
+      (
+        a,
+        b
+      ) =>
+        b.coverMargin -
+        a.coverMargin
+    );
+
+
+    const best =
+      handicapCandidates[0];
+
+
+    if (
+      best.coverMargin > 0
+    ) {
+      const actualCover =
+        best.side === "AWAY"
+          ? (
+              actualAway +
+              best.line -
+              actualHome
+            )
+          : (
+              actualHome +
+              best.line -
+              actualAway
+            );
+
+
+      const hit =
+        actualCover === 0
+          ? null
+          : actualCover > 0;
+
+
+      const odds =
+        SR32_odds(
+          best.row
+        );
+
+
+      SR32_ROWS.push({
+        split,
+        date:
+          String(g.date),
+        month:
+          String(g.date)
+            .slice(0, 7),
+        gameId:
+          g.gameId,
+        market:
+          "HANDICAP",
+        side:
+          best.side,
+        line:
+          best.line,
+        edge:
+          best.coverMargin,
+        hit,
+        odds,
+        profit:
+          SR32_profit(
+            hit,
+            odds
+          ),
+        predAway:
+          pred.away,
+        predHome:
+          pred.home,
+        actualAway,
+        actualHome,
+        label:
+          best.row.label,
+      });
+    }
+  }
+
+
+  /*
+  ================================================
+  TOTAL
+  ================================================
+  */
+
+  const totalRows =
+    source.filter(
+      row =>
+        row.market ===
+        "TOTAL"
+    );
+
+
+  if (
+    totalRows.length
+  ) {
+    const firstWithLine =
+      totalRows.find(
+        row =>
+          SR32_line(
+            row.label
+          ) !== null
+      );
+
+
+    if (firstWithLine) {
+      const line =
+        SR32_line(
+          firstWithLine.label
+        );
+
+      const projectedTotal =
+        pred.away +
+        pred.home;
+
+      const actualTotal =
+        actualAway +
+        actualHome;
+
+
+      if (
+        line !== null &&
+        projectedTotal !== line
+      ) {
+        const predictedSide =
+          projectedTotal > line
+            ? "OVER"
+            : "UNDER";
+
+
+        const selected =
+          totalRows.find(
+            row => {
+              const label =
+                String(
+                  row.label ?? ""
+                );
+
+              return predictedSide ===
+                "OVER"
+                ? (
+                    label.includes(
+                      "오버"
+                    ) ||
+                    label
+                      .toUpperCase()
+                      .includes(
+                        "OVER"
+                      )
+                  )
+                : (
+                    label.includes(
+                      "언더"
+                    ) ||
+                    label
+                      .toUpperCase()
+                      .includes(
+                        "UNDER"
+                      )
+                  );
+            }
+          );
+
+
+        if (selected) {
+          const hit =
+            actualTotal === line
+              ? null
+              : predictedSide ===
+                "OVER"
+                ? actualTotal > line
+                : actualTotal < line;
+
+
+          const odds =
+            SR32_odds(
+              selected
+            );
+
+
+          SR32_ROWS.push({
+            split,
+            date:
+              String(g.date),
+            month:
+              String(g.date)
+                .slice(0, 7),
+            gameId:
+              g.gameId,
+            market:
+              "TOTAL",
+            side:
+              predictedSide,
+            line,
+            edge:
+              Math.abs(
+                projectedTotal -
+                line
+              ),
+            hit,
+            odds,
+            profit:
+              SR32_profit(
+                hit,
+                odds
+              ),
+            predAway:
+              pred.away,
+            predHome:
+              pred.home,
+            projectedTotal,
+            actualAway,
+            actualHome,
+            actualTotal,
+            label:
+              selected.label,
+          });
+        }
+      }
+    }
+  }
+}
+
+
+/*
+==================================================
+STATS
+==================================================
+*/
+
+function SR32_stat(
+  rows
+) {
+  const settled =
+    rows.filter(
+      row =>
+        row.hit !== null
+    );
+
+
+  const withProfit =
+    settled.filter(
+      row =>
+        row.profit !== null
+    );
+
+
+  const n =
+    settled.length;
+
+
+  const hits =
+    settled.filter(
+      row =>
+        row.hit
+    ).length;
+
+
+  const avgEdge =
+    n
+      ? settled.reduce(
+          (
+            sum,
+            row
+          ) =>
+            sum +
+            row.edge,
+          0
+        ) / n
+      : null;
+
+
+  const avgOdds =
+    withProfit.length
+      ? withProfit.reduce(
+          (
+            sum,
+            row
+          ) =>
+            sum +
+            row.odds,
+          0
+        ) /
+        withProfit.length
+      : null;
+
+
+  const profit =
+    withProfit.reduce(
+      (
+        sum,
+        row
+      ) =>
+        sum +
+        row.profit,
+      0
+    );
+
+
+  return {
+    n,
+    hits,
+    hitRate:
+      n
+        ? hits / n
+        : null,
+    avgEdge,
+    avgOdds,
+    roi:
+      withProfit.length
+        ? profit /
+          withProfit.length
+        : null,
+  };
+}
+
+
+function SR32_print(
+  name,
+  rows
+) {
+  const s =
+    SR32_stat(
+      rows
+    );
+
+  console.log(
+    name,
+    `N=${s.n}`,
+    `HIT=${
+      s.hitRate === null
+        ? "NA"
+        : (
+            s.hitRate *
+            100
+          ).toFixed(1) +
+          "%"
+    }`,
+    `EDGE=${
+      s.avgEdge === null
+        ? "NA"
+        : s.avgEdge.toFixed(3)
+    }`,
+    `ODDS=${
+      s.avgOdds === null
+        ? "NA"
+        : s.avgOdds.toFixed(3)
+    }`,
+    `ROI=${
+      s.roi === null
+        ? "NA"
+        : (
+            s.roi *
+            100
+          ).toFixed(1) +
+          "%"
+    }`
+  );
+}
+
+
+/*
+==================================================
+BASE MARKET ACCURACY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR32 BASE MARKET ACCURACY ====="
+);
+
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `--- ${split} ---`
+  );
+
+
+  for (
+    const market
+    of [
+      "ML",
+      "HANDICAP",
+      "TOTAL",
+    ]
+  ) {
+    SR32_print(
+      market,
+      SR32_ROWS.filter(
+        row =>
+          row.split === split &&
+          row.market === market
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+EDGE BUCKETS
+
+These are diagnostics.
+NOT frozen thresholds.
+==================================================
+*/
+
+const SR32_BUCKETS = [
+  {
+    name:
+      "0.00~0.49",
+    lo:
+      0,
+    hi:
+      0.50,
+  },
+  {
+    name:
+      "0.50~0.99",
+    lo:
+      0.50,
+    hi:
+      1.00,
+  },
+  {
+    name:
+      "1.00~1.49",
+    lo:
+      1.00,
+    hi:
+      1.50,
+  },
+  {
+    name:
+      "1.50~1.99",
+    lo:
+      1.50,
+    hi:
+      2.00,
+  },
+  {
+    name:
+      "2.00~2.49",
+    lo:
+      2.00,
+    hi:
+      2.50,
+  },
+  {
+    name:
+      "2.50+",
+    lo:
+      2.50,
+    hi:
+      Infinity,
+  },
+];
+
+
+console.log();
+console.log(
+  "===== SR32 EDGE BUCKETS ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    console.log(
+      `--- ${split} ---`
+    );
+
+
+    for (
+      const bucket
+      of SR32_BUCKETS
+    ) {
+      const rows =
+        SR32_ROWS.filter(
+          row =>
+            row.split === split &&
+            row.market === market &&
+            row.edge >=
+              bucket.lo &&
+            row.edge <
+              bucket.hi
+        );
+
+
+      SR32_print(
+        bucket.name,
+        rows
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+CUMULATIVE EDGE THRESHOLDS
+
+Still diagnostic only.
+==================================================
+*/
+
+const SR32_THRESHOLDS =
+  [
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+  ];
+
+
+console.log();
+console.log(
+  "===== SR32 CUMULATIVE EDGE ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    console.log(
+      `--- ${split} ---`
+    );
+
+
+    for (
+      const threshold
+      of SR32_THRESHOLDS
+    ) {
+      SR32_print(
+        `EDGE>=${threshold.toFixed(1)}`,
+        SR32_ROWS.filter(
+          row =>
+            row.split === split &&
+            row.market === market &&
+            row.edge >=
+              threshold
+        )
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+MONTHLY
+
+No thresholds.
+Pure direction stability.
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR32 MONTHLY BASE ====="
+);
+
+
+for (
+  const month
+  of [
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+  ]
+) {
+  console.log();
+  console.log(
+    `--- ${month} ---`
+  );
+
+
+  for (
+    const market
+    of [
+      "ML",
+      "HANDICAP",
+      "TOTAL",
+    ]
+  ) {
+    SR32_print(
+      market,
+      SR32_ROWS.filter(
+        row =>
+          row.month === month &&
+          row.market === market
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+SIDE DIAGNOSTIC
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR32 SIDE DIAGNOSTIC ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const sides =
+    [
+      ...new Set(
+        SR32_ROWS
+          .filter(
+            row =>
+              row.market ===
+              market
+          )
+          .map(
+            row =>
+              row.side
+          )
+      ),
+    ];
+
+
+  for (
+    const side
+    of sides
+  ) {
+    SR32_print(
+      side,
+      SR32_ROWS.filter(
+        row =>
+          row.market ===
+            market &&
+          row.side ===
+            side
+      )
+    );
+  }
+}
+
+
+/*
+==================================================
+COVERAGE
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR32 COVERAGE ====="
+);
+
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  console.log(
+    split,
+    {
+      ML:
+        SR32_ROWS.filter(
+          row =>
+            row.split === split &&
+            row.market === "ML"
+        ).length,
+
+      HANDICAP:
+        SR32_ROWS.filter(
+          row =>
+            row.split === split &&
+            row.market ===
+              "HANDICAP"
+        ).length,
+
+      TOTAL:
+        SR32_ROWS.filter(
+          row =>
+            row.split === split &&
+            row.market === "TOTAL"
+        ).length,
+    }
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND32 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND32 PURPOSE: MARKET DIRECTION DIAGNOSTIC"
+);
+
+console.log(
+  "SCORE ROUND32 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE ROUND33
+V0.8 MARKET PROBABILITY CALIBRATION
+
+INPUT:
+  SR32_ROWS
+
+FIT:
+  DISCOVERY ONLY
+
+VALIDATE:
+  INTERNAL ONLY
+
+MODEL:
+  logit(P(hit)) =
+    intercept +
+    slope * edge
+
+NO SCORE MODEL CHANGE.
+NO FINAL/AUDIT.
+NO INTERNAL FITTING.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND33 — MARKET PROBABILITY CALIBRATION"
+);
+console.log(
+  "=================================================="
+);
+
+
+function SR33_sigmoid(
+  z
+) {
+  if (z >= 0) {
+    const e =
+      Math.exp(-z);
+
+    return 1 / (1 + e);
+  }
+
+  const e =
+    Math.exp(z);
+
+  return e / (1 + e);
+}
+
+
+function SR33_logitFit(
+  rows
+) {
+  const clean =
+    rows.filter(
+      row =>
+        row.hit !== null &&
+        Number.isFinite(
+          row.edge
+        )
+    );
+
+  if (
+    clean.length < 5
+  ) {
+    return null;
+  }
+
+
+  /*
+    Newton-Raphson logistic regression.
+
+    y =
+      hit ? 1 : 0
+
+    x =
+      edge
+  */
+
+  let a = 0;
+  let b = 0;
+
+
+  for (
+    let iter = 0;
+    iter < 100;
+    iter++
+  ) {
+    let g0 = 0;
+    let g1 = 0;
+
+    let h00 = 0;
+    let h01 = 0;
+    let h11 = 0;
+
+
+    for (
+      const row
+      of clean
+    ) {
+      const x =
+        row.edge;
+
+      const y =
+        row.hit
+          ? 1
+          : 0;
+
+      const p =
+        SR33_sigmoid(
+          a +
+          b * x
+        );
+
+      const w =
+        Math.max(
+          1e-9,
+          p * (1 - p)
+        );
+
+      const r =
+        y - p;
+
+
+      g0 += r;
+      g1 += r * x;
+
+      h00 += w;
+      h01 += w * x;
+      h11 += w * x * x;
+    }
+
+
+    /*
+      Tiny ridge only for
+      numerical stability.
+    */
+    h00 += 1e-8;
+    h11 += 1e-8;
+
+
+    const det =
+      h00 * h11 -
+      h01 * h01;
+
+
+    if (
+      Math.abs(det) <
+      1e-12
+    ) {
+      break;
+    }
+
+
+    const da =
+      (
+        g0 * h11 -
+        g1 * h01
+      ) / det;
+
+    const db =
+      (
+        g1 * h00 -
+        g0 * h01
+      ) / det;
+
+
+    a += da;
+    b += db;
+
+
+    if (
+      Math.abs(da) <
+        1e-9 &&
+      Math.abs(db) <
+        1e-9
+    ) {
+      break;
+    }
+  }
+
+
+  return {
+    n:
+      clean.length,
+
+    intercept:
+      a,
+
+    slope:
+      b,
+  };
+}
+
+
+function SR33_predict(
+  fit,
+  edge
+) {
+  if (
+    !fit ||
+    !Number.isFinite(edge)
+  ) {
+    return null;
+  }
+
+  const raw =
+    SR33_sigmoid(
+      fit.intercept +
+      fit.slope *
+        edge
+    );
+
+  /*
+    화면에서 0% / 100%처럼
+    과도하게 보이지 않도록
+    수치 안정성 clamp.
+  */
+  return Math.max(
+    0.02,
+    Math.min(
+      0.98,
+      raw
+    )
+  );
+}
+
+
+function SR33_eval(
+  rows,
+  fit
+) {
+  const clean =
+    rows.filter(
+      row =>
+        row.hit !== null &&
+        Number.isFinite(
+          row.edge
+        )
+    );
+
+
+  if (
+    !clean.length
+  ) {
+    return null;
+  }
+
+
+  let brier = 0;
+  let logloss = 0;
+  let correct = 0;
+  let predictedSum = 0;
+  let actualSum = 0;
+
+
+  for (
+    const row
+    of clean
+  ) {
+    const p =
+      SR33_predict(
+        fit,
+        row.edge
+      );
+
+    const y =
+      row.hit
+        ? 1
+        : 0;
+
+
+    predictedSum += p;
+    actualSum += y;
+
+
+    brier +=
+      (
+        p - y
+      ) ** 2;
+
+
+    const pp =
+      Math.max(
+        1e-9,
+        Math.min(
+          1 - 1e-9,
+          p
+        )
+      );
+
+
+    logloss +=
+      -(
+        y *
+          Math.log(pp) +
+        (1 - y) *
+          Math.log(
+            1 - pp
+          )
+      );
+
+
+    if (
+      (
+        p >= 0.5 &&
+        y === 1
+      ) ||
+      (
+        p < 0.5 &&
+        y === 0
+      )
+    ) {
+      correct++;
+    }
+  }
+
+
+  return {
+    n:
+      clean.length,
+
+    brier:
+      brier /
+      clean.length,
+
+    logloss:
+      logloss /
+      clean.length,
+
+    meanPred:
+      predictedSum /
+      clean.length,
+
+    actual:
+      actualSum /
+      clean.length,
+
+    classAcc:
+      correct /
+      clean.length,
+  };
+}
+
+
+function SR33_constantFit(
+  rows
+) {
+  const clean =
+    rows.filter(
+      row =>
+        row.hit !== null
+    );
+
+
+  const hitRate =
+    clean.length
+      ? clean.filter(
+          row =>
+            row.hit
+        ).length /
+        clean.length
+      : 0.5;
+
+
+  return {
+    n:
+      clean.length,
+
+    p:
+      hitRate,
+  };
+}
+
+
+function SR33_evalConstant(
+  rows,
+  constant
+) {
+  const clean =
+    rows.filter(
+      row =>
+        row.hit !== null
+    );
+
+
+  if (
+    !clean.length
+  ) {
+    return null;
+  }
+
+
+  const p =
+    Math.max(
+      0.02,
+      Math.min(
+        0.98,
+        constant.p
+      )
+    );
+
+
+  let brier = 0;
+  let logloss = 0;
+  let actual = 0;
+
+
+  for (
+    const row
+    of clean
+  ) {
+    const y =
+      row.hit
+        ? 1
+        : 0;
+
+    actual += y;
+
+    brier +=
+      (
+        p - y
+      ) ** 2;
+
+    logloss +=
+      -(
+        y *
+          Math.log(p) +
+        (1 - y) *
+          Math.log(
+            1 - p
+          )
+      );
+  }
+
+
+  return {
+    n:
+      clean.length,
+
+    brier:
+      brier /
+      clean.length,
+
+    logloss:
+      logloss /
+      clean.length,
+
+    meanPred:
+      p,
+
+    actual:
+      actual /
+      clean.length,
+  };
+}
+
+
+/*
+==================================================
+FIT DISCOVERY
+==================================================
+*/
+
+const SR33_MARKETS = [
+  "ML",
+  "HANDICAP",
+  "TOTAL",
+];
+
+
+const SR33_FITS =
+  new Map();
+
+
+console.log();
+console.log(
+  "===== SR33 DISCOVERY FIT ====="
+);
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  const discovery =
+    SR32_ROWS.filter(
+      row =>
+        row.split ===
+          "DISCOVERY" &&
+        row.market ===
+          market
+    );
+
+
+  const fit =
+    SR33_logitFit(
+      discovery
+    );
+
+
+  const constant =
+    SR33_constantFit(
+      discovery
+    );
+
+
+  SR33_FITS.set(
+    market,
+    {
+      fit,
+      constant,
+    }
+  );
+
+
+  console.log(
+    market,
+    `N=${fit?.n ?? 0}`,
+    `INTERCEPT=${
+      fit
+        ? fit.intercept
+            .toFixed(8)
+        : "NA"
+    }`,
+    `SLOPE=${
+      fit
+        ? fit.slope
+            .toFixed(8)
+        : "NA"
+    }`,
+    `DISC_BASE=${
+      (
+        constant.p *
+        100
+      ).toFixed(2)
+    }%`
+  );
+}
+
+
+/*
+==================================================
+DISCOVERY / INTERNAL METRICS
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR33 CALIBRATION METRICS ====="
+);
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const rows =
+      SR32_ROWS.filter(
+        row =>
+          row.split === split &&
+          row.market === market
+      );
+
+
+    const score =
+      SR33_eval(
+        rows,
+        model.fit
+      );
+
+
+    const baseline =
+      SR33_evalConstant(
+        rows,
+        model.constant
+      );
+
+
+    console.log(
+      split,
+      `N=${score.n}`,
+      `BRIER=${score.brier.toFixed(5)}`,
+      `BASE_BRIER=${baseline.brier.toFixed(5)}`,
+      `ΔBRIER=${(
+        score.brier -
+        baseline.brier
+      ).toFixed(5)}`,
+      `LOGLOSS=${score.logloss.toFixed(5)}`,
+      `BASE_LL=${baseline.logloss.toFixed(5)}`,
+      `ΔLL=${(
+        score.logloss -
+        baseline.logloss
+      ).toFixed(5)}`,
+      `PRED=${(
+        score.meanPred *
+        100
+      ).toFixed(1)}%`,
+      `ACTUAL=${(
+        score.actual *
+        100
+      ).toFixed(1)}%`
+    );
+  }
+}
+
+
+/*
+==================================================
+PROBABILITY TABLE BY EDGE
+
+This is NOT manual bucket fitting.
+Values come directly from Discovery logistic fit.
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR33 EDGE -> PROBABILITY ====="
+);
+
+
+const SR33_EDGE_POINTS = [
+  0,
+  0.5,
+  1.0,
+  1.5,
+  2.0,
+  2.5,
+  3.0,
+  3.5,
+];
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const edge
+    of SR33_EDGE_POINTS
+  ) {
+    const p =
+      SR33_predict(
+        model.fit,
+        edge
+      );
+
+
+    console.log(
+      `EDGE=${edge.toFixed(1)}`,
+      `P=${(
+        p * 100
+      ).toFixed(1)}%`
+    );
+  }
+}
+
+
+/*
+==================================================
+CALIBRATION BINS
+
+Fit from Discovery.
+Bins shown separately for
+Discovery and Internal.
+==================================================
+*/
+
+const SR33_PROB_BINS = [
+  [0.00, 0.55],
+  [0.55, 0.60],
+  [0.60, 0.65],
+  [0.65, 0.70],
+  [0.70, 0.75],
+  [0.75, 0.80],
+  [0.80, 0.85],
+  [0.85, 1.01],
+];
+
+
+console.log();
+console.log(
+  "===== SR33 PROBABILITY BINS ====="
+);
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    console.log(
+      `--- ${split} ---`
+    );
+
+
+    const rows =
+      SR32_ROWS.filter(
+        row =>
+          row.split === split &&
+          row.market === market &&
+          row.hit !== null
+      );
+
+
+    for (
+      const [
+        lo,
+        hi,
+      ]
+      of SR33_PROB_BINS
+    ) {
+      const bucket =
+        rows
+          .map(
+            row => ({
+              ...row,
+
+              probability:
+                SR33_predict(
+                  model.fit,
+                  row.edge
+                ),
+            })
+          )
+          .filter(
+            row =>
+              row.probability >=
+                lo &&
+              row.probability <
+                hi
+          );
+
+
+      if (
+        !bucket.length
+      ) {
+        continue;
+      }
+
+
+      const predicted =
+        bucket.reduce(
+          (
+            sum,
+            row
+          ) =>
+            sum +
+            row.probability,
+          0
+        ) /
+        bucket.length;
+
+
+      const actual =
+        bucket.filter(
+          row =>
+            row.hit
+        ).length /
+        bucket.length;
+
+
+      console.log(
+        `${(
+          lo *
+          100
+        ).toFixed(0)}-${(
+          hi *
+          100
+        ).toFixed(0)}%`,
+        `N=${bucket.length}`,
+        `PRED=${(
+          predicted *
+          100
+        ).toFixed(1)}%`,
+        `ACTUAL=${(
+          actual *
+          100
+        ).toFixed(1)}%`,
+        `GAP=${(
+          (
+            predicted -
+            actual
+          ) *
+          100
+        ).toFixed(1)}pp`
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+INTERNAL EDGE CHECK WITH FITTED PROBABILITY
+
+No threshold tuning.
+Just verify higher model probability
+corresponds to higher actual hit rate.
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR33 INTERNAL PROBABILITY CUMULATIVE ====="
+);
+
+
+const SR33_P_THRESHOLDS = [
+  0.55,
+  0.60,
+  0.65,
+  0.70,
+  0.75,
+  0.80,
+];
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+
+  const internal =
+    SR32_ROWS.filter(
+      row =>
+        row.split ===
+          "INTERNAL" &&
+        row.market ===
+          market &&
+        row.hit !== null
+    );
+
+
+  for (
+    const threshold
+    of SR33_P_THRESHOLDS
+  ) {
+    const rows =
+      internal
+        .map(
+          row => ({
+            ...row,
+
+            probability:
+              SR33_predict(
+                model.fit,
+                row.edge
+              ),
+          })
+        )
+        .filter(
+          row =>
+            row.probability >=
+            threshold
+        );
+
+
+    if (
+      !rows.length
+    ) {
+      console.log(
+        `P>=${(
+          threshold *
+          100
+        ).toFixed(0)}%`,
+        "N=0"
+      );
+
+      continue;
+    }
+
+
+    const actual =
+      rows.filter(
+        row =>
+          row.hit
+      ).length /
+      rows.length;
+
+
+    const predicted =
+      rows.reduce(
+        (
+          sum,
+          row
+        ) =>
+          sum +
+          row.probability,
+        0
+      ) /
+      rows.length;
+
+
+    console.log(
+      `P>=${(
+        threshold *
+        100
+      ).toFixed(0)}%`,
+      `N=${rows.length}`,
+      `PRED=${(
+        predicted *
+        100
+      ).toFixed(1)}%`,
+      `ACTUAL=${(
+        actual *
+        100
+      ).toFixed(1)}%`
+    );
+  }
+}
+
+
+/*
+==================================================
+SLOPE VALIDITY
+==================================================
+*/
+
+console.log();
+console.log(
+  "===== SR33 SLOPE CHECK ====="
+);
+
+
+for (
+  const market
+  of SR33_MARKETS
+) {
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+  console.log(
+    market,
+    `SLOPE=${model.fit.slope.toFixed(8)}`,
+    model.fit.slope > 0
+      ? "EDGE_DIRECTION=PASS"
+      : "EDGE_DIRECTION=FAIL"
+  );
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND33 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND33 FIT DATA: DISCOVERY ONLY"
+);
+
+console.log(
+  "SCORE ROUND33 INTERNAL: VALIDATION ONLY"
+);
+
+console.log(
+  "SCORE ROUND33 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+/*
+==================================================
+SCORE ROUND34
+CONSERVATIVE PROBABILITY CALIBRATION
+
+BASE
+----
+Round33 Discovery-only logistic fit.
+
+NO SCORE MODEL CHANGE.
+NO MARKET EDGE CHANGE.
+NO FINAL/AUDIT.
+
+Round33 raw probability:
+
+  rawP =
+    sigmoid(
+      intercept +
+      slope * edge
+    )
+
+Round34 conservative probability:
+
+  p =
+    discoveryBase +
+    alpha *
+      (
+        rawP -
+        discoveryBase
+      )
+
+alpha:
+  0.00 = Discovery base rate only
+  0.25 = strong shrink
+  0.50 = medium shrink
+  0.75 = mild shrink
+  1.00 = Round33 raw
+
+IMPORTANT
+---------
+Internal is validation only.
+
+This script does NOT automatically choose
+an optimal alpha.
+
+We inspect a small pre-defined grid
+for stability only.
+
+Final/Audit remains sealed.
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND34 — CONSERVATIVE PROBABILITY CALIBRATION"
+);
+console.log(
+  "=================================================="
+);
+
+
+const SR34_ALPHAS = [
+  0.00,
+  0.25,
+  0.50,
+  0.75,
+  1.00,
+];
+
+
+function SR34_clamp(
+  value,
+  lo = 0.01,
+  hi = 0.99
+) {
+  return Math.max(
+    lo,
+    Math.min(
+      hi,
+      value
+    )
+  );
+}
+
+
+function SR34_modelForMarket(
+  market
+) {
+  const model =
+    SR33_FITS.get(
+      market
+    );
+
+  if (
+    !model ||
+    !model.fit ||
+    !model.constant
+  ) {
+    return null;
+  }
+
+  return model;
+}
+
+
+function SR34_rawProbability(
+  market,
+  edge
+) {
+  const model =
+    SR34_modelForMarket(
+      market
+    );
+
+  if (!model) {
+    return null;
+  }
+
+  const p =
+    SR33_sigmoid(
+      model.fit.intercept +
+      model.fit.slope *
+        edge
+    );
+
+  return SR34_clamp(
+    p
+  );
+}
+
+
+function SR34_discoveryBase(
+  market
+) {
+  const model =
+    SR34_modelForMarket(
+      market
+    );
+
+  if (!model) {
+    return null;
+  }
+
+  return SR34_clamp(
+    model.constant.p
+  );
+}
+
+
+function SR34_probability(
+  market,
+  edge,
+  alpha
+) {
+  const raw =
+    SR34_rawProbability(
+      market,
+      edge
+    );
+
+  const base =
+    SR34_discoveryBase(
+      market
+    );
+
+  if (
+    raw === null ||
+    base === null
+  ) {
+    return null;
+  }
+
+  return SR34_clamp(
+    base +
+    alpha *
+      (
+        raw -
+        base
+      )
+  );
+}
+
+
+function SR34_eval(
+  market,
+  split,
+  alpha
+) {
+  const rows =
+    SR32_ROWS.filter(
+      row =>
+        row.market ===
+          market &&
+        row.split ===
+          split &&
+        row.hit !== null
+    );
+
+
+  let n = 0;
+
+  let brier = 0;
+  let logloss = 0;
+
+  let predSum = 0;
+  let actualSum = 0;
+
+
+  for (
+    const row
+    of rows
+  ) {
+    const p =
+      SR34_probability(
+        market,
+        row.edge,
+        alpha
+      );
+
+    if (p === null) {
+      continue;
+    }
+
+
+    const y =
+      row.hit
+        ? 1
+        : 0;
+
+
+    brier +=
+      (
+        p -
+        y
+      ) ** 2;
+
+
+    logloss +=
+      -(
+        y *
+          Math.log(p) +
+        (
+          1 - y
+        ) *
+          Math.log(
+            1 - p
+          )
+      );
+
+
+    predSum += p;
+    actualSum += y;
+
+    n++;
+  }
+
+
+  if (!n) {
+    return null;
+  }
+
+
+  const predicted =
+    predSum / n;
+
+  const actual =
+    actualSum / n;
+
+
+  return {
+    n,
+
+    brier:
+      brier / n,
+
+    logloss:
+      logloss / n,
+
+    predicted,
+
+    actual,
+
+    gap:
+      predicted -
+      actual,
+
+    absGap:
+      Math.abs(
+        predicted -
+        actual
+      ),
+  };
+}
+
+
+function SR34_pct(
+  value
+) {
+  return (
+    value *
+    100
+  ).toFixed(1) + "%";
+}
+
+
+function SR34_pp(
+  value
+) {
+  return (
+    value *
+    100
+  ).toFixed(1) + "pp";
+}
+
+
+function SR34_printEval(
+  split,
+  result,
+  raw
+) {
+  if (
+    !result ||
+    !raw
+  ) {
+    console.log(
+      split,
+      "N=0"
+    );
+
+    return;
+  }
+
+
+  const dBrier =
+    result.brier -
+    raw.brier;
+
+  const dLL =
+    result.logloss -
+    raw.logloss;
+
+
+  console.log(
+    split,
+    `N=${result.n}`,
+    `BRIER=${result.brier.toFixed(5)}`,
+    `ΔRAW_B=${dBrier.toFixed(5)}`,
+    `LL=${result.logloss.toFixed(5)}`,
+    `ΔRAW_LL=${dLL.toFixed(5)}`,
+    `PRED=${SR34_pct(result.predicted)}`,
+    `ACTUAL=${SR34_pct(result.actual)}`,
+    `GAP=${SR34_pp(result.gap)}`,
+    `ABS_GAP=${SR34_pp(result.absGap)}`
+  );
+}
+
+
+/*
+==================================================
+ALPHA GRID
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR34 ALPHA GRID ====="
+);
+
+
+const SR34_RESULTS = [];
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const rawDiscovery =
+    SR34_eval(
+      market,
+      "DISCOVERY",
+      1.00
+    );
+
+  const rawInternal =
+    SR34_eval(
+      market,
+      "INTERNAL",
+      1.00
+    );
+
+
+  for (
+    const alpha
+    of SR34_ALPHAS
+  ) {
+    const discovery =
+      SR34_eval(
+        market,
+        "DISCOVERY",
+        alpha
+      );
+
+    const internal =
+      SR34_eval(
+        market,
+        "INTERNAL",
+        alpha
+      );
+
+
+    console.log();
+    console.log(
+      `ALPHA=${alpha.toFixed(2)}`
+    );
+
+
+    SR34_printEval(
+      "DISCOVERY",
+      discovery,
+      rawDiscovery
+    );
+
+    SR34_printEval(
+      "INTERNAL ",
+      internal,
+      rawInternal
+    );
+
+
+    SR34_RESULTS.push({
+      market,
+      alpha,
+      discovery,
+      internal,
+      rawDiscovery,
+      rawInternal,
+    });
+  }
+}
+
+
+/*
+==================================================
+INTERNAL VS RAW SUMMARY
+
+NOT automatic model selection.
+
+Only identifies which fixed shrink levels
+improve BOTH Brier and Logloss
+against Round33 raw probability
+on Internal validation.
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR34 INTERNAL VS RAW ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  const rows =
+    SR34_RESULTS.filter(
+      row =>
+        row.market ===
+          market &&
+        row.alpha < 1.00
+    );
+
+
+  for (
+    const row
+    of rows
+  ) {
+    const x =
+      row.internal;
+
+    const raw =
+      row.rawInternal;
+
+
+    if (
+      !x ||
+      !raw
+    ) {
+      continue;
+    }
+
+
+    const brierBetter =
+      x.brier <=
+      raw.brier;
+
+    const llBetter =
+      x.logloss <=
+      raw.logloss;
+
+    const gapBetter =
+      x.absGap <=
+      raw.absGap;
+
+
+    console.log(
+      `ALPHA=${row.alpha.toFixed(2)}`,
+      `BRIER=${
+        brierBetter
+          ? "BETTER"
+          : "WORSE"
+      }`,
+      `LL=${
+        llBetter
+          ? "BETTER"
+          : "WORSE"
+      }`,
+      `ABS_GAP=${
+        gapBetter
+          ? "BETTER"
+          : "WORSE"
+      }`,
+      `STATUS=${
+        brierBetter &&
+        llBetter
+          ? "VALIDATION_IMPROVES_RAW"
+          : "NO"
+      }`
+    );
+  }
+}
+
+
+/*
+==================================================
+EDGE -> PROBABILITY TABLE
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR34 EDGE -> PROBABILITY ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  console.log(
+    `DISCOVERY_BASE=${SR34_pct(
+      SR34_discoveryBase(
+        market
+      )
+    )}`
+  );
+
+
+  for (
+    const alpha
+    of [
+      0.25,
+      0.50,
+      0.75,
+      1.00,
+    ]
+  ) {
+    console.log(
+      `ALPHA=${alpha.toFixed(2)}`
+    );
+
+
+    for (
+      const edge
+      of [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        2.5,
+        3.0,
+        3.5,
+      ]
+    ) {
+      const p =
+        SR34_probability(
+          market,
+          edge,
+          alpha
+        );
+
+
+      console.log(
+        `  EDGE=${edge.toFixed(1)}`,
+        `P=${
+          p === null
+            ? "NA"
+            : SR34_pct(p)
+        }`
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+INTERNAL CUMULATIVE PROBABILITY CHECK
+
+This does NOT establish recommendation thresholds.
+
+It checks whether high-probability groups
+remain separated after shrinkage.
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR34 INTERNAL CUMULATIVE CHECK ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const alpha
+    of [
+      0.25,
+      0.50,
+      0.75,
+      1.00,
+    ]
+  ) {
+    console.log(
+      `ALPHA=${alpha.toFixed(2)}`
+    );
+
+
+    for (
+      const threshold
+      of [
+        0.55,
+        0.60,
+        0.65,
+        0.70,
+        0.75,
+        0.80,
+      ]
+    ) {
+      const rows =
+        SR32_ROWS
+          .filter(
+            row =>
+              row.market ===
+                market &&
+              row.split ===
+                "INTERNAL" &&
+              row.hit !== null
+          )
+          .map(
+            row => ({
+              ...row,
+
+              sr34Probability:
+                SR34_probability(
+                  market,
+                  row.edge,
+                  alpha
+                ),
+            })
+          )
+          .filter(
+            row =>
+              row.sr34Probability !==
+                null &&
+              row.sr34Probability >=
+                threshold
+          );
+
+
+      if (!rows.length) {
+        console.log(
+          `  P>=${(
+            threshold *
+            100
+          ).toFixed(0)}% N=0`
+        );
+
+        continue;
+      }
+
+
+      const predicted =
+        rows.reduce(
+          (
+            sum,
+            row
+          ) =>
+            sum +
+            row.sr34Probability,
+          0
+        ) /
+        rows.length;
+
+
+      const actual =
+        rows.filter(
+          row =>
+            row.hit
+        ).length /
+        rows.length;
+
+
+      console.log(
+        `  P>=${(
+          threshold *
+          100
+        ).toFixed(0)}%`,
+        `N=${rows.length}`,
+        `PRED=${SR34_pct(predicted)}`,
+        `ACTUAL=${SR34_pct(actual)}`,
+        `GAP=${SR34_pp(
+          predicted -
+          actual
+        )}`
+      );
+    }
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND34 MODEL CHANGE: NO"
+);
+
+console.log(
+  "SCORE ROUND34 SCORE MODEL: V0.8 FROZEN"
+);
+
+console.log(
+  "SCORE ROUND34 MARKET EDGE: UNCHANGED"
+);
+
+console.log(
+  "SCORE ROUND34 FIT SOURCE: ROUND33 DISCOVERY ONLY"
+);
+
+console.log(
+  "SCORE ROUND34 INTERNAL: VALIDATION ONLY"
+);
+
+console.log(
+  "SCORE ROUND34 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+/*
+==================================================
+SCORE ROUND35
+WEAK PICK FILTER / CONFIDENCE TIERS
+
+Frozen conservative calibration candidate:
+
+ML        alpha = 0.50
+HANDICAP  alpha = 0.50
+TOTAL     alpha = 1.00
+
+IMPORTANT
+---------
+- Score model V0.8 frozen
+- Market edge unchanged
+- Round33 logistic unchanged
+- Round34 alpha frozen for this audit
+- Discovery + Internal only
+- Final/Audit NOT evaluated
+
+Round35 does NOT optimize arbitrary thresholds.
+
+It inspects simple pre-defined
+probability tiers and cumulative filters.
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "=================================================="
+);
+
+console.log(
+  "SCORE ROUND35 — WEAK PICK FILTER / CONFIDENCE TIERS"
+);
+
+console.log(
+  "=================================================="
+);
+
+
+const SR35_ALPHA = {
+  ML: 0.50,
+  HANDICAP: 0.50,
+  TOTAL: 1.00,
+};
+
+
+function SR35_probability(
+  row
+) {
+  const alpha =
+    SR35_ALPHA[
+      row.market
+    ];
+
+  if (
+    typeof alpha !==
+    "number"
+  ) {
+    return null;
+  }
+
+  return SR34_probability(
+    row.market,
+    row.edge,
+    alpha
+  );
+}
+
+
+function SR35_pct(
+  x
+) {
+  return (
+    x *
+    100
+  ).toFixed(1) + "%";
+}
+
+
+function SR35_pp(
+  x
+) {
+  return (
+    x *
+    100
+  ).toFixed(1) + "pp";
+}
+
+
+function SR35_summary(
+  rows
+) {
+  if (!rows.length) {
+    return null;
+  }
+
+
+  const enriched =
+    rows
+      .map(
+        row => ({
+          ...row,
+
+          sr35Probability:
+            SR35_probability(
+              row
+            ),
+        })
+      )
+      .filter(
+        row =>
+          row.sr35Probability !==
+          null
+      );
+
+
+  if (!enriched.length) {
+    return null;
+  }
+
+
+  const n =
+    enriched.length;
+
+
+  const hits =
+    enriched.filter(
+      row =>
+        row.hit === true
+    ).length;
+
+
+  const predicted =
+    enriched.reduce(
+      (
+        sum,
+        row
+      ) =>
+        sum +
+        row.sr35Probability,
+      0
+    ) / n;
+
+
+  const actual =
+    hits / n;
+
+
+  const avgEdge =
+    enriched.reduce(
+      (
+        sum,
+        row
+      ) =>
+        sum +
+        row.edge,
+      0
+    ) / n;
+
+
+  const minP =
+    Math.min(
+      ...enriched.map(
+        row =>
+          row.sr35Probability
+      )
+    );
+
+
+  const maxP =
+    Math.max(
+      ...enriched.map(
+        row =>
+          row.sr35Probability
+      )
+    );
+
+
+  const minEdge =
+    Math.min(
+      ...enriched.map(
+        row =>
+          row.edge
+      )
+    );
+
+
+  const maxEdge =
+    Math.max(
+      ...enriched.map(
+        row =>
+          row.edge
+      )
+    );
+
+
+  return {
+    n,
+    predicted,
+    actual,
+
+    gap:
+      predicted -
+      actual,
+
+    avgEdge,
+    minP,
+    maxP,
+    minEdge,
+    maxEdge,
+  };
+}
+
+
+function SR35_print(
+  label,
+  result
+) {
+  if (!result) {
+    console.log(
+      `${label} N=0`
+    );
+
+    return;
+  }
+
+
+  console.log(
+    label,
+    `N=${result.n}`,
+    `PRED=${SR35_pct(result.predicted)}`,
+    `ACTUAL=${SR35_pct(result.actual)}`,
+    `GAP=${SR35_pp(result.gap)}`,
+    `AVG_EDGE=${result.avgEdge.toFixed(3)}`,
+    `P_RANGE=${SR35_pct(result.minP)}~${SR35_pct(result.maxP)}`,
+    `EDGE_RANGE=${result.minEdge.toFixed(3)}~${result.maxEdge.toFixed(3)}`
+  );
+}
+
+
+/*
+==================================================
+FROZEN ALPHA
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR35 FROZEN ALPHA ====="
+);
+
+console.log(
+  "ML        =",
+  SR35_ALPHA.ML.toFixed(2)
+);
+
+console.log(
+  "HANDICAP  =",
+  SR35_ALPHA.HANDICAP.toFixed(2)
+);
+
+console.log(
+  "TOTAL     =",
+  SR35_ALPHA.TOTAL.toFixed(2)
+);
+
+
+/*
+==================================================
+EXACT PROBABILITY TIERS
+==================================================
+*/
+
+
+const SR35_TIERS = [
+  {
+    name: "WEAK",
+    lo: 0.00,
+    hi: 0.55,
+  },
+
+  {
+    name: "LEAN",
+    lo: 0.55,
+    hi: 0.60,
+  },
+
+  {
+    name: "SOLID",
+    lo: 0.60,
+    hi: 0.65,
+  },
+
+  {
+    name: "STRONG",
+    lo: 0.65,
+    hi: 0.70,
+  },
+
+  {
+    name: "ELITE",
+    lo: 0.70,
+    hi: 1.01,
+  },
+];
+
+
+console.log();
+console.log(
+  "===== SR35 EXACT CONFIDENCE TIERS ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const tier
+    of SR35_TIERS
+  ) {
+    console.log();
+    console.log(
+      `[${tier.name}]`
+    );
+
+
+    for (
+      const split
+      of [
+        "DISCOVERY",
+        "INTERNAL",
+      ]
+    ) {
+      const rows =
+        SR32_ROWS.filter(
+          row => {
+            if (
+              row.market !==
+                market ||
+              row.split !==
+                split ||
+              row.hit === null
+            ) {
+              return false;
+            }
+
+
+            const p =
+              SR35_probability(
+                row
+              );
+
+
+            return (
+              p !== null &&
+              p >= tier.lo &&
+              p < tier.hi
+            );
+          }
+        );
+
+
+      SR35_print(
+        split,
+        SR35_summary(
+          rows
+        )
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+PRE-DEFINED CUMULATIVE FILTER GRID
+
+This is diagnostic only.
+
+No threshold is automatically selected.
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR35 CUMULATIVE FILTER GRID ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const threshold
+    of [
+      0.50,
+      0.55,
+      0.60,
+      0.65,
+      0.70,
+      0.75,
+    ]
+  ) {
+    console.log();
+    console.log(
+      `P>=${(
+        threshold *
+        100
+      ).toFixed(0)}%`
+    );
+
+
+    for (
+      const split
+      of [
+        "DISCOVERY",
+        "INTERNAL",
+      ]
+    ) {
+      const rows =
+        SR32_ROWS.filter(
+          row => {
+            if (
+              row.market !==
+                market ||
+              row.split !==
+                split ||
+              row.hit === null
+            ) {
+              return false;
+            }
+
+
+            const p =
+              SR35_probability(
+                row
+              );
+
+
+            return (
+              p !== null &&
+              p >= threshold
+            );
+          }
+        );
+
+
+      SR35_print(
+        split,
+        SR35_summary(
+          rows
+        )
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+EDGE BINS
+
+Probability and edge should move together,
+but this checks whether weak probability
+is simply a low-edge region.
+==================================================
+*/
+
+
+const SR35_EDGE_BINS = [
+  {
+    name: "EDGE<0.5",
+    lo: -Infinity,
+    hi: 0.50,
+  },
+
+  {
+    name: "0.5<=EDGE<1.0",
+    lo: 0.50,
+    hi: 1.00,
+  },
+
+  {
+    name: "1.0<=EDGE<1.5",
+    lo: 1.00,
+    hi: 1.50,
+  },
+
+  {
+    name: "1.5<=EDGE<2.0",
+    lo: 1.50,
+    hi: 2.00,
+  },
+
+  {
+    name: "2.0<=EDGE<2.5",
+    lo: 2.00,
+    hi: 2.50,
+  },
+
+  {
+    name: "EDGE>=2.5",
+    lo: 2.50,
+    hi: Infinity,
+  },
+];
+
+
+console.log();
+console.log(
+  "===== SR35 EDGE BINS ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const bin
+    of SR35_EDGE_BINS
+  ) {
+    console.log();
+    console.log(
+      `[${bin.name}]`
+    );
+
+
+    for (
+      const split
+      of [
+        "DISCOVERY",
+        "INTERNAL",
+      ]
+    ) {
+      const rows =
+        SR32_ROWS.filter(
+          row =>
+            row.market ===
+              market &&
+            row.split ===
+              split &&
+            row.hit !== null &&
+            row.edge >=
+              bin.lo &&
+            row.edge <
+              bin.hi
+        );
+
+
+      SR35_print(
+        split,
+        SR35_summary(
+          rows
+        )
+      );
+    }
+  }
+}
+
+
+/*
+==================================================
+WEAK VS NON-WEAK
+==================================================
+*/
+
+
+console.log();
+console.log(
+  "===== SR35 WEAK VS NON-WEAK ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const weak =
+      SR32_ROWS.filter(
+        row => {
+          if (
+            row.market !==
+              market ||
+            row.split !==
+              split ||
+            row.hit === null
+          ) {
+            return false;
+          }
+
+
+          const p =
+            SR35_probability(
+              row
+            );
+
+
+          return (
+            p !== null &&
+            p < 0.55
+          );
+        }
+      );
+
+
+    const nonWeak =
+      SR32_ROWS.filter(
+        row => {
+          if (
+            row.market !==
+              market ||
+            row.split !==
+              split ||
+            row.hit === null
+          ) {
+            return false;
+          }
+
+
+          const p =
+            SR35_probability(
+              row
+            );
+
+
+          return (
+            p !== null &&
+            p >= 0.55
+          );
+        }
+      );
+
+
+    console.log();
+    console.log(
+      split
+    );
+
+
+    SR35_print(
+      "WEAK     ",
+      SR35_summary(
+        weak
+      )
+    );
+
+
+    SR35_print(
+      "NON-WEAK ",
+      SR35_summary(
+        nonWeak
+      )
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND35 SCORE MODEL: V0.8 FROZEN"
+);
+
+console.log(
+  "SCORE ROUND35 MARKET EDGE: UNCHANGED"
+);
+
+console.log(
+  "SCORE ROUND35 ML ALPHA: 0.50"
+);
+
+console.log(
+  "SCORE ROUND35 HANDICAP ALPHA: 0.50"
+);
+
+console.log(
+  "SCORE ROUND35 TOTAL ALPHA: 1.00"
+);
+
+console.log(
+  "SCORE ROUND35 THRESHOLD AUTO-SELECTION: NO"
+);
+
+console.log(
+  "SCORE ROUND35 FINAL/AUDIT: NOT EVALUATED"
+);
+
+
+
+/*
+==================================================
+SCORE ROUND36
+PRODUCTION PICK POLICY LOCK
+
+FROZEN:
+ML        alpha 0.50 / P >= 60%
+HANDICAP  alpha 0.50 / P >= 65%
+TOTAL     alpha 1.00 / P >= 65%
+
+NO THRESHOLD SEARCH.
+NO ALPHA SEARCH.
+DISCOVERY + INTERNAL ONLY.
+FINAL/AUDIT NOT EVALUATED.
+==================================================
+*/
+
+console.log();
+console.log(
+  "=================================================="
+);
+console.log(
+  "SCORE ROUND36 — PRODUCTION PICK POLICY LOCK"
+);
+console.log(
+  "=================================================="
+);
+
+
+const SR36_GATE = {
+  ML: 0.60,
+  HANDICAP: 0.65,
+  TOTAL: 0.65,
+};
+
+
+function SR36_prob(row) {
+  return SR35_probability(row);
+}
+
+
+function SR36_eligible(row) {
+  const gate =
+    SR36_GATE[row.market];
+
+  const p =
+    SR36_prob(row);
+
+  return (
+    typeof gate === "number" &&
+    p !== null &&
+    p >= gate
+  );
+}
+
+
+function SR36_pct(x) {
+  return (
+    x * 100
+  ).toFixed(1) + "%";
+}
+
+
+function SR36_pp(x) {
+  return (
+    x * 100
+  ).toFixed(1) + "pp";
+}
+
+
+function SR36_summary(rows) {
+  const x =
+    rows
+      .filter(
+        row =>
+          row.hit !== null &&
+          SR36_eligible(row)
+      )
+      .map(
+        row => ({
+          ...row,
+          p36:
+            SR36_prob(row),
+        })
+      );
+
+  if (!x.length) {
+    return null;
+  }
+
+  const n =
+    x.length;
+
+  const hits =
+    x.filter(
+      row =>
+        row.hit === true
+    ).length;
+
+  const pred =
+    x.reduce(
+      (sum, row) =>
+        sum + row.p36,
+      0
+    ) / n;
+
+  const actual =
+    hits / n;
+
+  const edge =
+    x.reduce(
+      (sum, row) =>
+        sum + row.edge,
+      0
+    ) / n;
+
+  const oddsRows =
+    x.filter(
+      row =>
+        typeof row.odds === "number" &&
+        Number.isFinite(row.odds)
+    );
+
+  const avgOdds =
+    oddsRows.length
+      ? oddsRows.reduce(
+          (sum, row) =>
+            sum + row.odds,
+          0
+        ) / oddsRows.length
+      : null;
+
+  const profitRows =
+    x.filter(
+      row =>
+        typeof row.profit === "number" &&
+        Number.isFinite(row.profit)
+    );
+
+  const profit =
+    profitRows.reduce(
+      (sum, row) =>
+        sum + row.profit,
+      0
+    );
+
+  const roi =
+    profitRows.length
+      ? profit / profitRows.length
+      : null;
+
+  return {
+    n,
+    hits,
+    pred,
+    actual,
+    gap:
+      pred - actual,
+    edge,
+    avgOdds,
+    profitN:
+      profitRows.length,
+    profit,
+    roi,
+  };
+}
+
+
+function SR36_print(
+  label,
+  r
+) {
+  if (!r) {
+    console.log(
+      `${label} N=0`
+    );
+    return;
+  }
+
+  console.log(
+    label,
+    `N=${r.n}`,
+    `HIT=${SR36_pct(r.actual)}`,
+    `PRED=${SR36_pct(r.pred)}`,
+    `GAP=${SR36_pp(r.gap)}`,
+    `AVG_EDGE=${r.edge.toFixed(3)}`,
+    `AVG_ODDS=${
+      r.avgOdds === null
+        ? "NA"
+        : r.avgOdds.toFixed(3)
+    }`,
+    `ROI_N=${r.profitN}`,
+    `ROI=${
+      r.roi === null
+        ? "NA"
+        : SR36_pct(r.roi)
+    }`,
+    `PROFIT=${r.profit.toFixed(3)}`
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR36 FROZEN POLICY ====="
+);
+console.log(
+  "ML        P>=60%"
+);
+console.log(
+  "HANDICAP  P>=65%"
+);
+console.log(
+  "TOTAL     P>=65%"
+);
+
+
+console.log();
+console.log(
+  "===== SR36 MARKET RESULTS ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    SR36_print(
+      split,
+      SR36_summary(
+        SR32_ROWS.filter(
+          row =>
+            row.market === market &&
+            row.split === split
+        )
+      )
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "===== SR36 ALL ELIGIBLE ====="
+);
+
+
+for (
+  const split
+  of [
+    "DISCOVERY",
+    "INTERNAL",
+  ]
+) {
+  SR36_print(
+    split,
+    SR36_summary(
+      SR32_ROWS.filter(
+        row =>
+          row.split === split
+      )
+    )
+  );
+}
+
+
+console.log();
+console.log(
+  "===== SR36 MONTHLY STABILITY ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    console.log(
+      `[${split}]`
+    );
+
+    const months =
+      [
+        ...new Set(
+          SR32_ROWS
+            .filter(
+              row =>
+                row.market === market &&
+                row.split === split
+            )
+            .map(
+              row =>
+                row.month
+            )
+            .filter(Boolean)
+        ),
+      ].sort();
+
+    for (
+      const month
+      of months
+    ) {
+      SR36_print(
+        month,
+        SR36_summary(
+          SR32_ROWS.filter(
+            row =>
+              row.market === market &&
+              row.split === split &&
+              row.month === month
+          )
+        )
+      );
+    }
+  }
+}
+
+
+console.log();
+console.log(
+  "===== SR36 ELIGIBILITY ====="
+);
+
+
+for (
+  const market
+  of [
+    "ML",
+    "HANDICAP",
+    "TOTAL",
+  ]
+) {
+  console.log();
+  console.log(
+    `### ${market}`
+  );
+
+  for (
+    const split
+    of [
+      "DISCOVERY",
+      "INTERNAL",
+    ]
+  ) {
+    const all =
+      SR32_ROWS.filter(
+        row =>
+          row.market === market &&
+          row.split === split &&
+          row.hit !== null
+      );
+
+    const eligible =
+      all.filter(
+        row =>
+          SR36_eligible(row)
+      );
+
+    console.log(
+      split,
+      `ALL=${all.length}`,
+      `ELIGIBLE=${eligible.length}`,
+      `RATE=${
+        all.length
+          ? SR36_pct(
+              eligible.length /
+              all.length
+            )
+          : "0.0%"
+      }`
+    );
+  }
+}
+
+
+console.log();
+console.log(
+  "SCORE ROUND36 SCORE MODEL: V0.8 FROZEN"
+);
+console.log(
+  "SCORE ROUND36 CALIBRATION: ML .50 / HC .50 / TOTAL 1.00"
+);
+console.log(
+  "SCORE ROUND36 GATES: ML 60 / HC 65 / TOTAL 65"
+);
+console.log(
+  "SCORE ROUND36 SEARCH: NO"
+);
+console.log(
+  "SCORE ROUND36 FINAL/AUDIT: NOT EVALUATED"
+);
+

@@ -1,0 +1,277 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "bets": 3,
+    "wins": 1,
+    "losses": 2,
+    "hit": 33.33,
+    "avgOdds": 6.234,
+    "roi": 112.62,
+    "mdd": 1.9,
+    "losingStreak": 2,
+    "finalBank": 1033787,
+    "monthly": [
+      {
+        "month": "2026-04",
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "roi": 112.62
+      }
+    ]
+  },
+  "internal": {
+    "bets": 10,
+    "wins": 3,
+    "losses": 7,
+    "hit": 30,
+    "avgOdds": 6.682,
+    "roi": 102.33,
+    "mdd": 4,
+    "losingStreak": 4,
+    "finalBank": 1102329,
+    "monthly": [
+      {
+        "month": "2026-05",
+        "bets": 5,
+        "wins": 1,
+        "hit": 20,
+        "roi": 25.84
+      },
+      {
+        "month": "2026-06",
+        "bets": 5,
+        "wins": 2,
+        "hit": 40,
+        "roi": 178.82
+      }
+    ]
+  },
+  "discoveryC": [
+    {
+      "family": "ML",
+      "days": 3,
+      "abcWins": 1,
+      "abcHit": 33.33,
+      "avgOdds": 11.92,
+      "abcROI": 352.89,
+      "abHitDays": 1,
+      "cHitWhenABHit": 100
+    },
+    {
+      "family": "OVER",
+      "days": 3,
+      "abcWins": 0,
+      "abcHit": 0,
+      "avgOdds": 10.85,
+      "abcROI": -100,
+      "abHitDays": 1,
+      "cHitWhenABHit": 0
+    },
+    {
+      "family": "UNDER",
+      "days": 3,
+      "abcWins": 1,
+      "abcHit": 33.33,
+      "avgOdds": 10.336,
+      "abcROI": 276.34,
+      "abHitDays": 1,
+      "cHitWhenABHit": 100
+    },
+    {
+      "family": "TOTAL",
+      "days": 3,
+      "abcWins": 0,
+      "abcHit": 0,
+      "avgOdds": 10.662,
+      "abcROI": -100,
+      "abHitDays": 1,
+      "cHitWhenABHit": 0
+    }
+  ],
+  "internalC": [
+    {
+      "family": "ML",
+      "days": 10,
+      "abcWins": 3,
+      "abcHit": 30,
+      "avgOdds": 11.13,
+      "abcROI": 188.34,
+      "abHitDays": 3,
+      "cHitWhenABHit": 100
+    },
+    {
+      "family": "OVER",
+      "days": 10,
+      "abcWins": 2,
+      "abcHit": 20,
+      "avgOdds": 11.54,
+      "abcROI": 136.34,
+      "abHitDays": 3,
+      "cHitWhenABHit": 66.67
+    },
+    {
+      "family": "UNDER",
+      "days": 10,
+      "abcWins": 2,
+      "abcHit": 20,
+      "avgOdds": 11.626,
+      "abcROI": 129.3,
+      "abHitDays": 3,
+      "cHitWhenABHit": 66.67
+    },
+    {
+      "family": "TOTAL",
+      "days": 10,
+      "abcWins": 2,
+      "abcHit": 20,
+      "avgOdds": 11.395,
+      "abcROI": 131.18,
+      "abHitDays": 3,
+      "cHitWhenABHit": 66.67
+    }
+  ],
+  "finalC": [
+    {
+      "family": "ML",
+      "days": 14,
+      "abcWins": 2,
+      "abcHit": 14.29,
+      "avgOdds": 8.899,
+      "abcROI": 41.15,
+      "abHitDays": 4,
+      "cHitWhenABHit": 50
+    },
+    {
+      "family": "OVER",
+      "days": 15,
+      "abcWins": 3,
+      "abcHit": 20,
+      "avgOdds": 9.706,
+      "abcROI": 72.77,
+      "abHitDays": 5,
+      "cHitWhenABHit": 60
+    },
+    {
+      "family": "UNDER",
+      "days": 15,
+      "abcWins": 1,
+      "abcHit": 6.67,
+      "avgOdds": 10.171,
+      "abcROI": 3.42,
+      "abHitDays": 5,
+      "cHitWhenABHit": 20
+    },
+    {
+      "family": "TOTAL",
+      "days": 15,
+      "abcWins": 3,
+      "abcHit": 20,
+      "avgOdds": 9.898,
+      "abcROI": 128.59,
+      "abHitDays": 5,
+      "cHitWhenABHit": 60
+    }
+  ],
+  "portfolio": {
+    "mode": "DYNAMIC_AB_RECOVERY",
+    "formula": "AB_PCT = 1 / AB_ODDS",
+    "discovery": {
+      "days": 3,
+      "avgABPct": 16.36,
+      "avgABCPct": 83.64,
+      "roi": 315.22,
+      "profit": 94566,
+      "finalBank": 1094566,
+      "mdd": 1.79,
+      "maxLosingStreak": 2,
+      "zeroHit": 2,
+      "abOnly": 0,
+      "both": 1,
+      "abOnlyRecovery": 0,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "days": 3,
+          "avgABPct": 16.36,
+          "avgABCPct": 83.64,
+          "roi": 315.22,
+          "profit": 94566
+        }
+      ]
+    },
+    "internal": {
+      "days": 10,
+      "avgABPct": 15.31,
+      "avgABCPct": 84.69,
+      "roi": 175.54,
+      "profit": 175537,
+      "finalBank": 1175537,
+      "mdd": 4,
+      "maxLosingStreak": 4,
+      "zeroHit": 7,
+      "abOnly": 0,
+      "both": 3,
+      "abOnlyRecovery": 0,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "days": 5,
+          "avgABPct": 14.71,
+          "avgABCPct": 85.29,
+          "roi": 80.88,
+          "profit": 40438
+        },
+        {
+          "month": "2026-06",
+          "days": 5,
+          "avgABPct": 15.91,
+          "avgABCPct": 84.09,
+          "roi": 270.2,
+          "profit": 135098
+        }
+      ]
+    },
+    "final": {
+      "days": 14,
+      "avgABPct": 18.65,
+      "avgABCPct": 81.35,
+      "roi": 48.86,
+      "profit": 68409,
+      "finalBank": 1068409,
+      "mdd": 3.87,
+      "maxLosingStreak": 3,
+      "zeroHit": 10,
+      "abOnly": 2,
+      "both": 2,
+      "abOnlyRecovery": 100,
+      "monthly": [
+        {
+          "month": "2026-07",
+          "days": 8,
+          "avgABPct": 19.45,
+          "avgABCPct": 80.55,
+          "roi": 15.4,
+          "profit": 12322
+        },
+        {
+          "month": "2026-08",
+          "days": 2,
+          "avgABPct": 16.91,
+          "avgABCPct": 83.09,
+          "roi": -100,
+          "profit": -20000
+        },
+        {
+          "month": "2026-09",
+          "days": 4,
+          "avgABPct": 17.92,
+          "avgABCPct": 82.08,
+          "roi": 190.22,
+          "profit": 76087
+        }
+      ]
+    }
+  }
+}

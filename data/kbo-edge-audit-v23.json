@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-09-14T17:00:49.523Z",
+  "periods": {
+    "discovery": [
+      "2026-03-28",
+      "2026-04-30"
+    ],
+    "internal": [
+      "2026-05-01",
+      "2026-06-30"
+    ],
+    "final": "LOCKED"
+  },
+  "edgeFields": [
+    "starterEdge",
+    "formEdge",
+    "bullpenEdge",
+    "lineupEdge",
+    "totalEdge"
+  ],
+  "robust": [],
+  "comboRobust": []
+}

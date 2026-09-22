@@ -1,0 +1,193 @@
+{
+  "structure": {
+    "A": "HANDICAP FORM #1",
+    "B": "HANDICAP FORM #2 / DIFFERENT GAME",
+    "C": "FROZEN ML / DIFFERENT FROM A AND B",
+    "candidates": [
+      "AB + AC",
+      "AB + BC"
+    ],
+    "allocation": "50:50"
+  },
+  "discovery": {
+    "AC": {
+      "ticket1": {
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "avgOdds": 6.234,
+        "roi": 112.62
+      },
+      "ticket2": {
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "avgOdds": 5.001,
+        "roi": 99.51
+      },
+      "portfolio": {
+        "days": 3,
+        "roi": 106.07,
+        "profit": 31820,
+        "finalBank": 1031820,
+        "mdd": 1.9,
+        "losingStreak": 2,
+        "zeroHit": 2,
+        "ticket1Only": 0,
+        "ticket2Only": 0,
+        "both": 1,
+        "oneHitDays": 0,
+        "oneHitRecovery": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "days": 3,
+            "roi": 106.07,
+            "zeroHit": 2,
+            "oneHit": 0,
+            "both": 1
+          }
+        ]
+      }
+    },
+    "BC": {
+      "ticket1": {
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "avgOdds": 6.234,
+        "roi": 112.62
+      },
+      "ticket2": {
+        "bets": 3,
+        "wins": 1,
+        "hit": 33.33,
+        "avgOdds": 4.558,
+        "roi": 61.17
+      },
+      "portfolio": {
+        "days": 3,
+        "roi": 86.9,
+        "profit": 26069,
+        "finalBank": 1026069,
+        "mdd": 1.91,
+        "losingStreak": 2,
+        "zeroHit": 2,
+        "ticket1Only": 0,
+        "ticket2Only": 0,
+        "both": 1,
+        "oneHitDays": 0,
+        "oneHitRecovery": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "days": 3,
+            "roi": 86.9,
+            "zeroHit": 2,
+            "oneHit": 0,
+            "both": 1
+          }
+        ]
+      }
+    }
+  },
+  "internal": {
+    "AC": {
+      "ticket1": {
+        "bets": 10,
+        "wins": 3,
+        "hit": 30,
+        "avgOdds": 6.682,
+        "roi": 102.33
+      },
+      "ticket2": {
+        "bets": 10,
+        "wins": 4,
+        "hit": 40,
+        "avgOdds": 4.368,
+        "roi": 45.72
+      },
+      "portfolio": {
+        "days": 10,
+        "roi": 74.02,
+        "profit": 74023,
+        "finalBank": 1074023,
+        "mdd": 4,
+        "losingStreak": 4,
+        "zeroHit": 6,
+        "ticket1Only": 0,
+        "ticket2Only": 1,
+        "both": 3,
+        "oneHitDays": 1,
+        "oneHitRecovery": 172.05,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "days": 5,
+            "roi": -3.64,
+            "zeroHit": 4,
+            "oneHit": 0,
+            "both": 1
+          },
+          {
+            "month": "2026-06",
+            "days": 5,
+            "roi": 151.68,
+            "zeroHit": 2,
+            "oneHit": 1,
+            "both": 2
+          }
+        ]
+      }
+    },
+    "BC": {
+      "ticket1": {
+        "bets": 10,
+        "wins": 3,
+        "hit": 30,
+        "avgOdds": 6.682,
+        "roi": 102.33
+      },
+      "ticket2": {
+        "bets": 10,
+        "wins": 4,
+        "hit": 40,
+        "avgOdds": 4.235,
+        "roi": 61.78
+      },
+      "portfolio": {
+        "days": 10,
+        "roi": 82.05,
+        "profit": 82053,
+        "finalBank": 1082053,
+        "mdd": 2,
+        "losingStreak": 2,
+        "zeroHit": 6,
+        "ticket1Only": 0,
+        "ticket2Only": 1,
+        "both": 3,
+        "oneHitDays": 1,
+        "oneHitRecovery": 249.48,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "days": 5,
+            "roi": 56.29,
+            "zeroHit": 3,
+            "oneHit": 1,
+            "both": 1
+          },
+          {
+            "month": "2026-06",
+            "days": 5,
+            "roi": 107.82,
+            "zeroHit": 3,
+            "oneHit": 0,
+            "both": 2
+          }
+        ]
+      }
+    }
+  },
+  "final": "LOCKED / NOT OPENED FOR SAFE 2+2 SELECTION"
+}

@@ -1,0 +1,1384 @@
+{
+  "generatedAt": "2026-09-14T16:59:41.608Z",
+  "final": "LOCKED",
+  "results": [
+    {
+      "name": "OVER_EV3_5",
+      "discovery": {
+        "bets": 3,
+        "wins": 2,
+        "losses": 1,
+        "voids": 0,
+        "hit": 66.67,
+        "avgOdds": 1.76,
+        "profit": 5600,
+        "roi": 18.67,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 1,
+            "wins": 1,
+            "losses": 0,
+            "voids": 0,
+            "returned": 17800,
+            "profit": 7800,
+            "roi": 78
+          },
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 17800,
+            "profit": -2200,
+            "roi": -11
+          }
+        ]
+      },
+      "internal": {
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.795,
+        "profit": -1300,
+        "roi": -6.5,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 18700,
+            "profit": -1300,
+            "roi": -6.5
+          }
+        ]
+      }
+    },
+    {
+      "name": "OVER_EV5_10",
+      "discovery": {
+        "bets": 4,
+        "wins": 3,
+        "losses": 1,
+        "voids": 0,
+        "hit": 75,
+        "avgOdds": 1.787,
+        "profit": 12700,
+        "roi": 31.75,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "voids": 0,
+            "returned": 35100,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 17600,
+            "profit": -2400,
+            "roi": -12
+          }
+        ]
+      },
+      "internal": {
+        "bets": 1,
+        "wins": 1,
+        "losses": 0,
+        "voids": 0,
+        "hit": 100,
+        "avgOdds": 1.92,
+        "profit": 9200,
+        "roi": 92,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 1,
+            "wins": 1,
+            "losses": 0,
+            "voids": 0,
+            "returned": 19200,
+            "profit": 9200,
+            "roi": 92
+          }
+        ]
+      }
+    },
+    {
+      "name": "OVER_EV3_10",
+      "discovery": {
+        "bets": 7,
+        "wins": 5,
+        "losses": 2,
+        "voids": 0,
+        "hit": 71.43,
+        "avgOdds": 1.776,
+        "profit": 18300,
+        "roi": 26.14,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 3,
+            "wins": 3,
+            "losses": 0,
+            "voids": 0,
+            "returned": 52900,
+            "profit": 22900,
+            "roi": 76.33
+          },
+          {
+            "month": "2026-04",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 35400,
+            "profit": -4600,
+            "roi": -11.5
+          }
+        ]
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 2,
+        "losses": 1,
+        "voids": 0,
+        "hit": 66.67,
+        "avgOdds": 1.837,
+        "profit": 7900,
+        "roi": 26.33,
+        "maxLosingStreak": 1,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 2,
+            "losses": 1,
+            "voids": 0,
+            "returned": 37900,
+            "profit": 7900,
+            "roi": 26.33
+          }
+        ]
+      }
+    },
+    {
+      "name": "UNDER_EV3_5",
+      "discovery": {
+        "bets": 2,
+        "wins": 0,
+        "losses": 2,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 1.925,
+        "profit": -20000,
+        "roi": -100,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 0,
+            "losses": 2,
+            "voids": 0,
+            "returned": 0,
+            "profit": -20000,
+            "roi": -100
+          }
+        ]
+      },
+      "internal": {
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.89,
+        "profit": -1600,
+        "roi": -8,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 1,
+            "wins": 1,
+            "losses": 0,
+            "voids": 0,
+            "returned": 18400,
+            "profit": 8400,
+            "roi": 84
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "UNDER_EV5_10",
+      "discovery": {
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.9,
+        "profit": -500,
+        "roi": -2.5,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 19500,
+            "profit": -500,
+            "roi": -2.5
+          }
+        ]
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 3,
+        "losses": 0,
+        "voids": 0,
+        "hit": 100,
+        "avgOdds": 1.877,
+        "profit": 26300,
+        "roi": 87.67,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-06",
+            "bets": 3,
+            "wins": 3,
+            "losses": 0,
+            "voids": 0,
+            "returned": 56300,
+            "profit": 26300,
+            "roi": 87.67
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_EV3_5",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 5,
+        "wins": 1,
+        "losses": 4,
+        "voids": 0,
+        "hit": 20,
+        "avgOdds": 2.112,
+        "profit": -33500,
+        "roi": -67,
+        "maxLosingStreak": 3,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 16500,
+            "profit": -3500,
+            "roi": -17.5
+          },
+          {
+            "month": "2026-06",
+            "bets": 3,
+            "wins": 0,
+            "losses": 3,
+            "voids": 0,
+            "returned": 0,
+            "profit": -30000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_EV5_10",
+      "discovery": {
+        "bets": 4,
+        "wins": 1,
+        "losses": 3,
+        "voids": 0,
+        "hit": 25,
+        "avgOdds": 2.228,
+        "profit": -18200,
+        "roi": -45.5,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 4,
+            "wins": 1,
+            "losses": 3,
+            "voids": 0,
+            "returned": 21800,
+            "profit": -18200,
+            "roi": -45.5
+          }
+        ]
+      },
+      "internal": {
+        "bets": 7,
+        "wins": 3,
+        "losses": 4,
+        "voids": 0,
+        "hit": 42.86,
+        "avgOdds": 2.311,
+        "profit": -5400,
+        "roi": -7.71,
+        "maxLosingStreak": 3,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "voids": 0,
+            "returned": 42700,
+            "profit": 22700,
+            "roi": 113.5
+          },
+          {
+            "month": "2026-06",
+            "bets": 5,
+            "wins": 1,
+            "losses": 4,
+            "voids": 0,
+            "returned": 21900,
+            "profit": -28100,
+            "roi": -56.2
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_EV3_10",
+      "discovery": {
+        "bets": 4,
+        "wins": 1,
+        "losses": 3,
+        "voids": 0,
+        "hit": 25,
+        "avgOdds": 2.228,
+        "profit": -18200,
+        "roi": -45.5,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 4,
+            "wins": 1,
+            "losses": 3,
+            "voids": 0,
+            "returned": 21800,
+            "profit": -18200,
+            "roi": -45.5
+          }
+        ]
+      },
+      "internal": {
+        "bets": 12,
+        "wins": 4,
+        "losses": 8,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 2.228,
+        "profit": -38900,
+        "roi": -32.42,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 4,
+            "wins": 3,
+            "losses": 1,
+            "voids": 0,
+            "returned": 59200,
+            "profit": 19200,
+            "roi": 48
+          },
+          {
+            "month": "2026-06",
+            "bets": 8,
+            "wins": 1,
+            "losses": 7,
+            "voids": 0,
+            "returned": 21900,
+            "profit": -58100,
+            "roi": -72.63
+          }
+        ]
+      }
+    },
+    {
+      "name": "HANDI_EV3_5",
+      "discovery": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 3.033,
+        "profit": 1000,
+        "roi": 3.33,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 31000,
+            "profit": 1000,
+            "roi": 3.33
+          }
+        ]
+      },
+      "internal": {
+        "bets": 7,
+        "wins": 5,
+        "losses": 2,
+        "voids": 0,
+        "hit": 71.43,
+        "avgOdds": 2.851,
+        "profit": 75700,
+        "roi": 108.14,
+        "maxLosingStreak": 1,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 4,
+            "wins": 3,
+            "losses": 1,
+            "voids": 0,
+            "returned": 86400,
+            "profit": 46400,
+            "roi": 116
+          },
+          {
+            "month": "2026-06",
+            "bets": 3,
+            "wins": 2,
+            "losses": 1,
+            "voids": 0,
+            "returned": 59300,
+            "profit": 29300,
+            "roi": 97.67
+          }
+        ]
+      }
+    },
+    {
+      "name": "HANDI_EV5_10",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 2,
+        "wins": 0,
+        "losses": 2,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 2.97,
+        "profit": -20000,
+        "roi": -100,
+        "maxLosingStreak": 2,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "HANDI_EV3_10",
+      "discovery": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 3.033,
+        "profit": 1000,
+        "roi": 3.33,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 31000,
+            "profit": 1000,
+            "roi": 3.33
+          }
+        ]
+      },
+      "internal": {
+        "bets": 9,
+        "wins": 5,
+        "losses": 4,
+        "voids": 0,
+        "hit": 55.56,
+        "avgOdds": 2.878,
+        "profit": 55700,
+        "roi": 61.89,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 5,
+            "wins": 3,
+            "losses": 2,
+            "voids": 0,
+            "returned": 86400,
+            "profit": 36400,
+            "roi": 72.8
+          },
+          {
+            "month": "2026-06",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 59300,
+            "profit": 19300,
+            "roi": 48.25
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_CONF55_EV0_3",
+      "discovery": {
+        "bets": 4,
+        "wins": 2,
+        "losses": 2,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.808,
+        "profit": -4400,
+        "roi": -11,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 35600,
+            "profit": -4400,
+            "roi": -11
+          }
+        ]
+      },
+      "internal": {
+        "bets": 4,
+        "wins": 1,
+        "losses": 3,
+        "voids": 0,
+        "hit": 25,
+        "avgOdds": 1.68,
+        "profit": -23700,
+        "roi": -59.25,
+        "maxLosingStreak": 2,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 16299.999999999998,
+            "profit": -13700,
+            "roi": -45.67
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_CONF55_EV3_10",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 4,
+        "wins": 2,
+        "losses": 2,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.738,
+        "profit": -4300,
+        "roi": -10.75,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 2,
+            "losses": 1,
+            "voids": 0,
+            "returned": 35700,
+            "profit": 5700,
+            "roi": 19
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_CONF60_EV0_3",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 1.623,
+        "profit": -13700,
+        "roi": -45.67,
+        "maxLosingStreak": 1,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 16299.999999999998,
+            "profit": -3700,
+            "roi": -18.5
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_CONF60_EV3_10",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 1.677,
+        "profit": -13500,
+        "roi": -45,
+        "maxLosingStreak": 1,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 16500,
+            "profit": -3500,
+            "roi": -17.5
+          },
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV3_5_ODDS120_180",
+      "discovery": {
+        "bets": 3,
+        "wins": 2,
+        "losses": 1,
+        "voids": 0,
+        "hit": 66.67,
+        "avgOdds": 1.76,
+        "profit": 5600,
+        "roi": 18.67,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 1,
+            "wins": 1,
+            "losses": 0,
+            "voids": 0,
+            "returned": 17800,
+            "profit": 7800,
+            "roi": 78
+          },
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 1,
+            "losses": 1,
+            "voids": 0,
+            "returned": 17800,
+            "profit": -2200,
+            "roi": -11
+          }
+        ]
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 1.677,
+        "profit": -13500,
+        "roi": -45,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 16500,
+            "profit": -13500,
+            "roi": -45
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV3_5_ODDS180_250",
+      "discovery": {
+        "bets": 2,
+        "wins": 0,
+        "losses": 2,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 1.925,
+        "profit": -20000,
+        "roi": -100,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 2,
+            "wins": 0,
+            "losses": 2,
+            "voids": 0,
+            "returned": 0,
+            "profit": -20000,
+            "roi": -100
+          }
+        ]
+      },
+      "internal": {
+        "bets": 5,
+        "wins": 2,
+        "losses": 3,
+        "voids": 0,
+        "hit": 40,
+        "avgOdds": 1.962,
+        "profit": -12900,
+        "roi": -25.8,
+        "maxLosingStreak": 3,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "voids": 0,
+            "returned": 37100,
+            "profit": 17100,
+            "roi": 85.5
+          },
+          {
+            "month": "2026-06",
+            "bets": 3,
+            "wins": 0,
+            "losses": 3,
+            "voids": 0,
+            "returned": 0,
+            "profit": -30000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV3_5_ODDS250_PLUS",
+      "discovery": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 3.033,
+        "profit": 1000,
+        "roi": 3.33,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 31000,
+            "profit": 1000,
+            "roi": 3.33
+          }
+        ]
+      },
+      "internal": {
+        "bets": 8,
+        "wins": 5,
+        "losses": 3,
+        "voids": 0,
+        "hit": 62.5,
+        "avgOdds": 2.881,
+        "profit": 65700,
+        "roi": 82.13,
+        "maxLosingStreak": 1,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 4,
+            "wins": 3,
+            "losses": 1,
+            "voids": 0,
+            "returned": 86400,
+            "profit": 46400,
+            "roi": 116
+          },
+          {
+            "month": "2026-06",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 59300,
+            "profit": 19300,
+            "roi": 48.25
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV5_10_ODDS120_180",
+      "discovery": {
+        "bets": 3,
+        "wins": 3,
+        "losses": 0,
+        "voids": 0,
+        "hit": 100,
+        "avgOdds": 1.757,
+        "profit": 22700,
+        "roi": 75.67,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "voids": 0,
+            "returned": 35100,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 1,
+            "wins": 1,
+            "losses": 0,
+            "voids": 0,
+            "returned": 17600,
+            "profit": 7600,
+            "roi": 76
+          }
+        ]
+      },
+      "internal": {
+        "bets": 1,
+        "wins": 0,
+        "losses": 1,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 1.72,
+        "profit": -10000,
+        "roi": -100,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-06",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV5_10_ODDS180_250",
+      "discovery": {
+        "bets": 7,
+        "wins": 2,
+        "losses": 5,
+        "voids": 0,
+        "hit": 28.57,
+        "avgOdds": 2.084,
+        "profit": -28700,
+        "roi": -41,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 7,
+            "wins": 2,
+            "losses": 5,
+            "voids": 0,
+            "returned": 41300,
+            "profit": -28700,
+            "roi": -41
+          }
+        ]
+      },
+      "internal": {
+        "bets": 8,
+        "wins": 7,
+        "losses": 1,
+        "voids": 0,
+        "hit": 87.5,
+        "avgOdds": 2.034,
+        "profit": 60100,
+        "roi": 75.13,
+        "maxLosingStreak": 1,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 3,
+            "losses": 0,
+            "voids": 0,
+            "returned": 61900,
+            "profit": 31900,
+            "roi": 106.33
+          },
+          {
+            "month": "2026-06",
+            "bets": 5,
+            "wins": 4,
+            "losses": 1,
+            "voids": 0,
+            "returned": 78200,
+            "profit": 28200,
+            "roi": 56.4
+          }
+        ]
+      }
+    },
+    {
+      "name": "EV5_10_ODDS250_PLUS",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 4,
+        "wins": 0,
+        "losses": 4,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 2.92,
+        "profit": -40000,
+        "roi": -100,
+        "maxLosingStreak": 4,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 1,
+            "wins": 0,
+            "losses": 1,
+            "voids": 0,
+            "returned": 0,
+            "profit": -10000,
+            "roi": -100
+          },
+          {
+            "month": "2026-06",
+            "bets": 3,
+            "wins": 0,
+            "losses": 3,
+            "voids": 0,
+            "returned": 0,
+            "profit": -30000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "OVER_EV3_10_ODDS160_200",
+      "discovery": {
+        "bets": 7,
+        "wins": 5,
+        "losses": 2,
+        "voids": 0,
+        "hit": 71.43,
+        "avgOdds": 1.776,
+        "profit": 18300,
+        "roi": 26.14,
+        "maxLosingStreak": 1,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 3,
+            "wins": 3,
+            "losses": 0,
+            "voids": 0,
+            "returned": 52900,
+            "profit": 22900,
+            "roi": 76.33
+          },
+          {
+            "month": "2026-04",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 35400,
+            "profit": -4600,
+            "roi": -11.5
+          }
+        ]
+      },
+      "internal": {
+        "bets": 3,
+        "wins": 2,
+        "losses": 1,
+        "voids": 0,
+        "hit": 66.67,
+        "avgOdds": 1.837,
+        "profit": 7900,
+        "roi": 26.33,
+        "maxLosingStreak": 1,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 2,
+            "losses": 1,
+            "voids": 0,
+            "returned": 37900,
+            "profit": 7900,
+            "roi": 26.33
+          }
+        ]
+      }
+    },
+    {
+      "name": "ML_EV3_10_ODDS150_200",
+      "discovery": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "voids": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "profit": 0,
+        "roi": 0,
+        "maxLosingStreak": 0,
+        "negativeMonths": 0,
+        "monthly": []
+      },
+      "internal": {
+        "bets": 5,
+        "wins": 2,
+        "losses": 3,
+        "voids": 0,
+        "hit": 40,
+        "avgOdds": 1.788,
+        "profit": -14300,
+        "roi": -28.6,
+        "maxLosingStreak": 2,
+        "negativeMonths": 1,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 3,
+            "wins": 2,
+            "losses": 1,
+            "voids": 0,
+            "returned": 35700,
+            "profit": 5700,
+            "roi": 19
+          },
+          {
+            "month": "2026-06",
+            "bets": 2,
+            "wins": 0,
+            "losses": 2,
+            "voids": 0,
+            "returned": 0,
+            "profit": -20000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "name": "HANDI_EV3_10_ODDS250_PLUS",
+      "discovery": {
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 3.033,
+        "profit": 1000,
+        "roi": 3.33,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "bets": 3,
+            "wins": 1,
+            "losses": 2,
+            "voids": 0,
+            "returned": 31000,
+            "profit": 1000,
+            "roi": 3.33
+          }
+        ]
+      },
+      "internal": {
+        "bets": 9,
+        "wins": 5,
+        "losses": 4,
+        "voids": 0,
+        "hit": 55.56,
+        "avgOdds": 2.878,
+        "profit": 55700,
+        "roi": 61.89,
+        "maxLosingStreak": 2,
+        "negativeMonths": 0,
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 5,
+            "wins": 3,
+            "losses": 2,
+            "voids": 0,
+            "returned": 86400,
+            "profit": 36400,
+            "roi": 72.8
+          },
+          {
+            "month": "2026-06",
+            "bets": 4,
+            "wins": 2,
+            "losses": 2,
+            "voids": 0,
+            "returned": 59300,
+            "profit": 19300,
+            "roi": 48.25
+          }
+        ]
+      }
+    }
+  ],
+  "robust": []
+}

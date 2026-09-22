@@ -1,0 +1,432 @@
+﻿import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+
+function implied(odds: number | null) {
+  return odds && odds > 1 ? 1 / odds : null;
+}
+
+function clamp(value: number, min = 0.2, max = 0.8) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function fairTwoWay(
+  firstOdds: number | null,
+  secondOdds: number | null
+) {
+  const first = implied(firstOdds);
+  const second = implied(secondOdds);
+
+  if (first === null || second === null) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  const sum = first + second;
+
+  if (sum <= 0) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  return {
+    first: first / sum,
+    second: second / sum,
+  };
+}
+
+function grade(
+  confidence: number,
+  ev: number | null
+): "A" | "B" | "C" {
+  if (
+    confidence >= 0.64 &&
+    (ev ?? 0) >= 0.04
+  ) {
+    return "A";
+  }
+
+  if (
+    confidence >= 0.57 &&
+    (ev ?? 0) >= 0
+  ) {
+    return "B";
+  }
+
+  return "C";
+}
+
+function formatLine(line: number | null) {
+  if (line === null) return "";
+
+  return line > 0
+    ? `+${line}`
+    : String(line);
+}
+
+/*
+  현재 v0.2 임시 분석 모델
+
+  ML:
+  - 시장배당
+  - 홈 이점
+  - 팀 순위
+
+  핸디캡:
+  - 시장 핸디캡 확률
+  - ML 모델의 팀 우위 일부 반영
+
+  O/U:
+  - 현재는 시장 no-vig 확률 기반
+  - 추후 최근 득실점 / 선발 / 불펜 / 구장 데이터를 연결해 교체
+*/
+export function analyzeGame(
+  game: KboGame,
+  odds: OddsInput,
+  starterEdgeScore = 0,
+  teamFormEdgeScore = 0
+): Pick[] {
+  const picks: Pick[] = [];
+
+  // ----------------------------------------------------------
+  // ML
+  // ----------------------------------------------------------
+
+  const rankEdge =
+    game.awayRank && game.homeRank
+      ? Math.max(
+          -0.08,
+          Math.min(
+            0.08,
+            (game.homeRank - game.awayRank) * 0.008
+          )
+        )
+      : 0;
+
+  const baseAway = 0.48 + rankEdge;
+
+  const mlFair = fairTwoWay(
+    odds.awayMl,
+    odds.homeMl
+  );
+
+  const awayFairMarket =
+    mlFair.first ?? 0.5;
+
+  const baseAwayProb = clamp(
+    baseAway * 0.45 +
+      awayFairMarket * 0.55
+  );
+
+  /*
+    선발 보정 v0.3
+
+    starterEdgeScore:
+    원정 선발점수 - 홈 선발점수
+
+    10점 차이 ≈ 1.8% 보정
+    20점 차이 ≈ 3.6% 보정
+
+    최대 ±5% 제한
+
+    아직 백테스트 전이므로
+    선발 비중을 보수적으로 제한한다.
+  */
+
+  const starterAdjustment =
+    Math.max(
+      -0.05,
+      Math.min(
+        0.05,
+        starterEdgeScore * 0.0018
+      )
+    );
+
+  /*
+    최근 팀 폼 보정 v0.4
+
+    teamFormEdgeScore:
+    원정 최근폼 점수 - 홈 최근폼 점수
+
+    최대 ±4%만 반영한다.
+
+    선발 + 최근폼이 동시에
+    한 방향으로 강해도 과도한 확률 상승을
+    막기 위해 제한한다.
+  */
+
+  const teamFormAdjustment =
+    Math.max(
+      -0.04,
+      Math.min(
+        0.04,
+        teamFormEdgeScore * 0.0013
+      )
+    );
+
+  const awayProb = clamp(
+    baseAwayProb +
+      starterAdjustment +
+      teamFormAdjustment
+  );
+
+  const homeProb =
+    1 - awayProb;
+
+  const awayEv =
+    odds.awayMl
+      ? awayProb * odds.awayMl - 1
+      : null;
+
+  const homeEv =
+    odds.homeMl
+      ? homeProb * odds.homeMl - 1
+      : null;
+
+  picks.push(
+    {
+      gameId: game.gameId,
+      label: `${game.awayTeamName} 승`,
+      market: "ML",
+      odds: odds.awayMl,
+      confidence: awayProb,
+      ev: awayEv,
+      grade: grade(
+        awayProb,
+        awayEv
+      ),
+    },
+    {
+      gameId: game.gameId,
+      label: `${game.homeTeamName} 승`,
+      market: "ML",
+      odds: odds.homeMl,
+      confidence: homeProb,
+      ev: homeEv,
+      grade: grade(
+        homeProb,
+        homeEv
+      ),
+    }
+  );
+
+  // ----------------------------------------------------------
+  // HANDICAP
+  // ----------------------------------------------------------
+
+  const handicapFair = fairTwoWay(
+    odds.awayHandicap,
+    odds.homeHandicap
+  );
+
+  if (
+    handicapFair.first !== null &&
+    handicapFair.second !== null
+  ) {
+    // ML 모델과 시장 방향 차이를 소폭만 반영
+    const teamEdge =
+      awayProb - 0.5;
+
+    const awayHandicapProb =
+      clamp(
+        handicapFair.first +
+          teamEdge * 0.18,
+        0.15,
+        0.85
+      );
+
+    const homeHandicapProb =
+      1 - awayHandicapProb;
+
+    const awayHandicapEv =
+      odds.awayHandicap
+        ? awayHandicapProb *
+            odds.awayHandicap -
+          1
+        : null;
+
+    const homeHandicapEv =
+      odds.homeHandicap
+        ? homeHandicapProb *
+            odds.homeHandicap -
+          1
+        : null;
+
+    picks.push(
+      {
+        gameId: game.gameId,
+        label:
+          `${game.awayTeamName} ` +
+          `${formatLine(
+            odds.awayHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.awayHandicap,
+        confidence:
+          awayHandicapProb,
+        ev: awayHandicapEv,
+        grade: grade(
+          awayHandicapProb,
+          awayHandicapEv
+        ),
+      },
+      {
+        gameId: game.gameId,
+        label:
+          `${game.homeTeamName} ` +
+          `${formatLine(
+            odds.homeHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.homeHandicap,
+        confidence:
+          homeHandicapProb,
+        ev: homeHandicapEv,
+        grade: grade(
+          homeHandicapProb,
+          homeHandicapEv
+        ),
+      }
+    );
+  }
+
+  // ----------------------------------------------------------
+  // TOTAL
+  // ----------------------------------------------------------
+
+  const totalFair = fairTwoWay(
+    odds.overOdds,
+    odds.underOdds
+  );
+
+  if (
+    odds.totalLine !== null &&
+    totalFair.first !== null &&
+    totalFair.second !== null
+  ) {
+    const overProb =
+      totalFair.first;
+
+    const underProb =
+      totalFair.second;
+
+    const overEv =
+      odds.overOdds
+        ? overProb *
+            odds.overOdds -
+          1
+        : null;
+
+    const underEv =
+      odds.underOdds
+        ? underProb *
+            odds.underOdds -
+          1
+        : null;
+
+    picks.push(
+      {
+        gameId: game.gameId,
+        label: `오버 ${odds.totalLine}`,
+        market: "TOTAL",
+        odds: odds.overOdds,
+        confidence: overProb,
+        ev: overEv,
+        grade: grade(
+          overProb,
+          overEv
+        ),
+      },
+      {
+        gameId: game.gameId,
+        label: `언더 ${odds.totalLine}`,
+        market: "TOTAL",
+        odds: odds.underOdds,
+        confidence: underProb,
+        ev: underEv,
+        grade: grade(
+          underProb,
+          underEv
+        ),
+      }
+    );
+  }
+
+  return picks.sort(
+    (a, b) =>
+      (b.ev ?? -1) -
+      (a.ev ?? -1)
+  );
+}
+
+export function makeAutoCombos(
+  allPicks: Pick[]
+) {
+  const usable = allPicks.filter(
+    (p) =>
+      p.grade !== "C" &&
+      p.odds &&
+      p.ev !== null &&
+      p.ev > -0.02
+  );
+
+  /*
+    같은 경기에서는 1개 픽만 허용.
+    예:
+    LG 승 + LG -1.5
+    같은 경기 중복 조합 방지
+  */
+  const byGame =
+    new Map<string, Pick>();
+
+  for (
+    const p of usable.sort(
+      (a, b) =>
+        (b.ev ?? 0) -
+        (a.ev ?? 0)
+    )
+  ) {
+    if (!byGame.has(p.gameId)) {
+      byGame.set(
+        p.gameId,
+        p
+      );
+    }
+  }
+
+  const picks =
+    [...byGame.values()];
+
+  const combo = (
+    name: string,
+    count: number
+  ) => {
+    const selected =
+      picks.slice(0, count);
+
+    return {
+      name,
+      picks: selected,
+      odds:
+        selected.reduce(
+          (acc, p) =>
+            acc *
+            (p.odds ?? 1),
+          1
+        ),
+    };
+  };
+
+  return [
+    combo("안정형 2폴", 2),
+    combo("균형형 3폴", 3),
+    combo("공격형 4폴", 4),
+  ].filter(
+    (x) =>
+      x.picks.length >= 2
+  );
+}
+
+

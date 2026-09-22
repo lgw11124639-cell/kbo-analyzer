@@ -1,0 +1,804 @@
+{
+  "generatedAt": "2026-09-14T16:36:53.993Z",
+  "initialBankroll": 1000000,
+  "dailyInvestment": 50000,
+  "structure": "A=2 / B=A+1",
+  "output": [
+    {
+      "template": "TOTAL_ML",
+      "bestFixedTrain": {
+        "template": "TOTAL_ML",
+        "ratioMode": "30:70",
+        "activeDays": 31,
+        "both": 5,
+        "onlyA": 1,
+        "neither": 25,
+        "avgARatio": 30,
+        "avgAOdds": 3.247,
+        "avgBOdds": 6.426,
+        "aOnlyAvgRecoveryPct": 88.4,
+        "aOnlyBreakEvenPct": 0,
+        "invested": 1550000,
+        "returned": 1248433,
+        "profit": -301567,
+        "roi": -19.46,
+        "finalBankroll": 698433,
+        "MDD": 51.55,
+        "maxLoseStreak": 10,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 541421,
+            "profit": 441421,
+            "roi": 441.42
+          },
+          {
+            "month": "2026-04",
+            "days": 7,
+            "invested": 350000,
+            "returned": 44195,
+            "profit": -305805,
+            "roi": -87.37
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 463924,
+            "profit": -186076,
+            "roi": -28.63
+          },
+          {
+            "month": "2026-06",
+            "days": 9,
+            "invested": 450000,
+            "returned": 198893,
+            "profit": -251107,
+            "roi": -55.8
+          }
+        ]
+      },
+      "fixedValidation": {
+        "template": "TOTAL_ML",
+        "ratioMode": "30:70",
+        "activeDays": 12,
+        "both": 0,
+        "onlyA": 2,
+        "neither": 10,
+        "avgARatio": 30,
+        "avgAOdds": 2.99,
+        "avgBOdds": 5.847,
+        "aOnlyAvgRecoveryPct": 90,
+        "aOnlyBreakEvenPct": 50,
+        "invested": 600000,
+        "returned": 89952,
+        "profit": -510048,
+        "roi": -85.01,
+        "finalBankroll": 489952,
+        "MDD": 51,
+        "maxLoseStreak": 8,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 7,
+            "invested": 350000,
+            "returned": 0,
+            "profit": -350000,
+            "roi": -100
+          },
+          {
+            "month": "2026-08",
+            "days": 2,
+            "invested": 100000,
+            "returned": 53100,
+            "profit": -46900,
+            "roi": -46.9
+          },
+          {
+            "month": "2026-09",
+            "days": 3,
+            "invested": 150000,
+            "returned": 36852,
+            "profit": -113148,
+            "roi": -75.43
+          }
+        ]
+      },
+      "recoveryTrain": {
+        "template": "TOTAL_ML",
+        "ratioMode": "RECOVERY",
+        "activeDays": 31,
+        "both": 5,
+        "onlyA": 1,
+        "neither": 25,
+        "avgARatio": 40,
+        "avgAOdds": 3.247,
+        "avgBOdds": 6.426,
+        "aOnlyAvgRecoveryPct": 117.9,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 1550000,
+        "returned": 1202867,
+        "profit": -347133,
+        "roi": -22.4,
+        "finalBankroll": 652867,
+        "MDD": 54.13,
+        "maxLoseStreak": 9,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 514319,
+            "profit": 414319,
+            "roi": 414.32
+          },
+          {
+            "month": "2026-04",
+            "days": 7,
+            "invested": 350000,
+            "returned": 58926,
+            "profit": -291074,
+            "roi": -83.16
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 440764,
+            "profit": -209236,
+            "roi": -32.19
+          },
+          {
+            "month": "2026-06",
+            "days": 9,
+            "invested": 450000,
+            "returned": 188858,
+            "profit": -261142,
+            "roi": -58.03
+          }
+        ]
+      },
+      "recoveryValidation": {
+        "template": "TOTAL_ML",
+        "ratioMode": "RECOVERY",
+        "activeDays": 12,
+        "both": 0,
+        "onlyA": 2,
+        "neither": 10,
+        "avgARatio": 40.1,
+        "avgAOdds": 2.99,
+        "avgBOdds": 5.847,
+        "aOnlyAvgRecoveryPct": 120.8,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 600000,
+        "returned": 120801,
+        "profit": -479199,
+        "roi": -79.87,
+        "finalBankroll": 520801,
+        "MDD": 47.92,
+        "maxLoseStreak": 8,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 7,
+            "invested": 350000,
+            "returned": 0,
+            "profit": -350000,
+            "roi": -100
+          },
+          {
+            "month": "2026-08",
+            "days": 2,
+            "invested": 100000,
+            "returned": 70800,
+            "profit": -29200,
+            "roi": -29.2
+          },
+          {
+            "month": "2026-09",
+            "days": 3,
+            "invested": 150000,
+            "returned": 50001,
+            "profit": -99999,
+            "roi": -66.67
+          }
+        ]
+      }
+    },
+    {
+      "template": "TOTAL_HANDICAP",
+      "bestFixedTrain": {
+        "template": "TOTAL_HANDICAP",
+        "ratioMode": "90:10",
+        "activeDays": 10,
+        "both": 1,
+        "onlyA": 2,
+        "neither": 7,
+        "avgARatio": 90,
+        "avgAOdds": 3.919,
+        "avgBOdds": 7.194,
+        "aOnlyAvgRecoveryPct": 376.3,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 500000,
+        "returned": 577374,
+        "profit": 77374,
+        "roi": 15.47,
+        "finalBankroll": 1077374,
+        "MDD": 20.14,
+        "maxLoseStreak": 5,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-05",
+            "days": 3,
+            "invested": 150000,
+            "returned": 391560,
+            "profit": 241560,
+            "roi": 161.04
+          },
+          {
+            "month": "2026-06",
+            "days": 6,
+            "invested": 300000,
+            "returned": 185814,
+            "profit": -114186,
+            "roi": -38.06
+          }
+        ]
+      },
+      "fixedValidation": {
+        "template": "TOTAL_HANDICAP",
+        "ratioMode": "90:10",
+        "activeDays": 7,
+        "both": 0,
+        "onlyA": 1,
+        "neither": 6,
+        "avgARatio": 90,
+        "avgAOdds": 4.154,
+        "avgBOdds": 7.774,
+        "aOnlyAvgRecoveryPct": 349.6,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 350000,
+        "returned": 174798,
+        "profit": -175202,
+        "roi": -50.06,
+        "finalBankroll": 824798,
+        "MDD": 30,
+        "maxLoseStreak": 6,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 4,
+            "invested": 200000,
+            "returned": 0,
+            "profit": -200000,
+            "roi": -100
+          },
+          {
+            "month": "2026-08",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-09",
+            "days": 2,
+            "invested": 100000,
+            "returned": 174798,
+            "profit": 74798,
+            "roi": 74.8
+          }
+        ]
+      },
+      "recoveryTrain": {
+        "template": "TOTAL_HANDICAP",
+        "ratioMode": "RECOVERY",
+        "activeDays": 10,
+        "both": 1,
+        "onlyA": 2,
+        "neither": 7,
+        "avgARatio": 40,
+        "avgAOdds": 3.919,
+        "avgBOdds": 7.194,
+        "aOnlyAvgRecoveryPct": 167.2,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 500000,
+        "returned": 427942,
+        "profit": -72058,
+        "roi": -14.41,
+        "finalBankroll": 927942,
+        "MDD": 22.37,
+        "maxLoseStreak": 5,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-04",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-05",
+            "days": 3,
+            "invested": 150000,
+            "returned": 345358,
+            "profit": 195358,
+            "roi": 130.24
+          },
+          {
+            "month": "2026-06",
+            "days": 6,
+            "invested": 300000,
+            "returned": 82584,
+            "profit": -217416,
+            "roi": -72.47
+          }
+        ]
+      },
+      "recoveryValidation": {
+        "template": "TOTAL_HANDICAP",
+        "ratioMode": "RECOVERY",
+        "activeDays": 7,
+        "both": 0,
+        "onlyA": 1,
+        "neither": 6,
+        "avgARatio": 40,
+        "avgAOdds": 4.154,
+        "avgBOdds": 7.774,
+        "aOnlyAvgRecoveryPct": 155.4,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 350000,
+        "returned": 77688,
+        "profit": -272312,
+        "roi": -77.8,
+        "finalBankroll": 727688,
+        "MDD": 30,
+        "maxLoseStreak": 6,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 4,
+            "invested": 200000,
+            "returned": 0,
+            "profit": -200000,
+            "roi": -100
+          },
+          {
+            "month": "2026-08",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-09",
+            "days": 2,
+            "invested": 100000,
+            "returned": 77688,
+            "profit": -22312,
+            "roi": -22.31
+          }
+        ]
+      }
+    },
+    {
+      "template": "ML_ML_TOTAL",
+      "bestFixedTrain": {
+        "template": "ML_ML_TOTAL",
+        "ratioMode": "30:70",
+        "activeDays": 14,
+        "both": 1,
+        "onlyA": 0,
+        "neither": 13,
+        "avgARatio": 30,
+        "avgAOdds": 3.744,
+        "avgBOdds": 6.654,
+        "aOnlyAvgRecoveryPct": 0,
+        "aOnlyBreakEvenPct": 0,
+        "invested": 700000,
+        "returned": 183864,
+        "profit": -516136,
+        "roi": -73.73,
+        "finalBankroll": 483864,
+        "MDD": 51.61,
+        "maxLoseStreak": 10,
+        "negativeMonths": 4,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-04",
+            "days": 4,
+            "invested": 200000,
+            "returned": 0,
+            "profit": -200000,
+            "roi": -100
+          },
+          {
+            "month": "2026-05",
+            "days": 6,
+            "invested": 300000,
+            "returned": 183864,
+            "profit": -116136,
+            "roi": -38.71
+          },
+          {
+            "month": "2026-06",
+            "days": 3,
+            "invested": 150000,
+            "returned": 0,
+            "profit": -150000,
+            "roi": -100
+          }
+        ]
+      },
+      "fixedValidation": {
+        "template": "ML_ML_TOTAL",
+        "ratioMode": "30:70",
+        "activeDays": 6,
+        "both": 0,
+        "onlyA": 1,
+        "neither": 5,
+        "avgARatio": 30,
+        "avgAOdds": 2.928,
+        "avgBOdds": 5.229,
+        "aOnlyAvgRecoveryPct": 88.5,
+        "aOnlyBreakEvenPct": 0,
+        "invested": 300000,
+        "returned": 44255,
+        "profit": -255745,
+        "roi": -85.25,
+        "finalBankroll": 744255,
+        "MDD": 25.57,
+        "maxLoseStreak": 6,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 5,
+            "invested": 250000,
+            "returned": 44255,
+            "profit": -205745,
+            "roi": -82.3
+          },
+          {
+            "month": "2026-08",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          }
+        ]
+      },
+      "recoveryTrain": {
+        "template": "ML_ML_TOTAL",
+        "ratioMode": "RECOVERY",
+        "activeDays": 14,
+        "both": 1,
+        "onlyA": 0,
+        "neither": 13,
+        "avgARatio": 40.1,
+        "avgAOdds": 3.744,
+        "avgBOdds": 6.654,
+        "aOnlyAvgRecoveryPct": 0,
+        "aOnlyBreakEvenPct": 0,
+        "invested": 700000,
+        "returned": 174270,
+        "profit": -525730,
+        "roi": -75.1,
+        "finalBankroll": 474270,
+        "MDD": 52.57,
+        "maxLoseStreak": 10,
+        "negativeMonths": 4,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          },
+          {
+            "month": "2026-04",
+            "days": 4,
+            "invested": 200000,
+            "returned": 0,
+            "profit": -200000,
+            "roi": -100
+          },
+          {
+            "month": "2026-05",
+            "days": 6,
+            "invested": 300000,
+            "returned": 174270,
+            "profit": -125730,
+            "roi": -41.91
+          },
+          {
+            "month": "2026-06",
+            "days": 3,
+            "invested": 150000,
+            "returned": 0,
+            "profit": -150000,
+            "roi": -100
+          }
+        ]
+      },
+      "recoveryValidation": {
+        "template": "ML_ML_TOTAL",
+        "ratioMode": "RECOVERY",
+        "activeDays": 6,
+        "both": 0,
+        "onlyA": 1,
+        "neither": 5,
+        "avgARatio": 40,
+        "avgAOdds": 2.928,
+        "avgBOdds": 5.229,
+        "aOnlyAvgRecoveryPct": 118,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 300000,
+        "returned": 59006,
+        "profit": -240994,
+        "roi": -80.33,
+        "finalBankroll": 759006,
+        "MDD": 24.1,
+        "maxLoseStreak": 3,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 5,
+            "invested": 250000,
+            "returned": 59006,
+            "profit": -190994,
+            "roi": -76.4
+          },
+          {
+            "month": "2026-08",
+            "days": 1,
+            "invested": 50000,
+            "returned": 0,
+            "profit": -50000,
+            "roi": -100
+          }
+        ]
+      }
+    },
+    {
+      "template": "ANY",
+      "bestFixedTrain": {
+        "template": "ANY",
+        "ratioMode": "30:70",
+        "activeDays": 34,
+        "both": 6,
+        "onlyA": 2,
+        "neither": 26,
+        "avgARatio": 30,
+        "avgAOdds": 3.094,
+        "avgBOdds": 6.149,
+        "aOnlyAvgRecoveryPct": 92.9,
+        "aOnlyBreakEvenPct": 50,
+        "invested": 1700000,
+        "returned": 1513505,
+        "profit": -186495,
+        "roi": -10.97,
+        "finalBankroll": 813505,
+        "MDD": 47.89,
+        "maxLoseStreak": 7,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 496890,
+            "profit": 396890,
+            "roi": 396.89
+          },
+          {
+            "month": "2026-04",
+            "days": 8,
+            "invested": 400000,
+            "returned": 314648,
+            "profit": -85352,
+            "roi": -21.34
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 460549,
+            "profit": -189451,
+            "roi": -29.15
+          },
+          {
+            "month": "2026-06",
+            "days": 11,
+            "invested": 550000,
+            "returned": 241418,
+            "profit": -308582,
+            "roi": -56.11
+          }
+        ]
+      },
+      "fixedValidation": {
+        "template": "ANY",
+        "ratioMode": "30:70",
+        "activeDays": 18,
+        "both": 0,
+        "onlyA": 7,
+        "neither": 11,
+        "avgARatio": 30,
+        "avgAOdds": 3.185,
+        "avgBOdds": 6.573,
+        "aOnlyAvgRecoveryPct": 97.2,
+        "aOnlyBreakEvenPct": 57.1,
+        "invested": 900000,
+        "returned": 340145,
+        "profit": -559855,
+        "roi": -62.21,
+        "finalBankroll": 440145,
+        "MDD": 55.99,
+        "maxLoseStreak": 5,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 9,
+            "invested": 450000,
+            "returned": 50463,
+            "profit": -399537,
+            "roi": -88.79
+          },
+          {
+            "month": "2026-08",
+            "days": 4,
+            "invested": 200000,
+            "returned": 154935,
+            "profit": -45065,
+            "roi": -22.53
+          },
+          {
+            "month": "2026-09",
+            "days": 5,
+            "invested": 250000,
+            "returned": 134747,
+            "profit": -115253,
+            "roi": -46.1
+          }
+        ]
+      },
+      "recoveryTrain": {
+        "template": "ANY",
+        "ratioMode": "RECOVERY",
+        "activeDays": 34,
+        "both": 6,
+        "onlyA": 2,
+        "neither": 26,
+        "avgARatio": 40,
+        "avgAOdds": 3.094,
+        "avgBOdds": 6.149,
+        "aOnlyAvgRecoveryPct": 123.9,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 1700000,
+        "returned": 1467147,
+        "profit": -232853,
+        "roi": -13.7,
+        "finalBankroll": 767147,
+        "MDD": 49.49,
+        "maxLoseStreak": 7,
+        "negativeMonths": 3,
+        "monthly": [
+          {
+            "month": "2026-03",
+            "days": 2,
+            "invested": 100000,
+            "returned": 469150,
+            "profit": 369150,
+            "roi": 369.15
+          },
+          {
+            "month": "2026-04",
+            "days": 8,
+            "invested": 400000,
+            "returned": 316967,
+            "profit": -83033,
+            "roi": -20.76
+          },
+          {
+            "month": "2026-05",
+            "days": 13,
+            "invested": 650000,
+            "returned": 435471,
+            "profit": -214529,
+            "roi": -33
+          },
+          {
+            "month": "2026-06",
+            "days": 11,
+            "invested": 550000,
+            "returned": 245558,
+            "profit": -304442,
+            "roi": -55.35
+          }
+        ]
+      },
+      "recoveryValidation": {
+        "template": "ANY",
+        "ratioMode": "RECOVERY",
+        "activeDays": 18,
+        "both": 0,
+        "onlyA": 7,
+        "neither": 11,
+        "avgARatio": 40,
+        "avgAOdds": 3.185,
+        "avgBOdds": 6.573,
+        "aOnlyAvgRecoveryPct": 129.8,
+        "aOnlyBreakEvenPct": 100,
+        "invested": 900000,
+        "returned": 454391,
+        "profit": -445609,
+        "roi": -49.51,
+        "finalBankroll": 554391,
+        "MDD": 47.61,
+        "maxLoseStreak": 5,
+        "negativeMonths": 2,
+        "monthly": [
+          {
+            "month": "2026-07",
+            "days": 9,
+            "invested": 450000,
+            "returned": 67284,
+            "profit": -382716,
+            "roi": -85.05
+          },
+          {
+            "month": "2026-08",
+            "days": 4,
+            "invested": 200000,
+            "returned": 206580,
+            "profit": 6580,
+            "roi": 3.29
+          },
+          {
+            "month": "2026-09",
+            "days": 5,
+            "invested": 250000,
+            "returned": 180527,
+            "profit": -69473,
+            "roi": -27.79
+          }
+        ]
+      }
+    }
+  ]
+}

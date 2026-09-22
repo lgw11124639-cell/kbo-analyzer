@@ -1,0 +1,445 @@
+﻿import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+
+export const dynamic = "force-dynamic";
+
+function num(
+  value: string | undefined
+) {
+  if (!value) {
+    return null;
+  }
+
+  const cleaned =
+    value
+      .replace(/,/g, "")
+      .replace(/[^0-9.-]/g, "")
+      .trim();
+
+  if (
+    !cleaned ||
+    cleaned === "-"
+  ) {
+    return null;
+  }
+
+  const parsed =
+    Number(cleaned);
+
+  return Number.isFinite(parsed)
+    ? parsed
+    : null;
+}
+
+function text(
+  value: string
+) {
+  return value
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function fetchHtml(
+  url: string
+) {
+  const response =
+    await fetch(
+      url,
+      {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+
+          "Accept-Language":
+            "ko-KR,ko;q=0.9",
+        },
+
+        cache:
+          "no-store",
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `KBO HTTP ${response.status}`
+    );
+  }
+
+  return response.text();
+}
+
+function parseTables(
+  html: string
+) {
+  const $ =
+    cheerio.load(html);
+
+  const tables:
+    Array<{
+      headers: string[];
+      rows: string[][];
+    }> = [];
+
+  $("table").each(
+    (_, table) => {
+      const headers =
+        $(table)
+          .find("thead th")
+          .map(
+            (_, th) =>
+              text(
+                $(th).text()
+              )
+          )
+          .get();
+
+      const rows =
+        $(table)
+          .find("tbody tr")
+          .map(
+            (_, tr) => {
+              const cells =
+                $(tr)
+                  .find("th,td")
+                  .map(
+                    (_, td) =>
+                      text(
+                        $(td).text()
+                      )
+                  )
+                  .get();
+
+              return cells.length
+                ? [cells]
+                : [];
+            }
+          )
+          .get() as string[][];
+
+      if (
+        headers.length &&
+        rows.length
+      ) {
+        tables.push({
+          headers,
+          rows,
+        });
+      }
+    }
+  );
+
+  return {
+    $,
+    tables,
+  };
+}
+
+function findSeasonRow(
+  tables: Array<{
+    headers: string[];
+    rows: string[][];
+  }>,
+  requiredHeaders: string[]
+) {
+  for (
+    const table of tables
+  ) {
+    const normalizedHeaders =
+      table.headers.map(
+        (value) =>
+          value.toUpperCase()
+      );
+
+    const ok =
+      requiredHeaders.every(
+        (required) =>
+          normalizedHeaders.includes(
+            required.toUpperCase()
+          )
+      );
+
+    if (!ok) {
+      continue;
+    }
+
+    /*
+      선수 상세페이지는
+      현재 시즌 한 줄 또는
+      시즌별 여러 줄이 있을 수 있다.
+
+      우선 가장 마지막 유효행을 사용.
+    */
+    for (
+      let i =
+        table.rows.length - 1;
+      i >= 0;
+      i--
+    ) {
+      const row =
+        table.rows[i];
+
+      if (
+        row &&
+        row.length >=
+          table.headers.length
+      ) {
+        const result:
+          Record<string, string> = {};
+
+        table.headers.forEach(
+          (header, index) => {
+            result[
+              header.toUpperCase()
+            ] =
+              row[index] ?? "";
+          }
+        );
+
+        return result;
+      }
+    }
+  }
+
+  return null;
+}
+
+export async function GET(
+  request: Request
+) {
+  const url =
+    new URL(request.url);
+
+  const playerId =
+    url.searchParams.get(
+      "playerId"
+    );
+
+  if (
+    !playerId ||
+    !/^\d+$/.test(playerId)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "playerId 파라미터가 필요합니다.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  try {
+    const basicUrl =
+      `https://www.koreabaseball.com/Record/Player/HitterDetail/Basic.aspx?playerId=${playerId}`;
+
+    const html =
+      await fetchHtml(
+        basicUrl
+      );
+
+    const {
+      $,
+      tables,
+    } =
+      parseTables(html);
+
+    const playerName =
+      text(
+        $(
+          ".player_info .name, .playerInfo .name, .player_info h4, .playerInfo h4"
+        )
+          .first()
+          .text()
+      ) ||
+      text(
+        $("h4")
+          .first()
+          .text()
+      );
+
+    /*
+      기본 기록 테이블
+      AVG / G / PA / AB / R / H / 2B / 3B / HR ...
+    */
+    const basic =
+      findSeasonRow(
+        tables,
+        [
+          "AVG",
+          "G",
+          "PA",
+          "AB",
+          "H",
+          "HR",
+        ]
+      );
+
+    /*
+      세부 기록 테이블
+      BB / SO / SLG / OBP / OPS 등이 있는 테이블
+    */
+    const advanced =
+      findSeasonRow(
+        tables,
+        [
+          "AVG",
+          "BB",
+          "SO",
+          "SLG",
+          "OBP",
+          "OPS",
+        ]
+      );
+
+    if (
+      !basic &&
+      !advanced
+    ) {
+      return NextResponse.json(
+        {
+          playerId:
+            Number(playerId),
+
+          playerName,
+
+          found:
+            false,
+
+          error:
+            "타자 기록 테이블을 찾지 못했습니다.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const avg =
+      num(
+        basic?.AVG ??
+        advanced?.AVG
+      );
+
+    const g =
+      num(
+        basic?.G
+      );
+
+    const pa =
+      num(
+        basic?.PA
+      );
+
+    const ab =
+      num(
+        basic?.AB
+      );
+
+    const runs =
+      num(
+        basic?.R
+      );
+
+    const hits =
+      num(
+        basic?.H
+      );
+
+    const doubles =
+      num(
+        basic?.["2B"]
+      );
+
+    const triples =
+      num(
+        basic?.["3B"]
+      );
+
+    const hr =
+      num(
+        basic?.HR
+      );
+
+    const rbi =
+      num(
+        basic?.RBI
+      );
+
+    const bb =
+      num(
+        advanced?.BB
+      );
+
+    const so =
+      num(
+        advanced?.SO
+      );
+
+    const slg =
+      num(
+        advanced?.SLG
+      );
+
+    const obp =
+      num(
+        advanced?.OBP
+      );
+
+    const ops =
+      num(
+        advanced?.OPS
+      );
+
+    return NextResponse.json({
+      fetchedAt:
+        new Date()
+          .toISOString(),
+
+      found: true,
+
+      playerId:
+        Number(playerId),
+
+      playerName,
+
+      stats: {
+        avg,
+        g,
+        pa,
+        ab,
+
+        runs,
+        hits,
+        doubles,
+        triples,
+
+        hr,
+        rbi,
+
+        bb,
+        so,
+
+        obp,
+        slg,
+        ops,
+      },
+
+      source:
+        basicUrl,
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "unknown error",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}

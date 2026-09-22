@@ -1,0 +1,128 @@
+{
+  "provider": "betman",
+  "fetchedAt": "2026-09-22T07:54:06.148Z",
+  "gmId": "G101",
+  "gmTs": 260112,
+  "round": 112,
+  "roundYear": 2026,
+  "saleStatus": "SaleProgress",
+  "statusMessage": "9월22일 23:00 회차마감",
+  "events": [
+    {
+      "id": "betman-2026-09-22-SS-NC",
+      "provider": "betman",
+      "date": "2026-09-22",
+      "commenceTime": "2026-09-22T09:30:00.000Z",
+      "matchSeq": 3877,
+      "league": "KBO",
+      "homeTeamRaw": "삼성 라이온즈",
+      "awayTeamRaw": "NC 다이노스",
+      "stadium": "대구삼성라이온즈파크",
+      "moneyline": {
+        "matchSeq": 3877,
+        "homeOdds": 1.38,
+        "awayOdds": 2.43
+      },
+      "spread": {
+        "matchSeq": 3879,
+        "homeLine": -2.5,
+        "homeOdds": 2.26,
+        "awayLine": 2.5,
+        "awayOdds": 1.44
+      },
+      "total": {
+        "matchSeq": 3880,
+        "line": 10.5,
+        "underOdds": 1.66,
+        "overOdds": 1.87
+      }
+    },
+    {
+      "id": "betman-2026-09-22-SK-KT",
+      "provider": "betman",
+      "date": "2026-09-22",
+      "commenceTime": "2026-09-22T09:30:00.000Z",
+      "matchSeq": 3885,
+      "league": "KBO",
+      "homeTeamRaw": "SSG 랜더스",
+      "awayTeamRaw": "KT 위즈",
+      "stadium": "인천SSG랜더스필드",
+      "moneyline": {
+        "matchSeq": 3885,
+        "homeOdds": 1.68,
+        "awayOdds": 1.85
+      },
+      "spread": {
+        "matchSeq": 3887,
+        "homeLine": -2.5,
+        "homeOdds": 3.03,
+        "awayLine": 2.5,
+        "awayOdds": 1.24
+      },
+      "total": {
+        "matchSeq": 3888,
+        "line": 9.5,
+        "underOdds": 1.74,
+        "overOdds": 1.78
+      }
+    },
+    {
+      "id": "betman-2026-09-22-HH-LT",
+      "provider": "betman",
+      "date": "2026-09-22",
+      "commenceTime": "2026-09-22T09:30:00.000Z",
+      "matchSeq": 3893,
+      "league": "KBO",
+      "homeTeamRaw": "한화 이글스",
+      "awayTeamRaw": "롯데 자이언츠",
+      "stadium": "대전한화생명볼파크",
+      "moneyline": {
+        "matchSeq": 3893,
+        "homeOdds": 1.59,
+        "awayOdds": 1.97
+      },
+      "spread": {
+        "matchSeq": 3895,
+        "homeLine": -2.5,
+        "homeOdds": 2.77,
+        "awayLine": 2.5,
+        "awayOdds": 1.29
+      },
+      "total": {
+        "matchSeq": 3896,
+        "line": 8.5,
+        "underOdds": 1.76,
+        "overOdds": 1.76
+      }
+    },
+    {
+      "id": "betman-2026-09-22-WO-OB",
+      "provider": "betman",
+      "date": "2026-09-22",
+      "commenceTime": "2026-09-22T09:30:00.000Z",
+      "matchSeq": 3901,
+      "league": "KBO",
+      "homeTeamRaw": "키움 히어로즈",
+      "awayTeamRaw": "두산 베어스",
+      "stadium": "고척스카이돔",
+      "moneyline": {
+        "matchSeq": 3901,
+        "homeOdds": 2.56,
+        "awayOdds": 1.34
+      },
+      "spread": {
+        "matchSeq": 3903,
+        "homeLine": 2.5,
+        "homeOdds": 1.58,
+        "awayLine": -2.5,
+        "awayOdds": 1.99
+      },
+      "total": {
+        "matchSeq": 3904,
+        "line": 8.5,
+        "underOdds": 1.65,
+        "overOdds": 1.89
+      }
+    }
+  ]
+}

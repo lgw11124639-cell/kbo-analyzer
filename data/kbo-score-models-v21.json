@@ -1,0 +1,372 @@
+{
+  "generatedAt": "2026-09-20T18:23:56.742Z",
+  "final": "LOCKED",
+  "results": [
+    {
+      "model": "CURRENT",
+      "discovery": {
+        "bets": 14,
+        "wins": 7,
+        "losses": 7,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 1.992,
+        "profit": -7600,
+        "roi": -5.43,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "markets": {
+          "OVER": 6,
+          "ML": 6,
+          "HANDICAP": 2
+        },
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 12,
+            "wins": 5,
+            "losses": 7,
+            "profit": -22700,
+            "roi": -18.92
+          }
+        ]
+      },
+      "internal": {
+        "bets": 30,
+        "wins": 10,
+        "losses": 20,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 2.224,
+        "profit": -81200,
+        "roi": -27.07,
+        "maxLosingStreak": 8,
+        "negativeMonths": 2,
+        "markets": {
+          "OVER": 3,
+          "ML": 13,
+          "HANDICAP": 14
+        },
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 17,
+            "wins": 7,
+            "losses": 10,
+            "profit": -27700,
+            "roi": -16.29
+          },
+          {
+            "month": "2026-06",
+            "bets": 13,
+            "wins": 3,
+            "losses": 10,
+            "profit": -53500,
+            "roi": -41.15
+          }
+        ]
+      }
+    },
+    {
+      "model": "EV_HEAVY",
+      "discovery": {
+        "bets": 14,
+        "wins": 7,
+        "losses": 7,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 2.103,
+        "profit": -1000,
+        "roi": -0.71,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "markets": {
+          "OVER": 6,
+          "HANDICAP": 5,
+          "ML": 3
+        },
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 12,
+            "wins": 5,
+            "losses": 7,
+            "profit": -16100,
+            "roi": -13.42
+          }
+        ]
+      },
+      "internal": {
+        "bets": 30,
+        "wins": 11,
+        "losses": 19,
+        "voids": 0,
+        "hit": 36.67,
+        "avgOdds": 2.24,
+        "profit": -59300,
+        "roi": -19.77,
+        "maxLosingStreak": 7,
+        "negativeMonths": 2,
+        "markets": {
+          "OVER": 3,
+          "ML": 13,
+          "HANDICAP": 14
+        },
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 17,
+            "wins": 7,
+            "losses": 10,
+            "profit": -27700,
+            "roi": -16.29
+          },
+          {
+            "month": "2026-06",
+            "bets": 13,
+            "wins": 4,
+            "losses": 9,
+            "profit": -31600,
+            "roi": -24.31
+          }
+        ]
+      }
+    },
+    {
+      "model": "BALANCED",
+      "discovery": {
+        "bets": 14,
+        "wins": 7,
+        "losses": 7,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 2.061,
+        "profit": -1000,
+        "roi": -0.71,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "markets": {
+          "OVER": 6,
+          "HANDICAP": 4,
+          "ML": 4
+        },
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 12,
+            "wins": 5,
+            "losses": 7,
+            "profit": -16100,
+            "roi": -13.42
+          }
+        ]
+      },
+      "internal": {
+        "bets": 30,
+        "wins": 10,
+        "losses": 20,
+        "voids": 0,
+        "hit": 33.33,
+        "avgOdds": 2.224,
+        "profit": -81200,
+        "roi": -27.07,
+        "maxLosingStreak": 8,
+        "negativeMonths": 2,
+        "markets": {
+          "OVER": 3,
+          "ML": 13,
+          "HANDICAP": 14
+        },
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 17,
+            "wins": 7,
+            "losses": 10,
+            "profit": -27700,
+            "roi": -16.29
+          },
+          {
+            "month": "2026-06",
+            "bets": 13,
+            "wins": 3,
+            "losses": 10,
+            "profit": -53500,
+            "roi": -41.15
+          }
+        ]
+      }
+    },
+    {
+      "model": "VALUE_FILTERED",
+      "discovery": {
+        "bets": 14,
+        "wins": 7,
+        "losses": 7,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 2.103,
+        "profit": -1000,
+        "roi": -0.71,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "markets": {
+          "OVER": 6,
+          "HANDICAP": 5,
+          "ML": 3
+        },
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 12,
+            "wins": 5,
+            "losses": 7,
+            "profit": -16100,
+            "roi": -13.42
+          }
+        ]
+      },
+      "internal": {
+        "bets": 30,
+        "wins": 12,
+        "losses": 18,
+        "voids": 0,
+        "hit": 40,
+        "avgOdds": 2.268,
+        "profit": -34400,
+        "roi": -11.47,
+        "maxLosingStreak": 7,
+        "negativeMonths": 2,
+        "markets": {
+          "OVER": 3,
+          "ML": 12,
+          "HANDICAP": 15
+        },
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 17,
+            "wins": 8,
+            "losses": 9,
+            "profit": -2800,
+            "roi": -1.65
+          },
+          {
+            "month": "2026-06",
+            "bets": 13,
+            "wins": 4,
+            "losses": 9,
+            "profit": -31600,
+            "roi": -24.31
+          }
+        ]
+      }
+    },
+    {
+      "model": "PURE_VALUE",
+      "discovery": {
+        "bets": 14,
+        "wins": 7,
+        "losses": 7,
+        "voids": 0,
+        "hit": 50,
+        "avgOdds": 2.103,
+        "profit": -1000,
+        "roi": -0.71,
+        "maxLosingStreak": 5,
+        "negativeMonths": 1,
+        "markets": {
+          "OVER": 6,
+          "HANDICAP": 5,
+          "ML": 3
+        },
+        "monthly": [
+          {
+            "month": "2026-03",
+            "bets": 2,
+            "wins": 2,
+            "losses": 0,
+            "profit": 15100,
+            "roi": 75.5
+          },
+          {
+            "month": "2026-04",
+            "bets": 12,
+            "wins": 5,
+            "losses": 7,
+            "profit": -16100,
+            "roi": -13.42
+          }
+        ]
+      },
+      "internal": {
+        "bets": 30,
+        "wins": 11,
+        "losses": 19,
+        "voids": 0,
+        "hit": 36.67,
+        "avgOdds": 2.279,
+        "profit": -56300,
+        "roi": -18.77,
+        "maxLosingStreak": 8,
+        "negativeMonths": 2,
+        "markets": {
+          "OVER": 3,
+          "ML": 11,
+          "HANDICAP": 16
+        },
+        "monthly": [
+          {
+            "month": "2026-05",
+            "bets": 17,
+            "wins": 8,
+            "losses": 9,
+            "profit": -2800,
+            "roi": -1.65
+          },
+          {
+            "month": "2026-06",
+            "bets": 13,
+            "wins": 3,
+            "losses": 10,
+            "profit": -53500,
+            "roi": -41.15
+          }
+        ]
+      }
+    }
+  ],
+  "passed": []
+}

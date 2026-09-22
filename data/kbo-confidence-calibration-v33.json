@@ -1,0 +1,1024 @@
+{
+  "generatedAt": "2026-09-14T17:20:19.980Z",
+  "final": "LOCKED",
+  "output": {
+    "DISCOVERY": {
+      "ALL": {
+        "overall": {
+          "bets": 656,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2387,
+          "rawMarketBrier": 0.2407
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 75,
+            "predicted": 42.43,
+            "actual": 40,
+            "calibrationGap": -2.43,
+            "avgOdds": 1.946,
+            "marketBE": 51.38,
+            "roi": -25.68
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 111,
+            "predicted": 47.59,
+            "actual": 40.54,
+            "calibrationGap": -7.05,
+            "avgOdds": 1.796,
+            "marketBE": 55.67,
+            "roi": -28.11
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 111,
+            "predicted": 52.41,
+            "actual": 59.46,
+            "calibrationGap": 7.05,
+            "avgOdds": 1.707,
+            "marketBE": 58.58,
+            "roi": 0.75
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 75,
+            "predicted": 57.57,
+            "actual": 60,
+            "calibrationGap": 2.43,
+            "avgOdds": 1.604,
+            "marketBE": 62.34,
+            "roi": -6.05
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 67,
+            "predicted": 62.43,
+            "actual": 52.24,
+            "calibrationGap": -10.19,
+            "avgOdds": 1.436,
+            "marketBE": 69.65,
+            "roi": -25.01
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 63,
+            "predicted": 67.1,
+            "actual": 69.84,
+            "calibrationGap": 2.74,
+            "avgOdds": 1.375,
+            "marketBE": 72.71,
+            "roi": -4.86
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 12,
+            "predicted": 71.24,
+            "actual": 75,
+            "calibrationGap": 3.76,
+            "avgOdds": 1.229,
+            "marketBE": 81.36,
+            "roi": -8.33
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "ML": {
+        "overall": {
+          "bets": 216,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2532,
+          "rawMarketBrier": 0.253
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 32,
+            "predicted": 42.35,
+            "actual": 40.63,
+            "calibrationGap": -1.73,
+            "avgOdds": 2.032,
+            "marketBE": 49.22,
+            "roi": -21.63
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 51,
+            "predicted": 47.78,
+            "actual": 39.22,
+            "calibrationGap": -8.56,
+            "avgOdds": 1.824,
+            "marketBE": 54.82,
+            "roi": -29.37
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 51,
+            "predicted": 52.22,
+            "actual": 60.78,
+            "calibrationGap": 8.56,
+            "avgOdds": 1.694,
+            "marketBE": 59.04,
+            "roi": 2.25
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 32,
+            "predicted": 57.65,
+            "actual": 59.38,
+            "calibrationGap": 1.73,
+            "avgOdds": 1.547,
+            "marketBE": 64.63,
+            "roi": -10.62
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 16,
+            "predicted": 61.79,
+            "actual": 37.5,
+            "calibrationGap": -24.29,
+            "avgOdds": 1.466,
+            "marketBE": 68.23,
+            "roi": -43.38
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 8,
+            "predicted": 67.02,
+            "actual": 62.5,
+            "calibrationGap": -4.52,
+            "avgOdds": 1.434,
+            "marketBE": 69.75,
+            "roi": -12.38
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 1,
+            "predicted": 70.56,
+            "actual": 0,
+            "calibrationGap": -70.56,
+            "avgOdds": 1.32,
+            "marketBE": 75.76,
+            "roi": -100
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "HANDICAP": {
+        "overall": {
+          "bets": 220,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2145,
+          "rawMarketBrier": 0.2178
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 12,
+            "predicted": 42.23,
+            "actual": 16.67,
+            "calibrationGap": -25.56,
+            "avgOdds": 2.163,
+            "marketBE": 46.22,
+            "roi": -63.17
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 4,
+            "predicted": 47.25,
+            "actual": 0,
+            "calibrationGap": -47.25,
+            "avgOdds": 1.915,
+            "marketBE": 52.22,
+            "roi": -100
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 4,
+            "predicted": 52.75,
+            "actual": 100,
+            "calibrationGap": 47.25,
+            "avgOdds": 1.615,
+            "marketBE": 61.92,
+            "roi": 61.5
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 12,
+            "predicted": 57.77,
+            "actual": 83.33,
+            "calibrationGap": 25.56,
+            "avgOdds": 1.458,
+            "marketBE": 68.61,
+            "roi": 21.83
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 40,
+            "predicted": 62.79,
+            "actual": 57.5,
+            "calibrationGap": -5.29,
+            "avgOdds": 1.357,
+            "marketBE": 73.72,
+            "roi": -22.48
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 43,
+            "predicted": 67.7,
+            "actual": 72.09,
+            "calibrationGap": 4.4,
+            "avgOdds": 1.278,
+            "marketBE": 78.22,
+            "roi": -7.98
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 11,
+            "predicted": 71.3,
+            "actual": 81.82,
+            "calibrationGap": 10.52,
+            "avgOdds": 1.221,
+            "marketBE": 81.91,
+            "roi": 0
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "TOTAL": {
+        "overall": {
+          "bets": 220,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2485,
+          "rawMarketBrier": 0.2516
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 31,
+            "predicted": 42.58,
+            "actual": 48.39,
+            "calibrationGap": 5.81,
+            "avgOdds": 1.774,
+            "marketBE": 56.38,
+            "roi": -15.35
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 56,
+            "predicted": 47.44,
+            "actual": 44.64,
+            "calibrationGap": -2.8,
+            "avgOdds": 1.762,
+            "marketBE": 56.75,
+            "roi": -21.82
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 56,
+            "predicted": 52.56,
+            "actual": 55.36,
+            "calibrationGap": 2.8,
+            "avgOdds": 1.726,
+            "marketBE": 57.95,
+            "roi": -4.96
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 31,
+            "predicted": 57.42,
+            "actual": 51.61,
+            "calibrationGap": -5.81,
+            "avgOdds": 1.72,
+            "marketBE": 58.15,
+            "roi": -12.13
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 11,
+            "predicted": 62.07,
+            "actual": 54.55,
+            "calibrationGap": -7.52,
+            "avgOdds": 1.68,
+            "marketBE": 59.52,
+            "roi": -7.55
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 12,
+            "predicted": 65,
+            "actual": 66.67,
+            "calibrationGap": 1.67,
+            "avgOdds": 1.684,
+            "marketBE": 59.38,
+            "roi": 11.33
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      }
+    },
+    "INTERNAL": {
+      "ALL": {
+        "overall": {
+          "bets": 1496,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2385,
+          "rawMarketBrier": 0.2415
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 177,
+            "predicted": 42.57,
+            "actual": 41.24,
+            "calibrationGap": -1.33,
+            "avgOdds": 1.942,
+            "marketBE": 51.5,
+            "roi": -19.93
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 248,
+            "predicted": 47.72,
+            "actual": 49.19,
+            "calibrationGap": 1.47,
+            "avgOdds": 1.811,
+            "marketBE": 55.22,
+            "roi": -11.84
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 248,
+            "predicted": 52.28,
+            "actual": 50.81,
+            "calibrationGap": -1.47,
+            "avgOdds": 1.712,
+            "marketBE": 58.42,
+            "roi": -13.83
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 177,
+            "predicted": 57.43,
+            "actual": 58.76,
+            "calibrationGap": 1.33,
+            "avgOdds": 1.619,
+            "marketBE": 61.77,
+            "roi": -4.89
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 164,
+            "predicted": 62.42,
+            "actual": 60.37,
+            "calibrationGap": -2.05,
+            "avgOdds": 1.467,
+            "marketBE": 68.16,
+            "roi": -12.76
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 132,
+            "predicted": 67.29,
+            "actual": 70.45,
+            "calibrationGap": 3.16,
+            "avgOdds": 1.326,
+            "marketBE": 75.41,
+            "roi": -6.65
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 26,
+            "predicted": 71.35,
+            "actual": 65.38,
+            "calibrationGap": -5.97,
+            "avgOdds": 1.25,
+            "marketBE": 80.02,
+            "roi": -18.81
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 1,
+            "predicted": 76.5,
+            "actual": 0,
+            "calibrationGap": -76.5,
+            "avgOdds": 1.26,
+            "marketBE": 79.37,
+            "roi": -100
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "ML": {
+        "overall": {
+          "bets": 492,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2384,
+          "rawMarketBrier": 0.2378
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 56,
+            "predicted": 42.63,
+            "actual": 35.71,
+            "calibrationGap": -6.92,
+            "avgOdds": 1.965,
+            "marketBE": 50.9,
+            "roi": -30.05
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 85,
+            "predicted": 47.67,
+            "actual": 49.41,
+            "calibrationGap": 1.74,
+            "avgOdds": 1.839,
+            "marketBE": 54.39,
+            "roi": -10.47
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 85,
+            "predicted": 52.33,
+            "actual": 50.59,
+            "calibrationGap": -1.74,
+            "avgOdds": 1.699,
+            "marketBE": 58.85,
+            "roi": -15.34
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 56,
+            "predicted": 57.37,
+            "actual": 64.29,
+            "calibrationGap": 6.92,
+            "avgOdds": 1.592,
+            "marketBE": 62.82,
+            "roi": 2.27
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 65,
+            "predicted": 62.41,
+            "actual": 60,
+            "calibrationGap": -2.41,
+            "avgOdds": 1.489,
+            "marketBE": 67.17,
+            "roi": -12.4
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 33,
+            "predicted": 67.27,
+            "actual": 75.76,
+            "calibrationGap": 8.49,
+            "avgOdds": 1.399,
+            "marketBE": 71.47,
+            "roi": 5.12
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 6,
+            "predicted": 72.82,
+            "actual": 50,
+            "calibrationGap": -22.82,
+            "avgOdds": 1.293,
+            "marketBE": 77.32,
+            "roi": -36.83
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 1,
+            "predicted": 76.5,
+            "actual": 0,
+            "calibrationGap": -76.5,
+            "avgOdds": 1.26,
+            "marketBE": 79.37,
+            "roi": -100
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "HANDICAP": {
+        "overall": {
+          "bets": 502,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.226,
+          "rawMarketBrier": 0.2321
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 43,
+            "predicted": 42.22,
+            "actual": 39.53,
+            "calibrationGap": -2.69,
+            "avgOdds": 2.196,
+            "marketBE": 45.54,
+            "roi": -12.47
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 24,
+            "predicted": 47.63,
+            "actual": 41.67,
+            "calibrationGap": -5.96,
+            "avgOdds": 1.918,
+            "marketBE": 52.13,
+            "roi": -20.38
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 24,
+            "predicted": 52.37,
+            "actual": 58.33,
+            "calibrationGap": 5.96,
+            "avgOdds": 1.633,
+            "marketBE": 61.26,
+            "roi": -4.92
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 43,
+            "predicted": 57.78,
+            "actual": 60.47,
+            "calibrationGap": 2.69,
+            "avgOdds": 1.457,
+            "marketBE": 68.64,
+            "roi": -11.49
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 70,
+            "predicted": 62.54,
+            "actual": 64.29,
+            "calibrationGap": 1.75,
+            "avgOdds": 1.363,
+            "marketBE": 73.36,
+            "roi": -12.46
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 94,
+            "predicted": 67.42,
+            "actual": 69.15,
+            "calibrationGap": 1.73,
+            "avgOdds": 1.284,
+            "marketBE": 77.9,
+            "roi": -11.01
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 20,
+            "predicted": 70.91,
+            "actual": 70,
+            "calibrationGap": -0.91,
+            "avgOdds": 1.236,
+            "marketBE": 80.87,
+            "roi": -13.4
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      },
+      "TOTAL": {
+        "overall": {
+          "bets": 502,
+          "avgPredicted": 50,
+          "actualHit": 50,
+          "gap": 0,
+          "brier": 0.2512,
+          "rawMarketBrier": 0.2545
+        },
+        "buckets": [
+          {
+            "bucket": "40-45%",
+            "bets": 78,
+            "predicted": 42.72,
+            "actual": 46.15,
+            "calibrationGap": 3.44,
+            "avgOdds": 1.785,
+            "marketBE": 56.03,
+            "roi": -16.78
+          },
+          {
+            "bucket": "45-50%",
+            "bets": 139,
+            "predicted": 47.77,
+            "actual": 50.36,
+            "calibrationGap": 2.59,
+            "avgOdds": 1.775,
+            "marketBE": 56.33,
+            "roi": -11.2
+          },
+          {
+            "bucket": "50-55%",
+            "bets": 139,
+            "predicted": 52.23,
+            "actual": 49.64,
+            "calibrationGap": -2.59,
+            "avgOdds": 1.733,
+            "marketBE": 57.7,
+            "roi": -14.44
+          },
+          {
+            "bucket": "55-60%",
+            "bets": 78,
+            "predicted": 57.28,
+            "actual": 53.85,
+            "calibrationGap": -3.44,
+            "avgOdds": 1.728,
+            "marketBE": 57.88,
+            "roi": -6.38
+          },
+          {
+            "bucket": "60-65%",
+            "bets": 29,
+            "predicted": 62.14,
+            "actual": 51.72,
+            "calibrationGap": -10.42,
+            "avgOdds": 1.67,
+            "marketBE": 59.88,
+            "roi": -14.31
+          },
+          {
+            "bucket": "65-70%",
+            "bets": 5,
+            "predicted": 65,
+            "actual": 60,
+            "calibrationGap": -5,
+            "avgOdds": 1.642,
+            "marketBE": 60.9,
+            "roi": -2.4
+          },
+          {
+            "bucket": "70-75%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "75-80%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "80-90%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          },
+          {
+            "bucket": "90-101%",
+            "bets": 0,
+            "predicted": 0,
+            "actual": 0,
+            "calibrationGap": 0,
+            "avgOdds": 0,
+            "marketBE": 0,
+            "roi": 0
+          }
+        ]
+      }
+    }
+  },
+  "edgeOutput": {
+    "DISCOVERY": [
+      {
+        "edge": "-20~-10%",
+        "bets": 225,
+        "hit": 60.44,
+        "avgOdds": 1.556,
+        "roi": -7.93
+      },
+      {
+        "edge": "-10~-5%",
+        "bets": 180,
+        "hit": 50,
+        "avgOdds": 1.781,
+        "roi": -14.85
+      },
+      {
+        "edge": "-5~0%",
+        "bets": 190,
+        "hit": 37.37,
+        "avgOdds": 2.194,
+        "roi": -20.92
+      },
+      {
+        "edge": "0~3%",
+        "bets": 31,
+        "hit": 51.61,
+        "avgOdds": 1.835,
+        "roi": -6.61
+      },
+      {
+        "edge": "3~5%",
+        "bets": 11,
+        "hit": 45.45,
+        "avgOdds": 1.85,
+        "roi": -15.36
+      },
+      {
+        "edge": "5~10%",
+        "bets": 9,
+        "hit": 66.67,
+        "avgOdds": 1.772,
+        "roi": 16.67
+      },
+      {
+        "edge": "10~20%",
+        "bets": 1,
+        "hit": 0,
+        "avgOdds": 1.92,
+        "roi": -100
+      },
+      {
+        "edge": "20~100%",
+        "bets": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "roi": 0
+      }
+    ],
+    "INTERNAL": [
+      {
+        "edge": "-20~-10%",
+        "bets": 468,
+        "hit": 53.85,
+        "avgOdds": 1.608,
+        "roi": -15.24
+      },
+      {
+        "edge": "-10~-5%",
+        "bets": 445,
+        "hit": 53.48,
+        "avgOdds": 1.755,
+        "roi": -11.84
+      },
+      {
+        "edge": "-5~0%",
+        "bets": 467,
+        "hit": 43.68,
+        "avgOdds": 2.145,
+        "roi": -10.62
+      },
+      {
+        "edge": "0~3%",
+        "bets": 72,
+        "hit": 48.61,
+        "avgOdds": 1.817,
+        "roi": -14.6
+      },
+      {
+        "edge": "3~5%",
+        "bets": 28,
+        "hit": 39.29,
+        "avgOdds": 1.783,
+        "roi": -30.61
+      },
+      {
+        "edge": "5~10%",
+        "bets": 8,
+        "hit": 50,
+        "avgOdds": 1.845,
+        "roi": -9.62
+      },
+      {
+        "edge": "10~20%",
+        "bets": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "roi": 0
+      },
+      {
+        "edge": "20~100%",
+        "bets": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "roi": 0
+      }
+    ]
+  }
+}

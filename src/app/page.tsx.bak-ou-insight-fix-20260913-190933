@@ -1,0 +1,5166 @@
+﻿"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+import { analyzeGame, makeAutoCombos } from "@/lib/analyzer";
+
+const emptyOdds: OddsInput = { awayMl: null, homeMl: null, awayHandicapLine: null, homeHandicapLine: null, awayHandicap: null, homeHandicap: null, totalLine: null, overOdds: null, underOdds: null };
+
+type AutoOddsEvent = {
+  id: string;
+  commenceTime: string;
+
+  awayTeam: string;
+  homeTeam: string;
+
+  awayMl: number | null;
+  homeMl: number | null;
+
+  awaySpreadLine: number | null;
+  homeSpreadLine: number | null;
+
+  awayHandicap: number | null;
+  homeHandicap: number | null;
+
+  totalLine: number | null;
+  overOdds: number | null;
+  underOdds: number | null;
+
+  bookmakerCount: number;
+  lastUpdate: string | null;
+};
+
+type PitcherStats = {
+  playerId: number;
+
+  era: number | null;
+  games: number | null;
+
+  wins: number | null;
+  losses: number | null;
+
+  innings: string | null;
+
+  strikeouts: number | null;
+  walks: number | null;
+
+  whip: number | null;
+  avg: number | null;
+
+  qs: number | null;
+
+  recent5?: {
+    games: number;
+    innings: number;
+    era: number | null;
+    whip: number | null;
+    strikeouts: number;
+    walks: number;
+    kbb: number | null;
+  } | null;
+
+  recent10?: {
+    games: number;
+    innings: number;
+    era: number | null;
+    whip: number | null;
+    strikeouts: number;
+    walks: number;
+    kbb: number | null;
+  } | null;
+};
+
+type LineupMatchupPlayer = {
+  order: number;
+  position: string;
+  name: string;
+  playerId: number | null;
+
+  stats: {
+    avg: number | null;
+    pa: number | null;
+    hr: number | null;
+    obp: number | null;
+    slg: number | null;
+    ops: number | null;
+  } | null;
+
+  score: number | null;
+
+  opponentStarter?: {
+    id: number;
+    name: string;
+    team: string;
+  };
+
+  bvp?: {
+    avg: number | null;
+    pa: number | null;
+    ab: number | null;
+    hits: number | null;
+    doubles: number | null;
+    triples: number | null;
+    hr: number | null;
+    rbi: number | null;
+    bb: number | null;
+    hbp: number | null;
+    so: number | null;
+    slg: number | null;
+    obp: number | null;
+    ops: number | null;
+  } | null;
+
+  bvpWeight?: number;
+  seasonScore?: number | null;
+  matchupScore?: number | null;
+  adjustment?: number;
+};
+
+type LineupMatchupData = {
+  fetchedAt: string;
+  date: string;
+  gameId?: string;
+
+  ready: boolean;
+  cached?: boolean;
+  message?: string;
+
+  edge: number | null;
+
+  away: {
+    team: string;
+    confirmed: boolean;
+
+    baseSummary?: {
+      playerCount: number;
+      score: number | null;
+      avgOps?: number | null;
+      avgObp?: number | null;
+      avgSlg?: number | null;
+      totalHr?: number | null;
+    } | null;
+
+    matchupSummary?: {
+      playerCount: number;
+      score: number | null;
+    } | null;
+
+    players?: LineupMatchupPlayer[];
+  };
+
+  home: {
+    team: string;
+    confirmed: boolean;
+
+    baseSummary?: {
+      playerCount: number;
+      score: number | null;
+      avgOps?: number | null;
+      avgObp?: number | null;
+      avgSlg?: number | null;
+      totalHr?: number | null;
+    } | null;
+
+    matchupSummary?: {
+      playerCount: number;
+      score: number | null;
+    } | null;
+
+    players?: LineupMatchupPlayer[];
+  };
+};
+
+type BullpenData = {
+  team: string;
+
+  summary: {
+    gamesPlayed: number;
+    bullpenAppearances: number;
+    uniquePitchers: number;
+
+    totalPitches: number;
+    totalInnings: number;
+
+    yesterdayPitches: number;
+    twoDaysAgoPitches: number;
+    threeDaysAgoPitches: number;
+
+    backToBackCount: number;
+    multiDayCount: number;
+
+    fatigueIndex: number;
+  };
+};
+
+type BullpenRating = {
+  score: number;
+  fatigue: number;
+  status: string;
+};
+
+function bullpenRating(
+  bullpen: BullpenData | undefined
+): BullpenRating | null {
+  if (!bullpen) {
+    return null;
+  }
+
+  const fatigue =
+    bullpen.summary.fatigueIndex;
+
+  /*
+    피로도 0 = 100점
+    피로도 100 = 0점
+
+    피로도가 낮을수록
+    오늘 사용할 수 있는 불펜 여력이 높다고 본다.
+  */
+
+  const score =
+    clampScore(
+      100 - fatigue
+    );
+
+  let status =
+    "보통";
+
+  if (fatigue >= 75) {
+    status = "매우 피로";
+  } else if (fatigue >= 55) {
+    status = "피로";
+  } else if (fatigue <= 25) {
+    status = "매우 여유";
+  } else if (fatigue <= 40) {
+    status = "여유";
+  }
+
+  return {
+    score:
+      Number(score.toFixed(1)),
+
+    fatigue:
+      Number(fatigue.toFixed(1)),
+
+    status,
+  };
+}
+type TeamForm = {
+  team: string;
+  sampleSize: number;
+
+  wins: number;
+  losses: number;
+  draws: number;
+
+  winPct: number | null;
+
+  avgRuns: number | null;
+  avgRunsAllowed: number | null;
+
+  runDifferential: number;
+};
+
+type TeamFormRating = {
+  score: number;
+  offenseScore: number;
+  defenseScore: number;
+  resultScore: number;
+};
+
+function teamFormRating(
+  form: TeamForm | undefined
+): TeamFormRating | null {
+  if (
+    !form ||
+    form.sampleSize < 5
+  ) {
+    return null;
+  }
+
+  /*
+    최근 10경기 상대평가 v0.4
+
+    승률      35%
+    득점력    35%
+    실점억제  30%
+
+    KBO 평균값을 아직 자동 계산하지 않으므로
+    초기 기준구간으로 상대점수를 만든다.
+    추후 전체 리그 평균으로 동적 보정 예정.
+  */
+
+  const winPct =
+    form.winPct ?? 0.5;
+
+  const avgRuns =
+    form.avgRuns ?? 4.5;
+
+  const avgRunsAllowed =
+    form.avgRunsAllowed ?? 4.5;
+
+  const resultScore =
+    clampScore(
+      winPct * 100
+    );
+
+  const offenseScore =
+    clampScore(
+      50 +
+        (avgRuns - 4.5) * 12
+    );
+
+  const defenseScore =
+    clampScore(
+      50 +
+        (4.5 - avgRunsAllowed) * 12
+    );
+
+  const score =
+    clampScore(
+      resultScore * 0.35 +
+      offenseScore * 0.35 +
+      defenseScore * 0.30
+    );
+
+  return {
+    score:
+      Number(score.toFixed(1)),
+
+    offenseScore:
+      Number(
+        offenseScore.toFixed(1)
+      ),
+
+    defenseScore:
+      Number(
+        defenseScore.toFixed(1)
+      ),
+
+    resultScore:
+      Number(
+        resultScore.toFixed(1)
+      ),
+  };
+}
+type StarterRating = {
+  score: number;
+  seasonScore: number;
+  recentScore: number;
+  reasons: string[];
+};
+
+function clampScore(value: number) {
+  return Math.max(
+    0,
+    Math.min(100, value)
+  );
+}
+
+function starterRating(
+  stats: PitcherStats | undefined
+): StarterRating | null {
+  if (!stats) return null;
+
+  /*
+    v0.3 선발 평가
+
+    시즌 60%
+    최근 5경기 40%
+
+    시즌:
+    ERA  25점
+    WHIP 20점
+    QS율 10점
+    K/BB 5점
+
+    최근:
+    ERA  20점
+    WHIP 12점
+    K/BB 8점
+
+    이 값은 현재 초기 모델이며
+    추후 실제 적중 데이터로 보정한다.
+  */
+
+  const era =
+    stats.era ?? 5;
+
+  const whip =
+    stats.whip ?? 1.6;
+
+  const qsRate =
+    stats.games &&
+    stats.games > 0 &&
+    stats.qs !== null
+      ? stats.qs / stats.games
+      : 0.4;
+
+  const seasonKbb =
+    stats.walks &&
+    stats.walks > 0 &&
+    stats.strikeouts !== null
+      ? stats.strikeouts /
+        stats.walks
+      : 2;
+
+  const seasonEraScore =
+    clampScore(
+      100 -
+        (era - 2) * 22
+    );
+
+  const seasonWhipScore =
+    clampScore(
+      100 -
+        (whip - 0.9) * 100
+    );
+
+  const qsScore =
+    clampScore(
+      qsRate * 125
+    );
+
+  const kbbScore =
+    clampScore(
+      seasonKbb * 22
+    );
+
+  const seasonScore =
+    seasonEraScore * 0.4167 +
+    seasonWhipScore * 0.3333 +
+    qsScore * 0.1667 +
+    kbbScore * 0.0833;
+
+
+  const r5 =
+    stats.recent5;
+
+  let recentScore =
+    seasonScore;
+
+  if (
+    r5 &&
+    r5.games >= 3
+  ) {
+    const recentEra =
+      r5.era ?? era;
+
+    const recentWhip =
+      r5.whip ?? whip;
+
+    const recentKbb =
+      r5.kbb ?? seasonKbb;
+
+    const recentEraScore =
+      clampScore(
+        100 -
+          (recentEra - 2) * 22
+      );
+
+    const recentWhipScore =
+      clampScore(
+        100 -
+          (recentWhip - 0.9) * 100
+      );
+
+    const recentKbbScore =
+      clampScore(
+        recentKbb * 22
+      );
+
+    recentScore =
+      recentEraScore * 0.50 +
+      recentWhipScore * 0.30 +
+      recentKbbScore * 0.20;
+  }
+
+
+  const score =
+    clampScore(
+      seasonScore * 0.60 +
+      recentScore * 0.40
+    );
+
+
+  const reasons: string[] = [];
+
+  if (era <= 3.2) {
+    reasons.push("시즌 ERA 우수");
+  }
+
+  if (whip <= 1.25) {
+    reasons.push("WHIP 우수");
+  }
+
+  if (qsRate >= 0.6) {
+    reasons.push("QS 안정성");
+  }
+
+  if (
+    r5?.era !== null &&
+    r5?.era !== undefined
+  ) {
+    if (r5.era <= 3) {
+      reasons.push("최근 ERA 강세");
+    }
+
+    if (
+      r5.era >= 5
+    ) {
+      reasons.push("최근 ERA 부진");
+    }
+  }
+
+  if (
+    r5?.whip !== null &&
+    r5?.whip !== undefined &&
+    r5.whip <= 1.2
+  ) {
+    reasons.push("최근 WHIP 강세");
+  }
+
+  return {
+    score:
+      Number(score.toFixed(1)),
+
+    seasonScore:
+      Number(
+        seasonScore.toFixed(1)
+      ),
+
+    recentScore:
+      Number(
+        recentScore.toFixed(1)
+      ),
+
+    reasons,
+  };
+}
+
+function starterEdgeText(
+  away: PitcherStats | undefined,
+  home: PitcherStats | undefined,
+  awayName: string,
+  homeName: string
+) {
+  const awayRating =
+    starterRating(away);
+
+  const homeRating =
+    starterRating(home);
+
+  if (
+    !awayRating ||
+    !homeRating
+  ) {
+    return null;
+  }
+
+  const diff =
+    Number(
+      (
+        awayRating.score -
+        homeRating.score
+      ).toFixed(1)
+    );
+
+  if (
+    Math.abs(diff) < 2
+  ) {
+    return {
+      text: "선발 대등",
+      detail:
+        `${awayName} ${awayRating.score} · ` +
+        `${homeName} ${homeRating.score}`,
+      className: "even",
+    };
+  }
+
+  const awayBetter =
+    diff > 0;
+
+  return {
+    text:
+      `선발 우위: ` +
+      `${awayBetter ? awayName : homeName} ` +
+      `+${Math.abs(diff).toFixed(1)}`,
+
+    detail:
+      `${awayName} ${awayRating.score} · ` +
+      `${homeName} ${homeRating.score}`,
+
+    className:
+      awayBetter
+        ? "away"
+        : "home",
+  };
+}
+function pitcherStatText(
+  stats: PitcherStats | undefined
+) {
+  if (!stats) return "기록 불러오는 중";
+
+  const parts: string[] = [];
+
+  if (stats.era !== null) {
+    parts.push(`ERA ${stats.era.toFixed(2)}`);
+  }
+
+  if (stats.whip !== null) {
+    parts.push(`WHIP ${stats.whip.toFixed(2)}`);
+  }
+
+  if (
+    stats.wins !== null &&
+    stats.losses !== null
+  ) {
+    parts.push(
+      `${stats.wins}승 ${stats.losses}패`
+    );
+  }
+
+  return parts.length
+    ? parts.join(" · ")
+    : "시즌 기록 없음";
+}
+
+function normalizeTeamName(name: string) {
+  return name
+    .replace("트윈스", "")
+    .replace("이글스", "")
+    .replace("랜더스", "")
+    .replace("다이노스", "")
+    .replace("위즈", "")
+    .replace("타이거즈", "")
+    .replace("라이온즈", "")
+    .replace("자이언츠", "")
+    .replace("베어스", "")
+    .replace("히어로즈", "")
+    .trim()
+    .toUpperCase();
+}
+
+function kstDateFromIso(iso: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+function num(v: string) { const x = Number(v); return v.trim() && Number.isFinite(x) ? x : null; }
+
+function DecimalInput({
+  value,
+  onValueChange,
+  placeholder,
+}: {
+  value: number | null;
+  onValueChange: (value: number | null) => void;
+  placeholder: string;
+}) {
+  const [text, setText] = useState(value === null ? "" : String(value));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) {
+      setText(value === null ? "" : String(value));
+    }
+  }, [value, focused]);
+
+  return (
+    <input
+      inputMode="decimal"
+      value={text}
+      placeholder={placeholder}
+      onFocus={() => setFocused(true)}
+      onChange={(e) => {
+        const next = e.target.value.replace(",", ".");
+
+        // 빈 값 / 음수 / 소수 입력 허용
+        // 예: -, -1, -1.5, 1.5
+        if (!/^-?\d*(?:\.\d*)?$/.test(next)) return;
+
+        setText(next);
+
+        if (
+          next === "" ||
+          next === "." ||
+          next === "-" ||
+          next === "-."
+        ) {
+          onValueChange(null);
+          return;
+        }
+
+        const n = Number(next);
+        if (Number.isFinite(n)) {
+          onValueChange(n);
+        }
+      }}
+      onBlur={() => {
+        setFocused(false);
+
+        if (
+          text === "" ||
+          text === "." ||
+          text === "-" ||
+          text === "-."
+        ) {
+          setText("");
+          onValueChange(null);
+          return;
+        }
+
+        const n = Number(text);
+
+        if (Number.isFinite(n)) {
+          setText(String(n));
+          onValueChange(n);
+        }
+      }}
+    />
+  );
+}
+
+
+function kboPlayerPhoto(playerId?: string | number | null) {
+  if (!playerId) return "";
+  return `https://6ptotvmi5753.edge.naverncp.com/KBO_IMAGE/person/middle/2026/${playerId}.jpg`;
+}
+
+function teamKey(name?: string | null) {
+  const n = name || "";
+
+  if (n.includes("NC")) return "nc";
+  if (n.includes("두산")) return "doosan";
+  if (n.includes("LG")) return "lg";
+  if (n.includes("삼성")) return "samsung";
+  if (n.includes("한화")) return "hanwha";
+  if (n.includes("KIA")) return "kia";
+  if (n.includes("롯데")) return "lotte";
+  if (n.includes("SSG")) return "ssg";
+  if (n.includes("KT") || n.includes("kt")) return "kt";
+  if (n.includes("키움")) return "kiwoom";
+
+  return "default";
+}
+
+
+function estimateProjectedTotal(
+  awayForm: TeamForm | undefined,
+  homeForm: TeamForm | undefined,
+  awayStarter: PitcherStats | undefined,
+  homeStarter: PitcherStats | undefined,
+  awayBullpen: BullpenData | undefined,
+  homeBullpen: BullpenData | undefined,
+  lineupMatchup: LineupMatchupData | undefined
+): number | null {
+  if (
+    awayForm?.avgRuns === null ||
+    awayForm?.avgRuns === undefined ||
+    awayForm.avgRunsAllowed === null ||
+    awayForm.avgRunsAllowed === undefined ||
+    homeForm?.avgRuns === null ||
+    homeForm?.avgRuns === undefined ||
+    homeForm.avgRunsAllowed === null ||
+    homeForm.avgRunsAllowed === undefined
+  ) {
+    return null;
+  }
+
+  /*
+    TOTAL MODEL V0.2
+
+    핵심 변경:
+    1. 최근 득실점을 그대로 사용하지 않고 리그 중립값으로 회귀
+    2. 최근 폼 55% / 중립값 45%
+    3. 선발·불펜·라인업 보정 강도 축소
+    4. 팀별 예상득점/총득점 극단값 제한
+
+    현재 임시 중립값:
+      팀당 4.50점
+      총 9.00점
+
+    추후 KBO 시즌 실제 리그 평균으로 자동 교체 예정.
+  */
+
+  const LEAGUE_TEAM_RUNS = 4.50;
+
+  const awayRecentExpectation =
+    (
+      awayForm.avgRuns +
+      homeForm.avgRunsAllowed
+    ) / 2;
+
+  const homeRecentExpectation =
+    (
+      homeForm.avgRuns +
+      awayForm.avgRunsAllowed
+    ) / 2;
+
+  // 최근 폼을 55%만 사용하고 45%는 리그 평균으로 회귀
+  let awayRuns =
+    LEAGUE_TEAM_RUNS * 0.45 +
+    awayRecentExpectation * 0.55;
+
+  let homeRuns =
+    LEAGUE_TEAM_RUNS * 0.45 +
+    homeRecentExpectation * 0.55;
+
+
+  // ----------------------------------------------------------
+  // 선발 ERA
+  // 시즌 60% + 최근5 40%
+  //
+  // 기존 보정보다 약 50% 축소.
+  // 상대 선발 ERA가 4.50보다 높으면 공격팀 예상득점 +
+  // 낮으면 -
+  // ----------------------------------------------------------
+
+  const blendedEra = (
+    stats: PitcherStats | undefined
+  ) => {
+    if (!stats) return null;
+
+    const season = stats.era;
+    const recent = stats.recent5?.era;
+
+    if (
+      season === null &&
+      (recent === null ||
+       recent === undefined)
+    ) {
+      return null;
+    }
+
+    if (
+      season !== null &&
+      recent !== null &&
+      recent !== undefined
+    ) {
+      return (
+        season * 0.60 +
+        recent * 0.40
+      );
+    }
+
+    return season ?? recent ?? null;
+  };
+
+  const homeStarterEra =
+    blendedEra(homeStarter);
+
+  const awayStarterEra =
+    blendedEra(awayStarter);
+
+  if (homeStarterEra !== null) {
+    awayRuns +=
+      Math.max(
+        -0.40,
+        Math.min(
+          0.40,
+          (homeStarterEra - 4.50) *
+            0.09
+        )
+      );
+  }
+
+  if (awayStarterEra !== null) {
+    homeRuns +=
+      Math.max(
+        -0.40,
+        Math.min(
+          0.40,
+          (awayStarterEra - 4.50) *
+            0.09
+        )
+      );
+  }
+
+
+  // ----------------------------------------------------------
+  // 불펜 피로
+  //
+  // 50 = 중립
+  // 기존 보정 강도의 약 절반
+  // ----------------------------------------------------------
+
+  if (homeBullpen) {
+    awayRuns +=
+      Math.max(
+        -0.18,
+        Math.min(
+          0.18,
+          (
+            homeBullpen.summary
+              .fatigueIndex -
+            50
+          ) * 0.003
+        )
+      );
+  }
+
+  if (awayBullpen) {
+    homeRuns +=
+      Math.max(
+        -0.18,
+        Math.min(
+          0.18,
+          (
+            awayBullpen.summary
+              .fatigueIndex -
+            50
+          ) * 0.003
+        )
+      );
+  }
+
+
+  // ----------------------------------------------------------
+  // 라인업 OPS
+  //
+  // OPS .750 = 중립
+  // 기존 2.0배 -> 1.0배
+  // ----------------------------------------------------------
+
+  const awayOps =
+    lineupMatchup?.away
+      ?.baseSummary
+      ?.avgOps;
+
+  const homeOps =
+    lineupMatchup?.home
+      ?.baseSummary
+      ?.avgOps;
+
+  if (typeof awayOps === "number") {
+    awayRuns +=
+      Math.max(
+        -0.20,
+        Math.min(
+          0.20,
+          (awayOps - 0.750) *
+            1.0
+        )
+      );
+  }
+
+  if (typeof homeOps === "number") {
+    homeRuns +=
+      Math.max(
+        -0.20,
+        Math.min(
+          0.20,
+          (homeOps - 0.750) *
+            1.0
+        )
+      );
+  }
+
+
+  // 팀별 극단값 억제
+  awayRuns =
+    Math.max(
+      2.75,
+      Math.min(6.25, awayRuns)
+    );
+
+  homeRuns =
+    Math.max(
+      2.75,
+      Math.min(6.25, homeRuns)
+    );
+
+  // 총득점도 개발 단계에서는 안전 범위 제한
+  const total =
+    Math.max(
+      6.50,
+      Math.min(
+        12.50,
+        awayRuns + homeRuns
+      )
+    );
+
+  return Number(
+    total.toFixed(2)
+  );
+}
+
+
+
+function stat3(
+  value: number | null | undefined
+) {
+  return typeof value === "number"
+    ? value.toFixed(3).replace(/^0/, "")
+    : "-";
+}
+
+
+function lineupPlayerVerdict(
+  player: LineupMatchupPlayer
+) {
+  const adjustment =
+    player.adjustment ?? 0;
+
+  if (adjustment >= 4) {
+    return {
+      label: "▲ 상대 선발 강한 우위",
+      tone: "strongPlus",
+    };
+  }
+
+  if (adjustment >= 1.5) {
+    return {
+      label: "▲ 상대 선발 상성 플러스",
+      tone: "plus",
+    };
+  }
+
+  if (adjustment <= -4) {
+    return {
+      label: "▼ 상대 선발 강한 열세",
+      tone: "strongMinus",
+    };
+  }
+
+  if (adjustment <= -1.5) {
+    return {
+      label: "▼ 상대 선발 상성 마이너스",
+      tone: "minus",
+    };
+  }
+
+  return {
+    label: "― 상대 선발 상성 중립",
+    tone: "neutral",
+  };
+}
+
+
+function lineupTeamReasons(
+  team:
+    LineupMatchupData["away"] |
+    LineupMatchupData["home"],
+  opponent:
+    LineupMatchupData["away"] |
+    LineupMatchupData["home"]
+) {
+  const reasons: string[] = [];
+
+  const teamScore =
+    team.matchupSummary?.score;
+
+  const oppScore =
+    opponent.matchupSummary?.score;
+
+  const teamOps =
+    team.baseSummary?.avgOps;
+
+  const oppOps =
+    opponent.baseSummary?.avgOps;
+
+  if (
+    typeof teamScore === "number" &&
+    typeof oppScore === "number"
+  ) {
+    const diff =
+      teamScore - oppScore;
+
+    if (diff >= 1) {
+      reasons.push(
+        `최종 타선 매치업 점수 +${diff.toFixed(1)} 우위`
+      );
+    } else if (diff <= -1) {
+      reasons.push(
+        `최종 타선 매치업 점수 ${diff.toFixed(1)} 열세`
+      );
+    } else {
+      reasons.push(
+        "최종 타선 매치업 점수는 대등"
+      );
+    }
+  }
+
+  if (
+    typeof teamOps === "number" &&
+    typeof oppOps === "number"
+  ) {
+    const opsDiff =
+      teamOps - oppOps;
+
+    if (opsDiff >= 0.025) {
+      reasons.push(
+        `선발 라인업 시즌 OPS 우위 (${stat3(teamOps)} vs ${stat3(oppOps)})`
+      );
+    } else if (opsDiff <= -0.025) {
+      reasons.push(
+        `선발 라인업 시즌 OPS 열세 (${stat3(teamOps)} vs ${stat3(oppOps)})`
+      );
+    }
+  }
+
+  const players =
+    team.players ?? [];
+
+  const plusCount =
+    players.filter(
+      (player) =>
+        (player.adjustment ?? 0) >= 1.5
+    ).length;
+
+  const minusCount =
+    players.filter(
+      (player) =>
+        (player.adjustment ?? 0) <= -1.5
+    ).length;
+
+  if (plusCount > 0) {
+    reasons.push(
+      `상대 선발 상성 플러스 타자 ${plusCount}명`
+    );
+  }
+
+  if (minusCount > 0) {
+    reasons.push(
+      `상대 선발 상성 마이너스 타자 ${minusCount}명`
+    );
+  }
+
+  const meaningfulBvp =
+    players.filter(
+      (player) =>
+        (player.bvp?.pa ?? 0) >= 5
+    ).length;
+
+  if (meaningfulBvp > 0) {
+    reasons.push(
+      `상대 선발 BvP 5타석 이상 표본 ${meaningfulBvp}명 반영`
+    );
+  }
+
+  return reasons;
+}
+
+function formatLineupPosition(
+  position: string | null | undefined
+) {
+  const raw =
+    String(position || "")
+      .trim();
+
+  const map:
+    Record<string, string> = {
+
+    /* 투수 */
+    "투": "투수",
+    "投": "투수",
+    "P": "투수",
+
+    /* 포수 */
+    "포": "포수",
+    "捕": "포수",
+    "C": "포수",
+
+    /* 1루 */
+    "1": "1루수",
+    "1B": "1루수",
+    "일": "1루수",
+    "一": "1루수",
+
+    /* 2루 */
+    "2": "2루수",
+    "2B": "2루수",
+    "이": "2루수",
+    "二": "2루수",
+
+    /* 3루 */
+    "3": "3루수",
+    "3B": "3루수",
+    "삼": "3루수",
+    "三": "3루수",
+
+    /* 유격 */
+    "유": "유격수",
+    "遊": "유격수",
+    "SS": "유격수",
+
+    /* 외야 */
+    "좌": "좌익수",
+    "左": "좌익수",
+    "LF": "좌익수",
+
+    "중": "중견수",
+    "中": "중견수",
+    "CF": "중견수",
+
+    "우": "우익수",
+    "右": "우익수",
+    "RF": "우익수",
+
+    /* 지명타자 */
+    "지": "지명타자",
+    "指": "지명타자",
+    "DH": "지명타자",
+
+    /* 교체 */
+    "대": "대타",
+    "PH": "대타",
+
+    "주": "대주자",
+    "PR": "대주자",
+
+    "-": "포지션 미정",
+    "－": "포지션 미정",
+    "—": "포지션 미정",
+    "?": "포지션 미정",
+  };
+
+  if (!raw) {
+    return "포지션 미정";
+  }
+
+  return (
+    map[raw] ||
+    raw
+  );
+}
+
+
+function GameCard({
+  game,
+  odds,
+  setOdds,
+  pitcherStats,
+  teamForms,
+  bullpens,
+  lineupMatchups,
+  oddsLocked,
+  onSaveOdds,
+  onUnlockOdds,
+}: {
+  game: KboGame;
+  odds: OddsInput;
+  setOdds: (v: OddsInput) => void;
+  pitcherStats: Record<number, PitcherStats>;
+  teamForms: Record<string, TeamForm>;
+  bullpens: Record<string, BullpenData>;
+  lineupMatchups: Record<string, LineupMatchupData>;
+  oddsLocked: boolean;
+  onSaveOdds: () => void;
+  onUnlockOdds: () => void;
+}) {
+
+  const awayStarterStats =
+    game.startingPitchers.away?.id
+      ? pitcherStats[
+          game.startingPitchers.away.id
+        ]
+      : undefined;
+
+  const homeStarterStats =
+    game.startingPitchers.home?.id
+      ? pitcherStats[
+          game.startingPitchers.home.id
+        ]
+      : undefined;
+
+  const awayStarterRating =
+    starterRating(
+      awayStarterStats
+    );
+
+  const homeStarterRating =
+    starterRating(
+      homeStarterStats
+    );
+
+  const starterEdge =
+    starterEdgeText(
+      awayStarterStats,
+      homeStarterStats,
+      game.startingPitchers.away?.name ??
+        game.awayTeamName,
+      game.startingPitchers.home?.name ??
+        game.homeTeamName
+    );
+
+  const starterScoreEdge =
+    awayStarterRating &&
+    homeStarterRating
+      ? awayStarterRating.score -
+        homeStarterRating.score
+      : 0;
+
+  const awayTeamForm =
+    teamForms[
+      game.awayTeamName
+    ];
+
+  const homeTeamForm =
+    teamForms[
+      game.homeTeamName
+    ];
+
+  const awayTeamFormRating =
+    teamFormRating(
+      awayTeamForm
+    );
+
+  const homeTeamFormRating =
+    teamFormRating(
+      homeTeamForm
+    );
+
+  const teamFormEdgeScore =
+    awayTeamFormRating &&
+    homeTeamFormRating
+      ? awayTeamFormRating.score -
+        homeTeamFormRating.score
+      : 0;
+
+  const awayBullpen =
+    bullpens[
+      game.awayTeamName
+    ];
+
+  const homeBullpen =
+    bullpens[
+      game.homeTeamName
+    ];
+
+  const awayBullpenRating =
+    bullpenRating(
+      awayBullpen
+    );
+
+  const homeBullpenRating =
+    bullpenRating(
+      homeBullpen
+    );
+
+  const bullpenEdgeScore =
+    awayBullpenRating &&
+    homeBullpenRating
+      ? awayBullpenRating.score -
+        homeBullpenRating.score
+      : 0;
+
+  const lineupMatchup =
+    lineupMatchups[
+      game.gameId
+    ];
+
+  const lineupMatchupEdgeScore =
+    lineupMatchup?.ready &&
+    typeof lineupMatchup.edge ===
+      "number"
+      ? lineupMatchup.edge
+      : 0;
+
+  const projectedTotal =
+    estimateProjectedTotal(
+      awayTeamForm,
+      homeTeamForm,
+      awayStarterStats,
+      homeStarterStats,
+      awayBullpen,
+      homeBullpen,
+      lineupMatchup
+    );
+
+  const picks = analyzeGame(
+    game,
+    odds,
+    starterScoreEdge,
+    teamFormEdgeScore,
+    bullpenEdgeScore,
+    lineupMatchupEdgeScore,
+    projectedTotal
+  );
+
+  /*
+    추천 자격:
+    - 배당 존재
+    - EV 양수
+    - A/B급
+
+    조건을 못 넘으면 억지 추천 대신 관망.
+  */
+  // 전체 시장 중 종합점수가 가장 높은 후보
+  const topCandidate =
+    picks.find(
+      (pick) =>
+        !!pick.odds &&
+        pick.ev !== null
+    );
+
+  // 실제 추천은 기존 추천 기준을 통과해야 한다.
+  const best =
+    picks.find((pick) => {
+      if (
+        !pick.odds ||
+        pick.ev === null ||
+        pick.ev <= 0 ||
+        pick.grade === "C"
+      ) {
+        return false;
+      }
+
+      // O/U는 예상 총득점과 기준점 차이가
+      // 최소 0.8점 이상일 때만 실제 추천 후보로 인정.
+      if (
+        pick.market === "TOTAL" &&
+        projectedTotal !== null &&
+        odds.totalLine !== null
+      ) {
+        const totalEdge =
+          Math.abs(
+            projectedTotal -
+            odds.totalLine
+          );
+
+        if (totalEdge < 0.8) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+  const hasAnyOdds =
+    picks.some(
+      (pick) =>
+        !!pick.odds
+    );
+
+  const awayMlPick =
+    picks.find(
+      (pick) =>
+        pick.market === "ML" &&
+        pick.label === `${game.awayTeamName} 승`
+    );
+
+  const homeMlPick =
+    picks.find(
+      (pick) =>
+        pick.market === "ML" &&
+        pick.label === `${game.homeTeamName} 승`
+    );
+
+  const awayHandicapPick =
+    picks.find(
+      (pick) =>
+        pick.market === "HANDICAP" &&
+        pick.label.startsWith(
+          `${game.awayTeamName} `
+        )
+    );
+
+  const homeHandicapPick =
+    picks.find(
+      (pick) =>
+        pick.market === "HANDICAP" &&
+        pick.label.startsWith(
+          `${game.homeTeamName} `
+        )
+    );
+
+  const overPick =
+    picks.find(
+      (pick) =>
+        pick.market === "TOTAL" &&
+        pick.label.startsWith("오버")
+    );
+
+  const underPick =
+    picks.find(
+      (pick) =>
+        pick.market === "TOTAL" &&
+        pick.label.startsWith("언더")
+    );
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    const previousOverflow =
+      document.body.style.overflow;
+
+    document.body.style.overflow =
+      "hidden";
+
+    const handleEscape = (
+      event: KeyboardEvent
+    ) => {
+      if (event.key === "Escape") {
+        setExpanded(false);
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleEscape
+    );
+
+    return () => {
+      document.body.style.overflow =
+        previousOverflow;
+
+      window.removeEventListener(
+        "keydown",
+        handleEscape
+      );
+    };
+  }, [expanded]);
+
+
+
+  return (
+    <article
+      className={`gameCard ${expanded ? "isExpanded" : "isCompact"}`}
+      data-away={teamKey(game.awayTeamName)}
+      data-home={teamKey(game.homeTeamName)}
+    >
+    {expanded && (
+      <div className="detailStickyBar">
+        <div className="detailStickyTeams">
+          <b>{game.awayTeamName}</b>
+          <span>VS</span>
+          <b>{game.homeTeamName}</b>
+        </div>
+
+        <div className="detailStickyMeta">
+          <span>{game.time || "-"}</span>
+          <i>·</i>
+          <span>{game.stadium || "구장 미정"}</span>
+          <i>·</i>
+          <span>
+            {game.status.cancelName ||
+              (game.score.away !== null
+                ? "경기 진행/종료"
+                : "경기전")}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className="detailStickyClose"
+          onClick={() => setExpanded(false)}
+          aria-label="상세 닫기"
+        >
+          <span>상세 닫기</span>
+          <b>✕</b>
+        </button>
+      </div>
+    )}
+
+    <div className="cardTop"><b>{game.time || "-"}</b><span>{game.stadium || "구장 미정"}</span><span className="status">{game.status.cancelName || (game.score.away !== null ? "LIVE/결과" : "경기전")}</span></div>
+    <div className="matchup">
+      <div><strong>{game.awayTeamName}</strong><small>{game.awayRank ? `${game.awayRank}위` : ""}</small></div><em>VS</em><div className="right"><strong>{game.homeTeamName}</strong><small>{game.homeRank ? `${game.homeRank}위` : ""}</small></div>
+    </div>
+    <div className="starterCompare">
+
+      <div className="starterBox awayStarter">
+        <div className="starterIdentity">
+          <div className="starterPhoto">
+            <span>
+              {(game.startingPitchers.away?.name || game.awayTeamName || "?").slice(0, 1)}
+            </span>
+
+            {game.startingPitchers.away?.id && (
+              <img
+                src={kboPlayerPhoto(game.startingPitchers.away.id)}
+                alt={game.startingPitchers.away?.name || "원정 선발"}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            )}
+          </div>
+
+          <div className="starterIdentityText">
+            <span className="starterLabel">원정 선발</span>
+            <b>{game.startingPitchers.away?.name || "미정"}</b>
+          </div>
+        </div>
+
+        {game.startingPitchers.away?.id ? (
+          <>
+            <small>
+              {pitcherStatText(
+                pitcherStats[
+                  game.startingPitchers.away.id
+                ]
+              )}
+            </small>
+
+            {pitcherStats[
+              game.startingPitchers.away.id
+            ] && (
+              <em>
+                {
+                  pitcherStats[
+                    game.startingPitchers.away.id
+                  ].innings || "-"
+                }이닝
+                {" · "}
+                K {
+                  pitcherStats[
+                    game.startingPitchers.away.id
+                  ].strikeouts ?? "-"
+                }
+                {" · "}
+                QS {
+                  pitcherStats[
+                    game.startingPitchers.away.id
+                  ].qs ?? "-"
+                }
+              </em>
+            )}
+          </>
+        ) : (
+          <small>선발 미정</small>
+        )}
+      </div>
+
+      <div className="starterVs">
+        VS
+      </div>
+
+      <div className="starterBox right homeStarter">
+        <div className="starterIdentity right">
+          <div className="starterPhoto">
+            <span>
+              {(game.startingPitchers.home?.name || game.homeTeamName || "?").slice(0, 1)}
+            </span>
+
+            {game.startingPitchers.home?.id && (
+              <img
+                src={kboPlayerPhoto(game.startingPitchers.home.id)}
+                alt={game.startingPitchers.home?.name || "홈 선발"}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+            )}
+          </div>
+
+          <div className="starterIdentityText">
+            <span className="starterLabel">홈 선발</span>
+            <b>{game.startingPitchers.home?.name || "미정"}</b>
+          </div>
+        </div>
+
+        {game.startingPitchers.home?.id ? (
+          <>
+            <small>
+              {pitcherStatText(
+                pitcherStats[
+                  game.startingPitchers.home.id
+                ]
+              )}
+            </small>
+
+            {pitcherStats[
+              game.startingPitchers.home.id
+            ] && (
+              <em>
+                {
+                  pitcherStats[
+                    game.startingPitchers.home.id
+                  ].innings || "-"
+                }이닝
+                {" · "}
+                K {
+                  pitcherStats[
+                    game.startingPitchers.home.id
+                  ].strikeouts ?? "-"
+                }
+                {" · "}
+                QS {
+                  pitcherStats[
+                    game.startingPitchers.home.id
+                  ].qs ?? "-"
+                }
+              </em>
+            )}
+          </>
+        ) : (
+          <small>선발 미정</small>
+        )}
+      </div>
+
+    </div>
+
+    <div className="detailTopGrid">
+    {starterEdge && (
+      <div className={`starterAnalysis ${starterEdge.className}`}>
+        <div className="starterAnalysisTop">
+          <b>{starterEdge.text}</b>
+          <span>{starterEdge.detail}</span>
+        </div>
+
+        <div className="starterMeters">
+
+          <div>
+            <span>
+              {game.startingPitchers.away?.name}
+            </span>
+
+            <strong>
+              {awayStarterRating?.score ?? "-"}
+            </strong>
+
+            <small>
+              시즌 {awayStarterRating?.seasonScore ?? "-"}
+              {" · "}
+              최근 {awayStarterRating?.recentScore ?? "-"}
+            </small>
+          </div>
+
+          <div>
+            <span>
+              {game.startingPitchers.home?.name}
+            </span>
+
+            <strong>
+              {homeStarterRating?.score ?? "-"}
+            </strong>
+
+            <small>
+              시즌 {homeStarterRating?.seasonScore ?? "-"}
+              {" · "}
+              최근 {homeStarterRating?.recentScore ?? "-"}
+            </small>
+          </div>
+
+        </div>
+
+        <div className="starterReasons">
+          {awayStarterRating?.reasons
+            .slice(0, 2)
+            .map((reason) => (
+              <span key={`away-${reason}`}>
+                {game.awayTeamName} · {reason}
+              </span>
+            ))}
+
+          {homeStarterRating?.reasons
+            .slice(0, 2)
+            .map((reason) => (
+              <span key={`home-${reason}`}>
+                {game.homeTeamName} · {reason}
+              </span>
+            ))}
+        </div>
+      </div>
+    )}
+
+    {(awayTeamForm || homeTeamForm) && (
+      <div className="teamFormCompare">
+
+        <div className="teamFormTitle">
+          최근 10경기 팀 폼
+        </div>
+
+        <div className="teamFormGrid">
+
+          <div className="teamFormBox">
+            <b>{game.awayTeamName}</b>
+
+            {awayTeamForm ? (
+              <>
+                <strong>
+                  {awayTeamForm.wins}승
+                  {" "}
+                  {awayTeamForm.losses}패
+                  {awayTeamForm.draws > 0
+                    ? ` ${awayTeamForm.draws}무`
+                    : ""}
+                </strong>
+
+                <span>
+                  득점 {awayTeamForm.avgRuns?.toFixed(1) ?? "-"}
+                  {" · "}
+                  실점 {awayTeamForm.avgRunsAllowed?.toFixed(1) ?? "-"}
+                </span>
+
+                <small>
+                  득실차{" "}
+                  {awayTeamForm.runDifferential > 0 ? "+" : ""}
+                  {awayTeamForm.runDifferential}
+                  {" · "}
+                  폼지수 {awayTeamFormRating?.score ?? "-"}
+                </small>
+              </>
+            ) : (
+              <span>불러오는 중</span>
+            )}
+          </div>
+
+          <div className="teamFormVs">
+            VS
+          </div>
+
+          <div className="teamFormBox right">
+            <b>{game.homeTeamName}</b>
+
+            {homeTeamForm ? (
+              <>
+                <strong>
+                  {homeTeamForm.wins}승
+                  {" "}
+                  {homeTeamForm.losses}패
+                  {homeTeamForm.draws > 0
+                    ? ` ${homeTeamForm.draws}무`
+                    : ""}
+                </strong>
+
+                <span>
+                  득점 {homeTeamForm.avgRuns?.toFixed(1) ?? "-"}
+                  {" · "}
+                  실점 {homeTeamForm.avgRunsAllowed?.toFixed(1) ?? "-"}
+                </span>
+
+                <small>
+                  득실차{" "}
+                  {homeTeamForm.runDifferential > 0 ? "+" : ""}
+                  {homeTeamForm.runDifferential}
+                  {" · "}
+                  폼지수 {homeTeamFormRating?.score ?? "-"}
+                </small>
+              </>
+            ) : (
+              <span>불러오는 중</span>
+            )}
+          </div>
+
+        </div>
+
+        {awayTeamFormRating &&
+          homeTeamFormRating && (
+            <div className="teamFormEdge">
+              {Math.abs(teamFormEdgeScore) < 2
+                ? "최근 팀 폼 대등"
+                : teamFormEdgeScore > 0
+                  ? `최근 폼 우위: ${game.awayTeamName} +${teamFormEdgeScore.toFixed(1)}`
+                  : `최근 폼 우위: ${game.homeTeamName} +${Math.abs(teamFormEdgeScore).toFixed(1)}`}
+            </div>
+          )}
+
+      </div>
+    )}
+
+    {(awayBullpen || homeBullpen) && (
+      <div className="bullpenCompare">
+
+        <div className="bullpenTitle">
+          최근 3일 불펜
+        </div>
+
+        <div className="bullpenGrid">
+
+          <div className="bullpenBox">
+            <b>{game.awayTeamName}</b>
+
+            {awayBullpen ? (
+              <>
+                <strong>
+                  피로도 {awayBullpen.summary.fatigueIndex.toFixed(1)}
+                </strong>
+
+                <span>
+                  총 {awayBullpen.summary.totalPitches}구
+                  {" · "}
+                  등판 {awayBullpen.summary.bullpenAppearances}회
+                </span>
+
+                <small>
+                  어제 {awayBullpen.summary.yesterdayPitches}구
+                  {" · "}
+                  연투 {awayBullpen.summary.backToBackCount}명
+                  {" · "}
+                  {awayBullpenRating?.status}
+                </small>
+              </>
+            ) : (
+              <span>불러오는 중</span>
+            )}
+          </div>
+
+          <div className="bullpenVs">
+            VS
+          </div>
+
+          <div className="bullpenBox right">
+            <b>{game.homeTeamName}</b>
+
+            {homeBullpen ? (
+              <>
+                <strong>
+                  피로도 {homeBullpen.summary.fatigueIndex.toFixed(1)}
+                </strong>
+
+                <span>
+                  총 {homeBullpen.summary.totalPitches}구
+                  {" · "}
+                  등판 {homeBullpen.summary.bullpenAppearances}회
+                </span>
+
+                <small>
+                  어제 {homeBullpen.summary.yesterdayPitches}구
+                  {" · "}
+                  연투 {homeBullpen.summary.backToBackCount}명
+                  {" · "}
+                  {homeBullpenRating?.status}
+                </small>
+              </>
+            ) : (
+              <span>불러오는 중</span>
+            )}
+          </div>
+
+        </div>
+
+        {awayBullpenRating &&
+          homeBullpenRating && (
+            <div className="bullpenEdge">
+              {Math.abs(bullpenEdgeScore) < 3
+                ? "불펜 상태 대등"
+                : bullpenEdgeScore > 0
+                  ? `불펜 우위: ${game.awayTeamName} +${bullpenEdgeScore.toFixed(1)}`
+                  : `불펜 우위: ${game.homeTeamName} +${Math.abs(bullpenEdgeScore).toFixed(1)}`}
+            </div>
+          )}
+
+      </div>
+    )}
+
+    </div>
+
+    <div className="lineupAnalysis">
+
+      <div className="lineupAnalysisHead">
+        <div>
+          <b>선발 타선 상세 분석</b>
+          <small>
+            시즌 타격 + 상대 선발 BvP + 타순 가중치
+          </small>
+        </div>
+
+        <span className={
+          lineupMatchup?.ready
+            ? "confirmed"
+            : "waiting"
+        }>
+          {lineupMatchup?.ready
+            ? "✓ 확정 라인업"
+            : "라인업 발표 대기"}
+        </span>
+      </div>
+
+      {lineupMatchup?.ready ? (
+        <>
+          <div className="lineupScoreCompare">
+            <div>
+              <span>{game.awayTeamName}</span>
+
+              <strong>
+                {lineupMatchup.away
+                  ?.matchupSummary
+                  ?.score ?? "-"}
+              </strong>
+
+              <small>
+                시즌 OPS{" "}
+                {stat3(
+                  lineupMatchup.away
+                    ?.baseSummary
+                    ?.avgOps
+                )}
+              </small>
+            </div>
+
+            <em>VS</em>
+
+            <div>
+              <span>{game.homeTeamName}</span>
+
+              <strong>
+                {lineupMatchup.home
+                  ?.matchupSummary
+                  ?.score ?? "-"}
+              </strong>
+
+              <small>
+                시즌 OPS{" "}
+                {stat3(
+                  lineupMatchup.home
+                    ?.baseSummary
+                    ?.avgOps
+                )}
+              </small>
+            </div>
+          </div>
+
+
+          <div className="lineupWhy">
+            <b>
+              모델이 타선을 이렇게 평가한 이유
+            </b>
+
+            <div className="lineupWhyGrid">
+              <div>
+                <strong>
+                  {game.awayTeamName}
+                </strong>
+
+                <ul>
+                  {lineupTeamReasons(
+                    lineupMatchup.away,
+                    lineupMatchup.home
+                  ).map(
+                    (reason,index) => (
+                      <li key={index}>
+                        {reason}
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+
+              <div>
+                <strong>
+                  {game.homeTeamName}
+                </strong>
+
+                <ul>
+                  {lineupTeamReasons(
+                    lineupMatchup.home,
+                    lineupMatchup.away
+                  ).map(
+                    (reason,index) => (
+                      <li key={index}>
+                        {reason}
+                      </li>
+                    )
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+
+          <div className="lineupPlayerColumns">
+
+            {[
+              {
+                teamName:
+                  game.awayTeamName,
+                side:
+                  lineupMatchup.away,
+              },
+              {
+                teamName:
+                  game.homeTeamName,
+                side:
+                  lineupMatchup.home,
+              },
+            ].map(
+              ({teamName,side}) => (
+                <div
+                  className="lineupTeamColumn"
+                  key={teamName}
+                >
+                  <div className="lineupTeamTitle">
+                    <strong>
+                      {teamName}
+                    </strong>
+
+                    <span>
+                      {side.players?.length ?? 0}명
+                    </span>
+                  </div>
+
+                  <div className="lineupPlayerList">
+                    {(side.players ?? []).map(
+                      (player) => {
+                        const verdict =
+                          lineupPlayerVerdict(
+                            player
+                          );
+
+                        return (
+                          <div
+                            className="lineupPlayerRow"
+                            key={
+                              `${teamName}-${player.order}-${player.playerId ?? player.name}`
+                            }
+                          >
+                            <div className="lineupOrder">
+                              {player.order}
+                            </div>
+
+                            <div className="lineupPlayerPhoto">
+                              <span>
+                                {player.name
+                                  .slice(0,1)}
+                              </span>
+
+                              {player.playerId && (
+                                <img
+                                  src={kboPlayerPhoto(
+                                    player.playerId
+                                  )}
+                                  alt={player.name}
+                                  onError={(e) => {
+                                    e.currentTarget
+                                      .style
+                                      .display =
+                                        "none";
+                                  }}
+                                />
+                              )}
+                            </div>
+
+                            <div className="lineupPlayerBody">
+
+                              <div className="lineupPlayerName">
+                                <strong>
+                                  {player.name}
+                                </strong>
+
+                                <span>
+                                  {formatLineupPosition(
+                                    player.position
+                                  )}
+                                </span>
+                              </div>
+
+                              <div className="lineupPlayerStats">
+                                <span>
+                                  AVG{" "}
+                                  <b>
+                                    {stat3(
+                                      player.stats
+                                        ?.avg
+                                    )}
+                                  </b>
+                                </span>
+
+                                <span>
+                                  OPS{" "}
+                                  <b>
+                                    {stat3(
+                                      player.stats
+                                        ?.ops
+                                    )}
+                                  </b>
+                                </span>
+
+                                <span>
+                                  HR{" "}
+                                  <b>
+                                    {player.stats
+                                      ?.hr ?? "-"}
+                                  </b>
+                                </span>
+                              </div>
+
+                              <div className="lineupBvp">
+                                <span>
+                                  vs{" "}
+                                  {player
+                                    .opponentStarter
+                                    ?.name ??
+                                    "상대 선발"}
+                                </span>
+
+                                {player.bvp &&
+                                (player.bvp.pa ?? 0) > 0 ? (
+                                  <b>
+                                    {player.bvp
+                                      .ab ?? 0}
+                                    타수{" "}
+                                    {player.bvp
+                                      .hits ?? 0}
+                                    안타 · AVG{" "}
+                                    {stat3(
+                                      player.bvp
+                                        .avg
+                                    )}
+                                    {" · "}
+                                    OPS{" "}
+                                    {stat3(
+                                      player.bvp
+                                        .ops
+                                    )}
+                                    {" · "}
+                                    {player.bvp
+                                      .pa ?? 0}
+                                    PA
+                                  </b>
+                                ) : (
+                                  <b>
+                                    BvP 표본 없음
+                                  </b>
+                                )}
+                              </div>
+
+                              <div className="lineupScoreFlow">
+                                <span>
+                                  시즌점수{" "}
+                                  <b>
+                                    {player
+                                      .seasonScore ??
+                                      player.score ??
+                                      "-"}
+                                  </b>
+                                </span>
+
+                                <i>→</i>
+
+                                <span>
+                                  매치업점수{" "}
+                                  <b>
+                                    {player
+                                      .matchupScore ??
+                                      "-"}
+                                  </b>
+                                </span>
+
+                                <em
+                                  className={
+                                    (player.adjustment ??
+                                      0) > 0
+                                      ? "plus"
+                                      : (player.adjustment ??
+                                          0) < 0
+                                        ? "minus"
+                                        : ""
+                                  }
+                                >
+                                  {(player.adjustment ??
+                                    0) > 0
+                                    ? "+"
+                                    : ""}
+                                  {(player.adjustment ??
+                                    0).toFixed(1)}
+                                </em>
+                              </div>
+
+                              <div
+                                className={
+                                  `lineupVerdict ${verdict.tone}`
+                                }
+                              >
+                                {verdict.label}
+                              </div>
+
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              )
+            )}
+
+          </div>
+
+
+          <div className="lineupFinalEdge">
+            <span>최종 타선 판단</span>
+
+            <b>
+              {Math.abs(
+                lineupMatchupEdgeScore
+              ) < 1
+                ? `대등 · EDGE ${lineupMatchupEdgeScore.toFixed(1)}`
+                : lineupMatchupEdgeScore > 0
+                  ? `${game.awayTeamName} 우위 +${lineupMatchupEdgeScore.toFixed(1)}`
+                  : `${game.homeTeamName} 우위 +${Math.abs(lineupMatchupEdgeScore).toFixed(1)}`}
+            </b>
+
+            <small>
+              이 EDGE가 현재 승률 모델의
+              라인업 보정값에 반영됩니다.
+            </small>
+          </div>
+        </>
+      ) : (
+        <div className="lineupWaitingBox">
+          확정 타순 발표 후 선수별 시즌 타격,
+          상대 선발 BvP와 타순 가중치를 자동 계산합니다.
+        </div>
+      )}
+
+    </div>
+
+    <div className="detailBottomGrid">
+    <div className="oddsMarkets">
+
+      <div className="marketBlock">
+        <b className="marketTitle">승패</b>
+
+        <div className="oddsRow">
+          <label>
+            {game.awayTeamName} 승
+            <DecimalInput
+              value={odds.awayMl}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  awayMl: v,
+                })
+              }
+              placeholder="1.75"
+            />
+          </label>
+
+          <label>
+            {game.homeTeamName} 승
+            <DecimalInput
+              value={odds.homeMl}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  homeMl: v,
+                })
+              }
+              placeholder="1.85"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="marketBlock handicapMarket">
+        <b className="marketTitle">
+          핸디캡
+          <small>홈팀 기준</small>
+        </b>
+
+        <div className="oddsRow handicapCompactRow">
+          <label className="handicapLineInput">
+            <span>{game.homeTeamName} 기준</span>
+            <DecimalInput
+              value={odds.homeHandicapLine}
+              onValueChange={(v) => {
+                const n = Number(v);
+
+                setOdds({
+                  ...odds,
+                  homeHandicapLine: v,
+                  awayHandicapLine:
+                    v === null || Number.isNaN(n)
+                      ? null
+                      : n * -1,
+                });
+              }}
+              placeholder="-1.5"
+            />
+          </label>
+
+          <label>
+            <span>{game.awayTeamName}</span>
+            <DecimalInput
+              value={odds.awayHandicap}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  awayHandicap: v,
+                })
+              }
+              placeholder="1.90"
+            />
+          </label>
+
+          <label>
+            <span>{game.homeTeamName}</span>
+            <DecimalInput
+              value={odds.homeHandicap}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  homeHandicap: v,
+                })
+              }
+              placeholder="1.90"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="marketBlock">
+        <b className="marketTitle">
+          오버 / 언더
+        </b>
+
+        <div className="oddsRow">
+          <label>
+            기준점
+            <DecimalInput
+              value={odds.totalLine}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  totalLine: v,
+                })
+              }
+              placeholder="9.5"
+            />
+          </label>
+
+          <label>
+            오버 배당
+            <DecimalInput
+              value={odds.overOdds}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  overOdds: v,
+                })
+              }
+              placeholder="1.90"
+            />
+          </label>
+
+          <label>
+            언더 배당
+            <DecimalInput
+              value={odds.underOdds}
+              onValueChange={(v) =>
+                setOdds({
+                  ...odds,
+                  underOdds: v,
+                })
+              }
+              placeholder="1.90"
+            />
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div className={`oddsSaveBar ${oddsLocked ? "isLocked" : ""}`}>
+      <div>
+        <b>{oddsLocked ? "🔒 배당 고정됨" : "배당 수정 가능"}</b>
+        <small>
+          {oddsLocked
+            ? "저장한 배당을 유지합니다"
+            : "수정 후 저장하면 자동배당이 덮어쓰지 않습니다"}
+        </small>
+      </div>
+
+      <button
+        type="button"
+        onClick={oddsLocked ? onUnlockOdds : onSaveOdds}
+      >
+        {oddsLocked ? "잠금 해제" : "배당 저장"}
+      </button>
+    </div>
+
+    {expanded && (
+      <div className="marketProbabilityAnalysis">
+        <div className="marketProbabilityHead">
+          <div>
+            <b>시장별 모델 확률</b>
+            <small>
+              승패 · 핸디캡 · 오버/언더 전체 비교
+            </small>
+          </div>
+        </div>
+
+        <div className="marketProbabilitySection">
+          <strong>승패</strong>
+
+          <div className="marketProbabilityPair">
+            <div>
+              <span>{game.awayTeamName} 승</span>
+              <b>
+                {awayMlPick
+                  ? `${(awayMlPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {awayMlPick?.ev !== null &&
+                 awayMlPick?.ev !== undefined
+                  ? `${awayMlPick.ev >= 0 ? "+" : ""}${(awayMlPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+
+            <div>
+              <span>{game.homeTeamName} 승</span>
+              <b>
+                {homeMlPick
+                  ? `${(homeMlPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {homeMlPick?.ev !== null &&
+                 homeMlPick?.ev !== undefined
+                  ? `${homeMlPick.ev >= 0 ? "+" : ""}${(homeMlPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+          </div>
+        </div>
+
+
+        <div className="marketProbabilitySection">
+          <strong>핸디캡</strong>
+
+          <div className="marketProbabilityPair">
+            <div>
+              <span>
+                {awayHandicapPick?.label ??
+                  `${game.awayTeamName} 핸디`}
+              </span>
+              <b>
+                {awayHandicapPick
+                  ? `${(awayHandicapPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {awayHandicapPick?.ev !== null &&
+                 awayHandicapPick?.ev !== undefined
+                  ? `${awayHandicapPick.ev >= 0 ? "+" : ""}${(awayHandicapPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+
+            <div>
+              <span>
+                {homeHandicapPick?.label ??
+                  `${game.homeTeamName} 핸디`}
+              </span>
+              <b>
+                {homeHandicapPick
+                  ? `${(homeHandicapPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {homeHandicapPick?.ev !== null &&
+                 homeHandicapPick?.ev !== undefined
+                  ? `${homeHandicapPick.ev >= 0 ? "+" : ""}${(homeHandicapPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+          </div>
+        </div>
+
+
+        <div className="marketProbabilitySection">
+          <strong>오버 / 언더</strong>
+
+          <div className="marketProbabilityPair">
+            <div>
+              <span>
+                {overPick?.label ??
+                  "오버"}
+              </span>
+              <b>
+                {overPick
+                  ? `${(overPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {overPick?.ev !== null &&
+                 overPick?.ev !== undefined
+                  ? `${overPick.ev >= 0 ? "+" : ""}${(overPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+
+            <div>
+              <span>
+                {underPick?.label ??
+                  "언더"}
+              </span>
+              <b>
+                {underPick
+                  ? `${(underPick.confidence * 100).toFixed(1)}%`
+                  : "-"}
+              </b>
+              <small>
+                EV{" "}
+                {underPick?.ev !== null &&
+                 underPick?.ev !== undefined
+                  ? `${underPick.ev >= 0 ? "+" : ""}${(underPick.ev * 100).toFixed(1)}%`
+                  : "-"}
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div className="marketProbabilityNote">
+          현재 입력된 배당 기준 · 배당 변경 시 즉시 재계산
+        </div>
+      </div>
+    )}
+
+    {expanded && projectedTotal !== null && (
+      <div className="totalAnalysis">
+        <div className="totalAnalysisHead">
+          <b>오버 / 언더 분석</b>
+          <strong>
+            예상 총득점 {projectedTotal.toFixed(1)}
+          </strong>
+        </div>
+
+        <div className="totalAnalysisGrid">
+          <div>
+            <span>기준점</span>
+            <b>
+              {odds.totalLine !== null
+                ? odds.totalLine.toFixed(1)
+                : "-"}
+            </b>
+          </div>
+
+          <div>
+            <span>오버 확률</span>
+            <b>
+              {overPick
+                ? `${(overPick.confidence * 100).toFixed(1)}%`
+                : "-"}
+            </b>
+            <small>
+              EV{" "}
+              {overPick?.ev !== null &&
+               overPick?.ev !== undefined
+                ? `${overPick.ev >= 0 ? "+" : ""}${(overPick.ev * 100).toFixed(1)}%`
+                : "-"}
+            </small>
+          </div>
+
+          <div>
+            <span>언더 확률</span>
+            <b>
+              {underPick
+                ? `${(underPick.confidence * 100).toFixed(1)}%`
+                : "-"}
+            </b>
+            <small>
+              EV{" "}
+              {underPick?.ev !== null &&
+               underPick?.ev !== undefined
+                ? `${underPick.ev >= 0 ? "+" : ""}${(underPick.ev * 100).toFixed(1)}%`
+                : "-"}
+            </small>
+          </div>
+        </div>
+
+        <div className="totalAnalysisEdge">
+          {odds.totalLine !== null
+            ? projectedTotal > odds.totalLine
+              ? `오버 방향 +${(projectedTotal - odds.totalLine).toFixed(1)}점`
+              : projectedTotal < odds.totalLine
+                ? `언더 방향 ${(odds.totalLine - projectedTotal).toFixed(1)}점`
+                : "기준점과 예상득점 동일"
+            : "O/U 기준점 입력 필요"}
+        </div>
+
+        {game.score.away !== null &&
+         game.score.home !== null && (
+          <div className="totalActualResult">
+            <div className="totalActualResultHead">
+              <span>실제 점수</span>
+              <strong>
+                {game.awayTeamName} {game.score.away}
+                <em>:</em>
+                {game.score.home} {game.homeTeamName}
+              </strong>
+            </div>
+
+            <div className="totalActualResultBottom">
+              <span>
+                실제 총점{" "}
+                <b>
+                  {game.score.away + game.score.home}점
+                </b>
+              </span>
+
+              {odds.totalLine !== null && (
+                <strong
+                  className={
+                    game.score.away + game.score.home >
+                    odds.totalLine
+                      ? "isOver"
+                      : game.score.away + game.score.home <
+                          odds.totalLine
+                        ? "isUnder"
+                        : "isPush"
+                  }
+                >
+                  {game.score.away + game.score.home >
+                  odds.totalLine
+                    ? "오버"
+                    : game.score.away + game.score.home <
+                        odds.totalLine
+                      ? "언더 결과"
+                      : "적특"}
+                </strong>
+              )}
+            </div>
+
+            {odds.totalLine !== null && (
+              <div className="totalActualComment">
+                {(() => {
+                  const line =
+                    odds.totalLine;
+
+                  const awayLineup =
+                    Number(
+                      lineupMatchup?.away
+                        ?.matchupSummary?.score
+                    );
+
+                  const homeLineup =
+                    Number(
+                      lineupMatchup?.home
+                        ?.matchupSummary?.score
+                    );
+
+                  const lineupGap =
+                    Number.isFinite(awayLineup) &&
+                    Number.isFinite(homeLineup)
+                      ? awayLineup - homeLineup
+                      : 0;
+
+                  const formGap =
+                    teamFormEdgeScore ?? 0;
+
+                  const bullpenGap =
+                    bullpenEdgeScore ?? 0;
+
+                  const factors = [
+                    {
+                      key: "bullpen",
+                      strength:
+                        Math.abs(bullpenGap),
+                    },
+                    {
+                      key: "form",
+                      strength:
+                        Math.abs(formGap),
+                    },
+                    {
+                      key: "lineup",
+                      strength:
+                        Math.abs(lineupGap),
+                    },
+                    {
+                      key: "starter",
+                      strength:
+                        starterEdge ? 5 : 0,
+                    },
+                  ].sort(
+                    (a, b) =>
+                      b.strength - a.strength
+                  );
+
+                  const first =
+                    factors[0]?.key;
+
+                  const second =
+                    factors[1]?.key;
+
+                  const direction =
+                    line === null
+                      ? "득점 방향"
+                      : projectedTotal > line
+                        ? "다득점"
+                        : projectedTotal < line
+                          ? "저득점"
+                          : "기준점 부근";
+
+                  const lineText =
+                    line === null
+                      ? `예상 총점은 ${projectedTotal.toFixed(1)}점입니다.`
+                      : projectedTotal > line
+                        ? `예상 총점 ${projectedTotal.toFixed(1)}점으로 기준점 ${line.toFixed(1)}보다 ${(projectedTotal - line).toFixed(1)}점 높게 봤습니다.`
+                        : projectedTotal < line
+                          ? `예상 총점 ${projectedTotal.toFixed(1)}점으로 기준점 ${line.toFixed(1)}보다 ${(line - projectedTotal).toFixed(1)}점 낮게 봤습니다.`
+                          : `예상 총점과 기준점이 ${line.toFixed(1)}점으로 같습니다.`;
+
+                  if (
+                    first === "bullpen" &&
+                    second === "form"
+                  ) {
+                    const bullpenTeam =
+                      bullpenGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    const formTeam =
+                      formGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    return (
+                      `${bullpenTeam}의 불펜 여유와 ` +
+                      `${formTeam}의 최근 경기 흐름이 가장 큰 변수지만, ` +
+                      `전체 득점 균형은 ${direction} 쪽입니다. ` +
+                      lineText
+                    );
+                  }
+
+                  if (
+                    first === "form" &&
+                    second === "lineup"
+                  ) {
+                    const formTeam =
+                      formGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    const lineupTeam =
+                      lineupGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    return (
+                      `${formTeam}의 최근 득점 흐름과 ` +
+                      `${lineupTeam} 타선의 상대 선발 매치업을 높게 반영했습니다. ` +
+                      lineText
+                    );
+                  }
+
+                  if (
+                    first === "lineup" &&
+                    second === "starter"
+                  ) {
+                    const lineupTeam =
+                      lineupGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    return (
+                      `${lineupTeam} 타선의 매치업 우위가 보이지만, ` +
+                      `${starterEdge?.text ?? "선발 비교"}까지 함께 반영했습니다. ` +
+                      lineText
+                    );
+                  }
+
+                  if (
+                    first === "starter" ||
+                    second === "starter"
+                  ) {
+                    return (
+                      `${starterEdge?.text ?? "양 팀 선발 지표"}가 경기 초반 흐름의 핵심입니다. ` +
+                      `최근 타선과 불펜 수치를 함께 계산해 ${direction} 쪽에 무게를 뒀습니다. ` +
+                      lineText
+                    );
+                  }
+
+                  if (first === "bullpen") {
+                    const team =
+                      bullpenGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    return (
+                      `${team}의 최근 불펜 소모가 상대적으로 적어 후반 실점 억제 가능성을 높게 봤습니다. ` +
+                      lineText
+                    );
+                  }
+
+                  if (first === "form") {
+                    const team =
+                      formGap >= 0
+                        ? game.awayTeamName
+                        : game.homeTeamName;
+
+                    return (
+                      `${team}의 최근 10경기 득점 흐름이 이번 예상에서 가장 크게 작용했습니다. ` +
+                      lineText
+                    );
+                  }
+
+                  return (
+                    `선발·타선·불펜 지표가 뚜렷하게 한쪽으로 기울지 않은 경기입니다. ` +
+                    lineText
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )}
+
+    </div>
+
+    <button
+
+      type="button"
+
+      className="detailModalToggle gameDetailToggle"
+
+      onClick={() => setExpanded((v) => !v)}
+
+    >
+
+      <span>{expanded ? "상세 분석 접기" : "상세 분석 보기"}</span>
+
+      <b>{expanded ? "▲" : "▼"}</b>
+
+    </button>
+
+
+
+    <div
+      className={`recommend ${
+        best
+          ? `grade${best.grade}`
+          : "gradeC"
+      }`}
+    >
+      <span>
+        {best
+          ? "추천"
+          : hasAnyOdds
+            ? "비추천"
+            : "추천"}
+      </span>
+
+      <b>
+        {best
+          ? best.label
+          : hasAnyOdds && topCandidate
+            ? `최고 후보 · ${topCandidate.label}`
+            : "배당 입력 대기"}
+      </b>
+
+      {best ? (
+        <small>
+          {best.grade}급
+          {" · "}
+          확률 {(best.confidence * 100).toFixed(1)}%
+          {" · "}
+          EV {best.ev !== null
+            ? `${best.ev >= 0 ? "+" : ""}${(best.ev * 100).toFixed(1)}%`
+            : "-"}
+          {projectedTotal !== null &&
+           best.market === "TOTAL"
+            ? ` · 예상 ${projectedTotal.toFixed(1)}점`
+            : ""}
+        </small>
+      ) : hasAnyOdds && topCandidate ? (
+        <small>
+          {topCandidate.grade}급
+          {" · "}
+          확률 {(topCandidate.confidence * 100).toFixed(1)}%
+          {" · "}
+          EV {topCandidate.ev !== null
+            ? `${topCandidate.ev >= 0 ? "+" : ""}${(topCandidate.ev * 100).toFixed(1)}%`
+            : "-"}
+          {" · 추천 기준 미달"}
+        </small>
+      ) : null}
+    </div>
+    </article>
+  );
+}
+
+
+type AutoComboStyle =
+  | "SAFE"
+  | "TOP"
+  | "BALANCED"
+  | "AGGRESSIVE"
+  | "HIGH_ODDS";
+
+type SavedComboSnapshot = {
+  id: string;
+  date: string;
+  savedAt: string;
+
+  name: string;
+  style: AutoComboStyle;
+
+  odds: number;
+  probability: number;
+  averageConfidence: number;
+  averageEv: number | null;
+
+  // 저장 당시 픽을 그대로 동결
+  picks: Pick[];
+
+  // 핸디캡 / O-U 결과 판정을 위해
+  // 저장 당시 경기별 기준점과 배당도 함께 동결
+  oddsByGame: Record<string, OddsInput>;
+
+  // 이후 팀명/구장 표시에 사용할 당시 경기정보
+  games: Record<
+    string,
+    {
+      awayTeamName: string;
+      homeTeamName: string;
+      stadium: string;
+    }
+  >;
+};
+
+
+type PickSettlement =
+  | "PENDING"
+  | "LIVE"
+  | "WIN"
+  | "LOSS"
+  | "PUSH"
+  | "VOID";
+
+type ComboSettlement =
+  | "PENDING"
+  | "LIVE"
+  | "WIN"
+  | "LOSS"
+  | "VOID";
+
+function settleSavedPick(
+  pick: Pick,
+  snapshot: SavedComboSnapshot,
+  game: KboGame | undefined
+): PickSettlement {
+  if (!game) {
+    return "PENDING";
+  }
+
+  const cancelName =
+    (game.status.cancelName || "").trim();
+
+  const cancelled =
+    cancelName &&
+    cancelName !== "정상경기";
+
+  if (cancelled) {
+    return "VOID";
+  }
+
+  const awayScore =
+    game.score.away;
+
+  const homeScore =
+    game.score.home;
+
+  const hasScore =
+    awayScore !== null &&
+    homeScore !== null;
+
+  const completed =
+    game.status.stateCode === "3" &&
+    hasScore;
+
+  if (!completed) {
+    return hasScore
+      ? "LIVE"
+      : "PENDING";
+  }
+
+  const frozenOdds =
+    snapshot.oddsByGame[pick.gameId] ||
+    emptyOdds;
+
+  const info =
+    snapshot.games[pick.gameId];
+
+  if (!info) {
+    return "VOID";
+  }
+
+  if (pick.market === "ML") {
+    const awayLabel =
+      `${info.awayTeamName} 승`;
+
+    const homeLabel =
+      `${info.homeTeamName} 승`;
+
+    if (pick.label === awayLabel) {
+      if (awayScore > homeScore) {
+        return "WIN";
+      }
+
+      if (awayScore < homeScore) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (pick.label === homeLabel) {
+      if (homeScore > awayScore) {
+        return "WIN";
+      }
+
+      if (homeScore < awayScore) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  if (pick.market === "HANDICAP") {
+    const awaySelected =
+      pick.label.startsWith(
+        `${info.awayTeamName} `
+      );
+
+    const homeSelected =
+      pick.label.startsWith(
+        `${info.homeTeamName} `
+      );
+
+    if (
+      awaySelected &&
+      frozenOdds.awayHandicapLine !== null
+    ) {
+      const adjusted =
+        awayScore +
+        frozenOdds.awayHandicapLine;
+
+      if (adjusted > homeScore) {
+        return "WIN";
+      }
+
+      if (adjusted < homeScore) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (
+      homeSelected &&
+      frozenOdds.homeHandicapLine !== null
+    ) {
+      const adjusted =
+        homeScore +
+        frozenOdds.homeHandicapLine;
+
+      if (adjusted > awayScore) {
+        return "WIN";
+      }
+
+      if (adjusted < awayScore) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  if (pick.market === "TOTAL") {
+    if (frozenOdds.totalLine === null) {
+      return "VOID";
+    }
+
+    const total =
+      awayScore + homeScore;
+
+    if (pick.label.startsWith("오버 ")) {
+      if (total > frozenOdds.totalLine) {
+        return "WIN";
+      }
+
+      if (total < frozenOdds.totalLine) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (pick.label.startsWith("언더 ")) {
+      if (total < frozenOdds.totalLine) {
+        return "WIN";
+      }
+
+      if (total > frozenOdds.totalLine) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+  return "VOID";
+}
+
+function settleSavedCombo(
+  snapshot: SavedComboSnapshot,
+  games: KboGame[]
+): {
+  status: ComboSettlement;
+  pickResults: PickSettlement[];
+  effectiveOdds: number;
+} {
+  const pickResults =
+    snapshot.picks.map(
+      (pick) =>
+        settleSavedPick(
+          pick,
+          snapshot,
+          games.find(
+            (game) =>
+              game.gameId ===
+              pick.gameId
+          )
+        )
+    );
+
+  if (
+    pickResults.some(
+      (result) =>
+        result === "LOSS"
+    )
+  ) {
+    return {
+      status: "LOSS",
+      pickResults,
+      effectiveOdds: 0,
+    };
+  }
+
+  if (
+    pickResults.some(
+      (result) =>
+        result === "LIVE"
+    )
+  ) {
+    return {
+      status: "LIVE",
+      pickResults,
+      effectiveOdds:
+        snapshot.odds,
+    };
+  }
+
+  if (
+    pickResults.some(
+      (result) =>
+        result === "PENDING"
+    )
+  ) {
+    return {
+      status: "PENDING",
+      pickResults,
+      effectiveOdds:
+        snapshot.odds,
+    };
+  }
+
+  const hasWin =
+    pickResults.some(
+      (result) =>
+        result === "WIN"
+    );
+
+  const onlyVoidOrPush =
+    pickResults.every(
+      (result) =>
+        result === "VOID" ||
+        result === "PUSH"
+    );
+
+  if (onlyVoidOrPush) {
+    return {
+      status: "VOID",
+      pickResults,
+      effectiveOdds: 1,
+    };
+  }
+
+  const effectiveOdds =
+    snapshot.picks.reduce(
+      (acc, pick, index) => {
+        const result =
+          pickResults[index];
+
+        if (
+          result === "PUSH" ||
+          result === "VOID"
+        ) {
+          return acc;
+        }
+
+        return acc *
+          (pick.odds ?? 1);
+      },
+      1
+    );
+
+  return {
+    status:
+      hasWin
+        ? "WIN"
+        : "VOID",
+    pickResults,
+    effectiveOdds,
+  };
+}
+
+
+function comboSettlementLabel(
+  status: ComboSettlement
+) {
+  if (status === "WIN") return "✅ 적중";
+  if (status === "LOSS") return "❌ 낙첨";
+  if (status === "LIVE") return "⏳ 진행중";
+  if (status === "VOID") return "↔ 무효";
+  return "⏸ 대기";
+}
+
+function pickSettlementLabel(
+  status: PickSettlement
+) {
+  if (status === "WIN") return "✅ 적중";
+  if (status === "LOSS") return "❌ 낙첨";
+  if (status === "LIVE") return "⏳ 진행중";
+  if (status === "PUSH") return "↔ 적특";
+  if (status === "VOID") return "↔ 무효";
+  return "⏸ 대기";
+}
+
+
+function comboStyleInfo(
+  style:
+    | "SAFE"
+    | "TOP"
+    | "BALANCED"
+    | "AGGRESSIVE"
+    | "HIGH_ODDS"
+) {
+  if (style === "SAFE") {
+    return {
+      icon: "🛡",
+      subtitle: "적중 가능성을 우선한 조합",
+      className: "safe",
+    };
+  }
+
+  if (style === "TOP") {
+    return {
+      icon: "👍",
+      subtitle: "모델 확률 TOP 픽 조합",
+      className: "top",
+    };
+  }
+
+  if (style === "BALANCED") {
+    return {
+      icon: "⚖",
+      subtitle: "확률 · 배당 · EV 균형 조합",
+      className: "balanced",
+    };
+  }
+
+  if (style === "AGGRESSIVE") {
+    return {
+      icon: "🎯",
+      subtitle: "확률 우선 4경기 조합",
+      className: "aggressive",
+    };
+  }
+
+  return {
+    icon: "🏆",
+    subtitle: "확률을 지키면서 배당을 높인 조합",
+    className: "highOdds",
+  };
+}
+
+
+function comboConfidenceGrade(
+  averageConfidence: number
+) {
+  if (averageConfidence >= 0.64) {
+    return "A";
+  }
+
+  if (averageConfidence >= 0.60) {
+    return "A-";
+  }
+
+  if (averageConfidence >= 0.57) {
+    return "B+";
+  }
+
+  if (averageConfidence >= 0.54) {
+    return "B";
+  }
+
+  if (averageConfidence >= 0.51) {
+    return "C+";
+  }
+
+  return "C";
+}
+
+
+function comboOverlapRisk(
+  comboGameIds: string[],
+  allComboGameIds: string[][]
+) {
+  let overlap = 0;
+
+  for (const gameId of comboGameIds) {
+    let count = 0;
+
+    for (const ids of allComboGameIds) {
+      if (ids.includes(gameId)) {
+        count += 1;
+      }
+    }
+
+    if (count >= 3) {
+      overlap += 2;
+    } else if (count >= 2) {
+      overlap += 1;
+    }
+  }
+
+  const ratio =
+    comboGameIds.length
+      ? overlap / comboGameIds.length
+      : 0;
+
+  if (ratio >= 1.4) {
+    return {
+      label: "매우 높음",
+      className: "veryHigh",
+    };
+  }
+
+  if (ratio >= 0.9) {
+    return {
+      label: "높음",
+      className: "high",
+    };
+  }
+
+  if (ratio >= 0.45) {
+    return {
+      label: "보통",
+      className: "medium",
+    };
+  }
+
+  return {
+    label: "낮음",
+    className: "low",
+  };
+}
+
+
+function pickMarketLabel(
+  market: Pick["market"]
+) {
+  if (market === "ML") {
+    return "승패";
+  }
+
+  if (market === "HANDICAP") {
+    return "핸디";
+  }
+
+  return "O/U";
+}
+
+export default function Home() {
+  const [games,setGames] = useState<KboGame[]>([]);
+  const [odds,setAllOdds] = useState<Record<string,OddsInput>>({});
+
+  // 사용자가 직접 저장한 경기별 배당
+  const [savedOdds, setSavedOdds] =
+    useState<Record<string, OddsInput>>({});
+
+  // 저장 후 자동배당이 덮어쓰지 못하도록 잠금
+  const [lockedOdds, setLockedOdds] =
+    useState<Record<string, boolean>>({});
+
+  // localStorage 복원이 끝난 뒤에만 저장/데이터 로드
+  const [oddsStorageReady, setOddsStorageReady] =
+    useState(false);
+
+  // 자동조합 저장 스냅샷
+  const [savedCombos, setSavedCombos] =
+    useState<SavedComboSnapshot[]>([]);
+
+  // 조합 localStorage 복원이 끝나기 전에
+  // 빈 배열로 덮어쓰는 것을 방지
+  const [comboStorageReady, setComboStorageReady] =
+    useState(false);
+
+  // PC / 모바일 공용 서버 상태 복원 완료 여부
+  const [sharedStateReady, setSharedStateReady] =
+    useState(false);
+  const [pitcherStats,setPitcherStats] = useState<Record<number,PitcherStats>>({});
+  const [teamForms,setTeamForms] = useState<Record<string,TeamForm>>({});
+  const [bullpens,setBullpens] = useState<Record<string,BullpenData>>({});
+
+  const [
+    lineupMatchups,
+    setLineupMatchups,
+  ] = useState<
+    Record<
+      string,
+      LineupMatchupData
+    >
+  >({});
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState("");
+  const [date,setDate] = useState(() => new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()));
+
+  async function loadLineupMatchups(
+    targetGames: KboGame[],
+    targetDate: string
+  ) {
+    if (
+      targetGames.length === 0
+    ) {
+      setLineupMatchups({});
+      return;
+    }
+
+    const next:
+      Record<
+        string,
+        LineupMatchupData
+      > = {};
+
+    /*
+      동시에 전 경기 호출하지 않고
+      한 경기씩 순차 처리한다.
+
+      KBO / BvP 요청 폭주 방지용.
+    */
+    for (
+      const game of targetGames
+    ) {
+      try {
+        const response =
+          await fetch(
+            `/api/kbo/lineup-matchup?away=${encodeURIComponent(game.awayTeamName)}&home=${encodeURIComponent(game.homeTeamName)}&date=${encodeURIComponent(targetDate)}`,
+            {
+              cache:
+                "no-store",
+            }
+          );
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const json =
+          await response.json();
+
+        next[
+          game.gameId
+        ] =
+          json as LineupMatchupData;
+
+        /*
+          한 경기 끝날 때마다
+          UI에 즉시 반영
+        */
+        setLineupMatchups(
+          (prev) => ({
+            ...prev,
+            [game.gameId]:
+              json as LineupMatchupData,
+          })
+        );
+
+        /*
+          서버 부담 분산
+        */
+        await new Promise(
+          (resolve) =>
+            setTimeout(
+              resolve,
+              250
+            )
+        );
+
+      } catch {
+        continue;
+      }
+    }
+
+    console.log(
+      "[LINEUP MATCHUPS]",
+      next
+    );
+  }
+
+  async function load() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const [gameResponse, oddsResponse] = await Promise.all([
+        fetch(`/api/kbo/today?date=${date}`, {
+          cache: "no-store",
+        }),
+        fetch(
+          `/api/odds/kbo?date=${encodeURIComponent(date)}`,
+          {
+            cache: "no-store",
+          }
+        ),
+      ]);
+
+      const gameJson = await gameResponse.json();
+
+      if (!gameResponse.ok) {
+        throw new Error(gameJson.error || "KBO 경기 불러오기 실패");
+      }
+
+      const loadedGames: KboGame[] = gameJson.games || [];
+
+      setGames(loadedGames);
+
+      // ------------------------------------------------------
+      // 확정 라인업 + 상대 선발 매치업 자동수집
+      // ------------------------------------------------------
+      await loadLineupMatchups(
+        loadedGames,
+        date
+      );
+
+      // ------------------------------------------------------
+      // 선발투수 시즌 기록 자동수집
+      // ------------------------------------------------------
+
+      const starterIds = [
+        ...new Set(
+          loadedGames.flatMap((game) => [
+            game.startingPitchers.away?.id,
+            game.startingPitchers.home?.id,
+          ])
+          .filter(
+            (id): id is number =>
+              typeof id === "number" &&
+              id > 0
+          )
+        ),
+      ];
+
+      if (starterIds.length > 0) {
+        const pitcherResults =
+          await Promise.all(
+            starterIds.map(async (playerId) => {
+              try {
+                const response = await fetch(
+                  `/api/kbo/pitcher/${playerId}`,
+                  {
+                    cache: "no-store",
+                  }
+                );
+
+                if (!response.ok) {
+                  return null;
+                }
+
+                const json =
+                  await response.json();
+
+                if (!json.stats) {
+                  return null;
+                }
+
+                return json.stats as PitcherStats;
+              } catch {
+                return null;
+              }
+            })
+          );
+
+        const nextPitcherStats:
+          Record<number, PitcherStats> = {};
+
+        for (const stats of pitcherResults) {
+          if (!stats) continue;
+
+          nextPitcherStats[
+            stats.playerId
+          ] = stats;
+        }
+
+        setPitcherStats((prev) => ({
+          ...prev,
+          ...nextPitcherStats,
+        }));
+      }
+
+      // ------------------------------------------------------
+      // 오늘 경기 참가팀 최근 10경기 자동수집
+      // ------------------------------------------------------
+
+      const teamNames = [
+        ...new Set(
+          loadedGames.flatMap(
+            (game) => [
+              game.awayTeamName,
+              game.homeTeamName,
+            ]
+          )
+        ),
+      ];
+
+      if (teamNames.length > 0) {
+        const teamFormResults =
+          await Promise.all(
+            teamNames.map(
+              async (teamName) => {
+                try {
+                  const response =
+                    await fetch(
+                      `/api/kbo/team-form?team=${encodeURIComponent(teamName)}&date=${encodeURIComponent(date)}`,
+                      {
+                        cache: "no-store",
+                      }
+                    );
+
+                  if (!response.ok) {
+                    return null;
+                  }
+
+                  const json =
+                    await response.json();
+
+                  return json as TeamForm;
+                } catch {
+                  return null;
+                }
+              }
+            )
+          );
+
+        const nextTeamForms:
+          Record<string, TeamForm> = {};
+
+        for (
+          const form of teamFormResults
+        ) {
+          if (!form) continue;
+
+          nextTeamForms[
+            form.team
+          ] = form;
+        }
+
+        setTeamForms(
+          nextTeamForms
+        );
+      }
+
+      // ------------------------------------------------------
+      // 최근 3일 불펜 자동수집
+      // ------------------------------------------------------
+
+      if (teamNames.length > 0) {
+        const bullpenResults =
+          await Promise.all(
+            teamNames.map(
+              async (teamName) => {
+                try {
+                  const response =
+                    await fetch(
+                      `/api/kbo/bullpen?team=${encodeURIComponent(teamName)}&date=${encodeURIComponent(date)}`,
+                      {
+                        cache: "no-store",
+                      }
+                    );
+
+                  if (!response.ok) {
+                    return null;
+                  }
+
+                  const json =
+                    await response.json();
+
+                  return json as BullpenData;
+                } catch {
+                  return null;
+                }
+              }
+            )
+          );
+
+        const nextBullpens:
+          Record<string, BullpenData> = {};
+
+        for (
+          const bullpen of bullpenResults
+        ) {
+          if (!bullpen) continue;
+
+          nextBullpens[
+            bullpen.team
+          ] = bullpen;
+        }
+
+        setBullpens(
+          nextBullpens
+        );
+      }
+
+      // 배당 API 실패는 경기목록 자체를 막지 않는다.
+      if (oddsResponse.ok) {
+        const oddsJson = await oddsResponse.json();
+        const autoEvents: AutoOddsEvent[] = oddsJson.events || [];
+
+        /*
+          자동으로 수집된 실제 사이트 배당/기준점을
+          경기별 히스토리에 별도 저장한다.
+
+          - 화면의 수동 잠금값과 분리
+          - 같은 값은 서버에서 중복 제거
+          - 향후 최근 30일 배당/적중률/ROI 통계 원본
+        */
+        const autoOddsSnapshots =
+          loadedGames.flatMap((game) => {
+            const away =
+              normalizeTeamName(
+                game.awayTeamName
+              );
+
+            const home =
+              normalizeTeamName(
+                game.homeTeamName
+              );
+
+            const matched =
+              autoEvents.find((event) => {
+                const oddsAway =
+                  normalizeTeamName(
+                    event.awayTeam
+                  );
+
+                const oddsHome =
+                  normalizeTeamName(
+                    event.homeTeam
+                  );
+
+                return (
+                  away === oddsAway &&
+                  home === oddsHome &&
+                  kstDateFromIso(
+                    event.commenceTime
+                  ) === date
+                );
+              });
+
+            if (!matched) {
+              return [];
+            }
+
+            /*
+              실제로 받은 시장이 하나도 없으면
+              빈 기록은 저장하지 않는다.
+            */
+            const hasOdds =
+              matched.awayMl !== null ||
+              matched.homeMl !== null ||
+              matched.awaySpreadLine !== null ||
+              matched.homeSpreadLine !== null ||
+              matched.awayHandicap !== null ||
+              matched.homeHandicap !== null ||
+              matched.totalLine !== null ||
+              matched.overOdds !== null ||
+              matched.underOdds !== null;
+
+            if (!hasOdds) {
+              return [];
+            }
+
+            return [{
+              gameId:
+                game.gameId,
+
+              date,
+
+              awayTeamName:
+                game.awayTeamName,
+
+              homeTeamName:
+                game.homeTeamName,
+
+              awayMl:
+                matched.awayMl,
+
+              homeMl:
+                matched.homeMl,
+
+              awayHandicapLine:
+                matched.awaySpreadLine,
+
+              homeHandicapLine:
+                matched.homeSpreadLine,
+
+              awayHandicap:
+                matched.awayHandicap,
+
+              homeHandicap:
+                matched.homeHandicap,
+
+              totalLine:
+                matched.totalLine,
+
+              overOdds:
+                matched.overOdds,
+
+              underOdds:
+                matched.underOdds,
+
+              source: "AUTO",
+            }];
+          });
+
+        if (autoOddsSnapshots.length) {
+          fetch(
+            "/api/odds/history",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                snapshots:
+                  autoOddsSnapshots,
+              }),
+            }
+          )
+            .then(async (response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `odds history POST ${response.status}`
+                );
+              }
+
+              return response.json();
+            })
+            .then((result) => {
+              console.log(
+                "[AUTO ODDS HISTORY]",
+                result
+              );
+            })
+            .catch((error) => {
+              /*
+                히스토리 저장 실패 때문에
+                경기/배당 화면 자체가 실패하면 안 된다.
+              */
+              console.error(
+                "auto odds history save failed",
+                error
+              );
+            });
+        }
+
+        setAllOdds((prev) => {
+          const next = { ...prev };
+
+          for (const game of loadedGames) {
+            const away = normalizeTeamName(game.awayTeamName);
+            const home = normalizeTeamName(game.homeTeamName);
+
+            const matched = autoEvents.find((event) => {
+              const oddsAway = normalizeTeamName(event.awayTeam);
+              const oddsHome = normalizeTeamName(event.homeTeam);
+
+              const sameTeams =
+                away === oddsAway &&
+                home === oddsHome;
+
+              const sameDate =
+                kstDateFromIso(event.commenceTime) === date;
+
+              return sameTeams && sameDate;
+            });
+
+            if (!matched) continue;
+
+            const current =
+              next[game.gameId] || emptyOdds;
+
+            // 사용자가 저장/잠금한 경기는 자동배당으로 덮어쓰지 않는다.
+            if (lockedOdds[game.gameId]) {
+              const saved =
+                savedOdds[game.gameId];
+
+              if (saved) {
+                next[game.gameId] = saved;
+              }
+
+              continue;
+            }
+
+            // 잠금되지 않은 경기는 최신 자동배당 우선.
+            // API에 없는 시장만 현재 입력값을 유지한다.
+            next[game.gameId] = {
+              awayMl:
+                matched.awayMl ??
+                current.awayMl,
+
+              homeMl:
+                matched.homeMl ??
+                current.homeMl,
+
+              awayHandicapLine:
+                matched.awaySpreadLine ??
+                current.awayHandicapLine,
+
+              homeHandicapLine:
+                matched.homeSpreadLine ??
+                current.homeHandicapLine,
+
+              awayHandicap:
+                matched.awayHandicap ??
+                current.awayHandicap,
+
+              homeHandicap:
+                matched.homeHandicap ??
+                current.homeHandicap,
+
+              totalLine:
+                matched.totalLine ??
+                current.totalLine,
+
+              overOdds:
+                matched.overOdds ??
+                current.overOdds,
+
+              underOdds:
+                matched.underOdds ??
+                current.underOdds,
+            };
+          }
+
+          return next;
+        });
+      }
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "불러오기 실패"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  // 저장된 배당 + 잠금 상태 복원
+  useEffect(() => {
+    try {
+      const savedRaw =
+        localStorage.getItem("kbo-analyzer-saved-odds");
+
+      const lockedRaw =
+        localStorage.getItem("kbo-analyzer-locked-odds");
+
+      const saved: Record<string, OddsInput> =
+        savedRaw ? JSON.parse(savedRaw) : {};
+
+      const locked: Record<string, boolean> =
+        lockedRaw ? JSON.parse(lockedRaw) : {};
+
+      setSavedOdds(saved);
+      setLockedOdds(locked);
+
+      // 저장된 경기 배당은 화면에도 즉시 복원
+      setAllOdds((prev) => ({
+        ...prev,
+        ...saved,
+      }));
+    } catch {}
+
+    setOddsStorageReady(true);
+  }, []);
+
+  // 저장된 자동조합 스냅샷 복원
+  useEffect(() => {
+    try {
+      const raw =
+        localStorage.getItem(
+          "kbo-analyzer-saved-combos-v1"
+        );
+
+      const parsed: SavedComboSnapshot[] =
+        raw ? JSON.parse(raw) : [];
+
+      setSavedCombos(
+        Array.isArray(parsed)
+          ? parsed
+          : []
+      );
+    } catch {
+      setSavedCombos([]);
+    }
+
+    setComboStorageReady(true);
+  }, []);
+
+  // 자동조합 스냅샷 영구 저장
+  useEffect(() => {
+    if (!comboStorageReady) return;
+
+    localStorage.setItem(
+      "kbo-analyzer-saved-combos-v1",
+      JSON.stringify(savedCombos)
+    );
+  }, [savedCombos, comboStorageReady]);
+
+
+  /*
+    PC / 모바일 공용 상태 동기화
+
+    1. 먼저 각 브라우저 localStorage 복원을 기다림
+    2. 서버에 기존 데이터가 있으면 서버값 우선
+    3. 서버가 비어 있으면 현재 localStorage 값을 유지
+    4. 이후 변경값은 서버에도 자동 저장
+  */
+  useEffect(() => {
+    if (
+      !oddsStorageReady ||
+      !comboStorageReady ||
+      sharedStateReady
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function restoreSharedState() {
+      try {
+        const response =
+          await fetch(
+            "/api/sync/state",
+            {
+              method: "GET",
+              cache: "no-store",
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `shared state GET ${response.status}`
+          );
+        }
+
+        const data = await response.json() as {
+          updatedAt?: string | null;
+
+          savedOdds?: Record<
+            string,
+            OddsInput
+          >;
+
+          lockedOdds?: Record<
+            string,
+            boolean
+          >;
+
+          savedCombos?:
+            SavedComboSnapshot[];
+        };
+
+        if (cancelled) return;
+
+        const serverSavedOdds =
+          data.savedOdds &&
+          typeof data.savedOdds === "object"
+            ? data.savedOdds
+            : {};
+
+        const serverLockedOdds =
+          data.lockedOdds &&
+          typeof data.lockedOdds === "object"
+            ? data.lockedOdds
+            : {};
+
+        const serverSavedCombos =
+          Array.isArray(
+            data.savedCombos
+          )
+            ? data.savedCombos
+            : [];
+
+        const serverHasData =
+          !!data.updatedAt ||
+          Object.keys(
+            serverSavedOdds
+          ).length > 0 ||
+          Object.keys(
+            serverLockedOdds
+          ).length > 0 ||
+          serverSavedCombos.length > 0;
+
+        /*
+          서버가 이미 사용 중이면 서버값 우선.
+          서버가 완전히 비어 있으면
+          현재 PC localStorage 값을 그대로 유지해서
+          아래 PUT effect가 최초 서버 데이터로 올린다.
+        */
+        if (serverHasData) {
+          setSavedOdds(
+            serverSavedOdds
+          );
+
+          setLockedOdds(
+            serverLockedOdds
+          );
+
+          setSavedCombos(
+            serverSavedCombos
+          );
+
+          setAllOdds((prev) => ({
+            ...prev,
+            ...serverSavedOdds,
+          }));
+        }
+      } catch (error) {
+        console.error(
+          "shared state restore failed",
+          error
+        );
+      } finally {
+        if (!cancelled) {
+          setSharedStateReady(true);
+        }
+      }
+    }
+
+    restoreSharedState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    oddsStorageReady,
+    comboStorageReady,
+    sharedStateReady,
+  ]);
+
+
+  useEffect(() => {
+    if (!sharedStateReady) {
+      return;
+    }
+
+    const controller =
+      new AbortController();
+
+    async function saveSharedState() {
+      try {
+        const response =
+          await fetch(
+            "/api/sync/state",
+            {
+              method: "PUT",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                savedOdds,
+                lockedOdds,
+                savedCombos,
+              }),
+
+              signal:
+                controller.signal,
+            }
+          );
+
+        if (!response.ok) {
+          throw new Error(
+            `shared state PUT ${response.status}`
+          );
+        }
+      } catch (error) {
+        if (
+          error instanceof DOMException &&
+          error.name === "AbortError"
+        ) {
+          return;
+        }
+
+        console.error(
+          "shared state save failed",
+          error
+        );
+      }
+    }
+
+    saveSharedState();
+
+    return () => {
+      controller.abort();
+    };
+  }, [
+    savedOdds,
+    lockedOdds,
+    savedCombos,
+    sharedStateReady,
+  ]);
+
+
+  // 저장 버튼을 눌러 확정한 값만 영구 저장
+  useEffect(() => {
+    if (!oddsStorageReady) return;
+
+    localStorage.setItem(
+      "kbo-analyzer-saved-odds",
+      JSON.stringify(savedOdds)
+    );
+
+    localStorage.setItem(
+      "kbo-analyzer-locked-odds",
+      JSON.stringify(lockedOdds)
+    );
+  }, [savedOdds, lockedOdds, oddsStorageReady]);
+
+  // 저장값 복원이 끝난 뒤 경기/자동배당 로드
+  useEffect(() => {
+    if (
+      !oddsStorageReady ||
+      !sharedStateReady
+    ) {
+      return;
+    }
+
+    load();
+  }, [
+    date,
+    oddsStorageReady,
+    sharedStateReady,
+  ]);
+
+  const allPicks: Pick[] = useMemo(
+    () =>
+      games.flatMap((g) => {
+        const awayStarter =
+          g.startingPitchers.away?.id
+            ? pitcherStats[
+                g.startingPitchers.away.id
+              ]
+            : undefined;
+
+        const homeStarter =
+          g.startingPitchers.home?.id
+            ? pitcherStats[
+                g.startingPitchers.home.id
+              ]
+            : undefined;
+
+        const awayStarterScore =
+          starterRating(
+            awayStarter
+          )?.score ?? 0;
+
+        const homeStarterScore =
+          starterRating(
+            homeStarter
+          )?.score ?? 0;
+
+        const starterEdge =
+          awayStarter &&
+          homeStarter
+            ? awayStarterScore -
+              homeStarterScore
+            : 0;
+
+        const awayFormScore =
+          teamFormRating(
+            teamForms[
+              g.awayTeamName
+            ]
+          )?.score ?? 0;
+
+        const homeFormScore =
+          teamFormRating(
+            teamForms[
+              g.homeTeamName
+            ]
+          )?.score ?? 0;
+
+        const formEdge =
+          teamForms[
+            g.awayTeamName
+          ] &&
+          teamForms[
+            g.homeTeamName
+          ]
+            ? awayFormScore -
+              homeFormScore
+            : 0;
+
+        const awayBullpenScore =
+          bullpenRating(
+            bullpens[
+              g.awayTeamName
+            ]
+          )?.score ?? 0;
+
+        const homeBullpenScore =
+          bullpenRating(
+            bullpens[
+              g.homeTeamName
+            ]
+          )?.score ?? 0;
+
+        const bullpenEdge =
+          bullpens[
+            g.awayTeamName
+          ] &&
+          bullpens[
+            g.homeTeamName
+          ]
+            ? awayBullpenScore -
+              homeBullpenScore
+            : 0;
+
+        const lineupEdge =
+          lineupMatchups[
+            g.gameId
+          ]?.ready &&
+          typeof lineupMatchups[
+            g.gameId
+          ]?.edge === "number"
+            ? lineupMatchups[
+                g.gameId
+              ].edge ?? 0
+            : 0;
+
+        const projectedTotal =
+          estimateProjectedTotal(
+            teamForms[g.awayTeamName],
+            teamForms[g.homeTeamName],
+            awayStarter,
+            homeStarter,
+            bullpens[g.awayTeamName],
+            bullpens[g.homeTeamName],
+            lineupMatchups[g.gameId]
+          );
+
+        return analyzeGame(
+          g,
+          odds[g.gameId] ||
+            emptyOdds,
+          starterEdge,
+          formEdge,
+          bullpenEdge,
+          lineupEdge,
+          projectedTotal
+        );
+      }),
+    [
+      games,
+      odds,
+      pitcherStats,
+      teamForms,
+      bullpens,
+      lineupMatchups,
+    ]
+  );
+  const combos =
+    useMemo(
+      () =>
+        makeAutoCombos(allPicks),
+      [allPicks]
+    );
+
+  const comboGameIdSets =
+    useMemo(
+      () =>
+        combos.map(
+          (combo) =>
+            combo.picks.map(
+              (pick) =>
+                pick.gameId
+            )
+        ),
+      [combos]
+    );
+
+  const savedCombosForDate =
+    useMemo(
+      () =>
+        savedCombos.filter(
+          (item) => item.date === date
+        ),
+      [savedCombos, date]
+    );
+
+
+  function saveAutoCombo(
+    combo: (typeof combos)[number]
+  ) {
+    const oddsByGame:
+      Record<string, OddsInput> = {};
+
+    const gameInfo:
+      SavedComboSnapshot["games"] = {};
+
+    for (const pick of combo.picks) {
+      oddsByGame[pick.gameId] = {
+        ...(odds[pick.gameId] || emptyOdds),
+      };
+
+      const game = games.find(
+        (item) =>
+          item.gameId === pick.gameId
+      );
+
+      if (game) {
+        gameInfo[pick.gameId] = {
+          awayTeamName:
+            game.awayTeamName,
+          homeTeamName:
+            game.homeTeamName,
+          stadium:
+            game.stadium || "",
+        };
+      }
+    }
+
+    const snapshot:
+      SavedComboSnapshot = {
+        id:
+          `${date}-${combo.style}-${Date.now()}`,
+
+        date,
+        savedAt:
+          new Date().toISOString(),
+
+        name: combo.name,
+        style: combo.style,
+
+        odds: combo.odds,
+        probability:
+          combo.probability,
+        averageConfidence:
+          combo.averageConfidence,
+        averageEv:
+          combo.averageEv,
+
+        picks:
+          combo.picks.map(
+            (pick) => ({ ...pick })
+          ),
+
+        oddsByGame,
+        games: gameInfo,
+      };
+
+    setSavedCombos((prev) => {
+      /*
+        같은 날짜 + 같은 스타일은
+        최신 저장본 1개만 유지.
+        예:
+        오늘 안정형 2폴을 다시 저장하면
+        이전 오늘 안정형 2폴을 교체.
+      */
+      const filtered =
+        prev.filter(
+          (item) =>
+            !(
+              item.date === date &&
+              item.style === combo.style
+            )
+        );
+
+      return [
+        snapshot,
+        ...filtered,
+      ];
+    });
+  }
+
+
+  return <main className="shell">
+    <aside className="sidebar">
+      <div className="brand">⚾ <b>KBO Analyzer</b><small>v0.1</small></div>
+      <nav><a className="active">오늘 경기</a><a>자동조합</a><a>적중기록</a><a>통계 리포트</a><a>설정</a></nav>
+      <div className="collector"><b>자동 수집</b><span>● KBO 경기/선발</span><span>● 실시간 점수</span><span>○ 팀·투수 세부지표 (다음)</span></div>
+    </aside>
+    <section className="content">
+      <header><div><h1>오늘의 KBO 경기</h1><p>{date} · 경기 카드 자동 생성</p></div><div className="headerActions"><input type="date" value={date} onChange={e=>setDate(e.target.value)} /><button onClick={load}>↻ 새로고침</button></div></header>
+      {error && <div className="error">KBO 데이터 연결 오류: {error}</div>}
+      {loading ? <div className="loading">KBO 경기 정보를 불러오는 중…</div> : games.length === 0 ? <div className="loading">이 날짜에는 KBO 경기가 없습니다.</div> : <div className="gameGrid">{games.map(g=><GameCard
+  key={g.gameId}
+  game={g}
+  odds={odds[g.gameId] || emptyOdds}
+  pitcherStats={pitcherStats}
+  teamForms={teamForms}
+  bullpens={bullpens}
+  lineupMatchups={lineupMatchups}
+
+  oddsLocked={!!lockedOdds[g.gameId]}
+
+  onSaveOdds={() => {
+    const current =
+      odds[g.gameId] || emptyOdds;
+
+    setSavedOdds((prev) => ({
+      ...prev,
+      [g.gameId]: current,
+    }));
+
+    setLockedOdds((prev) => ({
+      ...prev,
+      [g.gameId]: true,
+    }));
+  }}
+
+  onUnlockOdds={() => {
+    setLockedOdds((prev) => {
+      const next = { ...prev };
+      delete next[g.gameId];
+      return next;
+    });
+
+    setSavedOdds((prev) => {
+      const next = { ...prev };
+      delete next[g.gameId];
+      return next;
+    });
+  }}
+
+  setOdds={(v) =>
+    setAllOdds((prev) => ({
+      ...prev,
+      [g.gameId]: v,
+    }))
+  }
+/>)}</div>}
+      <section className="comboSection autoComboSection">
+
+        <div className="autoComboHeader">
+
+          <div>
+            <div className="autoComboTitle">
+              <span>⚡</span>
+
+              <div>
+                <h2>자동조합 추천</h2>
+
+                <p>
+                  모델 확률 · 보정 EV · 등급 · 경기 중복을
+                  종합해 자동 구성
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="autoComboHeaderBadges">
+            <span>
+              경기 내 중복픽 차단
+            </span>
+
+            <span>
+              조합간 중복 최소화
+            </span>
+
+            <button
+              type="button"
+              onClick={load}
+            >
+              ↻ 자동조합 새로고침
+            </button>
+          </div>
+
+        </div>
+
+
+        {combos.length ? (
+
+          <div className="autoComboGrid">
+
+            {combos.map(
+              (combo,index) => {
+
+                const styleInfo =
+                  comboStyleInfo(
+                    combo.style
+                  );
+
+                const confidenceGrade =
+                  comboConfidenceGrade(
+                    combo.averageConfidence
+                  );
+
+                const gameIds =
+                  combo.picks.map(
+                    (pick) =>
+                      pick.gameId
+                  );
+
+                const overlapRisk =
+                  comboOverlapRisk(
+                    gameIds,
+                    comboGameIdSets
+                  );
+
+                const savedSnapshot =
+                  savedCombosForDate.find(
+                    (item) =>
+                      item.style ===
+                      combo.style
+                  );
+
+                const savedSettlement =
+                  savedSnapshot
+                    ? settleSavedCombo(
+                        savedSnapshot,
+                        games
+                      )
+                    : null;
+
+                return (
+                  <div
+                    className={
+                      `autoComboCard ${styleInfo.className}`
+                    }
+                    key={
+                      `${combo.name}-${index}`
+                    }
+                  >
+
+                    <div className="autoComboCardHead">
+
+                      <div className="autoComboCardIcon">
+                        {styleInfo.icon}
+                      </div>
+
+                      <div className="autoComboCardTitle">
+                        <h3>
+                          {combo.name}
+                        </h3>
+
+                        <span>
+                          {styleInfo.subtitle}
+                        </span>
+                      </div>
+
+                      <div
+                        className={
+                          `autoComboResultBadge ${
+                            savedSettlement
+                              ? `status-${savedSettlement.status.toLowerCase()}`
+                              : "status-unsaved"
+                          }`
+                        }
+                      >
+                        {savedSettlement
+                          ? comboSettlementLabel(
+                              savedSettlement.status
+                            )
+                          : "저장 후 판정"}
+                      </div>
+
+                    </div>
+
+
+                    <div className="autoComboOdds">
+
+                      <span>
+                        예상 배당
+                      </span>
+
+                      <strong>
+                        {combo.odds.toFixed(2)}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="autoComboPicks">
+
+                      {combo.picks.map(
+                        (pick,pickIndex) => {
+
+                          const linkedGame =
+                            games.find(
+                              (game) =>
+                                game.gameId ===
+                                pick.gameId
+                            );
+
+                          return (
+                            <div
+                              className="autoComboPick"
+                              key={
+                                `${pick.gameId}-${pick.label}`
+                              }
+                            >
+
+                              <div className="autoComboPickNo">
+                                {pickIndex + 1}
+                              </div>
+
+                              <div className="autoComboPickMain">
+
+                                <div>
+                                  <strong>
+                                    {pick.label}
+                                  </strong>
+
+                                  <span
+                                    className={
+                                      `autoComboMarket market-${pick.market.toLowerCase()}`
+                                    }
+                                  >
+                                    {pickMarketLabel(
+                                      pick.market
+                                    )}
+                                  </span>
+                                </div>
+
+                                <small>
+                                  {linkedGame?.stadium ||
+                                    "구장 미정"}
+
+                                  {" · "}
+
+                                  모델확률{" "}
+                                  {(pick.confidence *
+                                    100
+                                  ).toFixed(1)}
+                                  %
+                                </small>
+
+                              </div>
+
+                              <div className="autoComboPickOdds">
+                                @
+                                {pick.odds?.toFixed(
+                                  2
+                                )}
+                              </div>
+
+                              <div
+                                className={
+                                  `autoComboGrade grade-${pick.grade}`
+                                }
+                              >
+                                {pick.grade}
+                              </div>
+
+                            </div>
+                          );
+                        }
+                      )}
+
+                    </div>
+
+
+                    <div className="autoComboMetrics">
+
+                      <div>
+                        <span>
+                          평균 모델확률
+                        </span>
+
+                        <b>
+                          {(combo.averageConfidence *
+                            100
+                          ).toFixed(1)}
+                          %
+                        </b>
+                      </div>
+
+                      <div>
+                        <span>
+                          모델 조합신뢰도
+                        </span>
+
+                        <b
+                          className={
+                            `confidence-${confidenceGrade
+                              .replace("+","plus")
+                              .replace("-","minus")}`
+                          }
+                        >
+                          {confidenceGrade}
+                        </b>
+                      </div>
+
+                      <div>
+                        <span>
+                          평균 보정 EV
+                        </span>
+
+                        <b
+                          className={
+                            (combo.averageEv ??
+                              -1) >= 0
+                              ? "positive"
+                              : "negative"
+                          }
+                        >
+                          {combo.averageEv !== null
+                            ? `${combo.averageEv >= 0
+                                ? "+"
+                                : ""}${(
+                                  combo.averageEv *
+                                  100
+                                ).toFixed(1)}%`
+                            : "-"}
+                        </b>
+                      </div>
+
+                      <div>
+                        <span>
+                          공통축 위험
+                        </span>
+
+                        <b
+                          className={
+                            `risk-${overlapRisk.className}`
+                          }
+                        >
+                          {overlapRisk.label}
+                        </b>
+                      </div>
+
+                    </div>
+
+
+                    <div className="autoComboProbability">
+
+                      <span>
+                        단순 결합확률
+                      </span>
+
+                      <b>
+                        {(combo.probability *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </b>
+
+                    </div>
+
+
+                    <button
+                      className="autoComboSave"
+                      type="button"
+                      onClick={() =>
+                        saveAutoCombo(combo)
+                      }
+                    >
+                      {savedCombos.some(
+                        (item) =>
+                          item.date === date &&
+                          item.style === combo.style
+                      )
+                        ? "저장됨 · 다시 저장"
+                        : "이 조합 저장하기"}
+                    </button>
+
+                  </div>
+                );
+              }
+            )}
+
+          </div>
+
+        ) : (
+
+          <div className="autoComboEmpty">
+            <b>
+              자동조합 생성 대기
+            </b>
+
+            <span>
+              경기별 배당이 입력되면
+              확률이 높은 픽을 기준으로
+              자동조합을 생성합니다.
+            </span>
+          </div>
+
+        )}
+
+      </section>
+
+      <section className="savedComboSection">
+        <div className="savedComboHeader">
+          <div>
+            <h2>📌 저장된 자동조합</h2>
+            <p>
+              저장 당시 픽과 배당을 기준으로
+              경기 종료 후 자동 판정합니다.
+            </p>
+          </div>
+          <span>
+            {savedCombosForDate.length}개 저장
+          </span>
+        </div>
+
+        {savedCombosForDate.length ? (
+          <div className="savedComboGrid">
+            {savedCombosForDate.map(
+              (snapshot) => {
+                const settlement =
+                  settleSavedCombo(
+                    snapshot,
+                    games
+                  );
+
+                return (
+                  <article
+                    className="savedComboCard"
+                    key={snapshot.id}
+                  >
+                    <div className="savedComboCardHead">
+                      <h3>{snapshot.name}</h3>
+
+                      <b>
+                        {comboSettlementLabel(
+                          settlement.status
+                        )}
+                      </b>
+                    </div>
+
+                    <div className="savedComboPicks">
+                      {snapshot.picks.map(
+                        (pick, index) => {
+                          const result =
+                            settlement.pickResults[
+                              index
+                            ];
+
+                          const game =
+                            games.find(
+                              (item) =>
+                                item.gameId ===
+                                pick.gameId
+                            );
+
+                          return (
+                            <div
+                              className="savedComboPick"
+                              key={
+                                `${snapshot.id}-${pick.gameId}-${index}`
+                              }
+                            >
+                              <div>
+                                <strong>
+                                  {pick.label}
+                                </strong>
+
+                                <small>
+                                  {pickMarketLabel(
+                                    pick.market
+                                  )}
+                                  {" · "}
+                                  @
+                                  {pick.odds?.toFixed(2) ||
+                                    "-"}
+                                </small>
+                              </div>
+
+                              <div className="savedComboPickScore">
+                                {game?.score.away !== null &&
+                                 game?.score.away !== undefined &&
+                                 game?.score.home !== null &&
+                                 game?.score.home !== undefined
+                                  ? `${game.score.away} : ${game.score.home}`
+                                  : "스코어 대기"}
+                              </div>
+
+                              <b>
+                                {pickSettlementLabel(
+                                  result
+                                )}
+                              </b>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+
+
+                    <div className="savedComboSummary">
+                      <span>
+                        저장 배당
+                        {" "}
+                        <strong>
+                          {snapshot.odds.toFixed(2)}
+                        </strong>
+                      </span>
+
+                      <span>
+                        유효 배당
+                        {" "}
+                        <strong>
+                          {settlement.status === "LOSS"
+                            ? "-"
+                            : settlement.effectiveOdds.toFixed(2)}
+                        </strong>
+                      </span>
+                    </div>
+                  </article>
+                );
+              }
+            )}
+          </div>
+        ) : (
+          <div className="savedComboEmpty">
+            저장된 자동조합이 없습니다.
+          </div>
+        )}
+      </section>
+
+
+      <section className="nextBox"><b>v0.1 현재 구현</b><span>KBO 공식 경기센터 데이터 자동수집 · 선발투수 · 경기상태/점수 · 카드 UI · 배당 저장 · 기본 추천 · 자동조합</span><small>다음: 선발 ERA/WHIP, 최근 10경기, 불펜 소모, Supabase 적중기록 자동판정</small></section>
+    </section>
+  </main>;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,162 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const dynamic = "force-dynamic";
+
+async function readJson(name: string, fallback: any) {
+  try { return JSON.parse(await fs.readFile(path.join(process.cwd(), "data", name), "utf8")); }
+  catch { return fallback; }
+}
+
+function text(v: any) { return String(v ?? "").trim(); }
+function num(v: any): number | null {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function team(v: any) {
+  const raw = text(v).replace(/\s+/g, "");
+  const aliases: Record<string, string> = {
+    LG:"LG", LG트윈스:"LG",
+    삼성:"삼성", 삼성라이온즈:"삼성", SS:"삼성",
+    두산:"두산", 두산베어스:"두산", OB:"두산",
+    롯데:"롯데", 롯데자이언츠:"롯데", LT:"롯데",
+    한화:"한화", 한화이글스:"한화", HH:"한화",
+    KIA:"KIA", 기아:"KIA", KIA타이거즈:"KIA", HT:"KIA",
+    KT:"KT", KT위즈:"KT",
+    NC:"NC", NC다이노스:"NC",
+    SSG:"SSG", SSG랜더스:"SSG", SK:"SSG",
+    키움:"키움", 키움히어로즈:"키움", WO:"키움",
+  };
+  return aliases[raw] || raw.replace(/트윈스|라이온즈|베어스|자이언츠|이글스|타이거즈|위즈|다이노스|랜더스|히어로즈/g, "");
+}
+
+function gameKey(date: any, gameId: any) { return text(date) + "|" + text(gameId); }
+function matchKey(date: any, away: any, home: any) { return text(date) + "|" + team(away) + "|" + team(home); }
+function awayOf(x: any) { return x?.awayTeam ?? x?.awayTeamName ?? x?.away ?? null; }
+function homeOf(x: any) { return x?.homeTeam ?? x?.homeTeamName ?? x?.home ?? null; }
+
+function addArray(map: Map<string, any[]>, key: string, row: any) {
+  if (!key || key.endsWith("||")) return;
+  const rows = map.get(key) || [];
+  rows.push(row);
+  map.set(key, rows);
+}
+
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const year = text(url.searchParams.get("year") || "2026");
+  const month = text(url.searchParams.get("month"));
+  const requestedGameId = text(url.searchParams.get("gameId"));
+
+  const [betman, predictions, oddsHistory, lineups] = await Promise.all([
+    readJson("betman-kbo-history-2026.json", { games: [] }),
+    readJson("kbo-live-predictions.json", { predictions: [] }),
+    readJson("kbo-odds-history.json", { snapshots: [] }),
+    readJson("kbo-historical-lineup-stats-2026.json", { snapshots: [] }),
+  ]);
+
+  const betmanGames = Array.isArray(betman?.games) ? betman.games : [];
+  const predictionRows = Array.isArray(predictions?.predictions) ? predictions.predictions : [];
+  const oddsRows = Array.isArray(oddsHistory?.snapshots) ? oddsHistory.snapshots : [];
+  const lineupRows = Array.isArray(lineups?.snapshots) ? lineups.snapshots : [];
+
+  const predById = new Map<string, any[]>();
+  const predByMatch = new Map<string, any[]>();
+  for (const row of predictionRows) {
+    addArray(predById, gameKey(row?.date, row?.gameId), row);
+    if (awayOf(row) && homeOf(row)) addArray(predByMatch, matchKey(row?.date, awayOf(row), homeOf(row)), row);
+  }
+
+  const oddsById = new Map<string, any[]>();
+  const oddsByMatch = new Map<string, any[]>();
+  for (const row of oddsRows) {
+    addArray(oddsById, gameKey(row?.date, row?.gameId), row);
+    if (awayOf(row) && homeOf(row)) addArray(oddsByMatch, matchKey(row?.date, awayOf(row), homeOf(row)), row);
+  }
+
+  const lineupById = new Map<string, any>();
+  const lineupByMatch = new Map<string, any>();
+  for (const row of lineupRows) {
+    const idKey = gameKey(row?.date, row?.gameId);
+    const prevId = lineupById.get(idKey);
+    if (!prevId || (!prevId?.confirmed && row?.confirmed)) lineupById.set(idKey, row);
+    if (awayOf(row) && homeOf(row)) {
+      const mk = matchKey(row?.date, awayOf(row), homeOf(row));
+      const prevMatch = lineupByMatch.get(mk);
+      if (!prevMatch || (!prevMatch?.confirmed && row?.confirmed)) lineupByMatch.set(mk, row);
+    }
+  }
+
+  const seen = new Set<string>();
+  const games = betmanGames
+    .filter((g: any) => {
+      const date = text(g?.date);
+      if (!date.startsWith(year + "-")) return false;
+      if (month && !date.startsWith(year + "-" + month.padStart(2, "0") + "-")) return false;
+      if (g?.actualScore == null || g?.canceled) return false;
+      const mk = matchKey(date, g?.awayTeam, g?.homeTeam);
+      if (seen.has(mk)) return false;
+      seen.add(mk);
+      return true;
+    })
+    .map((g: any) => {
+      const date = text(g?.date);
+      const betmanId = text(g?.id);
+      const mk = matchKey(date, g?.awayTeam, g?.homeTeam);
+
+      const matchOdds = (oddsByMatch.get(mk) || []).slice().sort((a: any,b: any) => text(a?.capturedAt).localeCompare(text(b?.capturedAt)));
+      const lastOdds = matchOdds.length ? matchOdds[matchOdds.length - 1] : null;
+      const resolvedGameId = text(lastOdds?.gameId) || text((lineupByMatch.get(mk) || {})?.gameId) || betmanId;
+      const idKey = gameKey(date, resolvedGameId);
+
+      const frozen = (predById.get(idKey) || predByMatch.get(mk) || [])
+        .filter((p: any) => ["ML","HANDICAP","TOTAL"].includes(text(p?.market)))
+        .slice()
+        .sort((a: any,b: any) => text(a?.capturedAt).localeCompare(text(b?.capturedAt)));
+      const latestByMarket = new Map<string, any>();
+      for (const p of frozen) latestByMarket.set(text(p?.market), p);
+
+      const idOdds = (oddsById.get(idKey) || []).slice().sort((a: any,b: any) => text(a?.capturedAt).localeCompare(text(b?.capturedAt)));
+      const finalOdds = idOdds.length ? idOdds[idOdds.length - 1] : lastOdds;
+      const lineup = lineupById.get(idKey) || lineupByMatch.get(mk) || null;
+
+      let awayScore: number | null = null;
+      let homeScore: number | null = null;
+      const score = g?.actualScore;
+      if (Array.isArray(score) && score.length >= 2) { awayScore = num(score[0]); homeScore = num(score[1]); }
+      else if (score && typeof score === "object") { awayScore = num(score.away ?? score.awayScore); homeScore = num(score.home ?? score.homeScore); }
+      else if (typeof score === "string") { const m = score.match(/(\d+)\D+(\d+)/); if (m) { awayScore = num(m[1]); homeScore = num(m[2]); } }
+
+      const picks = Array.from(latestByMarket.values()).map((p: any) => ({
+        market:text(p?.market), label:text(p?.label), grade:text(p?.grade),
+        confidence:num(p?.confidence), ev:num(p?.ev), odds:num(p?.odds),
+        result:text(p?.result) || null, capturedAt:text(p?.capturedAt) || null, settledAt:text(p?.settledAt) || null,
+      }));
+
+      return {
+        gameId: resolvedGameId, betmanId, date,
+        commenceTime:g?.commenceTime ?? null, stadium:g?.stadium ?? null,
+        awayTeamName:text(g?.awayTeam), homeTeamName:text(g?.homeTeam),
+        awayScore, homeScore, finalScoreRaw:g?.actualScore ?? null,
+        ai:{ frozen:picks.length > 0, picks },
+        betman: finalOdds ? {
+          capturedAt:finalOdds.capturedAt ?? null,
+          awayMl:finalOdds.awayMl ?? null, homeMl:finalOdds.homeMl ?? null,
+          awayHandicapLine:finalOdds.awayHandicapLine ?? null, homeHandicapLine:finalOdds.homeHandicapLine ?? null,
+          awayHandicap:finalOdds.awayHandicap ?? null, homeHandicap:finalOdds.homeHandicap ?? null,
+          totalLine:finalOdds.totalLine ?? null, overOdds:finalOdds.overOdds ?? null, underOdds:finalOdds.underOdds ?? null,
+          source:finalOdds.source ?? null,
+        } : null,
+        lineup: lineup ? { confirmed:!!lineup.confirmed, away:lineup.away ?? null, home:lineup.home ?? null, lineupEdge:lineup.lineupEdge ?? null } : null,
+        snapshotOnly:true,
+        join:{ matchupKey:mk, aiSource:picks.length ? "kbo-live-predictions" : null, aiUnavailableReason:picks.length ? null : "NO_STORED_PREGAME_AI_SNAPSHOT", oddsSource:finalOdds ? "kbo-odds-history" : null, lineupSource:lineup ? "kbo-historical-lineup-stats-2026" : null },
+      };
+    })
+    .filter((g: any) => !requestedGameId || g.gameId === requestedGameId || g.betmanId === requestedGameId)
+    .sort((a: any,b: any) => b.date.localeCompare(a.date) || b.gameId.localeCompare(a.gameId));
+
+  return NextResponse.json({ ok:true, source:"STORED_PREGAME_SNAPSHOTS_ONLY", recalculated:false, year, month:month || null, count:games.length, games }, { headers:{ "Cache-Control":"no-store, no-cache, must-revalidate" } });
+}

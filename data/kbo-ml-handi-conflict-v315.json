@@ -1,0 +1,26 @@
+{
+  "discovery": {
+    "period": "DISCOVERY",
+    "days": 10,
+    "abValid": 6,
+    "abConflict": 4,
+    "abcValid": 3,
+    "abcConflict": 7
+  },
+  "internal": {
+    "period": "INTERNAL",
+    "days": 35,
+    "abValid": 16,
+    "abConflict": 19,
+    "abcValid": 9,
+    "abcConflict": 26
+  },
+  "final": {
+    "period": "FINAL 07~09",
+    "days": 44,
+    "abValid": 19,
+    "abConflict": 25,
+    "abcValid": 10,
+    "abcConflict": 34
+  }
+}

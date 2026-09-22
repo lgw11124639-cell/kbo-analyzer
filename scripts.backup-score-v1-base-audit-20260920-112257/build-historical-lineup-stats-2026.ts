@@ -1,0 +1,2331 @@
+import fs from "node:fs";
+import path from "node:path";
+import * as cheerio from "cheerio";
+
+type RawGame = {
+  G_ID?: string;
+  AWAY_NM?: string;
+  HOME_NM?: string;
+  SEASON_ID?: string | number;
+  SR_ID?: string | number;
+};
+
+type LineupPlayer = {
+  order: number;
+  position: string;
+  name: string;
+};
+
+type HitterTotals = {
+  pa: number;
+  ab: number;
+
+  runs: number;
+  hits: number;
+
+  doubles: number;
+  triples: number;
+  hr: number;
+
+  rbi: number;
+
+  bb: number;
+  hbp: number;
+
+  sf: number;
+  sh: number;
+};
+
+type HitterStats = {
+  avg: number | null;
+  pa: number;
+  hr: number;
+  obp: number | null;
+  slg: number | null;
+  ops: number | null;
+};
+
+type ScoredPlayer = {
+  order: number;
+  position: string;
+  name: string;
+
+  playerId: number | null;
+
+  stats: HitterStats;
+
+  score: number;
+};
+
+type LineupSummary = {
+  playerCount: number;
+
+  score: number | null;
+
+  avgOps: number | null;
+  avgObp: number | null;
+  avgSlg: number | null;
+
+  totalHr: number;
+};
+
+type Snapshot = {
+  date: string;
+  gameId: string;
+
+  awayTeam: string;
+  homeTeam: string;
+
+  confirmed: boolean;
+
+  away: {
+    lineup: ScoredPlayer[];
+    summary: LineupSummary;
+  };
+
+  home: {
+    lineup: ScoredPlayer[];
+    summary: LineupSummary;
+  };
+
+  /*
+    현재 analyzer에 넣을 기본 타선 Edge.
+
+    +면 원정 타선 우위,
+    -면 홈 타선 우위.
+  */
+  lineupEdge: number;
+};
+
+
+const START_DATE =
+  process.env.START_DATE ??
+  "2026-03-28";
+
+const END_DATE =
+  process.env.END_DATE ??
+  "2026-09-14";
+
+const OUTPUT =
+  path.join(
+    process.cwd(),
+    "data",
+    "kbo-historical-lineup-stats-2026.json"
+  );
+
+
+const REGULAR_TEAMS =
+  new Set([
+    "LG",
+    "한화",
+    "SSG",
+    "삼성",
+    "NC",
+    "KT",
+    "KIA",
+    "롯데",
+    "두산",
+    "키움",
+  ]);
+
+
+function isoDate(
+  date: Date
+) {
+  return [
+    date.getUTCFullYear(),
+
+    String(
+      date.getUTCMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    ),
+
+    String(
+      date.getUTCDate()
+    ).padStart(
+      2,
+      "0"
+    ),
+  ].join("-");
+}
+
+
+function ymd(
+  date: Date
+) {
+  return isoDate(
+    date
+  ).replaceAll(
+    "-",
+    ""
+  );
+}
+
+
+function dateRange(
+  start: string,
+  end: string
+) {
+  const result:
+    Date[] = [];
+
+  const cursor =
+    new Date(
+      `${start}T00:00:00Z`
+    );
+
+  const last =
+    new Date(
+      `${end}T00:00:00Z`
+    );
+
+  while (
+    cursor.getTime() <=
+    last.getTime()
+  ) {
+    result.push(
+      new Date(cursor)
+    );
+
+    cursor.setUTCDate(
+      cursor.getUTCDate() +
+      1
+    );
+  }
+
+  return result;
+}
+
+
+function normalizeTeamName(
+  value:
+    string |
+    null |
+    undefined
+) {
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /\s+/g,
+      ""
+    )
+    .replace(
+      "두산베어스",
+      "두산"
+    )
+    .replace(
+      "LG트윈스",
+      "LG"
+    )
+    .replace(
+      "삼성라이온즈",
+      "삼성"
+    )
+    .replace(
+      "KIA타이거즈",
+      "KIA"
+    )
+    .replace(
+      "한화이글스",
+      "한화"
+    )
+    .replace(
+      "롯데자이언츠",
+      "롯데"
+    )
+    .replace(
+      "KT위즈",
+      "KT"
+    )
+    .replace(
+      "NC다이노스",
+      "NC"
+    )
+    .replace(
+      "SSG랜더스",
+      "SSG"
+    )
+    .replace(
+      "키움히어로즈",
+      "키움"
+    );
+}
+
+
+function cleanName(
+  value: string
+) {
+  return value
+    .replace(
+      /\s+/g,
+      ""
+    )
+    .trim();
+}
+
+
+/*
+  트레이드 시에도 시즌 성적은 이어져야 하므로
+  우선 선수명을 시즌 누적 키로 사용.
+
+  동일 이름이 여러 팀에서 동시에 발견되는 경우
+  diagnostics에 별도로 기록한다.
+*/
+
+const playerIdCache =
+  new Map<
+    string,
+    number | null
+  >();
+
+const unresolvedPlayers =
+  new Set<string>();
+
+
+function text(
+  value: string
+) {
+  return value
+    .replace(
+      /\s+/g,
+      " "
+    )
+    .trim();
+}
+
+
+function playerIdFromHref(
+  href:
+    string |
+    undefined
+) {
+  if (!href) {
+    return null;
+  }
+
+  const match =
+    href.match(
+      /playerId=(\d+)/i
+    );
+
+  return match
+    ? Number(
+        match[1]
+      )
+    : null;
+}
+
+
+async function findPlayerId(
+  name: string,
+  team: string
+) {
+  const cacheKey =
+    `${team}|${name}`;
+
+  if (
+    playerIdCache.has(
+      cacheKey
+    )
+  ) {
+    return (
+      playerIdCache.get(
+        cacheKey
+      ) ??
+      null
+    );
+  }
+
+  try {
+    const searchUrl =
+      new URL(
+        "https://www.koreabaseball.com/Player/Search.aspx"
+      );
+
+    searchUrl.searchParams.set(
+      "searchWord",
+      name
+    );
+
+    const response =
+      await fetch(
+        searchUrl.toString(),
+        {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+
+            "Accept-Language":
+              "ko-KR,ko;q=0.9",
+          },
+
+          cache:
+            "no-store",
+        }
+      );
+
+    if (!response.ok) {
+      playerIdCache.set(
+        cacheKey,
+        null
+      );
+
+      unresolvedPlayers.add(
+        cacheKey
+      );
+
+      return null;
+    }
+
+    const html =
+      await response.text();
+
+    const $ =
+      cheerio.load(
+        html
+      );
+
+    const candidates:
+      Array<{
+        name: string;
+        team: string;
+        playerId: number;
+      }> = [];
+
+
+    $("table tbody tr").each(
+      (_, row) => {
+        const cells =
+          $(row).find(
+            "td"
+          );
+
+        if (
+          cells.length <
+          3
+        ) {
+          return;
+        }
+
+        const nameCell =
+          $(cells[1]);
+
+        const playerName =
+          text(
+            nameCell.text()
+          );
+
+        const teamName =
+          normalizeTeamName(
+            $(cells[2])
+              .text()
+              .trim()
+          );
+
+        const href =
+          nameCell
+            .find(
+              "a"
+            )
+            .first()
+            .attr(
+              "href"
+            );
+
+        const playerId =
+          playerIdFromHref(
+            href
+          );
+
+        if (
+          playerName ===
+            name &&
+          playerId
+        ) {
+          candidates.push({
+            name:
+              playerName,
+
+            team:
+              teamName,
+
+            playerId,
+          });
+        }
+      }
+    );
+
+
+    /*
+      1순위:
+      당시 팀 + 이름 정확 일치
+    */
+    const exact =
+      candidates.find(
+        (
+          player
+        ) =>
+          player.team ===
+          team
+      );
+
+    if (exact) {
+      playerIdCache.set(
+        cacheKey,
+        exact.playerId
+      );
+
+      return exact.playerId;
+    }
+
+
+    /*
+      이적 선수 대응:
+      같은 이름의 실제 후보가
+      딱 1명뿐이면 팀이 달라도 사용.
+
+      동명이인이 여러 명이면
+      억지로 첫 번째 선수를 선택하지 않는다.
+    */
+    const uniqueIds =
+      [
+        ...new Set(
+          candidates.map(
+            (
+              player
+            ) =>
+              player.playerId
+          )
+        ),
+      ];
+
+    if (
+      uniqueIds.length ===
+      1
+    ) {
+      const playerId =
+        uniqueIds[0];
+
+      playerIdCache.set(
+        cacheKey,
+        playerId
+      );
+
+      return playerId;
+    }
+
+
+    playerIdCache.set(
+      cacheKey,
+      null
+    );
+
+    unresolvedPlayers.add(
+      cacheKey
+    );
+
+    return null;
+
+  } catch {
+    playerIdCache.set(
+      cacheKey,
+      null
+    );
+
+    unresolvedPlayers.add(
+      cacheKey
+    );
+
+    return null;
+  }
+}
+
+
+async function hitterHistoryKey(
+  name: string,
+  team: string
+) {
+  const clean =
+    cleanName(
+      name
+    );
+
+  const playerId =
+    await findPlayerId(
+      clean,
+      team
+    );
+
+  if (playerId) {
+    return {
+      key:
+        `id:${playerId}`,
+
+      playerId,
+    };
+  }
+
+  /*
+    검색 실패 시에는
+    다른 팀/동명이인과 절대 합치지 않도록
+    team + name fallback.
+  */
+  return {
+    key:
+      `fallback:${team}:${clean}`,
+
+    playerId:
+      null,
+  };
+}
+
+
+function zeroTotals():
+  HitterTotals {
+  return {
+    pa: 0,
+    ab: 0,
+
+    runs: 0,
+    hits: 0,
+
+    doubles: 0,
+    triples: 0,
+    hr: 0,
+
+    rbi: 0,
+
+    bb: 0,
+    hbp: 0,
+
+    sf: 0,
+    sh: 0,
+  };
+}
+
+
+function numberValue(
+  value:
+    string |
+    undefined
+) {
+  const n =
+    Number(
+      String(
+        value ?? ""
+      )
+        .replace(
+          /,/g,
+          ""
+        )
+        .trim()
+    );
+
+  return Number.isFinite(
+    n
+  )
+    ? n
+    : 0;
+}
+
+
+function parseTableRows(
+  raw: unknown
+): string[][] {
+  if (
+    typeof raw !==
+    "string"
+  ) {
+    return [];
+  }
+
+  try {
+    const parsed =
+      JSON.parse(raw);
+
+    if (
+      !Array.isArray(
+        parsed?.rows
+      )
+    ) {
+      return [];
+    }
+
+    return parsed.rows.map(
+      (
+        rowObject:
+          any
+      ) =>
+        Array.isArray(
+          rowObject?.row
+        )
+          ? rowObject.row.map(
+              (
+                cell:
+                  any
+              ) =>
+                String(
+                  cell?.Text ??
+                  ""
+                )
+                  .replace(
+                    /&nbsp;/g,
+                    ""
+                  )
+                  .trim()
+            )
+          : []
+    );
+  } catch {
+    return [];
+  }
+}
+
+
+function parseLineup(
+  hitterObject:
+    any
+): LineupPlayer[] {
+  const rows =
+    parseTableRows(
+      hitterObject
+        ?.table1
+    );
+
+  const parsed =
+    rows
+      .filter(
+        (
+          row
+        ) =>
+          row.length >=
+          3
+      )
+      .map(
+        (
+          row
+        ) => {
+          const orderRaw =
+            row[0] ??
+            "";
+
+          const order =
+            /^\d+$/.test(
+              orderRaw
+            )
+              ? Number(
+                  orderRaw
+                )
+              : null;
+
+          return {
+            order,
+
+            position:
+              row[1] ??
+              "",
+
+            name:
+              row[2] ??
+              "",
+          };
+        }
+      )
+      .filter(
+        (
+          player
+        ) =>
+          player.name
+      );
+
+
+  const byOrder =
+    new Map<
+      number,
+      LineupPlayer
+    >();
+
+
+  for (
+    const player of parsed
+  ) {
+    if (
+      player.order ===
+        null ||
+      player.order <
+        1 ||
+      player.order >
+        9
+    ) {
+      continue;
+    }
+
+    /*
+      현재 lineup route와 동일:
+      동일 타순 첫 선수가 선발.
+    */
+    if (
+      !byOrder.has(
+        player.order
+      )
+    ) {
+      byOrder.set(
+        player.order,
+        {
+          order:
+            player.order,
+
+          position:
+            player.position,
+
+          name:
+            player.name,
+        }
+      );
+    }
+  }
+
+
+  return [
+    ...byOrder.values(),
+  ].sort(
+    (
+      a,
+      b
+    ) =>
+      a.order -
+      b.order
+  );
+}
+
+
+function parseGameHitting(
+  hitterObject:
+    any
+) {
+  const lineupRows =
+    parseTableRows(
+      hitterObject
+        ?.table1
+    );
+
+  const eventRows =
+    parseTableRows(
+      hitterObject
+        ?.table2
+    );
+
+  const statRows =
+    parseTableRows(
+      hitterObject
+        ?.table3
+    );
+
+  const count =
+    Math.min(
+      lineupRows.length,
+      eventRows.length,
+      statRows.length
+    );
+
+  const rows:
+    Array<{
+      name: string;
+      teamPosition: string;
+
+      totals:
+        HitterTotals;
+
+      officialAb: number;
+      officialHits: number;
+    }> = [];
+
+
+  for (
+    let i = 0;
+    i < count;
+    i++
+  ) {
+    const info =
+      lineupRows[i] ??
+      [];
+
+    const events =
+      eventRows[i] ??
+      [];
+
+    const stats =
+      statRows[i] ??
+      [];
+
+    const name =
+      cleanName(
+        info[2] ??
+        ""
+      );
+
+    if (!name) {
+      continue;
+    }
+
+    /*
+      table3 확인:
+      0 AB
+      1 H
+      2 RBI
+      3 R
+      4 시즌 AVG 표시값
+
+      마지막 AVG는 미래 누수 방지를 위해 사용하지 않는다.
+    */
+    const ab =
+      numberValue(
+        stats[0]
+      );
+
+    const hits =
+      numberValue(
+        stats[1]
+      );
+
+    const rbi =
+      numberValue(
+        stats[2]
+      );
+
+    const runs =
+      numberValue(
+        stats[3]
+      );
+
+
+    let pa = 0;
+
+    let bb = 0;
+    let hbp = 0;
+
+    let sf = 0;
+    let sh = 0;
+
+    let doubles = 0;
+    let triples = 0;
+    let hr = 0;
+
+
+    for (
+      const rawEvent
+      of events
+    ) {
+      const event =
+        String(
+          rawEvent ??
+          ""
+        ).trim();
+
+      if (!event) {
+        continue;
+      }
+
+      /*
+        table2의 비어있지 않은 각 칸은
+        해당 선수의 타석 결과 1개.
+      */
+      pa++;
+
+
+      if (
+        event.includes(
+          "4구"
+        ) ||
+        event.includes(
+          "고4"
+        )
+      ) {
+        bb++;
+      }
+
+
+      if (
+        event.includes(
+          "사구"
+        )
+      ) {
+        hbp++;
+      }
+
+
+      if (
+        event.includes(
+          "희비"
+        )
+      ) {
+        sf++;
+      }
+
+
+      if (
+        event.includes(
+          "희번"
+        ) ||
+        event.includes(
+          "희생번트"
+        )
+      ) {
+        sh++;
+      }
+
+
+      /*
+        KBO 박스스코어 타격 결과 예:
+        좌2 / 우중2
+        우3
+        좌홈 / 우홈 / 중홈
+      */
+      if (
+        /2$/.test(
+          event
+        )
+      ) {
+        doubles++;
+      }
+
+
+      if (
+        /3$/.test(
+          event
+        )
+      ) {
+        triples++;
+      }
+
+
+      if (
+        event.includes(
+          "홈"
+        )
+      ) {
+        hr++;
+      }
+    }
+
+
+    rows.push({
+      name,
+
+      teamPosition:
+        info[1] ??
+        "",
+
+      officialAb:
+        ab,
+
+      officialHits:
+        hits,
+
+      totals: {
+        pa,
+        ab,
+
+        runs,
+        hits,
+
+        doubles,
+        triples,
+        hr,
+
+        rbi,
+
+        bb,
+        hbp,
+
+        sf,
+        sh,
+      },
+    });
+  }
+
+
+  return rows;
+}
+
+
+function addTotals(
+  base:
+    HitterTotals,
+  add:
+    HitterTotals
+) {
+  base.pa +=
+    add.pa;
+
+  base.ab +=
+    add.ab;
+
+  base.runs +=
+    add.runs;
+
+  base.hits +=
+    add.hits;
+
+  base.doubles +=
+    add.doubles;
+
+  base.triples +=
+    add.triples;
+
+  base.hr +=
+    add.hr;
+
+  base.rbi +=
+    add.rbi;
+
+  base.bb +=
+    add.bb;
+
+  base.hbp +=
+    add.hbp;
+
+  base.sf +=
+    add.sf;
+
+  base.sh +=
+    add.sh;
+}
+
+
+function makeStats(
+  totals:
+    HitterTotals
+): HitterStats {
+  const avg =
+    totals.ab > 0
+      ? totals.hits /
+        totals.ab
+      : null;
+
+
+  /*
+    공식 OBP 분모:
+    AB + BB + HBP + SF
+
+    희생번트(SH)는 제외.
+  */
+  const obpDenominator =
+    totals.ab +
+    totals.bb +
+    totals.hbp +
+    totals.sf;
+
+
+  const obp =
+    obpDenominator >
+      0
+      ? (
+          totals.hits +
+          totals.bb +
+          totals.hbp
+        ) /
+        obpDenominator
+      : null;
+
+
+  const singles =
+    Math.max(
+      0,
+      totals.hits -
+      totals.doubles -
+      totals.triples -
+      totals.hr
+    );
+
+
+  const totalBases =
+    singles +
+    totals.doubles *
+      2 +
+    totals.triples *
+      3 +
+    totals.hr *
+      4;
+
+
+  const slg =
+    totals.ab > 0
+      ? totalBases /
+        totals.ab
+      : null;
+
+
+  const ops =
+    obp !== null &&
+    slg !== null
+      ? obp + slg
+      : null;
+
+
+  return {
+    avg,
+
+    pa:
+      totals.pa,
+
+    hr:
+      totals.hr,
+
+    obp,
+    slg,
+    ops,
+  };
+}
+
+
+function orderWeight(
+  order: number
+) {
+  switch (
+    order
+  ) {
+    case 1:
+      return 1.08;
+
+    case 2:
+      return 1.10;
+
+    case 3:
+      return 1.13;
+
+    case 4:
+      return 1.16;
+
+    case 5:
+      return 1.12;
+
+    case 6:
+      return 1.00;
+
+    case 7:
+      return 0.94;
+
+    case 8:
+      return 0.90;
+
+    case 9:
+      return 0.88;
+
+    default:
+      return 1;
+  }
+}
+
+
+function hitterScore(
+  stats:
+    HitterStats
+) {
+  /*
+    현재 lineup-strength.ts와 동일.
+  */
+  const ops =
+    stats.ops ??
+    0.700;
+
+  const obp =
+    stats.obp ??
+    0.320;
+
+  const slg =
+    stats.slg ??
+    0.380;
+
+  const pa =
+    stats.pa ??
+    0;
+
+
+  const sampleFactor =
+    Math.max(
+      0.55,
+      Math.min(
+        1,
+        pa / 250
+      )
+    );
+
+
+  const raw =
+    50 +
+    (
+      ops -
+      0.700
+    ) * 90 +
+    (
+      obp -
+      0.320
+    ) * 35 +
+    (
+      slg -
+      0.380
+    ) * 25;
+
+
+  const regressed =
+    50 +
+    (
+      raw -
+      50
+    ) *
+    sampleFactor;
+
+
+  return Number(
+    Math.max(
+      0,
+      Math.min(
+        100,
+        regressed
+      )
+    ).toFixed(
+      1
+    )
+  );
+}
+
+
+
+async function scoreLineup(
+  lineup:
+    LineupPlayer[],
+  team:
+    string,
+  history:
+    Map<
+      string,
+      HitterTotals
+    >
+) {
+  const players:
+    ScoredPlayer[] =
+      await Promise.all(
+        lineup.map(
+          async (
+            player
+          ) => {
+            const identity =
+              await hitterHistoryKey(
+                player.name,
+                team
+              );
+
+            const totals =
+              history.get(
+                identity.key
+              ) ??
+              zeroTotals();
+
+            const stats =
+              makeStats(
+                totals
+              );
+
+            return {
+              ...player,
+
+              playerId:
+                identity.playerId,
+
+              stats,
+
+              score:
+                hitterScore(
+                  stats
+                ),
+            };
+          }
+        )
+      );
+
+
+  if (
+    !players.length
+  ) {
+    return {
+      lineup:
+        players,
+
+      summary: {
+        playerCount:
+          0,
+
+        score:
+          null,
+
+        avgOps:
+          null,
+
+        avgObp:
+          null,
+
+        avgSlg:
+          null,
+
+        totalHr:
+          0,
+      } satisfies
+        LineupSummary,
+    };
+  }
+
+
+  let weightedScore =
+    0;
+
+  let totalWeight =
+    0;
+
+  let opsSum =
+    0;
+
+  let opsCount =
+    0;
+
+  let obpSum =
+    0;
+
+  let obpCount =
+    0;
+
+  let slgSum =
+    0;
+
+  let slgCount =
+    0;
+
+  let totalHr =
+    0;
+
+
+  for (
+    const player
+    of players
+  ) {
+    const weight =
+      orderWeight(
+        player.order
+      );
+
+    weightedScore +=
+      player.score *
+      weight;
+
+    totalWeight +=
+      weight;
+
+
+    if (
+      typeof
+        player.stats.ops ===
+      "number"
+    ) {
+      opsSum +=
+        player.stats.ops;
+
+      opsCount++;
+    }
+
+
+    if (
+      typeof
+        player.stats.obp ===
+      "number"
+    ) {
+      obpSum +=
+        player.stats.obp;
+
+      obpCount++;
+    }
+
+
+    if (
+      typeof
+        player.stats.slg ===
+      "number"
+    ) {
+      slgSum +=
+        player.stats.slg;
+
+      slgCount++;
+    }
+
+
+    totalHr +=
+      player.stats.hr;
+  }
+
+
+  return {
+    lineup:
+      players,
+
+    summary: {
+      playerCount:
+        players.length,
+
+      score:
+        totalWeight >
+          0
+          ? Number(
+              (
+                weightedScore /
+                totalWeight
+              ).toFixed(
+                1
+              )
+            )
+          : null,
+
+      avgOps:
+        opsCount
+          ? Number(
+              (
+                opsSum /
+                opsCount
+              ).toFixed(
+                3
+              )
+            )
+          : null,
+
+      avgObp:
+        obpCount
+          ? Number(
+              (
+                obpSum /
+                obpCount
+              ).toFixed(
+                3
+              )
+            )
+          : null,
+
+      avgSlg:
+        slgCount
+          ? Number(
+              (
+                slgSum /
+                slgCount
+              ).toFixed(
+                3
+              )
+            )
+          : null,
+
+      totalHr,
+    },
+  };
+}
+
+
+async function fetchGames(
+  date:
+    Date
+): Promise<RawGame[]> {
+  try {
+    const response =
+      await fetch(
+        "https://www.koreabaseball.com/ws/Main.asmx/GetKboGameList",
+        {
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json; charset=UTF-8",
+
+            "User-Agent":
+              "Mozilla/5.0",
+
+            Referer:
+              "https://www.koreabaseball.com/",
+          },
+
+          body:
+            JSON.stringify({
+              leId:
+                "1",
+
+              srId:
+                "0,9,6",
+
+              date:
+                ymd(
+                  date
+                ),
+            }),
+
+          cache:
+            "no-store",
+        }
+      );
+
+
+    if (
+      !response.ok
+    ) {
+      return [];
+    }
+
+
+    let text =
+      await response.text();
+
+
+    const indexes =
+      [
+        text.indexOf(
+          "<!DOCTYPE"
+        ),
+
+        text.indexOf(
+          "<html"
+        ),
+      ].filter(
+        (
+          index
+        ) =>
+          index >=
+          0
+      );
+
+
+    if (
+      indexes.length
+    ) {
+      text =
+        text.slice(
+          0,
+          Math.min(
+            ...indexes
+          )
+        );
+    }
+
+
+    const json =
+      JSON.parse(
+        text
+      );
+
+
+    return Array.isArray(
+      json?.game
+    )
+      ? json.game
+      : [];
+
+  } catch {
+    return [];
+  }
+}
+
+
+async function fetchBoxScore(
+  fullGameId:
+    string,
+  seasonId:
+    number,
+  srId:
+    number
+) {
+  const body =
+    new URLSearchParams();
+
+  body.set(
+    "leId",
+    "1"
+  );
+
+  body.set(
+    "srId",
+    String(
+      srId
+    )
+  );
+
+  body.set(
+    "seasonId",
+    String(
+      seasonId
+    )
+  );
+
+  body.set(
+    "gameId",
+    fullGameId
+  );
+
+
+  const response =
+    await fetch(
+      "https://www.koreabaseball.com/ws/Schedule.asmx/GetBoxScoreScroll",
+      {
+        method:
+          "POST",
+
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded; charset=UTF-8",
+
+          "X-Requested-With":
+            "XMLHttpRequest",
+
+          Referer:
+            "https://www.koreabaseball.com/Schedule/GameCenter/Main.aspx",
+
+          "User-Agent":
+            "Mozilla/5.0",
+        },
+
+        body:
+          body.toString(),
+
+        cache:
+          "no-store",
+      }
+    );
+
+
+  if (
+    !response.ok
+  ) {
+    return null;
+  }
+
+
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+
+async function main() {
+  console.log(
+    "===== HISTORICAL LINEUP BUILD ====="
+  );
+
+  console.log(
+    "기간:",
+    START_DATE,
+    "~",
+    END_DATE
+  );
+
+
+  const history =
+    new Map<
+      string,
+      HitterTotals
+    >();
+
+
+  const teamsByName =
+    new Map<
+      string,
+      Set<string>
+    >();
+
+
+  const snapshots:
+    Snapshot[] =
+    [];
+
+
+  let processedGames =
+    0;
+
+  let missingBox =
+    0;
+
+  let incompleteLineup =
+    0;
+
+  let abValidationMismatch =
+    0;
+
+
+  for (
+    const date
+    of dateRange(
+      START_DATE,
+      END_DATE
+    )
+  ) {
+    const dateIso =
+      isoDate(
+        date
+      );
+
+    const games =
+      await fetchGames(
+        date
+      );
+
+
+    if (
+      !games.length
+    ) {
+      continue;
+    }
+
+
+    /*
+      동일 날짜 경기는 모두 snapshot부터 만든다.
+
+      그 다음 그날 결과를 한꺼번에 누적.
+      → 같은 날짜 미래정보 누수 방지.
+    */
+    const pendingUpdates:
+      Array<{
+        team:
+          string;
+
+        hitterObject:
+          any;
+      }> = [];
+
+
+    for (
+      const game
+      of games
+    ) {
+      const rawId =
+        String(
+          game.G_ID ??
+          ""
+        );
+
+      if (!rawId) {
+        continue;
+      }
+
+
+      const gameId =
+        rawId.startsWith(
+          ymd(date)
+        )
+          ? rawId
+          : ymd(date) +
+            rawId;
+
+
+      const awayTeam =
+        normalizeTeamName(
+          game.AWAY_NM
+        );
+
+      const homeTeam =
+        normalizeTeamName(
+          game.HOME_NM
+        );
+
+
+      if (
+        !awayTeam ||
+        !homeTeam
+      ) {
+        continue;
+      }
+
+
+      /*
+        정규 KBO 10개 구단 경기만 사용.
+
+        드림/나눔 올스타전 등은
+        정규시즌 타자 누적에 포함하지 않는다.
+      */
+      if (
+        !REGULAR_TEAMS.has(
+          awayTeam
+        ) ||
+        !REGULAR_TEAMS.has(
+          homeTeam
+        )
+      ) {
+        continue;
+      }
+
+
+      const seasonId =
+        Number(
+          game.SEASON_ID ??
+          date.getUTCFullYear()
+        );
+
+      const srId =
+        Number(
+          game.SR_ID ??
+          0
+        );
+
+
+      const box =
+        await fetchBoxScore(
+          gameId,
+          seasonId,
+          srId
+        );
+
+
+      if (!box) {
+        missingBox++;
+
+        continue;
+      }
+
+
+      const arrHitter =
+        Array.isArray(
+          box.arrHitter
+        )
+          ? box.arrHitter
+          : [];
+
+
+      if (
+        !arrHitter[0] ||
+        !arrHitter[1]
+      ) {
+        missingBox++;
+
+        continue;
+      }
+
+
+      const awayStarting =
+        parseLineup(
+          arrHitter[0]
+        );
+
+      const homeStarting =
+        parseLineup(
+          arrHitter[1]
+        );
+
+
+      const confirmed =
+        awayStarting.length ===
+          9 &&
+        homeStarting.length ===
+          9 &&
+        awayStarting.every(
+          (
+            player,
+            index
+          ) =>
+            player.order ===
+            index + 1
+        ) &&
+        homeStarting.every(
+          (
+            player,
+            index
+          ) =>
+            player.order ===
+            index + 1
+        );
+
+
+      if (!confirmed) {
+        incompleteLineup++;
+      }
+
+
+      const awayScored =
+        await scoreLineup(
+          awayStarting,
+          awayTeam,
+          history
+        );
+
+      const homeScored =
+        await scoreLineup(
+          homeStarting,
+          homeTeam,
+          history
+        );
+
+
+      const awayScore =
+        awayScored
+          .summary
+          .score;
+
+      const homeScore =
+        homeScored
+          .summary
+          .score;
+
+
+      const lineupEdge =
+        awayScore !== null &&
+        homeScore !== null
+          ? Number(
+              (
+                awayScore -
+                homeScore
+              ).toFixed(
+                1
+              )
+            )
+          : 0;
+
+
+      snapshots.push({
+        date:
+          dateIso,
+
+        gameId,
+
+        awayTeam,
+        homeTeam,
+
+        confirmed,
+
+        away:
+          awayScored,
+
+        home:
+          homeScored,
+
+        lineupEdge,
+      });
+
+
+      pendingUpdates.push({
+        team:
+          awayTeam,
+
+        hitterObject:
+          arrHitter[0],
+      });
+
+      pendingUpdates.push({
+        team:
+          homeTeam,
+
+        hitterObject:
+          arrHitter[1],
+      });
+
+
+      processedGames++;
+    }
+
+
+    /*
+      해당 날짜 모든 경기 snapshot 완료 후
+      그날 타격 결과를 누적.
+    */
+    for (
+      const update
+      of pendingUpdates
+    ) {
+      const rows =
+        parseGameHitting(
+          update.hitterObject
+        );
+
+
+      for (
+        const row
+        of rows
+      ) {
+        const identity =
+          await hitterHistoryKey(
+            row.name,
+            update.team
+          );
+
+        const key =
+          identity.key;
+
+
+        let teamSet =
+          teamsByName.get(
+            cleanName(
+              row.name
+            )
+          );
+
+        if (!teamSet) {
+          teamSet =
+            new Set();
+
+          teamsByName.set(
+            cleanName(
+              row.name
+            ),
+            teamSet
+          );
+        }
+
+        teamSet.add(
+          update.team
+        );
+
+
+        /*
+          table2 PA 파싱 검증.
+
+          AB =
+          PA - BB - HBP - SF - SH
+          가 원칙적으로 table3 AB와 맞아야 함.
+
+          드문 방해/특수기록 등이 있을 수 있어
+          mismatch는 진단만 남기고
+          공식 AB/H는 table3 값을 우선한다.
+        */
+        const derivedAb =
+          row.totals.pa -
+          row.totals.bb -
+          row.totals.hbp -
+          row.totals.sf -
+          row.totals.sh;
+
+
+        if (
+          derivedAb !==
+          row.officialAb
+        ) {
+          abValidationMismatch++;
+        }
+
+
+        let totals =
+          history.get(
+            key
+          );
+
+
+        if (!totals) {
+          totals =
+            zeroTotals();
+
+          history.set(
+            key,
+            totals
+          );
+        }
+
+
+        addTotals(
+          totals,
+          row.totals
+        );
+      }
+    }
+
+
+    if (
+      processedGames %
+        50 <
+      games.length
+    ) {
+      console.log(
+        dateIso,
+        "games:",
+        processedGames,
+        "hitters:",
+        history.size
+      );
+    }
+  }
+
+
+  const crossTeamNames =
+    [
+      ...teamsByName.entries(),
+    ]
+      .filter(
+        (
+          [
+            ,
+            teams,
+          ]
+        ) =>
+          teams.size >
+          1
+      )
+      .map(
+        (
+          [
+            name,
+            teams,
+          ]
+        ) => ({
+          name,
+
+          teams:
+            [
+              ...teams,
+            ],
+        })
+      );
+
+
+  const output = {
+    generatedAt:
+      new Date()
+        .toISOString(),
+
+    startDate:
+      START_DATE,
+
+    endDate:
+      END_DATE,
+
+    processedGames,
+
+    snapshotCount:
+      snapshots.length,
+
+    hitterCount:
+      history.size,
+
+    diagnostics: {
+      missingBox,
+
+      incompleteLineup,
+
+      abValidationMismatch,
+
+      crossTeamNames,
+
+      playerIdCacheSize:
+        playerIdCache.size,
+
+      unresolvedPlayerCount:
+        unresolvedPlayers.size,
+
+      unresolvedPlayers:
+        [
+          ...unresolvedPlayers,
+        ].sort(),
+    },
+
+    snapshots,
+  };
+
+
+  fs.mkdirSync(
+    path.dirname(
+      OUTPUT
+    ),
+    {
+      recursive:
+        true,
+    }
+  );
+
+
+  fs.writeFileSync(
+    OUTPUT,
+
+    JSON.stringify(
+      output,
+      null,
+      2
+    ),
+
+    "utf8"
+  );
+
+
+  console.log();
+  console.log(
+    "===== COMPLETE ====="
+  );
+
+  console.log(
+    "processedGames:",
+    processedGames
+  );
+
+  console.log(
+    "snapshots:",
+    snapshots.length
+  );
+
+  console.log(
+    "hitters:",
+    history.size
+  );
+
+  console.log(
+    "missingBox:",
+    missingBox
+  );
+
+  console.log(
+    "incompleteLineup:",
+    incompleteLineup
+  );
+
+  console.log(
+    "AB validation mismatch:",
+    abValidationMismatch
+  );
+
+  console.log(
+    "cross-team same names:",
+    crossTeamNames.length
+  );
+
+  console.log(
+    "playerId cache:",
+    playerIdCache.size
+  );
+
+  console.log(
+    "unresolved players:",
+    unresolvedPlayers.size
+  );
+
+  if (
+    unresolvedPlayers.size
+  ) {
+    console.log(
+      "UNRESOLVED SAMPLE:",
+      [
+        ...unresolvedPlayers,
+      ].slice(
+        0,
+        30
+      )
+    );
+  }
+
+  console.log(
+    "FILE:",
+    OUTPUT
+  );
+}
+
+
+main().catch(
+  (
+    error
+  ) => {
+    console.error(
+      error
+    );
+
+    process.exit(
+      1
+    );
+  }
+);

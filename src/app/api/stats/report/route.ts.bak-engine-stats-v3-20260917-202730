@@ -1,0 +1,306 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const dynamic = "force-dynamic";
+
+type Row = {
+  date: string;
+  month?: string;
+  gameId: string;
+  market: "ML" | "HANDICAP" | "TOTAL" | string;
+  label: string;
+  grade: string;
+  confidence: number;
+  ev: number | null;
+  odds: number | null;
+  passesCurrentFilter?: boolean;
+  result: "WIN" | "LOSS" | "PUSH" | "VOID" | string;
+  profit?: number;
+};
+
+const BACKTEST_END = "2026-09-13";
+
+function pct(n: number, d: number) {
+  return d > 0
+    ? Number(((n / d) * 100).toFixed(1))
+    : null;
+}
+
+function returnRate(rows: Row[]) {
+  if (!rows.length) return null;
+
+  const profit = rows.reduce((sum, r) => {
+    if (typeof r.profit === "number") {
+      return sum + r.profit;
+    }
+
+    const odds =
+      typeof r.odds === "number" && r.odds > 1
+        ? r.odds
+        : 1;
+
+    return (
+      sum +
+      (r.result === "WIN"
+        ? 10000 * (odds - 1)
+        : r.result === "LOSS"
+          ? -10000
+          : 0)
+    );
+  }, 0);
+
+  return Number(
+    ((profit / (rows.length * 10000)) * 100).toFixed(1)
+  );
+}
+
+function summarize(rows: Row[]) {
+  const wins = rows.filter(
+    (r) => r.result === "WIN"
+  ).length;
+
+  const losses = rows.filter(
+    (r) => r.result === "LOSS"
+  ).length;
+
+  const pushes = rows.filter(
+    (r) => r.result === "PUSH"
+  ).length;
+
+  return {
+    count: rows.length,
+    wins,
+    losses,
+    pushes,
+    hitRate: pct(wins, wins + losses),
+    returnRate: returnRate(rows),
+  };
+}
+
+function gradeValue(grade: string) {
+  if (grade === "A") return 3;
+  if (grade === "B") return 2;
+  return 1;
+}
+
+function eligible(r: Row) {
+  const ev =
+    typeof r.ev === "number"
+      ? r.ev
+      : -999;
+
+  const odds =
+    typeof r.odds === "number"
+      ? r.odds
+      : 0;
+
+  return (
+    Number.isFinite(r.confidence) &&
+    Number.isFinite(ev) &&
+    r.confidence >= 0.4 &&
+    ev >= -0.03 &&
+    ev <= 0.15 &&
+    odds >= 1.2
+  );
+}
+
+function pickScore(r: Row) {
+  const ev = Math.max(
+    -0.3,
+    Math.min(
+      0.35,
+      typeof r.ev === "number"
+        ? r.ev
+        : -0.2
+    )
+  );
+
+  return (
+    r.confidence * 0.72 +
+    ev * 0.18 +
+    gradeValue(r.grade) * 0.035
+  );
+}
+
+function topBy(
+  rows: Row[],
+  keyOf: (r: Row) => string
+) {
+  const map = new Map<string, Row>();
+
+  for (const row of rows) {
+    const key = keyOf(row);
+    const prev = map.get(key);
+
+    if (
+      !prev ||
+      pickScore(row) > pickScore(prev)
+    ) {
+      map.set(key, row);
+    }
+  }
+
+  return [...map.values()].sort(
+    (a, b) =>
+      a.date.localeCompare(b.date)
+  );
+}
+
+function groupSummary(
+  rows: Row[],
+  key: (r: Row) => string
+) {
+  const map = new Map<string, Row[]>();
+
+  for (const row of rows) {
+    const k = key(row);
+    const list = map.get(k) || [];
+    list.push(row);
+    map.set(k, list);
+  }
+
+  return [...map.entries()]
+    .map(([name, list]) => ({
+      name,
+      ...summarize(list),
+    }));
+}
+
+export async function GET() {
+  try {
+    const file = path.join(
+      process.cwd(),
+      "data",
+      "kbo-backtest-2026-all-candidates-lineup-base.json"
+    );
+
+    const raw = JSON.parse(
+      await fs.readFile(file, "utf8")
+    );
+
+    const allRows: Row[] =
+      Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.results)
+          ? raw.results
+          : [];
+
+    const rows = allRows.filter(
+      (r) =>
+        r.date <= BACKTEST_END &&
+        (
+          r.result === "WIN" ||
+          r.result === "LOSS" ||
+          r.result === "PUSH"
+        )
+    );
+
+    const pool = rows.filter(eligible);
+
+    const recommendations = topBy(
+      pool,
+      (r) => r.gameId
+    );
+
+    const dailyTop = topBy(
+      pool,
+      (r) => r.date
+    );
+
+    const games = new Set(
+      allRows
+        .filter((r) => r.date <= BACKTEST_END)
+        .map((r) => r.gameId)
+    );
+
+    const markets = groupSummary(
+      recommendations,
+      (r) =>
+        r.market === "ML"
+          ? "승패"
+          : r.market === "HANDICAP"
+            ? "핸디캡"
+            : "오버/언더"
+    );
+
+    const grades = ["A", "B", "C"].map(
+      (grade) => ({
+        name: grade,
+        ...summarize(
+          recommendations.filter(
+            (r) => r.grade === grade
+          )
+        ),
+      })
+    );
+
+    const buckets = [
+      { name: "55% 미만", min: 0, max: 0.55 },
+      { name: "55~60%", min: 0.55, max: 0.60 },
+      { name: "60~65%", min: 0.60, max: 0.65 },
+      { name: "65~70%", min: 0.65, max: 0.70 },
+      { name: "70~75%", min: 0.70, max: 0.75 },
+      { name: "75% 이상", min: 0.75, max: 1.01 },
+    ].map((b) => ({
+      name: b.name,
+      ...summarize(
+        recommendations.filter(
+          (r) =>
+            typeof r.confidence === "number" &&
+            r.confidence >= b.min &&
+            r.confidence < b.max
+        )
+      ),
+    }));
+
+    const monthly = groupSummary(
+      recommendations,
+      (r) =>
+        r.month ||
+        r.date.slice(0, 7)
+    ).sort(
+      (a, b) =>
+        a.name.localeCompare(b.name)
+    );
+
+    return NextResponse.json(
+      {
+        statsRule: "ORIGINAL_STATS_V1",
+        backtest: {
+          start: "2026-03-28",
+          end: BACKTEST_END,
+          analyzedGames: games.size,
+          recommendations:
+            summarize(recommendations),
+          dailyTop:
+            summarize(dailyTop),
+          recommendationDays:
+            dailyTop.length,
+          markets,
+          grades,
+          buckets,
+          monthly,
+        },
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  } catch (error) {
+    console.error(
+      "[stats/report]",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "통계 데이터를 불러오지 못했습니다.",
+      },
+      { status: 500 }
+    );
+  }
+}

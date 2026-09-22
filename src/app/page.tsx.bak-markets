@@ -1,0 +1,277 @@
+﻿"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+import { analyzeGame, makeAutoCombos } from "@/lib/analyzer";
+
+const emptyOdds: OddsInput = { awayMl: null, homeMl: null, awayHandicap: null, homeHandicap: null, totalLine: null, overOdds: null, underOdds: null };
+
+type AutoOddsEvent = {
+  id: string;
+  commenceTime: string;
+
+  awayTeam: string;
+  homeTeam: string;
+
+  awayMl: number | null;
+  homeMl: number | null;
+
+  awaySpreadLine: number | null;
+  homeSpreadLine: number | null;
+
+  awayHandicap: number | null;
+  homeHandicap: number | null;
+
+  totalLine: number | null;
+  overOdds: number | null;
+  underOdds: number | null;
+
+  bookmakerCount: number;
+  lastUpdate: string | null;
+};
+
+function normalizeTeamName(name: string) {
+  return name
+    .replace("트윈스", "")
+    .replace("이글스", "")
+    .replace("랜더스", "")
+    .replace("다이노스", "")
+    .replace("위즈", "")
+    .replace("타이거즈", "")
+    .replace("라이온즈", "")
+    .replace("자이언츠", "")
+    .replace("베어스", "")
+    .replace("히어로즈", "")
+    .trim()
+    .toUpperCase();
+}
+
+function kstDateFromIso(iso: string) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
+}
+
+function num(v: string) { const x = Number(v); return v.trim() && Number.isFinite(x) ? x : null; }
+
+function DecimalInput({
+  value,
+  onValueChange,
+  placeholder,
+}: {
+  value: number | null;
+  onValueChange: (value: number | null) => void;
+  placeholder: string;
+}) {
+  const [text, setText] = useState(value === null ? "" : String(value));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) {
+      setText(value === null ? "" : String(value));
+    }
+  }, [value, focused]);
+
+  return (
+    <input
+      inputMode="decimal"
+      value={text}
+      placeholder={placeholder}
+      onFocus={() => setFocused(true)}
+      onChange={(e) => {
+        const next = e.target.value.replace(",", ".");
+
+        // 빈 값 / 숫자 / 1. / 1.84 형태 허용
+        if (!/^\d*(?:\.\d*)?$/.test(next)) return;
+
+        setText(next);
+
+        if (next === "" || next === ".") {
+          onValueChange(null);
+          return;
+        }
+
+        const n = Number(next);
+        if (Number.isFinite(n)) {
+          onValueChange(n);
+        }
+      }}
+      onBlur={() => {
+        setFocused(false);
+
+        if (text === "" || text === ".") {
+          setText("");
+          onValueChange(null);
+          return;
+        }
+
+        const n = Number(text);
+
+        if (Number.isFinite(n)) {
+          setText(String(n));
+          onValueChange(n);
+        }
+      }}
+    />
+  );
+}
+
+function GameCard({ game, odds, setOdds }: { game: KboGame; odds: OddsInput; setOdds: (v: OddsInput) => void }) {
+  const picks = analyzeGame(game, odds);
+  const best = picks[0];
+  return <article className="gameCard">
+    <div className="cardTop"><b>{game.time || "-"}</b><span>{game.stadium || "구장 미정"}</span><span className="status">{game.status.cancelName || (game.score.away !== null ? "LIVE/결과" : "경기전")}</span></div>
+    <div className="matchup">
+      <div><strong>{game.awayTeamName}</strong><small>{game.awayRank ? `${game.awayRank}위` : ""}</small></div><em>VS</em><div className="right"><strong>{game.homeTeamName}</strong><small>{game.homeRank ? `${game.homeRank}위` : ""}</small></div>
+    </div>
+    <div className="starters">
+      <span>선발 {game.startingPitchers.away?.name || "미정"}</span><span>선발 {game.startingPitchers.home?.name || "미정"}</span>
+    </div>
+    <div className="scoreLine">{game.score.away !== null || game.score.home !== null ? `${game.score.away ?? 0} : ${game.score.home ?? 0}` : ""}</div>
+    <div className="oddsRow">
+      <label>{game.awayTeamName} 승<DecimalInput value={odds.awayMl} onValueChange={(v)=>setOdds({...odds,awayMl:v})} placeholder="1.75" /></label>
+      <label>{game.homeTeamName} 승<DecimalInput value={odds.homeMl} onValueChange={(v)=>setOdds({...odds,homeMl:v})} placeholder="1.85" /></label>
+      <label>O/U<DecimalInput value={odds.totalLine} onValueChange={(v)=>setOdds({...odds,totalLine:v})} placeholder="9.5" /></label>
+    </div>
+    <div className={`recommend grade${best?.grade ?? "C"}`}>
+      <span>추천</span><b>{best?.odds ? best.label : "배당 입력 대기"}</b>{best?.odds && <small>{best.grade}급 · EV {best.ev !== null ? `${best.ev >= 0 ? "+" : ""}${(best.ev*100).toFixed(1)}%` : "-"}</small>}
+    </div>
+  </article>;
+}
+
+export default function Home() {
+  const [games,setGames] = useState<KboGame[]>([]);
+  const [odds,setAllOdds] = useState<Record<string,OddsInput>>({});
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState("");
+  const [date,setDate] = useState(() => new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()));
+
+  async function load() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const [gameResponse, oddsResponse] = await Promise.all([
+        fetch(`/api/kbo/today?date=${date}`, {
+          cache: "no-store",
+        }),
+        fetch("/api/odds/kbo", {
+          cache: "no-store",
+        }),
+      ]);
+
+      const gameJson = await gameResponse.json();
+
+      if (!gameResponse.ok) {
+        throw new Error(gameJson.error || "KBO 경기 불러오기 실패");
+      }
+
+      const loadedGames: KboGame[] = gameJson.games || [];
+
+      setGames(loadedGames);
+
+      // 배당 API 실패는 경기목록 자체를 막지 않는다.
+      if (oddsResponse.ok) {
+        const oddsJson = await oddsResponse.json();
+        const autoEvents: AutoOddsEvent[] = oddsJson.events || [];
+
+        setAllOdds((prev) => {
+          const next = { ...prev };
+
+          for (const game of loadedGames) {
+            const away = normalizeTeamName(game.awayTeamName);
+            const home = normalizeTeamName(game.homeTeamName);
+
+            const matched = autoEvents.find((event) => {
+              const oddsAway = normalizeTeamName(event.awayTeam);
+              const oddsHome = normalizeTeamName(event.homeTeam);
+
+              const sameTeams =
+                away === oddsAway &&
+                home === oddsHome;
+
+              const sameDate =
+                kstDateFromIso(event.commenceTime) === date;
+
+              return sameTeams && sameDate;
+            });
+
+            if (!matched) continue;
+
+            const current = next[game.gameId] || emptyOdds;
+
+            // 이미 직접 입력한 값은 덮어쓰지 않고
+            // 빈 값만 자동배당으로 채운다.
+            next[game.gameId] = {
+              awayMl:
+                current.awayMl ??
+                matched.awayMl,
+
+              homeMl:
+                current.homeMl ??
+                matched.homeMl,
+
+              awayHandicap:
+                current.awayHandicap ??
+                matched.awayHandicap,
+
+              homeHandicap:
+                current.homeHandicap ??
+                matched.homeHandicap,
+
+              totalLine:
+                current.totalLine ??
+                matched.totalLine,
+
+              overOdds:
+                current.overOdds ??
+                matched.overOdds,
+
+              underOdds:
+                current.underOdds ??
+                matched.underOdds,
+            };
+          }
+
+          return next;
+        });
+      }
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "불러오기 실패"
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(()=>{ load(); },[date]);
+  useEffect(()=>{ const raw=localStorage.getItem("kbo-analyzer-odds"); if(raw) try{setAllOdds(JSON.parse(raw));}catch{} },[]);
+  useEffect(()=>{ localStorage.setItem("kbo-analyzer-odds",JSON.stringify(odds)); },[odds]);
+
+  const allPicks: Pick[] = useMemo(()=>games.flatMap(g=>analyzeGame(g,odds[g.gameId] || emptyOdds)),[games,odds]);
+  const combos = useMemo(()=>makeAutoCombos(allPicks),[allPicks]);
+
+  return <main className="shell">
+    <aside className="sidebar">
+      <div className="brand">⚾ <b>KBO Analyzer</b><small>v0.1</small></div>
+      <nav><a className="active">오늘 경기</a><a>자동조합</a><a>적중기록</a><a>통계 리포트</a><a>설정</a></nav>
+      <div className="collector"><b>자동 수집</b><span>● KBO 경기/선발</span><span>● 실시간 점수</span><span>○ 팀·투수 세부지표 (다음)</span></div>
+    </aside>
+    <section className="content">
+      <header><div><h1>오늘의 KBO 경기</h1><p>{date} · 경기 카드 자동 생성</p></div><div className="headerActions"><input type="date" value={date} onChange={e=>setDate(e.target.value)} /><button onClick={load}>↻ 새로고침</button></div></header>
+      {error && <div className="error">KBO 데이터 연결 오류: {error}</div>}
+      {loading ? <div className="loading">KBO 경기 정보를 불러오는 중…</div> : games.length === 0 ? <div className="loading">이 날짜에는 KBO 경기가 없습니다.</div> : <div className="gameGrid">{games.map(g=><GameCard key={g.gameId} game={g} odds={odds[g.gameId]||emptyOdds} setOdds={(v)=>setAllOdds(prev=>({...prev,[g.gameId]:v}))}/>)}</div>}
+      <section className="comboSection"><div className="sectionTitle"><div><h2>자동조합 추천</h2><p>현재 입력된 배당 중 경기 중복 없이 조합</p></div></div>
+        <div className="comboGrid">{combos.length ? combos.map(c=><div className="comboCard" key={c.name}><h3>{c.name}</h3><strong>{c.odds.toFixed(2)}배</strong><ol>{c.picks.map(p=><li key={p.gameId+p.label}><span>{p.label}</span><b>@{p.odds?.toFixed(2)}</b><em>{p.grade}</em></li>)}</ol><button disabled>저장 기능은 v0.2에서 연결</button></div>) : <div className="emptyCombo">각 경기의 승패 배당을 입력하면 자동조합이 생성됩니다.</div>}</div>
+      </section>
+      <section className="nextBox"><b>v0.1 현재 구현</b><span>KBO 공식 경기센터 데이터 자동수집 · 선발투수 · 경기상태/점수 · 카드 UI · 배당 저장 · 기본 추천 · 자동조합</span><small>다음: 선발 ERA/WHIP, 최근 10경기, 불펜 소모, Supabase 적중기록 자동판정</small></section>
+    </section>
+  </main>;
+}
+
+

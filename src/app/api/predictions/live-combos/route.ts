@@ -1,0 +1,1452 @@
+import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+
+export const dynamic =
+  "force-dynamic";
+
+
+const LIVE_START =
+  "2026-09-16";
+
+const DEFAULT_ENGINE_VERSION =
+  "v0.1";
+
+type ComboMode =
+  | "SAFE"
+  | "VALUE"
+  | "HIGH_ODDS";
+
+type PickResult =
+  | "PENDING"
+  | "WIN"
+  | "LOSS"
+  | "PUSH"
+  | "VOID";
+
+type ComboResult =
+  | "PENDING"
+  | "WIN"
+  | "LOSS"
+  | "VOID";
+
+
+type LiveComboPick = {
+  gameId: string;
+
+  awayTeamName: string;
+
+  homeTeamName: string;
+
+  market:
+    | "ML"
+    | "HANDICAP"
+    | "TOTAL";
+
+  label: string;
+
+  grade: string;
+
+  confidence: number;
+
+  ev: number | null;
+
+  odds: number;
+};
+
+
+type LiveAiCombo = {
+  id: string;
+
+  engineVersion: string;
+
+  source: "LIVE";
+
+  date: string;
+
+  mode: ComboMode;
+
+  leg: number;
+
+  name: string;
+
+  odds: number;
+
+  probability: number;
+
+  averageConfidence: number;
+
+  averageEv: number | null;
+
+  picks: LiveComboPick[];
+
+  firstCapturedAt: string;
+
+  capturedAt: string;
+
+  result: ComboResult;
+
+  pickResults?: PickResult[];
+
+  effectiveOdds?: number;
+
+  settledAt?: string;
+};
+
+
+type LiveComboStore = {
+  version: 1;
+
+  liveStart: string;
+
+  combos: LiveAiCombo[];
+};
+
+
+const dataFile =
+  path.join(
+    process.cwd(),
+    "data",
+    "kbo-live-ai-combos.json"
+  );
+
+
+function emptyStore():
+  LiveComboStore {
+  return {
+    version: 1,
+
+    liveStart:
+      LIVE_START,
+
+    combos: [],
+  };
+}
+
+
+async function readStore():
+  Promise<LiveComboStore> {
+  try {
+    const raw =
+      await fs.readFile(
+        dataFile,
+        "utf8"
+      );
+
+    const parsed =
+      JSON.parse(raw);
+
+    return {
+      version: 1,
+
+      liveStart:
+        LIVE_START,
+
+      combos:
+        Array.isArray(
+          parsed?.combos
+        )
+          ? parsed.combos
+          : [],
+    };
+
+  } catch {
+    return emptyStore();
+  }
+}
+
+
+/*
+  LIVE_STORE_WRITE_QUEUE_V1
+
+  같은 Node 프로세스에서 여러 POST가 동시에
+  read -> modify -> write 를 수행하지 못하게 직렬화한다.
+
+  tmp 이름도 pid + time + sequence 로 만들어
+  동일 밀리초 충돌을 방지한다.
+*/
+let storeMutationQueue:
+  Promise<void> =
+    Promise.resolve();
+
+let tempSequence = 0;
+
+
+async function withStoreMutationLock<T>(
+  task:
+    () => Promise<T>
+): Promise<T> {
+  const previous =
+    storeMutationQueue;
+
+  let release:
+    () => void =
+      () => {};
+
+  storeMutationQueue =
+    new Promise<void>(
+      (resolve) => {
+        release =
+          resolve;
+      }
+    );
+
+  await previous;
+
+  try {
+    return await task();
+
+  } finally {
+    release();
+  }
+}
+
+
+async function writeStore(
+  store: LiveComboStore
+) {
+  await fs.mkdir(
+    path.dirname(
+      dataFile
+    ),
+    {
+      recursive: true,
+    }
+  );
+
+  const temp =
+    `${dataFile}.tmp-${process.pid}-${Date.now()}-${++tempSequence}`;
+
+  await fs.writeFile(
+    temp,
+    JSON.stringify(
+      store,
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  await fs.rename(
+    temp,
+    dataFile
+  );
+}
+
+
+function todayKst() {
+  return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:
+        "Asia/Seoul",
+
+      year:
+        "numeric",
+
+      month:
+        "2-digit",
+
+      day:
+        "2-digit",
+    }
+  ).format(
+    new Date()
+  );
+}
+
+
+function parseLastNumber(
+  label: string
+) {
+  const matches =
+    String(
+      label
+    ).match(
+      /[+-]?\d+(?:\.\d+)?/g
+    );
+
+  if (
+    !matches?.length
+  ) {
+    return null;
+  }
+
+  const value =
+    Number(
+      matches[
+        matches.length - 1
+      ]
+    );
+
+  return Number.isFinite(
+    value
+  )
+    ? value
+    : null;
+}
+
+
+function settlePick(
+  pick: LiveComboPick,
+  game: any
+): PickResult {
+
+  if (!game) {
+    return "PENDING";
+  }
+
+  const cancelName =
+    String(
+      game?.status?.cancelName ||
+      ""
+    ).trim();
+
+  if (
+    cancelName &&
+    cancelName !==
+      "정상경기"
+  ) {
+    return "VOID";
+  }
+
+  if (
+    String(
+      game?.status?.stateCode ||
+      ""
+    ) !== "3"
+  ) {
+    return "PENDING";
+  }
+
+  const awayScore =
+    game?.score?.away;
+
+  const homeScore =
+    game?.score?.home;
+
+  if (
+    typeof awayScore !==
+      "number" ||
+    typeof homeScore !==
+      "number"
+  ) {
+    return "PENDING";
+  }
+
+
+  if (
+    pick.market ===
+    "ML"
+  ) {
+    if (
+      pick.label.startsWith(
+        `${pick.awayTeamName} `
+      )
+    ) {
+      if (
+        awayScore >
+        homeScore
+      ) {
+        return "WIN";
+      }
+
+      if (
+        awayScore <
+        homeScore
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (
+      pick.label.startsWith(
+        `${pick.homeTeamName} `
+      )
+    ) {
+      if (
+        homeScore >
+        awayScore
+      ) {
+        return "WIN";
+      }
+
+      if (
+        homeScore <
+        awayScore
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+
+  if (
+    pick.market ===
+    "HANDICAP"
+  ) {
+    const line =
+      parseLastNumber(
+        pick.label
+      );
+
+    if (
+      line === null
+    ) {
+      return "VOID";
+    }
+
+    if (
+      pick.label.startsWith(
+        `${pick.awayTeamName} `
+      )
+    ) {
+      const adjusted =
+        awayScore +
+        line;
+
+      if (
+        adjusted >
+        homeScore
+      ) {
+        return "WIN";
+      }
+
+      if (
+        adjusted <
+        homeScore
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (
+      pick.label.startsWith(
+        `${pick.homeTeamName} `
+      )
+    ) {
+      const adjusted =
+        homeScore +
+        line;
+
+      if (
+        adjusted >
+        awayScore
+      ) {
+        return "WIN";
+      }
+
+      if (
+        adjusted <
+        awayScore
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+
+  if (
+    pick.market ===
+    "TOTAL"
+  ) {
+    const line =
+      parseLastNumber(
+        pick.label
+      );
+
+    if (
+      line === null
+    ) {
+      return "VOID";
+    }
+
+    const total =
+      awayScore +
+      homeScore;
+
+    if (
+      pick.label.startsWith(
+        "오버"
+      )
+    ) {
+      if (
+        total >
+        line
+      ) {
+        return "WIN";
+      }
+
+      if (
+        total <
+        line
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    if (
+      pick.label.startsWith(
+        "언더"
+      )
+    ) {
+      if (
+        total <
+        line
+      ) {
+        return "WIN";
+      }
+
+      if (
+        total >
+        line
+      ) {
+        return "LOSS";
+      }
+
+      return "PUSH";
+    }
+
+    return "VOID";
+  }
+
+
+  return "VOID";
+}
+
+
+function isGameStarted(
+  game: any
+) {
+  if (!game) {
+    return true;
+  }
+
+  const stateCode =
+    String(
+      game?.status?.stateCode ||
+      ""
+    );
+
+  const inning =
+    Number(
+      game?.status?.inning ??
+      0
+    );
+
+  const topBottom =
+    game?.status?.topBottom;
+
+  return (
+    stateCode === "2" ||
+    stateCode === "3" ||
+    (
+      stateCode !== "1" &&
+      (
+        inning > 0 ||
+        Boolean(
+          topBottom
+        )
+      )
+    )
+  );
+}
+
+
+function isGameCancelled(
+  game: any
+) {
+  const cancelName =
+    String(
+      game?.status?.cancelName ||
+      ""
+    ).trim();
+
+  return (
+    !!cancelName &&
+    cancelName !==
+      "정상경기"
+  );
+}
+
+
+function comboId(
+  engineVersion: string,
+  date: string,
+  mode: ComboMode,
+  leg: number
+) {
+  return (
+    `${engineVersion}:` +
+    `${date}:` +
+    `${mode}:` +
+    `${leg}`
+  );
+}
+
+
+function settleCombo(
+  combo: LiveAiCombo,
+  gameMap: Map<
+    string,
+    any
+  >
+) {
+  const pickResults =
+    combo.picks.map(
+      (pick) =>
+        settlePick(
+          pick,
+          gameMap.get(
+            pick.gameId
+          )
+        )
+    );
+
+  if (
+    pickResults.some(
+      (result) =>
+        result ===
+        "LOSS"
+    )
+  ) {
+    return {
+      result:
+        "LOSS" as ComboResult,
+
+      pickResults,
+
+      effectiveOdds: 0,
+    };
+  }
+
+  if (
+    pickResults.some(
+      (result) =>
+        result ===
+        "PENDING"
+    )
+  ) {
+    return {
+      result:
+        "PENDING" as ComboResult,
+
+      pickResults,
+
+      effectiveOdds:
+        combo.effectiveOdds ??
+        combo.odds,
+    };
+  }
+
+  const winCount =
+    pickResults.filter(
+      (result) =>
+        result ===
+        "WIN"
+    ).length;
+
+  if (
+    winCount === 0
+  ) {
+    return {
+      result:
+        "VOID" as ComboResult,
+
+      pickResults,
+
+      effectiveOdds: 1,
+    };
+  }
+
+  const effectiveOdds =
+    combo.picks.reduce(
+      (
+        total,
+        pick,
+        index
+      ) => {
+        const result =
+          pickResults[index];
+
+        if (
+          result ===
+            "PUSH" ||
+          result ===
+            "VOID"
+        ) {
+          return total;
+        }
+
+        return (
+          total *
+          pick.odds
+        );
+      },
+      1
+    );
+
+  return {
+    result:
+      "WIN" as ComboResult,
+
+    pickResults,
+
+    effectiveOdds,
+  };
+}
+
+
+function summary(
+  combos: LiveAiCombo[]
+) {
+  const settled =
+    combos.filter(
+      (combo) =>
+        combo.result !==
+        "PENDING"
+    );
+
+  const wins =
+    settled.filter(
+      (combo) =>
+        combo.result ===
+        "WIN"
+    ).length;
+
+  const losses =
+    settled.filter(
+      (combo) =>
+        combo.result ===
+        "LOSS"
+    ).length;
+
+  const decided =
+    wins +
+    losses;
+
+  let stake = 0;
+
+  let returned = 0;
+
+  for (
+    const combo of
+    settled
+  ) {
+    stake += 10000;
+
+    if (
+      combo.result ===
+      "WIN"
+    ) {
+      returned +=
+        10000 *
+        (
+          combo.effectiveOdds ??
+          combo.odds
+        );
+
+    } else if (
+      combo.result ===
+      "VOID"
+    ) {
+      returned +=
+        10000;
+    }
+  }
+
+  return {
+    count:
+      combos.length,
+
+    settled:
+      settled.length,
+
+    pending:
+      combos.length -
+      settled.length,
+
+    wins,
+
+    losses,
+
+    hitRate:
+      decided
+        ? wins /
+          decided
+        : null,
+
+    returnRate:
+      stake
+        ? (
+            returned -
+            stake
+          ) /
+          stake
+        : null,
+  };
+}
+
+
+export async function GET(
+  request: Request
+) {
+  const store =
+    await readStore();
+
+  const url =
+    new URL(
+      request.url
+    );
+
+  const engineVersion =
+    String(
+      url.searchParams.get(
+        "engineVersion"
+      ) ||
+      DEFAULT_ENGINE_VERSION
+    );
+
+  const modeParam =
+    url.searchParams.get(
+      "mode"
+    );
+
+  const legParam =
+    Number(
+      url.searchParams.get(
+        "leg"
+      )
+    );
+
+  const combos =
+    store.combos
+      .filter(
+        (combo) =>
+          combo.engineVersion ===
+          engineVersion
+      )
+      .filter(
+        (combo) =>
+          !modeParam ||
+          combo.mode ===
+            modeParam
+      )
+      .filter(
+        (combo) =>
+          !Number.isFinite(
+            legParam
+          ) ||
+          legParam <= 0 ||
+          combo.leg ===
+            legParam
+      )
+      .sort(
+        (a, b) =>
+          b.date.localeCompare(
+            a.date
+          ) ||
+          a.mode.localeCompare(
+            b.mode
+          ) ||
+          a.leg -
+            b.leg
+      );
+
+  const byModeLeg =
+    (
+      [
+        "SAFE",
+        "VALUE",
+        "HIGH_ODDS",
+      ] as ComboMode[]
+    ).flatMap(
+      (mode) =>
+        [
+          2,
+          3,
+          4,
+          5,
+        ].map(
+          (leg) => ({
+            mode,
+
+            leg,
+
+            ...summary(
+              combos.filter(
+                (combo) =>
+                  combo.mode ===
+                    mode &&
+                  combo.leg ===
+                    leg
+              )
+            ),
+          })
+        )
+    );
+
+  return NextResponse.json({
+    version: 1,
+
+    liveStart:
+      LIVE_START,
+
+    engineVersion,
+
+    ...summary(
+      combos
+    ),
+
+    byModeLeg,
+
+    combos,
+  });
+}
+
+
+export async function POST(
+  request: Request
+) {
+  return withStoreMutationLock(
+    () =>
+      postUnlocked(
+        request
+      )
+  );
+}
+
+
+async function postUnlocked(
+  request: Request
+) {
+  const body =
+    await request.json();
+
+  const date =
+    String(
+      body?.date ||
+      ""
+    );
+
+  const engineVersion =
+    String(
+      body?.engineVersion ||
+      DEFAULT_ENGINE_VERSION
+    ).trim();
+
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(
+      date
+    ) ||
+    date < LIVE_START ||
+    !engineVersion
+  ) {
+    return NextResponse.json(
+      {
+        ok: false,
+
+        error:
+          "INVALID_DATE_OR_ENGINE",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  const incoming =
+    Array.isArray(
+      body?.combos
+    )
+      ? body.combos
+      : [];
+
+  const games =
+    Array.isArray(
+      body?.games
+    )
+      ? body.games
+      : [];
+
+  const gameMap =
+    new Map<
+      string,
+      any
+    >(
+      games.map(
+        (game: any) => [
+          String(
+            game?.gameId ||
+            ""
+          ),
+
+          game,
+        ]
+      )
+    );
+
+  const store =
+    await readStore();
+
+  const byId =
+    new Map(
+      store.combos.map(
+        (combo) => [
+          combo.id,
+          combo,
+        ]
+      )
+    );
+
+  const now =
+    new Date().toISOString();
+
+  const currentDate =
+    todayKst();
+
+  let created = 0;
+
+  let updated = 0;
+
+  let settled = 0;
+
+
+  if (
+    date ===
+    currentDate
+  ) {
+    for (
+      const raw of
+      incoming
+    ) {
+      const mode =
+        String(
+          raw?.mode ||
+          ""
+        ) as ComboMode;
+
+      const leg =
+        Number(
+          raw?.leg
+        );
+
+      const rawPicks =
+        Array.isArray(
+          raw?.picks
+        )
+          ? raw.picks
+          : [];
+
+      if (
+        ![
+          "SAFE",
+          "VALUE",
+          "HIGH_ODDS",
+        ].includes(
+          mode
+        ) ||
+        ![
+          2,
+          3,
+          4,
+          5,
+        ].includes(
+          leg
+        ) ||
+        rawPicks.length !==
+          leg
+      ) {
+        continue;
+      }
+
+      const picks:
+        LiveComboPick[] =
+          rawPicks
+            .map(
+              (pick: any) => ({
+                gameId:
+                  String(
+                    pick?.gameId ||
+                    ""
+                  ),
+
+                awayTeamName:
+                  String(
+                    pick?.awayTeamName ||
+                    ""
+                  ),
+
+                homeTeamName:
+                  String(
+                    pick?.homeTeamName ||
+                    ""
+                  ),
+
+                market:
+                  String(
+                    pick?.market ||
+                    ""
+                  ) as LiveComboPick["market"],
+
+                label:
+                  String(
+                    pick?.label ||
+                    ""
+                  ),
+
+                grade:
+                  String(
+                    pick?.grade ||
+                    "C"
+                  ),
+
+                confidence:
+                  Number(
+                    pick?.confidence
+                  ),
+
+                ev:
+                  pick?.ev === null ||
+                  pick?.ev ===
+                    undefined
+                    ? null
+                    : Number(
+                        pick.ev
+                      ),
+
+                odds:
+                  Number(
+                    pick?.odds
+                  ),
+              })
+            )
+            .filter(
+              (
+                pick:
+                  LiveComboPick
+              ) =>
+                !!pick.gameId &&
+                !!pick.label &&
+                [
+                  "ML",
+                  "HANDICAP",
+                  "TOTAL",
+                ].includes(
+                  pick.market
+                ) &&
+                Number.isFinite(
+                  pick.confidence
+                ) &&
+                Number.isFinite(
+                  pick.odds
+                ) &&
+                pick.odds >
+                  1
+            );
+
+      if (
+        picks.length !==
+        leg
+      ) {
+        continue;
+      }
+
+      const uniqueGames =
+        new Set(
+          picks.map(
+            (pick) =>
+              pick.gameId
+          )
+        );
+
+      if (
+        uniqueGames.size !==
+        picks.length
+      ) {
+        continue;
+      }
+
+      const id =
+        comboId(
+          engineVersion,
+          date,
+          mode,
+          leg
+        );
+
+      const previous =
+        byId.get(
+          id
+        );
+
+      /*
+        이미 저장된 조합 중
+        어느 한 경기라도 시작했다면
+        조합 스냅샷은 더 이상 변경하지 않는다.
+      */
+      if (
+        previous &&
+        previous.picks.some(
+          (pick) => {
+            const game =
+              gameMap.get(
+                pick.gameId
+              );
+
+            return (
+              isGameStarted(
+                game
+              ) ||
+              isGameCancelled(
+                game
+              )
+            );
+          }
+        )
+      ) {
+        continue;
+      }
+
+      const relatedGames =
+        picks.map(
+          (pick) =>
+            gameMap.get(
+              pick.gameId
+            )
+        );
+
+      /*
+        새 조합 저장도
+        모든 경기가 경기 전일 때만 허용.
+      */
+      if (
+        relatedGames.some(
+          (game) =>
+            !game ||
+            isGameStarted(
+              game
+            ) ||
+            isGameCancelled(
+              game
+            )
+        )
+      ) {
+        continue;
+      }
+
+      const odds =
+        Number(
+          raw?.odds
+        );
+
+      const probability =
+        Number(
+          raw?.probability
+        );
+
+      const averageConfidence =
+        Number(
+          raw?.averageConfidence
+        );
+
+      if (
+        !Number.isFinite(
+          odds
+        ) ||
+        odds <= 1 ||
+        !Number.isFinite(
+          probability
+        ) ||
+        !Number.isFinite(
+          averageConfidence
+        )
+      ) {
+        continue;
+      }
+
+      const next:
+        LiveAiCombo = {
+          id,
+
+          engineVersion,
+
+          source:
+            "LIVE",
+
+          date,
+
+          mode,
+
+          leg,
+
+          name:
+            String(
+              raw?.name ||
+              `${mode} ${leg}폴`
+            ),
+
+          odds,
+
+          probability,
+
+          averageConfidence,
+
+          averageEv:
+            raw?.averageEv ===
+              null ||
+            raw?.averageEv ===
+              undefined
+              ? null
+              : Number(
+                  raw.averageEv
+                ),
+
+          picks,
+
+          firstCapturedAt:
+            previous
+              ?.firstCapturedAt ||
+            now,
+
+          capturedAt:
+            now,
+
+          result:
+            "PENDING",
+        };
+
+      byId.set(
+        id,
+        next
+      );
+
+      if (
+        previous
+      ) {
+        updated += 1;
+      } else {
+        created += 1;
+      }
+    }
+  }
+
+
+  /*
+    해당 날짜의 기존 AI 조합을
+    현재 경기결과로 정산한다.
+  */
+  for (
+    const [
+      id,
+      combo,
+    ] of byId
+  ) {
+    if (
+      combo.date !==
+      date
+    ) {
+      continue;
+    }
+
+    const result =
+      settleCombo(
+        combo,
+        gameMap
+      );
+
+    if (
+      result.result !==
+        "PENDING" &&
+      (
+        combo.result !==
+          result.result ||
+        JSON.stringify(
+          combo.pickResults
+        ) !==
+          JSON.stringify(
+            result.pickResults
+          ) ||
+        combo.effectiveOdds !==
+          result.effectiveOdds
+      )
+    ) {
+      byId.set(
+        id,
+        {
+          ...combo,
+
+          result:
+            result.result,
+
+          pickResults:
+            result.pickResults,
+
+          effectiveOdds:
+            result.effectiveOdds,
+
+          settledAt:
+            now,
+        }
+      );
+
+      settled += 1;
+    }
+  }
+
+
+  store.combos =
+    [
+      ...byId.values(),
+    ].sort(
+      (a, b) =>
+        a.date.localeCompare(
+          b.date
+        ) ||
+        a.mode.localeCompare(
+          b.mode
+        ) ||
+        a.leg -
+          b.leg
+    );
+
+  await writeStore(
+    store
+  );
+
+  return NextResponse.json({
+    ok: true,
+
+    date,
+
+    currentDate,
+
+    engineVersion,
+
+    incoming:
+      incoming.length,
+
+    created,
+
+    updated,
+
+    settled,
+
+    total:
+      store.combos.length,
+  });
+}

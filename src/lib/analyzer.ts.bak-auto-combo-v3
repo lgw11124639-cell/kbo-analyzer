@@ -1,0 +1,771 @@
+﻿import type { KboGame, OddsInput, Pick } from "@/types/kbo";
+
+/*
+  EV용 확률 보정
+
+  화면에는 원래 모델 확률(confidence)을 그대로 표시하지만
+  EV / 등급 / 추천판정에는 50% 방향으로 축소한 확률을 사용한다.
+
+  ML       : 모델 엣지 85%만 인정
+  HANDICAP : 모델 엣지 80%만 인정
+  TOTAL    : 모델 엣지 70%만 인정
+*/
+function conservativeProbability(
+  confidence: number,
+  market: Pick["market"]
+) {
+  const factor =
+    market === "ML"
+      ? 0.85
+      : market === "HANDICAP"
+        ? 0.80
+        : 0.70;
+
+  return 0.50 +
+    (confidence - 0.50) * factor;
+}
+
+function conservativeEv(
+  confidence: number,
+  odds: number | null,
+  market: Pick["market"]
+) {
+  if (!odds || odds <= 1) {
+    return null;
+  }
+
+  const probability =
+    conservativeProbability(
+      confidence,
+      market
+    );
+
+  return probability * odds - 1;
+}
+
+function implied(odds: number | null) {
+  return odds && odds > 1 ? 1 / odds : null;
+}
+
+function clamp(value: number, min = 0.2, max = 0.8) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function fairTwoWay(
+  firstOdds: number | null,
+  secondOdds: number | null
+) {
+  const first = implied(firstOdds);
+  const second = implied(secondOdds);
+
+  if (first === null || second === null) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  const sum = first + second;
+
+  if (sum <= 0) {
+    return {
+      first: null,
+      second: null,
+    };
+  }
+
+  return {
+    first: first / sum,
+    second: second / sum,
+  };
+}
+
+function grade(
+  confidence: number,
+  ev: number | null
+): "A" | "B" | "C" {
+  if (
+    confidence >= 0.64 &&
+    (ev ?? 0) >= 0.04
+  ) {
+    return "A";
+  }
+
+  if (
+    confidence >= 0.57 &&
+    (ev ?? 0) >= 0
+  ) {
+    return "B";
+  }
+
+  return "C";
+}
+
+function formatLine(line: number | null) {
+  if (line === null) return "";
+
+  return line > 0
+    ? `+${line}`
+    : String(line);
+}
+
+/*
+  현재 v0.2 임시 분석 모델
+
+  ML:
+  - 시장배당
+  - 홈 이점
+  - 팀 순위
+
+  핸디캡:
+  - 시장 핸디캡 확률
+  - ML 모델의 팀 우위 일부 반영
+
+  O/U:
+  - 현재는 시장 no-vig 확률 기반
+  - 추후 최근 득실점 / 선발 / 불펜 / 구장 데이터를 연결해 교체
+*/
+export function analyzeGame(
+  game: KboGame,
+  odds: OddsInput,
+  starterEdgeScore = 0,
+  teamFormEdgeScore = 0,
+  bullpenEdgeScore = 0,
+  lineupMatchupEdgeScore = 0,
+  projectedTotal: number | null = null
+): Pick[] {
+  const picks: Pick[] = [];
+
+  // ----------------------------------------------------------
+  // ML
+  // ----------------------------------------------------------
+
+  const rankEdge =
+    game.awayRank && game.homeRank
+      ? Math.max(
+          -0.08,
+          Math.min(
+            0.08,
+            (game.homeRank - game.awayRank) * 0.008
+          )
+        )
+      : 0;
+
+  const baseAway = 0.48 + rankEdge;
+
+  const mlFair = fairTwoWay(
+    odds.awayMl,
+    odds.homeMl
+  );
+
+  const awayFairMarket =
+    mlFair.first ?? 0.5;
+
+  const baseAwayProb = clamp(
+    baseAway * 0.45 +
+      awayFairMarket * 0.55
+  );
+
+  /*
+    선발 보정 v0.3
+
+    starterEdgeScore:
+    원정 선발점수 - 홈 선발점수
+
+    10점 차이 ≈ 1.8% 보정
+    20점 차이 ≈ 3.6% 보정
+
+    최대 ±5% 제한
+
+    아직 백테스트 전이므로
+    선발 비중을 보수적으로 제한한다.
+  */
+
+  const starterAdjustment =
+    Math.max(
+      -0.05,
+      Math.min(
+        0.05,
+        starterEdgeScore * 0.0018
+      )
+    );
+
+  /*
+    최근 팀 폼 보정 v0.4
+
+    teamFormEdgeScore:
+    원정 최근폼 점수 - 홈 최근폼 점수
+
+    최대 ±4%만 반영한다.
+
+    선발 + 최근폼이 동시에
+    한 방향으로 강해도 과도한 확률 상승을
+    막기 위해 제한한다.
+  */
+
+  const teamFormAdjustment =
+    Math.max(
+      -0.04,
+      Math.min(
+        0.04,
+        teamFormEdgeScore * 0.0013
+      )
+    );
+
+  /*
+    불펜 보정 v0.5
+
+    bullpenEdgeScore:
+    원정 불펜점수 - 홈 불펜점수
+
+    피로도가 낮을수록 높은 점수.
+    아직 초기 모델이므로 최대 ±2.5%만 반영.
+  */
+
+  const bullpenAdjustment =
+    Math.max(
+      -0.025,
+      Math.min(
+        0.025,
+        bullpenEdgeScore * 0.0008
+      )
+    );
+
+  /*
+    확정 라인업 + 상대 선발 매치업 보정 v0.6
+
+    lineupMatchupEdgeScore:
+    원정 타선 매치업점수 - 홈 타선 매치업점수
+
+    예:
+    +1점 = 원정 승률 약 +0.3%
+    +5점 = 원정 승률 약 +1.5%
+
+    BvP 자체가 작은 표본일 수 있으므로
+    전체 승률 영향은 최대 ±2%로 제한한다.
+  */
+
+  const lineupMatchupAdjustment =
+    Math.max(
+      -0.02,
+      Math.min(
+        0.02,
+        lineupMatchupEdgeScore *
+          0.003
+      )
+    );
+
+  const awayProb = clamp(
+    baseAwayProb +
+      starterAdjustment +
+      teamFormAdjustment +
+      bullpenAdjustment +
+      lineupMatchupAdjustment
+  );
+
+  const homeProb =
+    1 - awayProb;
+
+  const awayEv =
+    conservativeEv(
+      awayProb,
+      odds.awayMl,
+      "ML"
+    );
+
+  const homeEv =
+    conservativeEv(
+      homeProb,
+      odds.homeMl,
+      "ML"
+    );
+
+  picks.push(
+    {
+      gameId: game.gameId,
+      label: `${game.awayTeamName} 승`,
+      market: "ML",
+      odds: odds.awayMl,
+      confidence: awayProb,
+      ev: awayEv,
+      grade: grade(
+        awayProb,
+        awayEv
+      ),
+    },
+    {
+      gameId: game.gameId,
+      label: `${game.homeTeamName} 승`,
+      market: "ML",
+      odds: odds.homeMl,
+      confidence: homeProb,
+      ev: homeEv,
+      grade: grade(
+        homeProb,
+        homeEv
+      ),
+    }
+  );
+
+  // ----------------------------------------------------------
+  // HANDICAP
+  // ----------------------------------------------------------
+
+  const handicapFair = fairTwoWay(
+    odds.awayHandicap,
+    odds.homeHandicap
+  );
+
+  if (
+    handicapFair.first !== null &&
+    handicapFair.second !== null
+  ) {
+    // ML 모델과 시장 방향 차이를 소폭만 반영
+    const teamEdge =
+      awayProb - 0.5;
+
+    const awayHandicapProb =
+      clamp(
+        handicapFair.first +
+          teamEdge * 0.18,
+        0.15,
+        0.85
+      );
+
+    const homeHandicapProb =
+      1 - awayHandicapProb;
+
+    const awayHandicapEv =
+      conservativeEv(
+        awayHandicapProb,
+        odds.awayHandicap,
+        "HANDICAP"
+      );
+
+    const homeHandicapEv =
+      conservativeEv(
+        homeHandicapProb,
+        odds.homeHandicap,
+        "HANDICAP"
+      );
+
+    picks.push(
+      {
+        gameId: game.gameId,
+        label:
+          `${game.awayTeamName} ` +
+          `${formatLine(
+            odds.awayHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.awayHandicap,
+        confidence:
+          awayHandicapProb,
+        ev: awayHandicapEv,
+        grade: grade(
+          conservativeProbability(
+            awayHandicapProb,
+            "HANDICAP"
+          ),
+          awayHandicapEv
+        ),
+      },
+      {
+        gameId: game.gameId,
+        label:
+          `${game.homeTeamName} ` +
+          `${formatLine(
+            odds.homeHandicapLine
+          )}`,
+        market: "HANDICAP",
+        odds: odds.homeHandicap,
+        confidence:
+          homeHandicapProb,
+        ev: homeHandicapEv,
+        grade: grade(
+          conservativeProbability(
+            homeHandicapProb,
+            "HANDICAP"
+          ),
+          homeHandicapEv
+        ),
+      }
+    );
+  }
+
+  // ----------------------------------------------------------
+  // TOTAL
+  //
+  // projectedTotal이 있으면 배당시장이 아닌
+  // 자체 예상 총득점을 이용해 O/U 확률을 만든다.
+  //
+  // 아직 v0.1 휴리스틱 모델이며
+  // 추후 실제 경기 결과로 분산/계수를 보정한다.
+  // ----------------------------------------------------------
+
+  const totalFair = fairTwoWay(
+    odds.overOdds,
+    odds.underOdds
+  );
+
+  if (
+    odds.totalLine !== null &&
+    odds.overOdds !== null &&
+    odds.underOdds !== null
+  ) {
+    let overProb: number | null = null;
+    let underProb: number | null = null;
+
+    if (
+      projectedTotal !== null &&
+      Number.isFinite(projectedTotal)
+    ) {
+      const runEdge =
+        projectedTotal -
+        odds.totalLine;
+
+      /*
+        총득점 차이를 확률로 변환.
+
+        기준점과 예상득점이 같으면 50%.
+
+        v0.2에서는 야구 득점 변동성을 반영해
+        확률을 기존보다 50% 쪽으로 축소한다.
+
+        약 1점 차이 = 58% 전후
+        약 2점 차이 = 66% 전후
+
+        지나친 확률을 막기 위해
+        30~70% 범위로 제한.
+      */
+      overProb = clamp(
+        1 /
+          (
+            1 +
+            Math.exp(
+              -runEdge / 4.5
+            )
+          ),
+        0.35,
+        0.65
+      );
+
+      underProb =
+        1 - overProb;
+    } else if (
+      totalFair.first !== null &&
+      totalFair.second !== null
+    ) {
+      // 자체 총득점 계산이 불가능할 때만 시장확률 fallback
+      overProb =
+        totalFair.first;
+
+      underProb =
+        totalFair.second;
+    }
+
+    if (
+      overProb !== null &&
+      underProb !== null
+    ) {
+      const overEv =
+        overProb *
+          odds.overOdds -
+        1;
+
+      const underEv =
+        underProb *
+          odds.underOdds -
+        1;
+
+      picks.push(
+        {
+          gameId: game.gameId,
+          label:
+            `오버 ${odds.totalLine}`,
+          market: "TOTAL",
+          odds: odds.overOdds,
+          confidence:
+            overProb,
+          ev:
+            overEv,
+          grade:
+            grade(
+              conservativeProbability(
+                overProb,
+                "TOTAL"
+              ),
+              overEv
+            ),
+        },
+        {
+          gameId: game.gameId,
+          label:
+            `언더 ${odds.totalLine}`,
+          market: "TOTAL",
+          odds: odds.underOdds,
+          confidence:
+            underProb,
+          ev:
+            underEv,
+          grade:
+            grade(
+              conservativeProbability(
+                underProb,
+                "TOTAL"
+              ),
+              underEv
+            ),
+        }
+      );
+    }
+  }
+
+  // ----------------------------------------------------------
+  // BEST MARKET RANKING
+  //
+  // 승패 / 핸디캡 / O-U 전체를 같은 후보군에서 비교한다.
+  //
+  // 단순 EV만 비교하면 낮은 신뢰도의 고배당 픽이
+  // 과도하게 1위가 될 수 있으므로
+  // EV + 모델 확률 + 등급을 함께 반영한다.
+  // ----------------------------------------------------------
+
+  const gradeBonus = (g: Pick["grade"]) => {
+    if (g === "A") return 0.08;
+    if (g === "B") return 0.04;
+    return 0;
+  };
+
+  const bestMarketScore = (pick: Pick) => {
+    if (!pick.odds || pick.ev === null) {
+      return -999;
+    }
+
+    const evScore =
+      Math.max(-0.20, Math.min(0.30, pick.ev));
+
+    const confidenceScore =
+      (pick.confidence - 0.50) * 0.70;
+
+    /*
+      TOTAL은 아직 시장 no-vig 기반 임시 모델이므로
+      완성된 득점예측 모델이 붙기 전까지 소폭 보수적으로 평가.
+      추천 후보에서는 제외하지 않는다.
+    */
+    const marketAdjustment =
+      pick.market === "TOTAL"
+        ? -0.045
+        : pick.market === "HANDICAP"
+          ? 0.005
+          : 0;
+
+    return (
+      evScore +
+      confidenceScore +
+      gradeBonus(pick.grade) +
+      marketAdjustment
+    );
+  };
+
+  return picks.sort(
+    (a, b) =>
+      bestMarketScore(b) -
+      bestMarketScore(a)
+  );
+}
+
+export function makeAutoCombos(
+  allPicks: Pick[]
+) {
+  /*
+    자동조합 v2
+
+    추천/비추천 여부와 관계없이
+    실제 배당이 있는 픽 중 모델 확률이 높은 순으로 조합한다.
+
+    1) 한 경기에서는 가장 확률 높은 픽 하나만 후보로 사용
+    2) 3폴 = 전체 중 확률 TOP 3
+    3) 4폴 = 3폴과 겹치지 않는 경기부터 우선
+    4) 부족한 자리는 TOP 확률 픽을 축으로 재사용
+       (3폴과 4폴 사이 중복은 허용)
+    5) 하나의 조합 내부에서는 같은 경기 중복 금지
+  */
+
+  const available =
+    allPicks
+      .filter(
+        (p) =>
+          !!p.odds &&
+          Number.isFinite(
+            p.confidence
+          )
+      )
+      .sort(
+        (a, b) => {
+          const confidenceDiff =
+            b.confidence -
+            a.confidence;
+
+          if (
+            Math.abs(
+              confidenceDiff
+            ) > 0.0001
+          ) {
+            return confidenceDiff;
+          }
+
+          return (
+            (b.ev ?? -999) -
+            (a.ev ?? -999)
+          );
+        }
+      );
+
+
+  // 경기별 확률 최고 픽 1개
+  const byGame =
+    new Map<string, Pick>();
+
+  for (const pick of available) {
+    if (
+      !byGame.has(
+        pick.gameId
+      )
+    ) {
+      byGame.set(
+        pick.gameId,
+        pick
+      );
+    }
+  }
+
+  const gamePicks =
+    [...byGame.values()]
+      .sort(
+        (a, b) =>
+          b.confidence -
+          a.confidence
+      );
+
+
+  const makeCombo = (
+    name: string,
+    selected: Pick[]
+  ) => ({
+    name,
+    picks: selected,
+    odds:
+      selected.reduce(
+        (acc, pick) =>
+          acc *
+          (pick.odds ?? 1),
+        1
+      ),
+  });
+
+
+  // 안정형 2폴
+  const two =
+    gamePicks.slice(0, 2);
+
+
+  // 확률 TOP 3
+  const three =
+    gamePicks.slice(0, 3);
+
+
+  /*
+    4폴은 3폴과 중복을 최대한 피한다.
+
+    예: 오늘 5경기라면
+    3폴 = A B C
+
+    4폴 구성 시
+    먼저 D E를 넣고
+    부족한 2자리는 A B 같은 최고확률 픽을
+    축으로 다시 사용.
+
+    단, 4폴 내부에는 같은 경기가 두 번 들어가지 않는다.
+  */
+  const threeGameIds =
+    new Set(
+      three.map(
+        (pick) =>
+          pick.gameId
+      )
+    );
+
+  const four: Pick[] = [];
+
+  // 먼저 3폴에 없는 경기
+  for (const pick of gamePicks) {
+    if (
+      four.length >= 4
+    ) {
+      break;
+    }
+
+    if (
+      !threeGameIds.has(
+        pick.gameId
+      )
+    ) {
+      four.push(pick);
+    }
+  }
+
+  // 부족하면 확률 높은 픽을 축으로 사용
+  for (const pick of gamePicks) {
+    if (
+      four.length >= 4
+    ) {
+      break;
+    }
+
+    if (
+      four.some(
+        (selected) =>
+          selected.gameId ===
+          pick.gameId
+      )
+    ) {
+      continue;
+    }
+
+    four.push(pick);
+  }
+
+
+  const combos = [];
+
+  if (two.length === 2) {
+    combos.push(
+      makeCombo(
+        "안정형 2폴",
+        two
+      )
+    );
+  }
+
+  if (three.length === 3) {
+    combos.push(
+      makeCombo(
+        "확률 TOP 3폴",
+        three
+      )
+    );
+  }
+
+  if (four.length === 4) {
+    combos.push(
+      makeCombo(
+        "확률 TOP 4폴",
+        four
+      )
+    );
+  }
+
+  return combos;
+}
+

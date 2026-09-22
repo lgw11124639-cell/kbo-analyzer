@@ -1,0 +1,302 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": [
+    {
+      "family": "ML_DIFF",
+      "bets": 10,
+      "wins": 3,
+      "losses": 7,
+      "hit": 30,
+      "avgOdds": 4.401,
+      "roi": 38.12,
+      "mdd": 5.46,
+      "losingStreak": 6,
+      "finalBank": 1038118,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 3,
+          "hit": 30,
+          "roi": 38.12
+        }
+      ]
+    },
+    {
+      "family": "HANDI_DIFF",
+      "bets": 10,
+      "wins": 3,
+      "losses": 7,
+      "hit": 30,
+      "avgOdds": 3.358,
+      "roi": -7.39,
+      "mdd": 2.94,
+      "losingStreak": 3,
+      "finalBank": 992605,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 3,
+          "hit": 30,
+          "roi": -7.39
+        }
+      ]
+    },
+    {
+      "family": "OVER",
+      "bets": 10,
+      "wins": 1,
+      "losses": 9,
+      "hit": 10,
+      "avgOdds": 4.572,
+      "roi": -61.04,
+      "mdd": 7.85,
+      "losingStreak": 8,
+      "finalBank": 938955,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 1,
+          "hit": 10,
+          "roi": -61.04
+        }
+      ]
+    },
+    {
+      "family": "UNDER",
+      "bets": 10,
+      "wins": 1,
+      "losses": 9,
+      "hit": 10,
+      "avgOdds": 4.422,
+      "roi": -50.26,
+      "mdd": 8.66,
+      "losingStreak": 9,
+      "finalBank": 949737,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 1,
+          "hit": 10,
+          "roi": -50.26
+        }
+      ]
+    },
+    {
+      "family": "TOTAL",
+      "bets": 10,
+      "wins": 1,
+      "losses": 9,
+      "hit": 10,
+      "avgOdds": 4.495,
+      "roi": -61.04,
+      "mdd": 7.85,
+      "losingStreak": 8,
+      "finalBank": 938955,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 1,
+          "hit": 10,
+          "roi": -61.04
+        }
+      ]
+    },
+    {
+      "family": "ANY_LEGAL",
+      "bets": 10,
+      "wins": 1,
+      "losses": 9,
+      "hit": 10,
+      "avgOdds": 4.471,
+      "roi": -61.04,
+      "mdd": 7.85,
+      "losingStreak": 8,
+      "finalBank": 938955,
+      "monthly": [
+        {
+          "month": "2026-04",
+          "bets": 10,
+          "wins": 1,
+          "hit": 10,
+          "roi": -61.04
+        }
+      ]
+    }
+  ],
+  "internal": [
+    {
+      "family": "ML_DIFF",
+      "bets": 35,
+      "wins": 7,
+      "losses": 28,
+      "hit": 20,
+      "avgOdds": 4.194,
+      "roi": -23.63,
+      "mdd": 16,
+      "losingStreak": 16,
+      "finalBank": 917311,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 3,
+          "hit": 15,
+          "roi": -44.57
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 4,
+          "hit": 26.67,
+          "roi": 4.3
+        }
+      ]
+    },
+    {
+      "family": "HANDI_DIFF",
+      "bets": 35,
+      "wins": 11,
+      "losses": 24,
+      "hit": 31.43,
+      "avgOdds": 3.201,
+      "roi": 2.6,
+      "mdd": 3.95,
+      "losingStreak": 4,
+      "finalBank": 1009105,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 7,
+          "hit": 35,
+          "roi": 16.5
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 4,
+          "hit": 26.67,
+          "roi": -15.93
+        }
+      ]
+    },
+    {
+      "family": "OVER",
+      "bets": 35,
+      "wins": 8,
+      "losses": 27,
+      "hit": 22.86,
+      "avgOdds": 4.343,
+      "roi": -0.13,
+      "mdd": 7.56,
+      "losingStreak": 6,
+      "finalBank": 999561,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 5,
+          "hit": 25,
+          "roi": 9.39
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 3,
+          "hit": 20,
+          "roi": -12.81
+        }
+      ]
+    },
+    {
+      "family": "UNDER",
+      "bets": 35,
+      "wins": 9,
+      "losses": 26,
+      "hit": 25.71,
+      "avgOdds": 4.407,
+      "roi": 15.25,
+      "mdd": 7.21,
+      "losingStreak": 6,
+      "finalBank": 1053373,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 6,
+          "hit": 30,
+          "roi": 35.82
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 3,
+          "hit": 20,
+          "roi": -12.18
+        }
+      ]
+    },
+    {
+      "family": "TOTAL",
+      "bets": 35,
+      "wins": 8,
+      "losses": 27,
+      "hit": 22.86,
+      "avgOdds": 4.308,
+      "roi": 0.15,
+      "mdd": 7.76,
+      "losingStreak": 6,
+      "finalBank": 1000514,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 5,
+          "hit": 25,
+          "roi": 9.39
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 3,
+          "hit": 20,
+          "roi": -12.18
+        }
+      ]
+    },
+    {
+      "family": "ANY_LEGAL",
+      "bets": 35,
+      "wins": 7,
+      "losses": 28,
+      "hit": 20,
+      "avgOdds": 4.157,
+      "roi": -22.02,
+      "mdd": 10.82,
+      "losingStreak": 7,
+      "finalBank": 922932,
+      "monthly": [
+        {
+          "month": "2026-05",
+          "bets": 20,
+          "wins": 4,
+          "hit": 20,
+          "roi": -29.4
+        },
+        {
+          "month": "2026-06",
+          "bets": 15,
+          "wins": 3,
+          "hit": 20,
+          "roi": -12.18
+        }
+      ]
+    }
+  ]
+}

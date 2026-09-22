@@ -1,0 +1,517 @@
+{
+  "version": 1,
+  "updatedAt": "2026-09-14T08:34:03.005Z",
+  "savedOdds": {
+    "20260913LTKT0": {
+      "awayMl": 2.24,
+      "homeMl": 1.51,
+      "awayHandicapLine": 1.5,
+      "homeHandicapLine": -1.5,
+      "awayHandicap": 1.75,
+      "homeHandicap": 1.96,
+      "totalLine": 9.5,
+      "overOdds": 1.72,
+      "underOdds": 1.99
+    },
+    "20260913NCOB0": {
+      "awayMl": 2.07,
+      "homeMl": 1.65,
+      "awayHandicapLine": 1.5,
+      "homeHandicapLine": -1.5,
+      "awayHandicap": 1.56,
+      "homeHandicap": 2.18,
+      "totalLine": 8.5,
+      "overOdds": 1.99,
+      "underOdds": 1.72
+    },
+    "20260913LGSS0": {
+      "awayMl": 1.77,
+      "homeMl": 1.94,
+      "awayHandicapLine": -1.5,
+      "homeHandicapLine": 1.5,
+      "awayHandicap": 2.1,
+      "homeHandicap": 1.62,
+      "totalLine": 11.5,
+      "overOdds": 1.88,
+      "underOdds": 1.7
+    },
+    "20260913HHHT0": {
+      "awayMl": 1.66,
+      "homeMl": 2.06,
+      "awayHandicapLine": -1.5,
+      "homeHandicapLine": 1.5,
+      "awayHandicap": 2.03,
+      "homeHandicap": 1.68,
+      "totalLine": 9.5,
+      "overOdds": 1.77,
+      "underOdds": 1.94
+    },
+    "20260912NCOB0": {
+      "awayMl": 1.94,
+      "homeMl": 1.77,
+      "awayHandicapLine": 1.5,
+      "homeHandicapLine": -1.5,
+      "awayHandicap": 1.47,
+      "homeHandicap": 2.29,
+      "totalLine": 7.5,
+      "overOdds": 1.82,
+      "underOdds": 1.82
+    },
+    "20260912LGSS0": {
+      "awayMl": 2.09,
+      "homeMl": 1.63,
+      "awayHandicapLine": 1.5,
+      "homeHandicapLine": -1.5,
+      "awayHandicap": 1.61,
+      "homeHandicap": 2.12,
+      "totalLine": 10.5,
+      "overOdds": 1.93,
+      "underOdds": 1.76
+    },
+    "20260912HTKT0": {
+      "awayMl": 2.1,
+      "homeMl": 1.62,
+      "awayHandicapLine": 1.5,
+      "homeHandicapLine": -1.5,
+      "awayHandicap": 1.59,
+      "homeHandicap": 2.14,
+      "totalLine": 9.5,
+      "overOdds": 1.78,
+      "underOdds": 1.68
+    },
+    "20260912LTWO0": {
+      "awayMl": 1.74,
+      "homeMl": 1.97,
+      "awayHandicapLine": -1.5,
+      "homeHandicapLine": 1.5,
+      "awayHandicap": 2.19,
+      "homeHandicap": 1.55,
+      "totalLine": 6.5,
+      "overOdds": 1.72,
+      "underOdds": 1.69
+    }
+  },
+  "lockedOdds": {
+    "20260913LTKT0": true,
+    "20260913NCOB0": true,
+    "20260913LGSS0": true,
+    "20260913HHHT0": true,
+    "20260912NCOB0": true,
+    "20260912LGSS0": true,
+    "20260912HTKT0": true,
+    "20260912LTWO0": true
+  },
+  "savedCombos": [
+    {
+      "id": "2026-09-13-BALANCED-1789360160266",
+      "date": "2026-09-13",
+      "savedAt": "2026-09-14T04:29:20.266Z",
+      "name": "혼합형 5폴",
+      "style": "BALANCED",
+      "odds": 13.991715869999997,
+      "probability": 0.07854188037115736,
+      "averageConfidence": 0.6050952325493876,
+      "averageEv": 0.0037757127410231297,
+      "stakeAmount": 25000,
+      "source": "BANKROLL",
+      "investmentProfile": "BALANCED",
+      "picks": [
+        {
+          "gameId": "20260913LTKT0",
+          "label": "KT 승",
+          "market": "ML",
+          "odds": 1.51,
+          "confidence": 0.7116133333333334,
+          "ev": 0.026605713333333503,
+          "grade": "B"
+        },
+        {
+          "gameId": "20260913LGSS0",
+          "label": "언더 11.5",
+          "market": "TOTAL",
+          "odds": 1.7,
+          "confidence": 0.65,
+          "ev": 0.10499999999999998,
+          "grade": "B"
+        },
+        {
+          "gameId": "20260913NCOB0",
+          "label": "두산 승",
+          "market": "ML",
+          "odds": 1.65,
+          "confidence": 0.5813383870967742,
+          "ev": -0.06092291209677425,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260913HHHT0",
+          "label": "한화 승",
+          "market": "ML",
+          "odds": 1.66,
+          "confidence": 0.5708598924731182,
+          "ev": -0.07001669172043035,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260913NCOB0",
+          "label": "오버 8.5",
+          "market": "TOTAL",
+          "odds": 1.99,
+          "confidence": 0.5116645498437119,
+          "ev": 0.01821245418898676,
+          "grade": "C"
+        }
+      ],
+      "oddsByGame": {
+        "20260913LTKT0": {
+          "awayMl": 2.24,
+          "homeMl": 1.51,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.75,
+          "homeHandicap": 1.96,
+          "totalLine": 9.5,
+          "overOdds": 1.72,
+          "underOdds": 1.99
+        },
+        "20260913LGSS0": {
+          "awayMl": 1.77,
+          "homeMl": 1.94,
+          "awayHandicapLine": -1.5,
+          "homeHandicapLine": 1.5,
+          "awayHandicap": 2.1,
+          "homeHandicap": 1.62,
+          "totalLine": 11.5,
+          "overOdds": 1.88,
+          "underOdds": 1.7
+        },
+        "20260913NCOB0": {
+          "awayMl": 2.07,
+          "homeMl": 1.65,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.56,
+          "homeHandicap": 2.18,
+          "totalLine": 8.5,
+          "overOdds": 1.99,
+          "underOdds": 1.72
+        },
+        "20260913HHHT0": {
+          "awayMl": 1.66,
+          "homeMl": 2.06,
+          "awayHandicapLine": -1.5,
+          "homeHandicapLine": 1.5,
+          "awayHandicap": 2.03,
+          "homeHandicap": 1.68,
+          "totalLine": 9.5,
+          "overOdds": 1.77,
+          "underOdds": 1.94
+        }
+      },
+      "games": {
+        "20260913LTKT0": {
+          "awayTeamName": "롯데",
+          "homeTeamName": "KT",
+          "stadium": "수원"
+        },
+        "20260913LGSS0": {
+          "awayTeamName": "LG",
+          "homeTeamName": "삼성",
+          "stadium": "대구"
+        },
+        "20260913NCOB0": {
+          "awayTeamName": "NC",
+          "homeTeamName": "두산",
+          "stadium": "잠실"
+        },
+        "20260913HHHT0": {
+          "awayTeamName": "한화",
+          "homeTeamName": "KIA",
+          "stadium": "광주"
+        }
+      }
+    },
+    {
+      "id": "2026-09-13-HIGH_ODDS-1789360160266",
+      "date": "2026-09-13",
+      "savedAt": "2026-09-14T04:29:20.266Z",
+      "name": "공격형 3폴",
+      "style": "HIGH_ODDS",
+      "odds": 5.3186729999999995,
+      "probability": 0.19638594892099986,
+      "averageConfidence": 0.5875469012921134,
+      "averageEv": -0.00016987994664274808,
+      "stakeAmount": 35000,
+      "source": "BANKROLL",
+      "investmentProfile": "BALANCED",
+      "picks": [
+        {
+          "gameId": "20260913LTKT0",
+          "label": "KT 승",
+          "market": "ML",
+          "odds": 1.51,
+          "confidence": 0.7116133333333334,
+          "ev": 0.026605713333333503,
+          "grade": "B"
+        },
+        {
+          "gameId": "20260913HHHT0",
+          "label": "오버 9.5",
+          "market": "TOTAL",
+          "odds": 1.77,
+          "confidence": 0.5393628206992946,
+          "ev": -0.04532780736224851,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260913NCOB0",
+          "label": "오버 8.5",
+          "market": "TOTAL",
+          "odds": 1.99,
+          "confidence": 0.5116645498437119,
+          "ev": 0.01821245418898676,
+          "grade": "C"
+        }
+      ],
+      "oddsByGame": {
+        "20260913LTKT0": {
+          "awayMl": 2.24,
+          "homeMl": 1.51,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.75,
+          "homeHandicap": 1.96,
+          "totalLine": 9.5,
+          "overOdds": 1.72,
+          "underOdds": 1.99
+        },
+        "20260913HHHT0": {
+          "awayMl": 1.66,
+          "homeMl": 2.06,
+          "awayHandicapLine": -1.5,
+          "homeHandicapLine": 1.5,
+          "awayHandicap": 2.03,
+          "homeHandicap": 1.68,
+          "totalLine": 9.5,
+          "overOdds": 1.77,
+          "underOdds": 1.94
+        },
+        "20260913NCOB0": {
+          "awayMl": 2.07,
+          "homeMl": 1.65,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.56,
+          "homeHandicap": 2.18,
+          "totalLine": 8.5,
+          "overOdds": 1.99,
+          "underOdds": 1.72
+        }
+      },
+      "games": {
+        "20260913LTKT0": {
+          "awayTeamName": "롯데",
+          "homeTeamName": "KT",
+          "stadium": "수원"
+        },
+        "20260913HHHT0": {
+          "awayTeamName": "한화",
+          "homeTeamName": "KIA",
+          "stadium": "광주"
+        },
+        "20260913NCOB0": {
+          "awayTeamName": "NC",
+          "homeTeamName": "두산",
+          "stadium": "잠실"
+        }
+      }
+    },
+    {
+      "id": "2026-09-13-SAFE-1789360160266",
+      "date": "2026-09-13",
+      "savedAt": "2026-09-14T04:29:20.266Z",
+      "name": "방어형 2폴",
+      "style": "SAFE",
+      "odds": 2.8049999999999997,
+      "probability": 0.37786995161290327,
+      "averageConfidence": 0.6156691935483871,
+      "averageEv": 0.022038543951612866,
+      "stakeAmount": 40000,
+      "source": "BANKROLL",
+      "investmentProfile": "BALANCED",
+      "picks": [
+        {
+          "gameId": "20260913LGSS0",
+          "label": "언더 11.5",
+          "market": "TOTAL",
+          "odds": 1.7,
+          "confidence": 0.65,
+          "ev": 0.10499999999999998,
+          "grade": "B"
+        },
+        {
+          "gameId": "20260913NCOB0",
+          "label": "두산 승",
+          "market": "ML",
+          "odds": 1.65,
+          "confidence": 0.5813383870967742,
+          "ev": -0.06092291209677425,
+          "grade": "C"
+        }
+      ],
+      "oddsByGame": {
+        "20260913LGSS0": {
+          "awayMl": 1.77,
+          "homeMl": 1.94,
+          "awayHandicapLine": -1.5,
+          "homeHandicapLine": 1.5,
+          "awayHandicap": 2.1,
+          "homeHandicap": 1.62,
+          "totalLine": 11.5,
+          "overOdds": 1.88,
+          "underOdds": 1.7
+        },
+        "20260913NCOB0": {
+          "awayMl": 2.07,
+          "homeMl": 1.65,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.56,
+          "homeHandicap": 2.18,
+          "totalLine": 8.5,
+          "overOdds": 1.99,
+          "underOdds": 1.72
+        }
+      },
+      "games": {
+        "20260913LGSS0": {
+          "awayTeamName": "LG",
+          "homeTeamName": "삼성",
+          "stadium": "대구"
+        },
+        "20260913NCOB0": {
+          "awayTeamName": "NC",
+          "homeTeamName": "두산",
+          "stadium": "잠실"
+        }
+      }
+    },
+    {
+      "id": "2026-09-12-SAFE-1789358096220",
+      "date": "2026-09-12",
+      "savedAt": "2026-09-14T03:54:56.220Z",
+      "name": "방어형 4폴 #5",
+      "style": "SAFE",
+      "odds": 7.1103289499999995,
+      "probability": 0.09349243197292798,
+      "averageConfidence": 0.5534866658661332,
+      "averageEv": -0.11271327640943213,
+      "picks": [
+        {
+          "gameId": "20260912LTWO0",
+          "label": "키움 +1.5",
+          "market": "HANDICAP",
+          "odds": 1.55,
+          "confidence": 0.5834647641725643,
+          "ev": -0.12150369242602022,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260912HTKT0",
+          "label": "KIA +1.5",
+          "market": "HANDICAP",
+          "odds": 1.59,
+          "confidence": 0.5637754447807662,
+          "ev": -0.12387763423886533,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260912LGSS0",
+          "label": "삼성 승",
+          "market": "ML",
+          "odds": 1.63,
+          "confidence": 0.5490053763440861,
+          "ev": -0.11710305107526875,
+          "grade": "C"
+        },
+        {
+          "gameId": "20260912NCOB0",
+          "label": "두산 승",
+          "market": "ML",
+          "odds": 1.77,
+          "confidence": 0.5177010781671159,
+          "ev": -0.08836872789757422,
+          "grade": "C"
+        }
+      ],
+      "oddsByGame": {
+        "20260912LTWO0": {
+          "awayMl": 1.74,
+          "homeMl": 1.97,
+          "awayHandicapLine": -1.5,
+          "homeHandicapLine": 1.5,
+          "awayHandicap": 2.19,
+          "homeHandicap": 1.55,
+          "totalLine": 6.5,
+          "overOdds": 1.72,
+          "underOdds": 1.69
+        },
+        "20260912HTKT0": {
+          "awayMl": 2.1,
+          "homeMl": 1.62,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.59,
+          "homeHandicap": 2.14,
+          "totalLine": 9.5,
+          "overOdds": 1.78,
+          "underOdds": 1.68
+        },
+        "20260912LGSS0": {
+          "awayMl": 2.09,
+          "homeMl": 1.63,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.61,
+          "homeHandicap": 2.12,
+          "totalLine": 10.5,
+          "overOdds": 1.93,
+          "underOdds": 1.76
+        },
+        "20260912NCOB0": {
+          "awayMl": 1.94,
+          "homeMl": 1.77,
+          "awayHandicapLine": 1.5,
+          "homeHandicapLine": -1.5,
+          "awayHandicap": 1.47,
+          "homeHandicap": 2.29,
+          "totalLine": 7.5,
+          "overOdds": 1.82,
+          "underOdds": 1.82
+        }
+      },
+      "games": {
+        "20260912LTWO0": {
+          "awayTeamName": "롯데",
+          "homeTeamName": "키움",
+          "stadium": "고척"
+        },
+        "20260912HTKT0": {
+          "awayTeamName": "KIA",
+          "homeTeamName": "KT",
+          "stadium": "수원"
+        },
+        "20260912LGSS0": {
+          "awayTeamName": "LG",
+          "homeTeamName": "삼성",
+          "stadium": "대구"
+        },
+        "20260912NCOB0": {
+          "awayTeamName": "NC",
+          "homeTeamName": "두산",
+          "stadium": "잠실"
+        }
+      }
+    }
+  ]
+}

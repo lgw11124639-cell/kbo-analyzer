@@ -1,0 +1,4213 @@
+*{box-sizing:border-box}html,body{margin:0;background:#f4f7fb;color:#172033;font-family:Arial,"Noto Sans KR",sans-serif}button,input{font:inherit}.shell{display:grid;grid-template-columns:210px 1fr;min-height:100vh}.sidebar{background:#0f1b2d;color:#fff;padding:22px 14px;display:flex;flex-direction:column;gap:24px}.brand{font-size:18px;display:flex;gap:7px;align-items:center}.brand small{font-size:11px;color:#7fa6d7}.sidebar nav{display:grid;gap:7px}.sidebar nav a{padding:11px 12px;border-radius:10px;color:#b7c6dc}.sidebar nav a.active{background:#2b72e8;color:#fff;font-weight:700}.collector{margin-top:auto;border:1px solid #263b58;border-radius:12px;padding:12px;display:grid;gap:8px;font-size:12px;color:#a9bad1}.collector b{color:#fff}.collector span:nth-of-type(-n+2){color:#68d4a3}.content{padding:24px;min-width:0}header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}h1{margin:0;font-size:27px}header p,.sectionTitle p{margin:5px 0 0;color:#758197;font-size:13px}.headerActions{display:flex;gap:8px}.headerActions input,.headerActions button{border:1px solid #d9e1ec;background:white;border-radius:10px;padding:10px 12px}.gameGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.gameCard{background:#fff;border:1px solid #dfe6ef;border-radius:14px;padding:14px;box-shadow:0 2px 8px #15233b0b}.cardTop{display:flex;gap:8px;align-items:center;font-size:12px;color:#78859a}.cardTop b{font-size:14px;color:#172033}.status{margin-left:auto;background:#f0f4f9;border-radius:999px;padding:4px 8px}.matchup{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:9px;margin:18px 0 8px}.matchup strong{display:block;font-size:20px}.matchup small{color:#8390a3}.matchup em{font-size:11px;color:#9aa5b4;font-style:normal}.right{text-align:right}.starters{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:#536075;border-top:1px solid #eef2f6;padding-top:10px}.scoreLine{text-align:center;font-weight:800;font-size:18px;margin-top:5px}.oddsRow{display:grid;grid-template-columns:1fr 1fr .8fr;gap:6px;margin-top:11px}.oddsRow label{font-size:10px;color:#748195}.oddsRow input{width:100%;border:1px solid #dfe6ef;border-radius:8px;padding:8px;margin-top:3px}.recommend{margin-top:10px;border-radius:9px;padding:9px 10px;display:flex;align-items:center;gap:7px;font-size:12px;background:#f2f6fb}.recommend span{color:#68778d}.recommend small{margin-left:auto}.gradeA{background:#e9f8ef}.gradeB{background:#eef5ff}.gradeC{background:#f4f5f7}.comboSection{margin-top:22px}.sectionTitle{display:flex;justify-content:space-between;align-items:end}.sectionTitle h2{margin:0}.comboGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}.comboCard,.emptyCombo,.nextBox{background:#fff;border:1px solid #dfe6ef;border-radius:14px;padding:15px}.comboCard h3{margin:0;font-size:16px}.comboCard>strong{display:block;font-size:27px;margin:7px 0}.comboCard ol{list-style:none;padding:0;margin:8px 0;display:grid;gap:6px}.comboCard li{display:grid;grid-template-columns:1fr auto auto;gap:7px;font-size:13px;align-items:center}.comboCard li em{font-style:normal;background:#e9f8ef;border-radius:6px;padding:2px 5px}.comboCard button{width:100%;border:0;border-radius:8px;padding:9px;color:#8290a4}.emptyCombo{color:#7c899c}.nextBox{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px}.nextBox small{color:#718096}.error{background:#fff0f0;border:1px solid #ffd3d3;color:#a43c3c;padding:12px;border-radius:10px;margin-bottom:12px}.loading{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:35px;text-align:center;color:#718096}@media(max-width:1050px){.gameGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.comboGrid{grid-template-columns:1fr 1fr}}@media(max-width:760px){.shell{display:block}.sidebar{padding:12px}.sidebar nav,.collector{display:none}.content{padding:12px}header{align-items:flex-start;flex-direction:column}.gameGrid,.comboGrid{grid-template-columns:1fr}.headerActions{width:100%}.headerActions input{flex:1}.matchup strong{font-size:18px}}
+
+.oddsMarkets {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.marketBlock {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.marketTitle {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+.marketBlock .oddsRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.marketBlock .oddsRow label {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .marketBlock .oddsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.starterCompare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.starterBox {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.starterBox.right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.starterLabel {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.starterBox b {
+  font-size: 14px;
+}
+
+.starterBox small {
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.starterBox em {
+  font-size: 10px;
+  font-style: normal;
+  color: #94a3b8;
+}
+
+.starterVs {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+@media (max-width: 720px) {
+  .starterCompare {
+    grid-template-columns: 1fr;
+  }
+
+  .starterVs {
+    display: none;
+  }
+
+  .starterBox.right {
+    text-align: left;
+    align-items: flex-start;
+    padding-top: 8px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+  }
+}
+
+
+.starterAnalysis {
+  margin: -3px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.06);
+}
+
+.starterAnalysisTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.starterAnalysisTop b {
+  font-size: 12px;
+}
+
+.starterAnalysisTop span {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.starterMeters {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.starterMeters > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1px 8px;
+  padding: 7px 8px;
+  background: rgba(255,255,255,.55);
+  border-radius: 8px;
+}
+
+.starterMeters span {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.starterMeters strong {
+  grid-row: span 2;
+  font-size: 18px;
+}
+
+.starterMeters small {
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.starterReasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.starterReasons span {
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(148,163,184,.12);
+  font-size: 9px;
+  color: #64748b;
+}
+
+@media (max-width: 720px) {
+  .starterAnalysisTop {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .starterMeters {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.teamFormCompare {
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.teamFormTitle {
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.teamFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 28px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.teamFormBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.teamFormBox.right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.teamFormBox b {
+  font-size: 12px;
+}
+
+.teamFormBox strong {
+  font-size: 13px;
+}
+
+.teamFormBox span {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.teamFormBox small {
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.teamFormVs {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.teamFormEdge {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .teamFormGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .teamFormVs {
+    display: none;
+  }
+
+  .teamFormBox.right {
+    padding-top: 7px;
+    border-top: 1px solid rgba(148,163,184,.1);
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+
+
+.bullpenCompare {
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: rgba(15,23,42,.13);
+  border: 1px solid rgba(148,163,184,.13);
+}
+
+.bullpenTitle {
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.bullpenGrid {
+  display: grid;
+  grid-template-columns: 1fr 28px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.bullpenBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bullpenBox.right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.bullpenBox b {
+  font-size: 12px;
+}
+
+.bullpenBox strong {
+  font-size: 13px;
+}
+
+.bullpenBox span {
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.bullpenBox small {
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.bullpenVs {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.bullpenEdge {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(148,163,184,.12);
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .bullpenGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bullpenVs {
+    display: none;
+  }
+
+  .bullpenBox.right {
+    padding-top: 7px;
+    border-top: 1px solid rgba(148,163,184,.1);
+    text-align: left;
+    align-items: flex-start;
+  }
+}
+
+
+/* =========================================================
+   LINEUP MATCHUP MINI
+   ========================================================= */
+
+.lineupMini {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+.lineupMiniHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.lineupMiniHead b {
+  font-size: 13px;
+}
+
+.lineupMiniHead span {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+.lineupMiniTeams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.lineupMiniTeams > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.lineupMiniTeams .right {
+  flex-direction: row-reverse;
+}
+
+.lineupMiniTeams strong {
+  font-size: 13px;
+}
+
+.lineupMiniTeams b {
+  font-size: 18px;
+}
+
+.lineupMiniTeams em {
+  font-size: 10px;
+  opacity: 0.4;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.lineupMiniEdge {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lineupMiniWaiting {
+  padding: 5px 0;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .lineupMini {
+    padding: 11px;
+  }
+
+  .lineupMiniHead span {
+    font-size: 10px;
+  }
+}
+
+
+
+
+/* =========================================================
+
+   KBO ANALYZER UI REDESIGN v1
+
+   ========================================================= */
+
+
+
+:root {
+
+  --ui-bg: #f4f7fb;
+
+  --ui-card: #ffffff;
+
+  --ui-sidebar: #0b1830;
+
+  --ui-sidebar-2: #102443;
+
+  --ui-primary: #2563eb;
+
+  --ui-primary-soft: #eff6ff;
+
+  --ui-border: #e4eaf2;
+
+  --ui-text: #152033;
+
+  --ui-muted: #7d899c;
+
+  --ui-shadow: 0 10px 30px rgba(15, 31, 55, 0.07);
+
+}
+
+
+
+/* 전체 레이아웃 */
+
+html,
+
+body {
+
+  background: var(--ui-bg);
+
+}
+
+
+
+body {
+
+  margin: 0;
+
+  color: var(--ui-text);
+
+}
+
+
+
+.shell {
+
+  min-height: 100vh;
+
+  background: var(--ui-bg);
+
+}
+
+
+
+/* 왼쪽 네비게이션 */
+
+.sidebar {
+
+  background:
+
+    linear-gradient(180deg, var(--ui-sidebar) 0%, var(--ui-sidebar-2) 100%);
+
+  border-right: 0;
+
+  box-shadow: 6px 0 24px rgba(8, 24, 48, 0.08);
+
+}
+
+
+
+.sidebar .brand {
+
+  padding: 26px 22px 22px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+
+
+.sidebar .brand b {
+
+  font-size: 18px;
+
+  letter-spacing: -0.4px;
+
+}
+
+
+
+.sidebar .brand small {
+
+  opacity: 0.5;
+
+  margin-left: 6px;
+
+}
+
+
+
+.sidebar nav {
+
+  padding: 18px 12px;
+
+}
+
+
+
+.sidebar nav a {
+
+  margin-bottom: 6px;
+
+  border-radius: 10px;
+
+  padding: 12px 14px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  transition: 0.18s ease;
+
+}
+
+
+
+.sidebar nav a:hover {
+
+  background: rgba(255, 255, 255, 0.07);
+
+}
+
+
+
+.sidebar nav a.active {
+
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.28);
+
+}
+
+
+
+/* 본문 */
+
+.content {
+
+  padding: 28px 32px 48px;
+
+  max-width: 1600px;
+
+  width: 100%;
+
+  margin: 0 auto;
+
+}
+
+
+
+/* 상단 헤더 */
+
+.header {
+
+  background: var(--ui-card);
+
+  border: 1px solid var(--ui-border);
+
+  border-radius: 18px;
+
+  padding: 22px 24px;
+
+  margin-bottom: 22px;
+
+  box-shadow: var(--ui-shadow);
+
+}
+
+
+
+.header h1 {
+
+  margin: 0;
+
+  font-size: 26px;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.7px;
+
+}
+
+
+
+.header p {
+
+  color: var(--ui-muted);
+
+  margin-top: 7px;
+
+  margin-bottom: 0;
+
+  font-size: 13px;
+
+}
+
+
+
+.headerActions {
+
+  gap: 10px;
+
+}
+
+
+
+.headerActions input,
+
+.headerActions button {
+
+  min-height: 42px;
+
+  border-radius: 10px;
+
+}
+
+
+
+.headerActions button {
+
+  border: 1px solid var(--ui-border);
+
+  background: #fff;
+
+  font-weight: 700;
+
+  padding: 0 15px;
+
+  transition: 0.15s ease;
+
+}
+
+
+
+.headerActions button:hover {
+
+  border-color: #b8c7dc;
+
+  background: #f8fafc;
+
+}
+
+
+
+/* 경기 카드 그리드 */
+
+.gameGrid {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+
+  align-items: start;
+
+}
+
+
+
+/* GameCard 루트가 어떤 클래스든 첫 레벨 카드 공통 스타일 */
+
+.gameGrid > * {
+
+  background: var(--ui-card);
+
+  border: 1px solid var(--ui-border);
+
+  border-radius: 18px;
+
+  box-shadow: var(--ui-shadow);
+
+  overflow: hidden;
+
+  transition:
+
+    transform 0.18s ease,
+
+    box-shadow 0.18s ease,
+
+    border-color 0.18s ease;
+
+}
+
+
+
+.gameGrid > *:hover {
+
+  transform: translateY(-2px);
+
+  border-color: #cad6e6;
+
+  box-shadow: 0 16px 38px rgba(15, 31, 55, 0.1);
+
+}
+
+
+
+/* 카드 내부 공통 요소를 조금 더 촘촘하게 */
+
+.gameGrid section {
+
+  border-color: var(--ui-border);
+
+}
+
+
+
+.gameGrid input {
+
+  border-radius: 8px;
+
+}
+
+
+
+.gameGrid button {
+
+  border-radius: 9px;
+
+}
+
+
+
+/* 타선 매치업 */
+
+.lineupMini {
+
+  margin: 10px 12px;
+
+  padding: 12px 13px;
+
+  background: #f8fafc;
+
+  border: 1px solid var(--ui-border);
+
+  border-radius: 12px;
+
+}
+
+
+
+.lineupMiniHead {
+
+  margin-bottom: 9px;
+
+}
+
+
+
+.lineupMiniTeams {
+
+  gap: 8px;
+
+}
+
+
+
+.lineupMiniTeams strong {
+
+  font-size: 12px;
+
+  color: #475569;
+
+}
+
+
+
+.lineupMiniTeams b {
+
+  font-size: 19px;
+
+  letter-spacing: -0.5px;
+
+}
+
+
+
+.lineupMiniTeams em {
+
+  color: #94a3b8;
+
+  opacity: 1;
+
+}
+
+
+
+.lineupMiniEdge {
+
+  border-top-color: #e5eaf1;
+
+  color: #334155;
+
+}
+
+
+
+/* 오류/로딩 */
+
+.error,
+
+.loading {
+
+  background: #fff;
+
+  border: 1px solid var(--ui-border);
+
+  border-radius: 14px;
+
+  padding: 24px;
+
+  box-shadow: var(--ui-shadow);
+
+}
+
+
+
+/* 태블릿 */
+
+@media (max-width: 1250px) {
+
+  .gameGrid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  }
+
+
+
+  .content {
+
+    padding: 24px;
+
+  }
+
+}
+
+
+
+/* 모바일 */
+
+@media (max-width: 760px) {
+
+  .shell {
+
+    display: block;
+
+  }
+
+
+
+  .sidebar {
+
+    position: static;
+
+    width: 100%;
+
+    min-height: auto;
+
+  }
+
+
+
+  .sidebar .brand {
+
+    padding: 16px 18px;
+
+  }
+
+
+
+  .sidebar nav {
+
+    display: flex;
+
+    overflow-x: auto;
+
+    padding: 8px 12px 12px;
+
+    gap: 7px;
+
+  }
+
+
+
+  .sidebar nav a {
+
+    flex: 0 0 auto;
+
+    margin: 0;
+
+    white-space: nowrap;
+
+    padding: 10px 13px;
+
+  }
+
+
+
+  .content {
+
+    padding: 16px 12px 32px;
+
+  }
+
+
+
+  .header {
+
+    border-radius: 14px;
+
+    padding: 17px;
+
+  }
+
+
+
+  .header h1 {
+
+    font-size: 22px;
+
+  }
+
+
+
+  .gameGrid {
+
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+
+  }
+
+
+
+  .gameGrid > * {
+
+    border-radius: 14px;
+
+  }
+
+}
+
+
+
+
+
+
+/* =========================================================
+
+   KBO ANALYZER - COMPACT GAME CARD UI v1
+
+   ========================================================= */
+
+
+
+.gameCard {
+
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  border: 1px solid #dbe3ee;
+
+  background: #ffffff;
+
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+
+  transition:
+
+    box-shadow 0.2s ease,
+
+    transform 0.2s ease,
+
+    border-color 0.2s ease;
+
+}
+
+
+
+.gameCard:hover {
+
+  border-color: #c5d3e5;
+
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.09);
+
+}
+
+
+
+/* 접힌 상태에서는 핵심 정보만 */
+
+.gameCard.isCompact .teamFormCompare,
+
+.gameCard.isCompact .bullpenCompare,
+
+.gameCard.isCompact .lineupMini,
+
+.gameCard.isCompact .oddsSection,
+
+.gameCard.isCompact .oddsBox,
+
+.gameCard.isCompact .analysisBox {
+
+  display: none !important;
+
+}
+
+
+
+/* 선발 영역은 요약 정보라 항상 표시 */
+
+.gameCard.isCompact .starterCompare {
+
+  margin-top: 10px;
+
+}
+
+
+
+/* 상세 버튼 */
+
+.gameDetailToggle {
+
+  width: calc(100% - 24px);
+
+  margin: 12px 12px 8px;
+
+  min-height: 42px;
+
+  padding: 0 14px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+
+
+  border: 1px solid #d9e2ef;
+
+  border-radius: 11px;
+
+  background: #f8fafc;
+
+
+
+  color: #334155;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+
+
+  cursor: pointer;
+
+  transition:
+
+    background 0.15s ease,
+
+    border-color 0.15s ease;
+
+}
+
+
+
+.gameDetailToggle:hover {
+
+  background: #f1f5f9;
+
+  border-color: #bfcee0;
+
+}
+
+
+
+.gameDetailToggle b {
+
+  font-size: 10px;
+
+  color: #64748b;
+
+}
+
+
+
+/* 추천픽을 카드 핵심 CTA처럼 */
+
+.gameCard .recommend {
+
+  margin: 8px 12px 12px;
+
+  min-height: 52px;
+
+  border-radius: 12px;
+
+  padding: 10px 12px;
+
+
+
+  display: grid;
+
+  grid-template-columns: auto 1fr auto;
+
+  align-items: center;
+
+  gap: 9px;
+
+}
+
+
+
+.gameCard .recommend > span {
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.04em;
+
+}
+
+
+
+.gameCard .recommend > b {
+
+  font-size: 14px;
+
+  font-weight: 900;
+
+}
+
+
+
+.gameCard .recommend > small {
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+
+/* 펼쳐진 카드 */
+
+.gameCard.isExpanded {
+
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.11);
+
+}
+
+
+
+.gameCard.isExpanded .gameDetailToggle {
+
+  background: #eef4ff;
+
+  border-color: #c7d7f5;
+
+  color: #2563eb;
+
+}
+
+
+
+/* 모바일 */
+
+@media (max-width: 700px) {
+
+  .gameCard {
+
+    border-radius: 15px;
+
+  }
+
+
+
+  .gameDetailToggle {
+
+    margin-left: 10px;
+
+    margin-right: 10px;
+
+    width: calc(100% - 20px);
+
+  }
+
+
+
+  .gameCard .recommend {
+
+    margin-left: 10px;
+
+    margin-right: 10px;
+
+  }
+
+}
+
+
+
+
+/* =========================================================
+   KBO CARD VISUAL UPGRADE
+   ========================================================= */
+
+.gameCard {
+  --away-color: #334155;
+  --away-soft: #f1f5f9;
+  --home-color: #475569;
+  --home-soft: #f8fafc;
+
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px !important;
+  background: #fff;
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.08),
+    0 2px 7px rgba(15, 23, 42, 0.04);
+}
+
+/* ---------- 원정팀 컬러 ---------- */
+
+.gameCard[data-away="nc"] {
+  --away-color: #174a7e;
+  --away-soft: #e8f5f7;
+}
+
+.gameCard[data-away="doosan"] {
+  --away-color: #131230;
+  --away-soft: #eef0f7;
+}
+
+.gameCard[data-away="lg"] {
+  --away-color: #c6003d;
+  --away-soft: #fff0f4;
+}
+
+.gameCard[data-away="samsung"] {
+  --away-color: #1261c9;
+  --away-soft: #edf5ff;
+}
+
+.gameCard[data-away="hanwha"] {
+  --away-color: #f26b21;
+  --away-soft: #fff3eb;
+}
+
+.gameCard[data-away="kia"] {
+  --away-color: #d71920;
+  --away-soft: #fff0f0;
+}
+
+.gameCard[data-away="lotte"] {
+  --away-color: #041e42;
+  --away-soft: #eef2f8;
+}
+
+.gameCard[data-away="ssg"] {
+  --away-color: #ce0e2d;
+  --away-soft: #fff0f3;
+}
+
+.gameCard[data-away="kt"] {
+  --away-color: #171717;
+  --away-soft: #f1f1f1;
+}
+
+.gameCard[data-away="kiwoom"] {
+  --away-color: #6f263d;
+  --away-soft: #f7eef1;
+}
+
+
+/* ---------- 홈팀 컬러 ---------- */
+
+.gameCard[data-home="nc"] {
+  --home-color: #174a7e;
+  --home-soft: #e8f5f7;
+}
+
+.gameCard[data-home="doosan"] {
+  --home-color: #131230;
+  --home-soft: #eef0f7;
+}
+
+.gameCard[data-home="lg"] {
+  --home-color: #c6003d;
+  --home-soft: #fff0f4;
+}
+
+.gameCard[data-home="samsung"] {
+  --home-color: #1261c9;
+  --home-soft: #edf5ff;
+}
+
+.gameCard[data-home="hanwha"] {
+  --home-color: #f26b21;
+  --home-soft: #fff3eb;
+}
+
+.gameCard[data-home="kia"] {
+  --home-color: #d71920;
+  --home-soft: #fff0f0;
+}
+
+.gameCard[data-home="lotte"] {
+  --home-color: #041e42;
+  --home-soft: #eef2f8;
+}
+
+.gameCard[data-home="ssg"] {
+  --home-color: #ce0e2d;
+  --home-soft: #fff0f3;
+}
+
+.gameCard[data-home="kt"] {
+  --home-color: #171717;
+  --home-soft: #f1f1f1;
+}
+
+.gameCard[data-home="kiwoom"] {
+  --home-color: #6f263d;
+  --home-soft: #f7eef1;
+}
+
+
+/* ---------- 경기 상단 ---------- */
+
+.gameCard .cardTop {
+  border-bottom: 0;
+  padding-bottom: 8px;
+}
+
+.gameCard .matchup {
+  margin: 0 -18px 18px;
+  padding: 20px 20px;
+  background:
+    linear-gradient(
+      105deg,
+      var(--away-color) 0%,
+      var(--away-color) 47%,
+      var(--home-color) 53%,
+      var(--home-color) 100%
+    );
+  color: white;
+  box-shadow: inset 0 -1px 0 rgba(255,255,255,.12);
+}
+
+.gameCard .matchup strong {
+  color: #fff !important;
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+}
+
+.gameCard .matchup small {
+  color: rgba(255,255,255,.76) !important;
+  font-weight: 700;
+}
+
+.gameCard .matchup em {
+  color: rgba(255,255,255,.8);
+  font-weight: 900;
+  font-style: normal;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.13);
+  backdrop-filter: blur(8px);
+}
+
+
+/* ---------- 선발투수 ---------- */
+
+.gameCard .starterCompare {
+  position: relative;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+}
+
+.gameCard .starterBox {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: 14px !important;
+  background: linear-gradient(145deg, #fff, var(--away-soft));
+  border: 1px solid color-mix(in srgb, var(--away-color) 20%, #e2e8f0);
+}
+
+.gameCard .starterBox.right {
+  background: linear-gradient(215deg, #fff, var(--home-soft));
+  border-color: color-mix(in srgb, var(--home-color) 20%, #e2e8f0);
+}
+
+.gameCard .starterIdentity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 9px;
+}
+
+.gameCard .starterIdentity.right {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.gameCard .starterIdentityText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gameCard .starterIdentityText b {
+  font-size: 17px;
+  line-height: 1.25;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gameCard .starterLabel {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: -.2px;
+  color: #64748b;
+}
+
+.gameCard .starterPhoto {
+  position: relative;
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+  overflow: hidden;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--away-color);
+  color: white;
+  font-size: 22px;
+  font-weight: 900;
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--away-color) 55%, white),
+    0 8px 18px rgba(15,23,42,.15);
+}
+
+.gameCard .homeStarter .starterPhoto {
+  background: var(--home-color);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--home-color) 55%, white),
+    0 8px 18px rgba(15,23,42,.15);
+}
+
+.gameCard .starterPhoto span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.gameCard .starterPhoto img {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  background: #eef2f7;
+}
+
+.gameCard .starterBox > small {
+  display: block;
+  margin-top: 7px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.gameCard .starterBox > em {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  font-style: normal;
+  color: #64748b;
+}
+
+.gameCard .starterVs {
+  z-index: 3;
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 7px 8px;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(15,23,42,.15);
+}
+
+
+/* ---------- 분석 블록 ---------- */
+
+.gameCard .starterAnalysis,
+.gameCard .teamFormCompare,
+.gameCard .bullpenCompare,
+.gameCard .lineupMini {
+  border-radius: 14px;
+}
+
+.gameCard .starterAnalysis {
+  margin-top: 12px;
+  border-left: 4px solid var(--away-color);
+}
+
+
+/* ---------- 상세보기 버튼 ---------- */
+
+.gameCard .gameDetailToggle {
+  border: 1px solid #dbe3ee;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 900;
+  transition: .18s ease;
+}
+
+.gameCard .gameDetailToggle:hover {
+  background: #eef2f7;
+  transform: translateY(-1px);
+}
+
+
+/* ---------- 추천 영역 ---------- */
+
+.gameCard .recommend {
+  margin-top: 14px;
+  border-radius: 15px;
+  padding: 13px 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: none;
+}
+
+.gameCard .recommend.gradeA {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-color: #86efac;
+  color: #166534;
+}
+
+.gameCard .recommend.gradeB {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.gameCard .recommend.gradeC {
+  background: linear-gradient(135deg, #fff7ed, #ffedd5);
+  border-color: #fdba74;
+  color: #c2410c;
+}
+
+.gameCard .recommend b {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.gameCard .recommend small {
+  font-weight: 800;
+}
+
+
+/* ---------- 모바일 ---------- */
+
+@media (max-width: 720px) {
+  .gameCard .matchup {
+    margin-left: -14px;
+    margin-right: -14px;
+    padding: 17px 15px;
+  }
+
+  .gameCard .matchup strong {
+    font-size: 20px;
+  }
+
+  .gameCard .starterPhoto {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .gameCard .starterIdentityText b {
+    font-size: 15px;
+  }
+}
+
+
+/* =========================================================
+   COMPACT ODDS PANELS
+   ========================================================= */
+
+.gameCard .oddsSection,
+.gameCard .oddsBox {
+  margin-top: 8px !important;
+  padding: 9px 10px !important;
+  border-radius: 12px !important;
+  min-height: 0 !important;
+}
+
+.gameCard .oddsSection h3,
+.gameCard .oddsSection h4,
+.gameCard .oddsBox h3,
+.gameCard .oddsBox h4 {
+  margin: 0 0 6px !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+}
+
+.gameCard .oddsSection label,
+.gameCard .oddsBox label {
+  margin: 0 !important;
+  font-size: 9px !important;
+  line-height: 1.1 !important;
+}
+
+.gameCard .oddsSection input,
+.gameCard .oddsBox input {
+  height: 27px !important;
+  min-height: 27px !important;
+  padding: 3px 7px !important;
+  border-radius: 7px !important;
+  font-size: 10px !important;
+}
+
+.gameCard .oddsSection > div,
+.gameCard .oddsBox > div {
+  gap: 6px !important;
+}
+
+.gameCard .oddsSection {
+  gap: 6px !important;
+}
+
+/* 상세분석을 닫았을 때 더 압축 */
+.gameCard.isCompact .oddsSection,
+.gameCard.isCompact .oddsBox {
+  padding: 7px 9px !important;
+  margin-top: 6px !important;
+}
+
+/* 카드 내부 전체 세로 간격도 조금 축소 */
+.gameCard.isCompact {
+  gap: 7px !important;
+}
+
+.gameCard.isCompact .starterAnalysis {
+  margin-top: 8px !important;
+  margin-bottom: 6px !important;
+}
+
+/* 모바일 */
+@media (max-width: 720px) {
+  .gameCard .oddsSection,
+  .gameCard .oddsBox {
+    padding: 7px !important;
+  }
+
+  .gameCard .oddsSection input,
+  .gameCard .oddsBox input {
+    height: 26px !important;
+    min-height: 26px !important;
+  }
+}
+
+
+/* =========================================================
+   COMPACT MARKET UI v2
+   ========================================================= */
+
+.gameCard .marketBlock {
+  display: grid !important;
+  grid-template-columns: 72px 1fr !important;
+  align-items: center !important;
+  gap: 8px !important;
+
+  min-height: 54px !important;
+  margin-top: 7px !important;
+  padding: 8px 10px !important;
+
+  border-radius: 13px !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.gameCard .marketTitle {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.15 !important;
+  font-weight: 900 !important;
+  color: #334155 !important;
+  white-space: nowrap !important;
+}
+
+.gameCard .marketTitle small {
+  margin-top: 3px;
+  font-size: 8px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.gameCard .oddsRow {
+  display: grid !important;
+  grid-auto-flow: column !important;
+  grid-auto-columns: minmax(0, 1fr) !important;
+  gap: 6px !important;
+  align-items: end !important;
+}
+
+.gameCard .oddsRow label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 8px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+.gameCard .oddsRow label > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gameCard .oddsRow input {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 26px !important;
+  min-height: 26px !important;
+
+  padding: 2px 7px !important;
+  border-radius: 7px !important;
+
+  font-size: 10px !important;
+  font-weight: 800 !important;
+}
+
+
+/* 핸디캡 : 홈 기준점 + 원정배당 + 홈배당 */
+
+.gameCard .handicapCompactRow {
+  grid-template-columns: 1.12fr 1fr 1fr !important;
+  grid-auto-flow: unset !important;
+}
+
+.gameCard .handicapLineInput input {
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+
+/* =========================================================
+   STARTER CARD — 줄바꿈 방지
+   ========================================================= */
+
+.gameCard .starterBox > small {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.35px !important;
+}
+
+.gameCard .starterBox > em {
+  white-space: nowrap !important;
+  overflow: visible !important;
+
+  font-size: 9.5px !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.35px !important;
+}
+
+.gameCard .starterBox {
+  min-width: 0 !important;
+}
+
+.gameCard .starterIdentity {
+  margin-bottom: 7px !important;
+}
+
+
+/* 시장 전체 높이 축소 */
+
+.gameCard .oddsPanel,
+.gameCard .markets,
+.gameCard .marketArea {
+  gap: 6px !important;
+}
+
+
+/* 모바일 */
+
+@media (max-width: 720px) {
+  .gameCard .marketBlock {
+    grid-template-columns: 65px 1fr !important;
+    padding: 7px 8px !important;
+  }
+
+  .gameCard .marketTitle {
+    font-size: 11px !important;
+  }
+
+  .gameCard .starterBox > small {
+    font-size: 9px !important;
+  }
+
+  .gameCard .starterBox > em {
+    font-size: 8.5px !important;
+  }
+}
+
+
+/* =========================================================
+   DETAIL ANALYSIS REDESIGN v1
+   ========================================================= */
+
+/* 기본 화면에서는 선발 우위도 숨김 */
+.gameCard.isCompact .starterAnalysis {
+  display: none !important;
+}
+
+/* 상세 열었을 때만 분석 카드 표시 */
+.gameCard.isExpanded .starterAnalysis,
+.gameCard.isExpanded .teamFormCompare,
+.gameCard.isExpanded .bullpenCompare,
+.gameCard.isExpanded .lineupMini {
+  display: block !important;
+}
+
+
+/* =========================================================
+   상세 분석 전체 영역
+   ========================================================= */
+
+.gameCard.isExpanded .starterAnalysis,
+.gameCard.isExpanded .teamFormCompare,
+.gameCard.isExpanded .bullpenCompare,
+.gameCard.isExpanded .lineupMini {
+  position: relative;
+
+  margin-top: 10px !important;
+  padding: 14px 15px !important;
+
+  background: #ffffff !important;
+
+  border: 1px solid #dbe4ee !important;
+  border-radius: 14px !important;
+
+  box-shadow:
+    0 3px 10px rgba(15, 23, 42, 0.05),
+    0 1px 2px rgba(15, 23, 42, 0.04);
+
+  color: #0f172a !important;
+}
+
+
+/* =========================================================
+   선발 우위
+   ========================================================= */
+
+.gameCard.isExpanded .starterAnalysis {
+  border-left: 5px solid var(--away-color) !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--away-color) 7%, white),
+      #ffffff 48%
+    ) !important;
+}
+
+.gameCard.isExpanded .starterAnalysisTop {
+  margin-bottom: 9px !important;
+}
+
+.gameCard.isExpanded .starterAnalysisTop b {
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+.gameCard.isExpanded .starterAnalysisTop span,
+.gameCard.isExpanded .starterAnalysisTop small {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+}
+
+
+/* 선발 점수 */
+
+.gameCard.isExpanded .starterAnalysis strong {
+  font-size: 19px !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+.gameCard.isExpanded .starterAnalysis small {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+  color: #64748b !important;
+}
+
+
+/* 선발 이유 태그 */
+
+.gameCard.isExpanded .starterAnalysis span {
+  font-size: 10px;
+}
+
+.gameCard.isExpanded .starterAnalysis .tag,
+.gameCard.isExpanded .starterAnalysis em {
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+
+/* =========================================================
+   최근 10경기 팀 폼
+   ========================================================= */
+
+.gameCard.isExpanded .teamFormCompare {
+  border-left: 5px solid #2563eb !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #eff6ff 0%,
+      #ffffff 25%
+    ) !important;
+}
+
+.gameCard.isExpanded .teamFormCompare::before {
+  content: "최근 10경기";
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: #2563eb;
+}
+
+
+/* =========================================================
+   불펜
+   ========================================================= */
+
+.gameCard.isExpanded .bullpenCompare {
+  border-left: 5px solid #7c3aed !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #f5f3ff 0%,
+      #ffffff 25%
+    ) !important;
+}
+
+.gameCard.isExpanded .bullpenCompare::before {
+  content: "최근 3일 불펜";
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: #7c3aed;
+}
+
+
+/* =========================================================
+   타선 매치업
+   ========================================================= */
+
+.gameCard.isExpanded .lineupMini {
+  border-left: 5px solid #059669 !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ecfdf5 0%,
+      #ffffff 25%
+    ) !important;
+}
+
+.gameCard.isExpanded .lineupMini::before {
+  content: "타선 매치업";
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: #059669;
+}
+
+
+/* =========================================================
+   상세카드 공통 텍스트 확대
+   ========================================================= */
+
+.gameCard.isExpanded .teamFormCompare b,
+.gameCard.isExpanded .bullpenCompare b,
+.gameCard.isExpanded .lineupMini b {
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+.gameCard.isExpanded .teamFormCompare strong,
+.gameCard.isExpanded .bullpenCompare strong,
+.gameCard.isExpanded .lineupMini strong {
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+.gameCard.isExpanded .teamFormCompare span,
+.gameCard.isExpanded .bullpenCompare span,
+.gameCard.isExpanded .lineupMini span {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  color: #334155 !important;
+}
+
+.gameCard.isExpanded .teamFormCompare small,
+.gameCard.isExpanded .bullpenCompare small,
+.gameCard.isExpanded .lineupMini small {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+}
+
+
+/* 가운데 VS */
+
+.gameCard.isExpanded .teamFormCompare em,
+.gameCard.isExpanded .bullpenCompare em,
+.gameCard.isExpanded .lineupMini em {
+  font-size: 11px !important;
+  font-style: normal !important;
+  font-weight: 900 !important;
+  color: #64748b !important;
+}
+
+
+/* =========================================================
+   상세 결과 하단 강조 문구
+   ========================================================= */
+
+.gameCard.isExpanded .teamFormCompare > :last-child,
+.gameCard.isExpanded .bullpenCompare > :last-child,
+.gameCard.isExpanded .lineupMini > :last-child {
+  font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   상세보기 버튼
+   ========================================================= */
+
+.gameCard .gameDetailToggle {
+  height: 38px !important;
+  margin-top: 9px !important;
+
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+
+  font-size: 12px !important;
+  font-weight: 900 !important;
+
+  color: #0f172a !important;
+}
+
+.gameCard.isExpanded .gameDetailToggle {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #1d4ed8 !important;
+}
+
+
+/* =========================================================
+   기존 회색 배경 강제 제거
+   ========================================================= */
+
+.gameCard.isExpanded .teamFormCompare *,
+.gameCard.isExpanded .bullpenCompare *,
+.gameCard.isExpanded .lineupMini *,
+.gameCard.isExpanded .starterAnalysis * {
+  text-shadow: none !important;
+}
+
+
+/* =========================================================
+   카드 전체 기본 글씨 약간 확대
+   ========================================================= */
+
+.gameCard {
+  font-size: 12px;
+}
+
+.gameCard .marketTitle {
+  font-size: 13px !important;
+}
+
+.gameCard .oddsRow label {
+  font-size: 9px !important;
+}
+
+.gameCard .oddsRow input {
+  font-size: 11px !important;
+  height: 29px !important;
+  min-height: 29px !important;
+}
+
+
+/* =========================================================
+   모바일
+   ========================================================= */
+
+@media (max-width: 720px) {
+  .gameCard.isExpanded .starterAnalysis,
+  .gameCard.isExpanded .teamFormCompare,
+  .gameCard.isExpanded .bullpenCompare,
+  .gameCard.isExpanded .lineupMini {
+    padding: 12px !important;
+  }
+
+  .gameCard.isExpanded .teamFormCompare strong,
+  .gameCard.isExpanded .bullpenCompare strong,
+  .gameCard.isExpanded .lineupMini strong {
+    font-size: 15px !important;
+  }
+}
+
+
+/* =========================================================
+   ODDS SAVE / LOCK
+   ========================================================= */
+
+.gameCard .oddsSaveBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-top: 9px;
+  padding: 9px 11px;
+
+  border: 1px solid #dbe4ee;
+  border-radius: 12px;
+
+  background: #f8fafc;
+}
+
+.gameCard .oddsSaveBar > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gameCard .oddsSaveBar b {
+  font-size: 11px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.gameCard .oddsSaveBar small {
+  margin-top: 2px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.gameCard .oddsSaveBar button {
+  flex: 0 0 auto;
+
+  height: 30px;
+  padding: 0 12px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.gameCard .oddsSaveBar.isLocked {
+  background: #ecfdf5;
+  border-color: #86efac;
+}
+
+.gameCard .oddsSaveBar.isLocked b {
+  color: #166534;
+}
+
+.gameCard .oddsSaveBar.isLocked button {
+  background: #166534;
+}
+
+.gameCard .oddsSaveBar button:hover {
+  filter: brightness(.96);
+}
+
+
+/* =========================================================
+   TOTAL ANALYSIS CARD
+   ========================================================= */
+
+.totalAnalysis {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-left: 5px solid #7c3aed;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f5f3ff, #ffffff 40%);
+}
+
+.totalAnalysisHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 11px;
+}
+
+.totalAnalysisHead b {
+  font-size: 13px;
+  font-weight: 900;
+  color: #6d28d9;
+}
+
+.totalAnalysisHead strong {
+  font-size: 16px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.totalAnalysisGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.totalAnalysisGrid > div {
+  padding: 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  text-align: center;
+}
+
+.totalAnalysisGrid span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.totalAnalysisGrid b {
+  display: block;
+  font-size: 16px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.totalAnalysisGrid small {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.totalAnalysisEdge {
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #6d28d9;
+}
+
+@media (max-width: 720px) {
+  .totalAnalysisGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .totalAnalysisHead {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* =========================================================
+   MARKET PROBABILITY DETAIL
+   ========================================================= */
+
+.marketProbabilityAnalysis {
+  margin-top: 10px;
+  padding: 14px 15px;
+
+  border: 1px solid #bfdbfe;
+  border-left: 5px solid #2563eb;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #eff6ff 0%,
+      #ffffff 30%
+    );
+}
+
+.marketProbabilityHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+
+  border-bottom: 1px solid #dbeafe;
+}
+
+.marketProbabilityHead b {
+  display: block;
+
+  font-size: 14px;
+  font-weight: 950;
+
+  color: #1d4ed8;
+}
+
+.marketProbabilityHead small {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  color: #64748b;
+}
+
+
+.marketProbabilitySection {
+  margin-top: 10px;
+}
+
+.marketProbabilitySection > strong {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  color: #334155;
+}
+
+
+.marketProbabilityPair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.marketProbabilityPair > div {
+  min-width: 0;
+
+  padding: 9px 10px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.marketProbabilityPair span {
+  display: block;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  margin-bottom: 3px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  color: #64748b;
+}
+
+.marketProbabilityPair b {
+  display: block;
+
+  font-size: 17px;
+  font-weight: 950;
+
+  color: #0f172a;
+}
+
+.marketProbabilityPair small {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  color: #475569;
+}
+
+.marketProbabilityNote {
+  margin-top: 10px;
+  padding-top: 8px;
+
+  border-top: 1px dashed #cbd5e1;
+
+  text-align: center;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  color: #64748b;
+}
+
+
+@media (max-width: 720px) {
+  .marketProbabilityAnalysis {
+    padding: 12px;
+  }
+
+  .marketProbabilityPair b {
+    font-size: 15px;
+  }
+}
+
+
+/* =========================================================
+   LINEUP PLAYER DETAIL V1
+   ========================================================= */
+
+.lineupAnalysis {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.lineupAnalysisHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lineupAnalysisHead > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lineupAnalysisHead b {
+  font-size: 14px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.lineupAnalysisHead small {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.lineupAnalysisHead > span {
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.lineupAnalysisHead .confirmed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.lineupAnalysisHead .waiting {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.lineupScoreCompare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lineupScoreCompare > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+}
+
+.lineupScoreCompare > div:last-child {
+  justify-content: flex-end;
+}
+
+.lineupScoreCompare span {
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.lineupScoreCompare strong {
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.lineupScoreCompare small {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.lineupScoreCompare em {
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 950;
+  color: #94a3b8;
+}
+
+.lineupWhy {
+  margin-bottom: 12px;
+  padding: 11px;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+
+.lineupWhy > b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 950;
+  color: #1e40af;
+}
+
+.lineupWhyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.lineupWhyGrid > div {
+  min-width: 0;
+}
+
+.lineupWhyGrid strong {
+  font-size: 10px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.lineupWhyGrid ul {
+  margin: 5px 0 0;
+  padding-left: 15px;
+}
+
+.lineupWhyGrid li {
+  margin: 3px 0;
+  font-size: 9px;
+  line-height: 1.35;
+  color: #475569;
+  font-weight: 700;
+}
+
+.lineupPlayerColumns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.lineupTeamColumn {
+  min-width: 0;
+}
+
+.lineupTeamTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+  padding: 0 2px;
+}
+
+.lineupTeamTitle strong {
+  font-size: 12px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.lineupTeamTitle span {
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.lineupPlayerList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lineupPlayerRow {
+  display: grid;
+  grid-template-columns: 25px 38px minmax(0,1fr);
+  gap: 7px;
+  align-items: start;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  background: white;
+}
+
+.lineupOrder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: white;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.lineupPlayerPhoto {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #e2e8f0;
+}
+
+.lineupPlayerPhoto span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 950;
+  color: #64748b;
+}
+
+.lineupPlayerPhoto img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lineupPlayerBody {
+  min-width: 0;
+}
+
+.lineupPlayerName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lineupPlayerName strong {
+  font-size: 11px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.lineupPlayerName span {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #f1f5f9;
+  font-size: 8px;
+  font-weight: 900;
+  color: #64748b;
+}
+
+.lineupPlayerStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.lineupPlayerStats span {
+  font-size: 8px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.lineupPlayerStats b {
+  color: #0f172a;
+}
+
+.lineupBvp {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 5px;
+  padding: 5px 6px;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.lineupBvp span {
+  font-size: 8px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.lineupBvp b {
+  font-size: 8px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.lineupScoreFlow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.lineupScoreFlow span {
+  font-size: 8px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.lineupScoreFlow span b {
+  color: #0f172a;
+}
+
+.lineupScoreFlow i {
+  font-size: 8px;
+  font-style: normal;
+  color: #94a3b8;
+}
+
+.lineupScoreFlow em {
+  padding: 2px 4px;
+  border-radius: 5px;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 950;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.lineupScoreFlow em.plus {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.lineupScoreFlow em.minus {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.lineupVerdict {
+  margin-top: 5px;
+  font-size: 8px;
+  font-weight: 950;
+}
+
+.lineupVerdict.strongPlus,
+.lineupVerdict.plus {
+  color: #15803d;
+}
+
+.lineupVerdict.strongMinus,
+.lineupVerdict.minus {
+  color: #dc2626;
+}
+
+.lineupVerdict.neutral {
+  color: #64748b;
+}
+
+.lineupFinalEdge {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  margin-top: 12px;
+  padding: 10px 11px;
+  border-radius: 11px;
+  background: #0f172a;
+  color: white;
+}
+
+.lineupFinalEdge span {
+  font-size: 9px;
+  font-weight: 800;
+  color: #94a3b8;
+}
+
+.lineupFinalEdge b {
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.lineupFinalEdge small {
+  grid-column: 1 / -1;
+  font-size: 8px;
+  color: #cbd5e1;
+}
+
+.lineupWaitingBox {
+  padding: 14px;
+  border-radius: 10px;
+  background: white;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+@media (max-width: 760px) {
+  .lineupPlayerColumns,
+  .lineupWhyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .lineupScoreCompare > div {
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+  }
+}
+
+/* =========================================================
+   AUTO COMBO UI V3
+   ========================================================= */
+
+.autoComboSection {
+  margin-top: 22px;
+  padding: 15px;
+  border: 1px solid #dbe4ef;
+  border-radius: 17px;
+  background: #f8fafc;
+}
+
+.autoComboHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 13px;
+}
+
+.autoComboTitle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.autoComboTitle > span {
+  display: flex;
+  width: 35px;
+  height: 35px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 18px;
+}
+
+.autoComboTitle h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.autoComboTitle p {
+  margin: 3px 0 0;
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.autoComboHeaderBadges {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.autoComboHeaderBadges > span {
+  padding: 5px 8px;
+  border: 1px solid #dbe4ef;
+  border-radius: 999px;
+  background: white;
+  font-size: 8px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.autoComboHeaderBadges button {
+  height: 31px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 8px;
+  background: #0f172a;
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.autoComboGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(5,minmax(0,1fr));
+  gap: 9px;
+}
+
+.autoComboCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 390px;
+  padding: 11px;
+  border: 1px solid #dbe4ef;
+  border-radius: 14px;
+  background: white;
+  overflow: hidden;
+}
+
+.autoComboCard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+}
+
+.autoComboCard.safe::before {
+  background: #16a34a;
+}
+
+.autoComboCard.top::before {
+  background: #2563eb;
+}
+
+.autoComboCard.balanced::before {
+  background: #f59e0b;
+}
+
+.autoComboCard.aggressive::before {
+  background: #f43f5e;
+}
+
+.autoComboCard.highOdds::before {
+  background: #7c3aed;
+}
+
+.autoComboCard.safe {
+  background:
+    linear-gradient(
+      180deg,
+      #f0fdf4 0,
+      white 70px
+    );
+}
+
+.autoComboCard.top {
+  background:
+    linear-gradient(
+      180deg,
+      #eff6ff 0,
+      white 70px
+    );
+}
+
+.autoComboCard.balanced {
+  background:
+    linear-gradient(
+      180deg,
+      #fffbeb 0,
+      white 70px
+    );
+}
+
+.autoComboCard.aggressive {
+  background:
+    linear-gradient(
+      180deg,
+      #fff1f2 0,
+      white 70px
+    );
+}
+
+.autoComboCard.highOdds {
+  background:
+    linear-gradient(
+      180deg,
+      #f5f3ff 0,
+      white 70px
+    );
+}
+
+.autoComboCardHead {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 38px;
+}
+
+.autoComboCardIcon {
+  display: flex;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 2px 8px rgba(15,23,42,.08);
+  font-size: 15px;
+}
+
+.autoComboCardTitle {
+  min-width: 0;
+}
+
+.autoComboCardTitle h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.autoComboCardTitle span {
+  display: block;
+  margin-top: 2px;
+  font-size: 7px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.autoComboOdds {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 11px 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.autoComboOdds span {
+  font-size: 8px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.autoComboOdds strong {
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.autoComboCard.safe
+.autoComboOdds strong {
+  color: #15803d;
+}
+
+.autoComboCard.top
+.autoComboOdds strong {
+  color: #2563eb;
+}
+
+.autoComboCard.balanced
+.autoComboOdds strong {
+  color: #d97706;
+}
+
+.autoComboCard.aggressive
+.autoComboOdds strong {
+  color: #e11d48;
+}
+
+.autoComboCard.highOdds
+.autoComboOdds strong {
+  color: #7c3aed;
+}
+
+.autoComboPicks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.autoComboPick {
+  display: grid;
+  grid-template-columns:
+    22px
+    minmax(0,1fr)
+    auto
+    22px;
+  gap: 5px;
+  align-items: center;
+  padding: 6px 5px;
+  border-radius: 8px;
+  background: rgba(248,250,252,.92);
+}
+
+.autoComboPickNo {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #1e293b;
+  color: white;
+  font-size: 8px;
+  font-weight: 950;
+}
+
+.autoComboPickMain {
+  min-width: 0;
+}
+
+.autoComboPickMain > div {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.autoComboPickMain strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.autoComboPickMain small {
+  display: block;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 7px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.autoComboMarket {
+  flex: 0 0 auto;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 6px;
+  font-weight: 950;
+}
+
+.autoComboMarket.market-ml {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.autoComboMarket.market-handicap {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.autoComboMarket.market-total {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.autoComboPickOdds {
+  font-size: 8px;
+  font-weight: 900;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.autoComboGrade {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 8px;
+  font-weight: 950;
+}
+
+.autoComboGrade.grade-A {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.autoComboGrade.grade-B {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.autoComboGrade.grade-C {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.autoComboMetrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.autoComboMetrics > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+  padding: 6px;
+  border: 1px solid #edf1f5;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.autoComboMetrics span {
+  font-size: 7px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.autoComboMetrics b {
+  font-size: 8px;
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.autoComboMetrics b.positive {
+  color: #15803d;
+}
+
+.autoComboMetrics b.negative {
+  color: #dc2626;
+}
+
+.autoComboMetrics
+[class*="risk-low"] {
+  color: #15803d;
+}
+
+.autoComboMetrics
+[class*="risk-medium"] {
+  color: #d97706;
+}
+
+.autoComboMetrics
+[class*="risk-high"],
+.autoComboMetrics
+[class*="risk-veryHigh"] {
+  color: #dc2626;
+}
+
+.autoComboProbability {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 7px;
+  padding: 6px 7px;
+  border-radius: 7px;
+  background: #f1f5f9;
+}
+
+.autoComboProbability span {
+  font-size: 7px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.autoComboProbability b {
+  font-size: 9px;
+  font-weight: 950;
+  color: #334155;
+}
+
+.autoComboSave {
+  width: 100%;
+  height: 31px;
+  margin-top: 7px;
+  border: 0;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-size: 8px;
+  font-weight: 950;
+}
+
+.autoComboSave:disabled {
+  opacity: .82;
+  cursor: default;
+}
+
+.autoComboEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 30px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: white;
+  text-align: center;
+}
+
+.autoComboEmpty b {
+  font-size: 12px;
+}
+
+.autoComboEmpty span {
+  font-size: 9px;
+  color: #64748b;
+}
+
+
+@media (max-width: 1400px) {
+  .autoComboGrid {
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 950px) {
+  .autoComboGrid {
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .autoComboHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .autoComboHeaderBadges {
+    justify-content: flex-start;
+  }
+
+  .autoComboGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .autoComboCard {
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   SAVED AUTO COMBO RESULT UI V1
+========================================================= */
+
+.savedComboSection {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #dbe4ee;
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fafc 100%
+    );
+}
+
+.savedComboHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.savedComboHeader h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.savedComboHeader p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.savedComboHeader > span {
+  flex-shrink: 0;
+  padding: 7px 11px;
+  border: 1px solid #dbe4ee;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.savedComboGrid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(320px, 1fr)
+    );
+  gap: 16px;
+}
+
+.savedComboCard {
+  overflow: hidden;
+  border: 1px solid #dbe4ee;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow:
+    0 8px 28px
+    rgba(15, 23, 42, 0.06);
+}
+
+.savedComboCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e8eef5;
+  background:
+    linear-gradient(
+      135deg,
+      #f8fafc,
+      #eef4fa
+    );
+}
+
+.savedComboCardHead h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.savedComboCardHead > b {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #0f172a;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.savedComboPicks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+}
+
+.savedComboPick {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto
+    auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid #e5ebf1;
+  border-radius: 14px;
+  background: #fbfdff;
+}
+
+.savedComboPick > div:first-child {
+  min-width: 0;
+}
+
+.savedComboPick strong {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 900;
+  color: #0f172a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.savedComboPick small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.savedComboPickScore {
+  min-width: 58px;
+  padding: 5px 8px;
+  border-radius: 9px;
+  background: #eef2f7;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.savedComboPick > b {
+  min-width: 62px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.savedComboSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-top: 1px solid #e8eef5;
+  background: #f8fafc;
+}
+
+.savedComboSummary span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.savedComboSummary strong {
+  margin-left: 4px;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.savedComboEmpty {
+  padding: 28px 18px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+@media (max-width: 700px) {
+  .savedComboSection {
+    padding: 16px;
+  }
+
+  .savedComboHeader {
+    flex-direction: column;
+  }
+
+  .savedComboGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .savedComboPick {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+  }
+
+  .savedComboPickScore {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+
+
+/* =========================================================
+   DESKTOP FIVE GAME GRID + DETAIL LINEUP FIRST V1
+========================================================= */
+
+/*
+  접힌 카드에서는 무거운 선수별 라인업 분석을 숨긴다.
+  상세 열기 시 기존 DOM 순서상 시장별 확률보다 먼저
+  라인업이 위치하므로 상세 화면 최상단 분석으로 표시된다.
+*/
+.gameCard.isCompact .lineupAnalysis {
+  display: none;
+}
+
+.gameCard.isExpanded .lineupAnalysis {
+  display: block;
+}
+
+
+/*
+  자동조합 결과 배지
+*/
+.autoComboResultBadge {
+  margin-left: auto;
+  flex: 0 0 auto;
+
+  padding:
+    7px 9px;
+
+  border-radius:
+    999px;
+
+  font-size:
+    11px;
+
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
+
+  background:
+    #eef2f7;
+
+  color:
+    #64748b;
+}
+
+.autoComboResultBadge.status-win {
+  background:
+    #dcfce7;
+
+  color:
+    #15803d;
+}
+
+.autoComboResultBadge.status-loss {
+  background:
+    #fee2e2;
+
+  color:
+    #b91c1c;
+}
+
+.autoComboResultBadge.status-live {
+  background:
+    #fef3c7;
+
+  color:
+    #b45309;
+}
+
+.autoComboResultBadge.status-void {
+  background:
+    #e2e8f0;
+
+  color:
+    #475569;
+}
+
+.autoComboResultBadge.status-pending {
+  background:
+    #e0f2fe;
+
+  color:
+    #0369a1;
+}
+
+
+/*
+  넓은 PC에서는 정규 KBO 5경기를
+  한 줄에 전부 볼 수 있게 한다.
+*/
+@media (min-width: 1450px) {
+
+  .gameGrid {
+    grid-template-columns:
+      repeat(
+        5,
+        minmax(0, 1fr)
+      ) !important;
+
+    gap:
+      10px !important;
+
+    align-items:
+      start;
+  }
+
+  /*
+    상세를 열면 해당 경기만 전체 너비 사용.
+  */
+  .gameGrid >
+  .gameCard.isExpanded {
+    grid-column:
+      1 / -1;
+  }
+
+  .gameCard.isCompact {
+    padding:
+      11px !important;
+
+    border-radius:
+      16px;
+  }
+
+  .gameCard.isCompact
+  .cardTop {
+    font-size:
+      10px;
+  }
+
+  .gameCard.isCompact
+  .cardTop b {
+    font-size:
+      12px;
+  }
+
+  .gameCard.isCompact
+  .matchup {
+    margin:
+      12px 0 7px;
+
+    gap:
+      4px;
+  }
+
+  .gameCard.isCompact
+  .matchup strong {
+    font-size:
+      16px;
+  }
+
+  .gameCard.isCompact
+  .matchup small {
+    font-size:
+      10px;
+  }
+
+  .gameCard.isCompact
+  .starters {
+    gap:
+      5px;
+
+    font-size:
+      10px;
+  }
+
+  .gameCard.isCompact
+  .scoreLine {
+    font-size:
+      16px;
+  }
+
+  .gameCard.isCompact
+  .recommend {
+    font-size:
+      11px;
+  }
+
+}
+
+
+/*
+  중간 화면은 3경기
+*/
+@media (
+  min-width: 1000px
+) and (
+  max-width: 1449px
+) {
+
+  .gameGrid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  .gameGrid >
+  .gameCard.isExpanded {
+    grid-column:
+      1 / -1;
+  }
+}
+
+
+/*
+  태블릿 2경기
+*/
+@media (
+  min-width: 761px
+) and (
+  max-width: 999px
+) {
+
+  .gameGrid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      ) !important;
+  }
+
+  .gameGrid >
+  .gameCard.isExpanded {
+    grid-column:
+      1 / -1;
+  }
+}
+
+
+
+
+/* =========================================================
+   EXPANDED DETAIL FONT + POSITION UI V1
+========================================================= */
+
+/*
+  상세화면 전체 기본 크기
+*/
+.gameCard.isExpanded {
+  font-size: 16px;
+}
+
+
+/*
+  상세 상단 경기정보
+*/
+.gameCard.isExpanded .cardTop {
+  font-size: 14px;
+}
+
+.gameCard.isExpanded .cardTop b {
+  font-size: 17px;
+}
+
+.gameCard.isExpanded .matchup strong {
+  font-size: 28px;
+}
+
+.gameCard.isExpanded .matchup small {
+  font-size: 14px;
+}
+
+
+/*
+  선발투수 카드
+*/
+.gameCard.isExpanded .starterBox {
+  padding: 18px;
+}
+
+.gameCard.isExpanded .starterLabel {
+  font-size: 13px;
+}
+
+.gameCard.isExpanded .starterIdentityText b {
+  font-size: 20px;
+}
+
+.gameCard.isExpanded .starterBox small {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.gameCard.isExpanded .starterBox em {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.gameCard.isExpanded .starterPhoto {
+  width: 62px;
+  height: 62px;
+}
+
+.gameCard.isExpanded .starterPhoto img {
+  width: 62px;
+  height: 62px;
+}
+
+
+/*
+  선발 / 최근10경기 / 불펜 분석 텍스트
+*/
+.gameCard.isExpanded .starterEdge,
+.gameCard.isExpanded .bullpenEdge {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+
+/*
+  라인업 상세 제목
+*/
+.gameCard.isExpanded .lineupAnalysisHead b {
+  font-size: 21px;
+}
+
+.gameCard.isExpanded .lineupAnalysisHead small {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.gameCard.isExpanded .lineupAnalysisHead > span {
+  font-size: 13px;
+  padding: 7px 11px;
+}
+
+
+/*
+  라인업 선수 카드
+*/
+.gameCard.isExpanded .lineupPlayerRow {
+  padding: 14px 15px;
+  min-height: 92px;
+}
+
+.gameCard.isExpanded .lineupOrder {
+  width: 34px;
+  height: 34px;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.gameCard.isExpanded .lineupPlayerPhoto {
+  width: 52px;
+  height: 52px;
+}
+
+.gameCard.isExpanded .lineupPlayerPhoto img {
+  width: 52px;
+  height: 52px;
+}
+
+.gameCard.isExpanded .lineupPlayerName {
+  gap: 8px;
+}
+
+.gameCard.isExpanded .lineupPlayerName strong {
+  font-size: 16px;
+}
+
+.gameCard.isExpanded .lineupPlayerName span {
+  display: inline-flex;
+  align-items: center;
+
+  width: auto;
+  min-width: max-content;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  background: #eef2f7;
+
+  color: #475569;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.gameCard.isExpanded .lineupPlayerStats {
+  margin-top: 5px;
+  gap: 8px;
+}
+
+.gameCard.isExpanded .lineupPlayerStats span {
+  font-size: 13px;
+}
+
+.gameCard.isExpanded .lineupPlayerStats b {
+  font-size: 14px;
+}
+
+
+/*
+  BvP / 상대 선발 기록 / 평가 문구
+*/
+.gameCard.isExpanded .lineupPlayerBody small,
+.gameCard.isExpanded .lineupPlayerBody em {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+
+/*
+  시장별 모델확률
+*/
+.gameCard.isExpanded .marketProbabilityHead b {
+  font-size: 21px;
+}
+
+.gameCard.isExpanded .marketProbabilityHead small {
+  font-size: 14px;
+}
+
+.gameCard.isExpanded .marketProbabilitySection > strong {
+  font-size: 16px;
+}
+
+.gameCard.isExpanded .marketProbabilityPair span {
+  font-size: 14px;
+}
+
+.gameCard.isExpanded .marketProbabilityPair b {
+  font-size: 21px;
+}
+
+
+/*
+  배당 입력도 상세에서는 크게
+*/
+.gameCard.isExpanded .oddsRow label {
+  font-size: 13px;
+}
+
+.gameCard.isExpanded .oddsRow input {
+  font-size: 16px;
+  padding: 11px 12px;
+}
+
+
+/*
+  추천영역
+*/
+.gameCard.isExpanded .recommend {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.gameCard.isExpanded .recommend b {
+  font-size: 17px;
+}
+
+.gameCard.isExpanded .recommend small {
+  font-size: 13px;
+}
+
+
+/*
+  모바일에서는 너무 과하게 커지지 않게
+*/
+@media (max-width: 760px) {
+
+  .gameCard.isExpanded {
+    font-size: 14px;
+  }
+
+  .gameCard.isExpanded
+  .lineupAnalysisHead b {
+    font-size: 18px;
+  }
+
+  .gameCard.isExpanded
+  .lineupPlayerName strong {
+    font-size: 15px;
+  }
+
+  .gameCard.isExpanded
+  .marketProbabilityPair b {
+    font-size: 18px;
+  }
+
+}
+
+

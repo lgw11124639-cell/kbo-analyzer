@@ -1,0 +1,712 @@
+﻿import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+
+export const dynamic = "force-dynamic";
+
+const KBO_BVP_URL =
+  "https://www.koreabaseball.com/Record/Etc/HitVsPit.aspx";
+
+const PITCHER_TEAM =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlPitcherTeam";
+
+const PITCHER_PLAYER =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlPitcherPlayer";
+
+const HITTER_TEAM =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlHitterTeam";
+
+const HITTER_PLAYER =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlHitterPlayer";
+
+const SEARCH_BUTTON =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$btnSearch";
+
+
+function teamCode(
+  value: string
+) {
+  const normalized =
+    value
+      .replace(/\s+/g, "")
+      .replace("두산베어스", "두산")
+      .replace("LG트윈스", "LG")
+      .replace("삼성라이온즈", "삼성")
+      .replace("KIA타이거즈", "KIA")
+      .replace("한화이글스", "한화")
+      .replace("롯데자이언츠", "롯데")
+      .replace("KT위즈", "KT")
+      .replace("NC다이노스", "NC")
+      .replace("SSG랜더스", "SSG")
+      .replace("키움히어로즈", "키움");
+
+  const map:
+    Record<string,string> = {
+      KT: "KT",
+      삼성: "SS",
+      LG: "LG",
+      KIA: "HT",
+      두산: "OB",
+      NC: "NC",
+      한화: "HH",
+      SSG: "SK",
+      롯데: "LT",
+      키움: "WO",
+    };
+
+  return map[normalized] ?? "";
+}
+
+
+function hiddenFields(
+  html: string
+) {
+  const $ =
+    cheerio.load(html);
+
+  const result:
+    Record<string,string> = {};
+
+  $("input[type=hidden]").each(
+    (_, el) => {
+      const name =
+        $(el).attr("name");
+
+      if (!name) {
+        return;
+      }
+
+      result[name] =
+        $(el).attr("value") ?? "";
+    }
+  );
+
+  return result;
+}
+
+
+async function requestPage(
+  method: "GET" | "POST",
+  body?: URLSearchParams,
+  cookie?: string
+) {
+  const response =
+    await fetch(
+      KBO_BVP_URL,
+      {
+        method,
+
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+
+          "Accept-Language":
+            "ko-KR,ko;q=0.9",
+
+          ...(method === "POST"
+            ? {
+                "Content-Type":
+                  "application/x-www-form-urlencoded",
+              }
+            : {}),
+
+          ...(cookie
+            ? {
+                Cookie:
+                  cookie,
+              }
+            : {}),
+        },
+
+        body:
+          method === "POST"
+            ? body
+            : undefined,
+
+        cache:
+          "no-store",
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `KBO HTTP ${response.status}`
+    );
+  }
+
+  return {
+    html:
+      await response.text(),
+
+    cookie:
+      response.headers.get(
+        "set-cookie"
+      ) ??
+      cookie ??
+      "",
+  };
+}
+
+
+async function postback(
+  html: string,
+  cookie: string,
+  eventTarget: string,
+  values:
+    Record<string,string>
+) {
+  const hidden =
+    hiddenFields(
+      html
+    );
+
+  const body =
+    new URLSearchParams();
+
+  for (
+    const [key,value]
+    of Object.entries(
+      hidden
+    )
+  ) {
+    body.set(
+      key,
+      value
+    );
+  }
+
+  body.set(
+    "__EVENTTARGET",
+    eventTarget
+  );
+
+  body.set(
+    "__EVENTARGUMENT",
+    ""
+  );
+
+  for (
+    const [key,value]
+    of Object.entries(
+      values
+    )
+  ) {
+    body.set(
+      key,
+      value
+    );
+  }
+
+  return requestPage(
+    "POST",
+    body,
+    cookie
+  );
+}
+
+
+function numberValue(
+  value:
+    string | undefined
+) {
+  if (
+    !value ||
+    value === "-"
+  ) {
+    return null;
+  }
+
+  const parsed =
+    Number(
+      value
+        .replace(/,/g, "")
+        .trim()
+    );
+
+  return Number.isFinite(
+    parsed
+  )
+    ? parsed
+    : null;
+}
+
+
+function parseResult(
+  html: string
+): Record<string,string> | null {
+
+  const $ =
+    cheerio.load(html);
+
+  const tables =
+    $("table").toArray();
+
+  for (
+    const table of tables
+  ) {
+
+    const headers =
+      $(table)
+        .find("thead th")
+        .map(
+          (_, th) =>
+            $(th)
+              .text()
+              .replace(/\s+/g, " ")
+              .trim()
+              .toUpperCase()
+        )
+        .get();
+
+    const required =
+      [
+        "AVG",
+        "PA",
+        "AB",
+        "H",
+        "HR",
+        "SLG",
+        "OBP",
+        "OPS",
+      ];
+
+    const matched =
+      required.every(
+        (header) =>
+          headers.includes(
+            header
+          )
+      );
+
+    if (!matched) {
+      continue;
+    }
+
+
+    const firstRow =
+      $(table)
+        .find("tbody tr")
+        .first();
+
+    if (!firstRow.length) {
+      continue;
+    }
+
+
+    const cells =
+      firstRow
+        .find("th,td")
+        .map(
+          (_, td) =>
+            $(td)
+              .text()
+              .replace(/\s+/g, " ")
+              .trim()
+        )
+        .get();
+
+
+    if (
+      cells.length <
+      headers.length
+    ) {
+      continue;
+    }
+
+
+    const row:
+      Record<string,string> = {};
+
+
+    headers.forEach(
+      (header,index) => {
+        row[header] =
+          cells[index] ?? "";
+      }
+    );
+
+
+    return row;
+  }
+
+
+  return null;
+}
+
+export async function GET(
+  request: Request
+) {
+  const url =
+    new URL(
+      request.url
+    );
+
+  const pitcherId =
+    url.searchParams.get(
+      "pitcherId"
+    );
+
+  const hitterId =
+    url.searchParams.get(
+      "hitterId"
+    );
+
+  const pitcherTeam =
+    url.searchParams.get(
+      "pitcherTeam"
+    ) ?? "";
+
+  const hitterTeam =
+    url.searchParams.get(
+      "hitterTeam"
+    ) ?? "";
+
+
+  if (
+    !pitcherId ||
+    !/^\d+$/.test(
+      pitcherId
+    ) ||
+    !hitterId ||
+    !/^\d+$/.test(
+      hitterId
+    )
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "pitcherId, hitterId 파라미터가 필요합니다.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+
+  const pitcherTeamCode =
+    teamCode(
+      pitcherTeam
+    );
+
+  const hitterTeamCode =
+    teamCode(
+      hitterTeam
+    );
+
+
+  if (
+    !pitcherTeamCode ||
+    !hitterTeamCode
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "pitcherTeam, hitterTeam 파라미터가 필요합니다.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+
+  try {
+
+    const first =
+      await requestPage(
+        "GET"
+      );
+
+
+    const step1 =
+      await postback(
+        first.html,
+        first.cookie,
+        PITCHER_TEAM,
+        {
+          [PITCHER_TEAM]:
+            pitcherTeamCode,
+
+          [PITCHER_PLAYER]:
+            "0",
+
+          [HITTER_TEAM]:
+            "",
+
+          [HITTER_PLAYER]:
+            "0",
+        }
+      );
+
+
+    const step2 =
+      await postback(
+        step1.html,
+        step1.cookie,
+        PITCHER_PLAYER,
+        {
+          [PITCHER_TEAM]:
+            pitcherTeamCode,
+
+          [PITCHER_PLAYER]:
+            pitcherId,
+
+          [HITTER_TEAM]:
+            "",
+
+          [HITTER_PLAYER]:
+            "0",
+        }
+      );
+
+
+    const step3 =
+      await postback(
+        step2.html,
+        step2.cookie,
+        HITTER_TEAM,
+        {
+          [PITCHER_TEAM]:
+            pitcherTeamCode,
+
+          [PITCHER_PLAYER]:
+            pitcherId,
+
+          [HITTER_TEAM]:
+            hitterTeamCode,
+
+          [HITTER_PLAYER]:
+            "0",
+        }
+      );
+
+
+    const step4 =
+      await postback(
+        step3.html,
+        step3.cookie,
+        HITTER_PLAYER,
+        {
+          [PITCHER_TEAM]:
+            pitcherTeamCode,
+
+          [PITCHER_PLAYER]:
+            pitcherId,
+
+          [HITTER_TEAM]:
+            hitterTeamCode,
+
+          [HITTER_PLAYER]:
+            hitterId,
+        }
+      );
+
+
+    const hidden =
+      hiddenFields(
+        step4.html
+      );
+
+    const body =
+      new URLSearchParams();
+
+    for (
+      const [key,value]
+      of Object.entries(
+        hidden
+      )
+    ) {
+      body.set(
+        key,
+        value
+      );
+    }
+
+    body.set(
+      "__EVENTTARGET",
+      ""
+    );
+
+    body.set(
+      "__EVENTARGUMENT",
+      ""
+    );
+
+    body.set(
+      PITCHER_TEAM,
+      pitcherTeamCode
+    );
+
+    body.set(
+      PITCHER_PLAYER,
+      pitcherId
+    );
+
+    body.set(
+      HITTER_TEAM,
+      hitterTeamCode
+    );
+
+    body.set(
+      HITTER_PLAYER,
+      hitterId
+    );
+
+    body.set(
+      SEARCH_BUTTON,
+      "검색"
+    );
+
+
+    const resultPage =
+      await requestPage(
+        "POST",
+        body,
+        step4.cookie
+      );
+
+
+    const row =
+      parseResult(
+        resultPage.html
+      );
+
+
+    if (!row) {
+      return NextResponse.json({
+        found: false,
+
+        pitcherId:
+          Number(
+            pitcherId
+          ),
+
+        hitterId:
+          Number(
+            hitterId
+          ),
+
+        stats:
+          null,
+      });
+    }
+
+
+    const stats = {
+      avg:
+        numberValue(
+          row.AVG
+        ),
+
+      pa:
+        numberValue(
+          row.PA
+        ),
+
+      ab:
+        numberValue(
+          row.AB
+        ),
+
+      hits:
+        numberValue(
+          row.H
+        ),
+
+      doubles:
+        numberValue(
+          row["2B"]
+        ),
+
+      triples:
+        numberValue(
+          row["3B"]
+        ),
+
+      hr:
+        numberValue(
+          row.HR
+        ),
+
+      rbi:
+        numberValue(
+          row.RBI
+        ),
+
+      bb:
+        numberValue(
+          row.BB
+        ),
+
+      hbp:
+        numberValue(
+          row.HBP
+        ),
+
+      so:
+        numberValue(
+          row.SO
+        ),
+
+      slg:
+        numberValue(
+          row.SLG
+        ),
+
+      obp:
+        numberValue(
+          row.OBP
+        ),
+
+      ops:
+        numberValue(
+          row.OPS
+        ),
+    };
+
+
+    return NextResponse.json({
+      fetchedAt:
+        new Date()
+          .toISOString(),
+
+      found: true,
+
+      pitcherId:
+        Number(
+          pitcherId
+        ),
+
+      hitterId:
+        Number(
+          hitterId
+        ),
+
+      pitcherTeam:
+        pitcherTeam,
+
+      hitterTeam:
+        hitterTeam,
+
+      stats,
+    });
+
+
+  } catch (
+    error
+  ) {
+
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "unknown error",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+

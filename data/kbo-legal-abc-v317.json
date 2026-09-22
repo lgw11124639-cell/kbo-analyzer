@@ -1,0 +1,158 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discoveryAB": {
+    "overall": {
+      "bets": 10,
+      "wins": 3,
+      "losses": 7,
+      "hit": 30,
+      "avgOdds": 4.401,
+      "roi": 38.12
+    },
+    "monthly": [
+      {
+        "month": "2026-04",
+        "bets": 10,
+        "wins": 3,
+        "losses": 7,
+        "hit": 30,
+        "avgOdds": 4.401,
+        "roi": 38.12
+      }
+    ],
+    "sameGame": {
+      "bets": 0,
+      "wins": 0,
+      "losses": 0,
+      "hit": 0,
+      "avgOdds": 0,
+      "roi": 0
+    },
+    "differentGame": {
+      "bets": 10,
+      "wins": 3,
+      "losses": 7,
+      "hit": 30,
+      "avgOdds": 4.401,
+      "roi": 38.12
+    },
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1038118,
+      "profit": 38118,
+      "mdd": 5.46,
+      "maxLosingStreak": 6
+    }
+  },
+  "internalAB": {
+    "overall": {
+      "bets": 35,
+      "wins": 7,
+      "losses": 28,
+      "hit": 20,
+      "avgOdds": 4.194,
+      "roi": -23.63
+    },
+    "monthly": [
+      {
+        "month": "2026-05",
+        "bets": 20,
+        "wins": 3,
+        "losses": 17,
+        "hit": 15,
+        "avgOdds": 4.379,
+        "roi": -44.57
+      },
+      {
+        "month": "2026-06",
+        "bets": 15,
+        "wins": 4,
+        "losses": 11,
+        "hit": 26.67,
+        "avgOdds": 3.948,
+        "roi": 4.3
+      }
+    ],
+    "sameGame": {
+      "bets": 0,
+      "wins": 0,
+      "losses": 0,
+      "hit": 0,
+      "avgOdds": 0,
+      "roi": 0
+    },
+    "differentGame": {
+      "bets": 35,
+      "wins": 7,
+      "losses": 28,
+      "hit": 20,
+      "avgOdds": 4.194,
+      "roi": -23.63
+    },
+    "bankroll": {
+      "initial": 1000000,
+      "final": 917311,
+      "profit": -82689,
+      "mdd": 16,
+      "maxLosingStreak": 16
+    }
+  },
+  "discoveryExtensions": [
+    {
+      "family": "ML",
+      "cDays": 10,
+      "cWins": 2,
+      "abcHit": 20,
+      "abcAvgOdds": 7.512,
+      "abcROI": 27.99,
+      "abHitDays": 3,
+      "cHitWhenABHit": 66.67,
+      "dDays": 0,
+      "dWins": 0,
+      "abcdHit": 0,
+      "abcdAvgOdds": 0,
+      "abcdROI": 0,
+      "abcHitDays": 0,
+      "dHitWhenABCHit": 0
+    }
+  ],
+  "internalExtensions": [
+    {
+      "family": "ML",
+      "cDays": 35,
+      "cWins": 4,
+      "abcHit": 11.43,
+      "abcAvgOdds": 6.73,
+      "abcROI": -32.11,
+      "abHitDays": 7,
+      "cHitWhenABHit": 57.14,
+      "dDays": 0,
+      "dWins": 0,
+      "abcdHit": 0,
+      "abcdAvgOdds": 0,
+      "abcdROI": 0,
+      "abcHitDays": 0,
+      "dHitWhenABCHit": 0
+    }
+  ],
+  "finalExtensions": [
+    {
+      "family": "ML",
+      "cDays": 44,
+      "cWins": 6,
+      "abcHit": 13.64,
+      "abcAvgOdds": 6.835,
+      "abcROI": -22.9,
+      "abHitDays": 11,
+      "cHitWhenABHit": 54.55,
+      "dDays": 0,
+      "dWins": 0,
+      "abcdHit": 0,
+      "abcdAvgOdds": 0,
+      "abcdROI": 0,
+      "abcHitDays": 0,
+      "dHitWhenABCHit": 0
+    }
+  ]
+}

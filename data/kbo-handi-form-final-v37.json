@@ -1,0 +1,529 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "positiveEV": {
+      "bets": 13,
+      "wins": 5,
+      "losses": 8,
+      "hit": 38.46,
+      "avgOdds": 2.561,
+      "avgEV": 6.38,
+      "roi": -5.08
+    },
+    "monthly": [
+      {
+        "month": "2026-04",
+        "bets": 13,
+        "wins": 5,
+        "losses": 8,
+        "hit": 38.46,
+        "avgOdds": 2.561,
+        "avgEV": 6.38,
+        "roi": -5.08
+      }
+    ],
+    "odds": [
+      {
+        "bucket": "1.20-1.49",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      },
+      {
+        "bucket": "1.50-1.79",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      },
+      {
+        "bucket": "1.80-1.99",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      },
+      {
+        "bucket": "2.00-2.49",
+        "bets": 6,
+        "wins": 3,
+        "losses": 3,
+        "hit": 50,
+        "avgOdds": 2.313,
+        "avgEV": 4.39,
+        "roi": 15.67
+      },
+      {
+        "bucket": "2.50+",
+        "bets": 7,
+        "wins": 2,
+        "losses": 5,
+        "hit": 28.57,
+        "avgOdds": 2.773,
+        "avgEV": 8.08,
+        "roi": -22.86
+      }
+    ],
+    "evBuckets": [
+      {
+        "bucket": "0-3%",
+        "bets": 5,
+        "wins": 2,
+        "losses": 3,
+        "hit": 40,
+        "avgOdds": 2.568,
+        "avgEV": 1.93,
+        "roi": -2.8
+      },
+      {
+        "bucket": "3-5%",
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "hit": 50,
+        "avgOdds": 2.315,
+        "avgEV": 4.81,
+        "roi": 11
+      },
+      {
+        "bucket": "5-10%",
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "hit": 33.33,
+        "avgOdds": 2.543,
+        "avgEV": 8.25,
+        "roi": -18.33
+      },
+      {
+        "bucket": "10-15%",
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "hit": 50,
+        "avgOdds": 2.665,
+        "avgEV": 11.33,
+        "roi": 40.5
+      },
+      {
+        "bucket": "15%+",
+        "bets": 1,
+        "wins": 0,
+        "losses": 1,
+        "hit": 0,
+        "avgOdds": 2.86,
+        "avgEV": 16.21,
+        "roi": -100
+      }
+    ],
+    "dailyBest": {
+      "bets": 10,
+      "wins": 4,
+      "losses": 6,
+      "hit": 40,
+      "avgOdds": 2.612,
+      "avgEV": 6.86,
+      "roi": 0.7
+    },
+    "dailyBestMonthly": [
+      {
+        "month": "2026-04",
+        "bets": 10,
+        "wins": 4,
+        "losses": 6,
+        "hit": 40,
+        "avgOdds": 2.612,
+        "avgEV": 6.86,
+        "roi": 0.7
+      }
+    ],
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1000700,
+      "profit": 700,
+      "mdd": 3.3,
+      "maxLosingStreak": 3
+    }
+  },
+  "internal": {
+    "positiveEV": {
+      "bets": 45,
+      "wins": 20,
+      "losses": 25,
+      "hit": 44.44,
+      "avgOdds": 2.51,
+      "avgEV": 3.74,
+      "roi": 12.24
+    },
+    "monthly": [
+      {
+        "month": "2026-05",
+        "bets": 25,
+        "wins": 11,
+        "losses": 14,
+        "hit": 44,
+        "avgOdds": 2.588,
+        "avgEV": 3.93,
+        "roi": 16.08
+      },
+      {
+        "month": "2026-06",
+        "bets": 20,
+        "wins": 9,
+        "losses": 11,
+        "hit": 45,
+        "avgOdds": 2.412,
+        "avgEV": 3.5,
+        "roi": 7.45
+      }
+    ],
+    "odds": [
+      {
+        "bucket": "1.20-1.49",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      },
+      {
+        "bucket": "1.50-1.79",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      },
+      {
+        "bucket": "1.80-1.99",
+        "bets": 4,
+        "wins": 1,
+        "losses": 3,
+        "hit": 25,
+        "avgOdds": 1.932,
+        "avgEV": 3.13,
+        "roi": -50.75
+      },
+      {
+        "bucket": "2.00-2.49",
+        "bets": 18,
+        "wins": 9,
+        "losses": 9,
+        "hit": 50,
+        "avgOdds": 2.277,
+        "avgEV": 3.66,
+        "roi": 13.17
+      },
+      {
+        "bucket": "2.50+",
+        "bets": 23,
+        "wins": 10,
+        "losses": 13,
+        "hit": 43.48,
+        "avgOdds": 2.792,
+        "avgEV": 3.9,
+        "roi": 22.48
+      }
+    ],
+    "evBuckets": [
+      {
+        "bucket": "0-3%",
+        "bets": 23,
+        "wins": 12,
+        "losses": 11,
+        "hit": 52.17,
+        "avgOdds": 2.499,
+        "avgEV": 1.42,
+        "roi": 30.52
+      },
+      {
+        "bucket": "3-5%",
+        "bets": 6,
+        "wins": 3,
+        "losses": 3,
+        "hit": 50,
+        "avgOdds": 2.687,
+        "avgEV": 3.74,
+        "roi": 34.83
+      },
+      {
+        "bucket": "5-10%",
+        "bets": 13,
+        "wins": 4,
+        "losses": 9,
+        "hit": 30.77,
+        "avgOdds": 2.361,
+        "avgEV": 6.07,
+        "roi": -27.46
+      },
+      {
+        "bucket": "10-15%",
+        "bets": 3,
+        "wins": 1,
+        "losses": 2,
+        "hit": 33.33,
+        "avgOdds": 2.887,
+        "avgEV": 11.39,
+        "roi": -1
+      },
+      {
+        "bucket": "15%+",
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "hit": 0,
+        "avgOdds": 0,
+        "avgEV": 0,
+        "roi": 0
+      }
+    ],
+    "dailyBest": {
+      "bets": 35,
+      "wins": 16,
+      "losses": 19,
+      "hit": 45.71,
+      "avgOdds": 2.501,
+      "avgEV": 4.2,
+      "roi": 13.49
+    },
+    "dailyBestMonthly": [
+      {
+        "month": "2026-05",
+        "bets": 20,
+        "wins": 9,
+        "losses": 11,
+        "hit": 45,
+        "avgOdds": 2.575,
+        "avgEV": 4.23,
+        "roi": 15.95
+      },
+      {
+        "month": "2026-06",
+        "bets": 15,
+        "wins": 7,
+        "losses": 8,
+        "hit": 46.67,
+        "avgOdds": 2.401,
+        "avgEV": 4.17,
+        "roi": 10.2
+      }
+    ],
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1047200,
+      "profit": 47200,
+      "mdd": 3.26,
+      "maxLosingStreak": 3
+    }
+  },
+  "final": {
+    "positiveEV": {
+      "bets": 59,
+      "wins": 28,
+      "losses": 31,
+      "hit": 47.46,
+      "avgOdds": 2.423,
+      "avgEV": 5.19,
+      "roi": 15.07
+    },
+    "monthly": [
+      {
+        "month": "2026-07",
+        "bets": 25,
+        "wins": 13,
+        "losses": 12,
+        "hit": 52,
+        "avgOdds": 2.34,
+        "avgEV": 4.86,
+        "roi": 21.04
+      },
+      {
+        "month": "2026-08",
+        "bets": 19,
+        "wins": 8,
+        "losses": 11,
+        "hit": 42.11,
+        "avgOdds": 2.454,
+        "avgEV": 3.59,
+        "roi": 0.79
+      },
+      {
+        "month": "2026-09",
+        "bets": 15,
+        "wins": 7,
+        "losses": 8,
+        "hit": 46.67,
+        "avgOdds": 2.522,
+        "avgEV": 7.79,
+        "roi": 23.2
+      }
+    ],
+    "odds": [
+      {
+        "bucket": "1.20-1.49",
+        "bets": 1,
+        "wins": 1,
+        "losses": 0,
+        "hit": 100,
+        "avgOdds": 1.3,
+        "avgEV": 0.04,
+        "roi": 30
+      },
+      {
+        "bucket": "1.50-1.79",
+        "bets": 2,
+        "wins": 1,
+        "losses": 1,
+        "hit": 50,
+        "avgOdds": 1.65,
+        "avgEV": 0.5,
+        "roi": -14
+      },
+      {
+        "bucket": "1.80-1.99",
+        "bets": 1,
+        "wins": 0,
+        "losses": 1,
+        "hit": 0,
+        "avgOdds": 1.81,
+        "avgEV": 0.79,
+        "roi": -100
+      },
+      {
+        "bucket": "2.00-2.49",
+        "bets": 29,
+        "wins": 12,
+        "losses": 17,
+        "hit": 41.38,
+        "avgOdds": 2.264,
+        "avgEV": 5.43,
+        "roi": -7.07
+      },
+      {
+        "bucket": "2.50+",
+        "bets": 26,
+        "wins": 14,
+        "losses": 12,
+        "hit": 53.85,
+        "avgOdds": 2.727,
+        "avgEV": 5.66,
+        "roi": 45.85
+      }
+    ],
+    "evBuckets": [
+      {
+        "bucket": "0-3%",
+        "bets": 25,
+        "wins": 11,
+        "losses": 14,
+        "hit": 44,
+        "avgOdds": 2.32,
+        "avgEV": 1.03,
+        "roi": -2.68
+      },
+      {
+        "bucket": "3-5%",
+        "bets": 7,
+        "wins": 4,
+        "losses": 3,
+        "hit": 57.14,
+        "avgOdds": 2.469,
+        "avgEV": 3.77,
+        "roi": 40.43
+      },
+      {
+        "bucket": "5-10%",
+        "bets": 16,
+        "wins": 9,
+        "losses": 7,
+        "hit": 56.25,
+        "avgOdds": 2.501,
+        "avgEV": 7.36,
+        "roi": 46.5
+      },
+      {
+        "bucket": "10-15%",
+        "bets": 10,
+        "wins": 4,
+        "losses": 6,
+        "hit": 40,
+        "avgOdds": 2.487,
+        "avgEV": 11.77,
+        "roi": 2.9
+      },
+      {
+        "bucket": "15%+",
+        "bets": 1,
+        "wins": 0,
+        "losses": 1,
+        "hit": 0,
+        "avgOdds": 2.82,
+        "avgEV": 18.8,
+        "roi": -100
+      }
+    ],
+    "dailyBest": {
+      "bets": 44,
+      "wins": 21,
+      "losses": 23,
+      "hit": 47.73,
+      "avgOdds": 2.445,
+      "avgEV": 5.98,
+      "roi": 14.89
+    },
+    "dailyBestMonthly": [
+      {
+        "month": "2026-07",
+        "bets": 17,
+        "wins": 8,
+        "losses": 9,
+        "hit": 47.06,
+        "avgOdds": 2.391,
+        "avgEV": 6.18,
+        "roi": 9.24
+      },
+      {
+        "month": "2026-08",
+        "bets": 16,
+        "wins": 7,
+        "losses": 9,
+        "hit": 43.75,
+        "avgOdds": 2.399,
+        "avgEV": 4.03,
+        "roi": 2.94
+      },
+      {
+        "month": "2026-09",
+        "bets": 11,
+        "wins": 6,
+        "losses": 5,
+        "hit": 54.55,
+        "avgOdds": 2.597,
+        "avgEV": 8.52,
+        "roi": 41
+      }
+    ],
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1065500,
+      "profit": 65500,
+      "mdd": 5.28,
+      "maxLosingStreak": 5
+    }
+  }
+}

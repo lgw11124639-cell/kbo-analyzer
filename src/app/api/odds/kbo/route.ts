@@ -1,0 +1,915 @@
+import { NextResponse } from "next/server";
+import { fetchOddspapiKboOdds } from "@/lib/oddspapiKbo";
+import { fetchBetmanKboOdds } from "@/lib/betmanKbo";
+
+export const dynamic = "force-dynamic";
+
+/*
+  ODDS_CACHE_V1
+  Oddspapi 경기 배당 결과를 날짜별로 60초 메모리 캐시.
+  같은 날짜 요청마다 외부 API를 반복 호출하지 않는다.
+*/
+const ODDSPAPI_CACHE_TTL_MS = 60_000;
+
+type OddspapiEvents =
+  Awaited<
+    ReturnType<
+      typeof fetchOddspapiKboOdds
+    >
+  >;
+
+const oddspapiOddsCache =
+  new Map<
+    string,
+    {
+      expiresAt: number;
+      events: OddspapiEvents;
+    }
+  >();
+
+
+type Outcome = {
+  name: string;
+  price: number;
+  point?: number;
+};
+
+type Market = {
+  key: "h2h" | "spreads" | "totals";
+  last_update?: string;
+  outcomes: Outcome[];
+};
+
+type Bookmaker = {
+  key: string;
+  title: string;
+  last_update: string;
+  markets: Market[];
+};
+
+type OddsEvent = {
+  id: string;
+  sport_key: string;
+  commence_time: string;
+  home_team: string;
+  away_team: string;
+  bookmakers: Bookmaker[];
+};
+
+type HistoricalResponse = {
+  timestamp?: string;
+  previous_timestamp?: string | null;
+  next_timestamp?: string | null;
+  data?: OddsEvent[];
+};
+
+function avg(
+  values: number[]
+) {
+  if (!values.length) {
+    return null;
+  }
+
+  return Number(
+    (
+      values.reduce(
+        (a, b) => a + b,
+        0
+      ) / values.length
+    ).toFixed(3)
+  );
+}
+
+function mostCommonNumber(
+  values: number[]
+) {
+  if (!values.length) {
+    return null;
+  }
+
+  const counts =
+    new Map<number, number>();
+
+  for (const value of values) {
+    counts.set(
+      value,
+      (counts.get(value) || 0) + 1
+    );
+  }
+
+  return (
+    [...counts.entries()]
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      )[0]?.[0] ??
+    null
+  );
+}
+
+function normalizeTeam(
+  name: string
+) {
+  const n =
+    name
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9가-힣]/g,
+        ""
+      );
+
+  const aliases:
+    Record<string, string> = {
+    lgtwins: "LG",
+    lg트윈스: "LG",
+
+    hanwhaeagles: "한화",
+    한화이글스: "한화",
+
+    sslanders: "SSG",
+    ssglanders: "SSG",
+    ssg랜더스: "SSG",
+
+    ncdinos: "NC",
+    nc다이노스: "NC",
+
+    ktwiz: "KT",
+    kt위즈: "KT",
+
+    kiatigers: "KIA",
+    kia타이거즈: "KIA",
+
+    samsunglions: "삼성",
+    삼성라이온즈: "삼성",
+
+    lottegiants: "롯데",
+    롯데자이언츠: "롯데",
+
+    doosanbears: "두산",
+    두산베어스: "두산",
+
+    kiwoomheroes: "키움",
+    키움히어로즈: "키움",
+  };
+
+  return (
+    aliases[n] ||
+    name
+  );
+}
+
+function extractEvent(
+  event: OddsEvent
+) {
+  const awayMl: number[] = [];
+  const homeMl: number[] = [];
+
+  const spreadAwayLines:
+    number[] = [];
+
+  const spreadHomeLines:
+    number[] = [];
+
+  const spreadAwayPrices =
+    new Map<number, number[]>();
+
+  const spreadHomePrices =
+    new Map<number, number[]>();
+
+  const totalLines:
+    number[] = [];
+
+  const overPrices =
+    new Map<number, number[]>();
+
+  const underPrices =
+    new Map<number, number[]>();
+
+  const awayNormalized =
+    normalizeTeam(
+      event.away_team
+    );
+
+  const homeNormalized =
+    normalizeTeam(
+      event.home_team
+    );
+
+  let latestUpdate = "";
+
+  for (
+    const book of
+    event.bookmakers || []
+  ) {
+    if (
+      book.last_update &&
+      book.last_update >
+        latestUpdate
+    ) {
+      latestUpdate =
+        book.last_update;
+    }
+
+    for (
+      const market of
+      book.markets || []
+    ) {
+      if (
+        market.key === "h2h"
+      ) {
+        for (
+          const outcome of
+          market.outcomes || []
+        ) {
+          const team =
+            normalizeTeam(
+              outcome.name
+            );
+
+          if (
+            team ===
+              awayNormalized &&
+            outcome.price > 1
+          ) {
+            awayMl.push(
+              outcome.price
+            );
+          }
+
+          if (
+            team ===
+              homeNormalized &&
+            outcome.price > 1
+          ) {
+            homeMl.push(
+              outcome.price
+            );
+          }
+        }
+      }
+
+      if (
+        market.key ===
+        "spreads"
+      ) {
+        for (
+          const outcome of
+          market.outcomes || []
+        ) {
+          if (
+            typeof outcome.point !==
+            "number"
+          ) {
+            continue;
+          }
+
+          const team =
+            normalizeTeam(
+              outcome.name
+            );
+
+          if (
+            team ===
+            awayNormalized
+          ) {
+            spreadAwayLines.push(
+              outcome.point
+            );
+
+            if (
+              !spreadAwayPrices.has(
+                outcome.point
+              )
+            ) {
+              spreadAwayPrices.set(
+                outcome.point,
+                []
+              );
+            }
+
+            spreadAwayPrices
+              .get(
+                outcome.point
+              )!
+              .push(
+                outcome.price
+              );
+          }
+
+          if (
+            team ===
+            homeNormalized
+          ) {
+            spreadHomeLines.push(
+              outcome.point
+            );
+
+            if (
+              !spreadHomePrices.has(
+                outcome.point
+              )
+            ) {
+              spreadHomePrices.set(
+                outcome.point,
+                []
+              );
+            }
+
+            spreadHomePrices
+              .get(
+                outcome.point
+              )!
+              .push(
+                outcome.price
+              );
+          }
+        }
+      }
+
+      if (
+        market.key ===
+        "totals"
+      ) {
+        for (
+          const outcome of
+          market.outcomes || []
+        ) {
+          if (
+            typeof outcome.point !==
+            "number"
+          ) {
+            continue;
+          }
+
+          totalLines.push(
+            outcome.point
+          );
+
+          if (
+            outcome.name
+              .toLowerCase() ===
+            "over"
+          ) {
+            if (
+              !overPrices.has(
+                outcome.point
+              )
+            ) {
+              overPrices.set(
+                outcome.point,
+                []
+              );
+            }
+
+            overPrices
+              .get(
+                outcome.point
+              )!
+              .push(
+                outcome.price
+              );
+          }
+
+          if (
+            outcome.name
+              .toLowerCase() ===
+            "under"
+          ) {
+            if (
+              !underPrices.has(
+                outcome.point
+              )
+            ) {
+              underPrices.set(
+                outcome.point,
+                []
+              );
+            }
+
+            underPrices
+              .get(
+                outcome.point
+              )!
+              .push(
+                outcome.price
+              );
+          }
+        }
+      }
+    }
+  }
+
+  const awaySpreadLine =
+    mostCommonNumber(
+      spreadAwayLines
+    );
+
+  const homeSpreadLine =
+    mostCommonNumber(
+      spreadHomeLines
+    );
+
+  const totalLine =
+    mostCommonNumber(
+      totalLines
+    );
+
+  return {
+    id:
+      event.id,
+
+    commenceTime:
+      event.commence_time,
+
+    awayTeamRaw:
+      event.away_team,
+
+    homeTeamRaw:
+      event.home_team,
+
+    awayTeam:
+      awayNormalized,
+
+    homeTeam:
+      homeNormalized,
+
+    awayMl:
+      avg(
+        awayMl
+      ),
+
+    homeMl:
+      avg(
+        homeMl
+      ),
+
+    awaySpreadLine,
+
+    homeSpreadLine,
+
+    awayHandicap:
+      awaySpreadLine !== null
+        ? avg(
+            spreadAwayPrices.get(
+              awaySpreadLine
+            ) || []
+          )
+        : null,
+
+    homeHandicap:
+      homeSpreadLine !== null
+        ? avg(
+            spreadHomePrices.get(
+              homeSpreadLine
+            ) || []
+          )
+        : null,
+
+    totalLine,
+
+    overOdds:
+      totalLine !== null
+        ? avg(
+            overPrices.get(
+              totalLine
+            ) || []
+          )
+        : null,
+
+    underOdds:
+      totalLine !== null
+        ? avg(
+            underPrices.get(
+              totalLine
+            ) || []
+          )
+        : null,
+
+    bookmakerCount:
+      event.bookmakers
+        ?.length || 0,
+
+    lastUpdate:
+      latestUpdate ||
+      null,
+  };
+}
+
+function todayKst() {
+  return new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:
+        "Asia/Seoul",
+
+      year:
+        "numeric",
+
+      month:
+        "2-digit",
+
+      day:
+        "2-digit",
+    }
+  ).format(
+    new Date()
+  );
+}
+
+export async function GET(
+  request: Request
+) {
+  const apiKey =
+    process.env
+      .ODDS_API_KEY;
+
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        error:
+          "ODDS_API_KEY가 .env.local에 없습니다.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  const incomingUrl =
+    new URL(
+      request.url
+    );
+
+  const requestedDate =
+    incomingUrl
+      .searchParams
+      .get("date");
+
+  const validDate =
+    requestedDate &&
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      requestedDate
+    )
+      ? requestedDate
+      : null;
+
+  const currentDate =
+    todayKst();
+
+  const historical =
+    !!validDate &&
+    validDate <
+      currentDate;
+
+  /*
+    ----------------------------------------------------------
+    Betman 프로토 승부식 KBO 자동배당
+    ----------------------------------------------------------
+
+    현재/미래 날짜는 서버 Chromium 수집기가 만든
+    data/betman-kbo-live.json 을 가장 먼저 사용한다.
+
+    수집 파일이 없거나,
+    15분 이상 오래되었거나,
+    해당 날짜에 유효한 KBO 배당이 없으면
+    자동으로 Oddspapi → The Odds API 순서로 fallback.
+  */
+  if (!historical) {
+    try {
+      const betmanEvents =
+        fetchBetmanKboOdds(
+          validDate ||
+          currentDate
+        );
+
+      if (
+        betmanEvents.length >
+        0
+      ) {
+        return NextResponse.json({
+          fetchedAt:
+            new Date()
+              .toISOString(),
+
+          mode:
+            "current",
+
+          provider:
+            "betman",
+
+          bookmaker:
+            "betman-proto",
+
+          requestedDate:
+            validDate,
+
+          snapshotAt:
+            null,
+
+          remaining:
+            null,
+
+          used:
+            null,
+
+          events:
+            betmanEvents,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "[BETMAN KBO]",
+        error
+      );
+    }
+  }
+
+  /*
+    ----------------------------------------------------------
+    Oddspapi KBO 자동배당
+    ----------------------------------------------------------
+
+    현재/미래 날짜는 Oddspapi를 우선 사용한다.
+
+    - KBO tournamentId = 2541
+    - bookmaker = kalshi
+    - 전체 경기 result 시장만 사용
+    - mainLine=true 기준점만 사용
+
+    Oddspapi에서 해당 날짜 배당을 못 찾으면
+    아래 기존 The Odds API 로직으로 자동 fallback.
+  */
+  if (!historical) {
+    try {
+      const oddspapiTargetDate =
+        validDate ||
+        currentDate;
+
+      const cachedOddspapi =
+        oddspapiOddsCache.get(
+          oddspapiTargetDate
+        );
+
+      let oddspapiEvents:
+        OddspapiEvents;
+
+      if (
+        cachedOddspapi &&
+        cachedOddspapi.expiresAt >
+          Date.now()
+      ) {
+        oddspapiEvents =
+          cachedOddspapi.events;
+
+        console.log(
+          "[ODDS CACHE HIT]",
+          oddspapiTargetDate
+        );
+      } else {
+        oddspapiEvents =
+          await fetchOddspapiKboOdds(
+            oddspapiTargetDate
+          );
+
+        if (
+          oddspapiEvents.length >
+          0
+        ) {
+          oddspapiOddsCache.set(
+            oddspapiTargetDate,
+            {
+              expiresAt:
+                Date.now() +
+                ODDSPAPI_CACHE_TTL_MS,
+              events:
+                oddspapiEvents,
+            }
+          );
+        }
+
+        console.log(
+          "[ODDS CACHE MISS]",
+          oddspapiTargetDate
+        );
+      }
+
+      if (
+        oddspapiEvents.length >
+        0
+      ) {
+        return NextResponse.json({
+          fetchedAt:
+            new Date()
+              .toISOString(),
+
+          mode:
+            "current",
+
+          provider:
+            "oddspapi",
+
+          bookmaker:
+            "kalshi",
+
+          requestedDate:
+            validDate,
+
+          snapshotAt:
+            null,
+
+          remaining:
+            null,
+
+          used:
+            null,
+
+          events:
+            oddspapiEvents,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "[ODDSPAPI KBO]",
+        error
+      );
+    }
+  }
+
+  /*
+    과거 날짜:
+    KST 13:00 기준 스냅샷 조회.
+    UTC로는 04:00.
+
+    대부분의 KBO 경기 시작 전이며
+    당일 배당이 충분히 형성된 시간대를
+    우선 사용한다.
+  */
+  const historicalTimestamp =
+    validDate
+      ? `${validDate}T04:00:00Z`
+      : null;
+
+  const url =
+    historical
+      ? new URL(
+          "https://api.the-odds-api.com/v4/historical/sports/baseball_kbo/odds/"
+        )
+      : new URL(
+          "https://api.the-odds-api.com/v4/sports/baseball_kbo/odds/"
+        );
+
+  url.searchParams.set(
+    "apiKey",
+    apiKey
+  );
+
+  url.searchParams.set(
+    "regions",
+    "us"
+  );
+
+  url.searchParams.set(
+    "markets",
+    "h2h,spreads,totals"
+  );
+
+  url.searchParams.set(
+    "oddsFormat",
+    "decimal"
+  );
+
+  url.searchParams.set(
+    "dateFormat",
+    "iso"
+  );
+
+  if (
+    historical &&
+    historicalTimestamp
+  ) {
+    url.searchParams.set(
+      "date",
+      historicalTimestamp
+    );
+  } else {
+    /*
+      현재 API에서는
+      이미 시작한 경기의 라이브 배당 제외.
+    */
+    url.searchParams.set(
+      "commenceTimeFrom",
+      new Date()
+        .toISOString()
+        .replace(
+          /\.\d{3}Z$/,
+          "Z"
+        )
+    );
+  }
+
+  try {
+    const response =
+      await fetch(
+        url.toString(),
+        {
+          cache:
+            "no-store",
+        }
+      );
+
+    const remaining =
+      response.headers.get(
+        "x-requests-remaining"
+      );
+
+    const used =
+      response.headers.get(
+        "x-requests-used"
+      );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          error:
+            data?.message ||
+            data?.error ||
+            (
+              historical
+                ? `과거 배당 API 오류 (${response.status})`
+                : `배당 API 오류 (${response.status})`
+            ),
+
+          historical,
+
+          requestedDate:
+            validDate,
+        },
+        {
+          status:
+            response.status,
+        }
+      );
+    }
+
+    const rawEvents:
+      OddsEvent[] =
+      historical
+        ? (
+            data as
+              HistoricalResponse
+          ).data || []
+        : Array.isArray(
+            data
+          )
+          ? data
+          : [];
+
+    const events =
+      rawEvents.map(
+        extractEvent
+      );
+
+    return NextResponse.json({
+      fetchedAt:
+        new Date()
+          .toISOString(),
+
+      mode:
+        historical
+          ? "historical"
+          : "current",
+
+      requestedDate:
+        validDate,
+
+      snapshotAt:
+        historical
+          ? (
+              data as
+                HistoricalResponse
+            ).timestamp ||
+            historicalTimestamp
+          : null,
+
+      remaining,
+      used,
+      events,
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "배당 API 연결 실패",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}

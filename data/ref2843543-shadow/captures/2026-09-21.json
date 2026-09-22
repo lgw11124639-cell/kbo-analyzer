@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-09-21T03:51:21.698Z",
+  "captureDate": "2026-09-21",
+  "status": "PRE_GAME_SHADOW_CAPTURE_ONLY",
+  "referenceModel": "REF-2843543",
+  "uncertaintySpec": "WHIP_UNCERTAINTY_V3_SHADOW",
+  "provenance": {
+    "todayApi": "http://127.0.0.1:3200/api/kbo/today?date=2026-09-21",
+    "teamFormApi": "http://127.0.0.1:3200/api/kbo/team-form",
+    "starterFile": "data/kbo-h15-shadow-starter-2026.json",
+    "starterFileSha256": "0eb0a8900ad192220d29a2736a71e2f28ac9e82542f78ed10acce1acc3f2074c",
+    "bullpenFile": "data/kbo-h15-shadow-bullpen-2026.json",
+    "bullpenFileSha256": "9672556c0a8dfc348fd69513462d0e5f7212a6df7a313a884ec2423820ccd723"
+  },
+  "frozenParameters": {
+    "starterEraBlend": [
+      0.5,
+      0.5
+    ],
+    "starterWeight": 0.5,
+    "bullpenEraBlend": [
+      0.4,
+      0.6
+    ],
+    "bullpenWeight": 0.75,
+    "whipMean": 1.455191,
+    "whipSd": 0.351002,
+    "uncertaintyIntercept": 2.585862,
+    "uncertaintySlope": 0.246771,
+    "uncertaintyHighCutoff": 2.717549
+  },
+  "rules": [
+    "PRE_GAME_ONLY",
+    "NO_RESULT_FIELDS",
+    "NO_RETUNE",
+    "NO_REF_MEAN_CHANGE",
+    "NO_PRODUCTION_CONFIDENCE_CHANGE",
+    "PRODUCTION_.675_UNCHANGED"
+  ],
+  "rows": []
+}

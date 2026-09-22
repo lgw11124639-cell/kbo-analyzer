@@ -1,0 +1,19 @@
+0 verbose cli /usr/bin/node /usr/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@10.9.8
+2 info using node@v22.23.2
+3 silly config load:file:/usr/lib/node_modules/npm/npmrc
+4 silly config load:file:/opt/kbo-analyzer/.npmrc
+5 silly config load:file:/opt/kbo-analyzer/KIA/.npmrc
+6 silly config load:file:/usr/etc/npmrc
+7 verbose title npm exec tsc --noEmit
+8 verbose argv "exec" "--" "tsc" "--noEmit"
+9 verbose logfile logs-max:10 dir:/opt/kbo-analyzer/KIA/.npm/_logs/2026-09-18T15_17_45_531Z-
+10 verbose logfile /opt/kbo-analyzer/KIA/.npm/_logs/2026-09-18T15_17_45_531Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 verbose cwd /opt/kbo-analyzer
+14 verbose os Linux 7.0.0-1012-aws
+15 verbose node v22.23.2
+16 verbose npm  v10.9.8
+17 verbose exit 1
+18 verbose code 1

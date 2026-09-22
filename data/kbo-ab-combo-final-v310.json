@@ -1,0 +1,163 @@
+{
+  "formSd": 17.6689172380097,
+  "beta": 0.03816985690553097,
+  "discovery": {
+    "overall": {
+      "bets": 10,
+      "wins": 3,
+      "losses": 7,
+      "hit": 30,
+      "avgOdds": 4.293,
+      "roi": 38.12
+    },
+    "monthly": [
+      {
+        "month": "2026-04",
+        "bets": 10,
+        "wins": 3,
+        "losses": 7,
+        "hit": 30,
+        "avgOdds": 4.293,
+        "roi": 38.12
+      }
+    ],
+    "sameGame": {
+      "bets": 4,
+      "wins": 0,
+      "losses": 4,
+      "hit": 0,
+      "avgOdds": 4.255,
+      "roi": -100
+    },
+    "differentGame": {
+      "bets": 6,
+      "wins": 3,
+      "losses": 3,
+      "hit": 50,
+      "avgOdds": 4.318,
+      "roi": 130.2
+    },
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1038118,
+      "profit": 38118,
+      "mdd": 5.46,
+      "maxLosingStreak": 6
+    }
+  },
+  "internal": {
+    "overall": {
+      "bets": 35,
+      "wins": 10,
+      "losses": 25,
+      "hit": 28.57,
+      "avgOdds": 3.952,
+      "roi": 10.28
+    },
+    "monthly": [
+      {
+        "month": "2026-05",
+        "bets": 20,
+        "wins": 5,
+        "losses": 15,
+        "hit": 25,
+        "avgOdds": 4.139,
+        "roi": -3
+      },
+      {
+        "month": "2026-06",
+        "bets": 15,
+        "wins": 5,
+        "losses": 10,
+        "hit": 33.33,
+        "avgOdds": 3.702,
+        "roi": 28
+      }
+    ],
+    "sameGame": {
+      "bets": 19,
+      "wins": 8,
+      "losses": 11,
+      "hit": 42.11,
+      "avgOdds": 3.689,
+      "roi": 57.26
+    },
+    "differentGame": {
+      "bets": 16,
+      "wins": 2,
+      "losses": 14,
+      "hit": 12.5,
+      "avgOdds": 4.264,
+      "roi": -45.5
+    },
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1035996,
+      "profit": 35996,
+      "mdd": 9.77,
+      "maxLosingStreak": 10
+    }
+  },
+  "final": {
+    "overall": {
+      "bets": 44,
+      "wins": 18,
+      "losses": 26,
+      "hit": 40.91,
+      "avgOdds": 3.757,
+      "roi": 43.52
+    },
+    "monthly": [
+      {
+        "month": "2026-07",
+        "bets": 17,
+        "wins": 7,
+        "losses": 10,
+        "hit": 41.18,
+        "avgOdds": 3.626,
+        "roi": 38.01
+      },
+      {
+        "month": "2026-08",
+        "bets": 16,
+        "wins": 5,
+        "losses": 11,
+        "hit": 31.25,
+        "avgOdds": 3.766,
+        "roi": 5.76
+      },
+      {
+        "month": "2026-09",
+        "bets": 11,
+        "wins": 6,
+        "losses": 5,
+        "hit": 54.55,
+        "avgOdds": 3.945,
+        "roi": 106.95
+      }
+    ],
+    "sameGame": {
+      "bets": 25,
+      "wins": 12,
+      "losses": 13,
+      "hit": 48,
+      "avgOdds": 3.604,
+      "roi": 69.48
+    },
+    "differentGame": {
+      "bets": 19,
+      "wins": 6,
+      "losses": 13,
+      "hit": 31.58,
+      "avgOdds": 3.958,
+      "roi": 9.36
+    },
+    "bankroll": {
+      "initial": 1000000,
+      "final": 1191485,
+      "profit": 191485,
+      "mdd": 8.33,
+      "maxLosingStreak": 8
+    }
+  }
+}

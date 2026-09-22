@@ -1,0 +1,31 @@
+{
+  "referenceModel": "REF-2843543",
+  "signal": "WHIP_UNCERTAINTY_V3_SHADOW",
+  "status": "GENUINELY_UNSEEN_ACCUMULATION",
+  "startDate": "2026-09-21",
+  "specSha256": "23fd3e5fa9344dee162bcb71532a494aa7fef2695b9e781b1db1b9dc9c5539e8",
+  "sepObservationSha256": "c9a1aab133200279eaab748bfc32012852691bfaf52ef0847a98b3aea32bea48",
+  "frozenParameters": {
+    "trainWhipMean": 1.455191,
+    "trainWhipSd": 0.351002,
+    "intercept": 2.585862,
+    "slope": 0.246771,
+    "minPrediction": 0.05,
+    "highCutoff": 2.717549
+  },
+  "evaluationMilestones": [
+    50,
+    100,
+    150,
+    200
+  ],
+  "rules": [
+    "Append only games dated 2026-09-21 or later",
+    "Do not alter frozen parameters",
+    "Do not retune cutoff from unseen outcomes",
+    "Do not change REF mean score",
+    "Do not change production confidence from tracker until separately approved",
+    "Production handicap threshold .675 remains unchanged"
+  ],
+  "rows": []
+}

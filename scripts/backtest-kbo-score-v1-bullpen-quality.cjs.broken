@@ -1,0 +1,88 @@
+const fs=require("fs");
+
+const src=JSON.parse(fs.readFileSync("data/kbo-score-features-v06.json","utf8"));
+const games=(Array.isArray(src)?src:Object.values(src).find(v=>Array.isArray(v))||[])
+  .filter(g=>g.date<="2026-08-31");
+
+const starterSrc=JSON.parse(fs.readFileSync("data/kbo-historical-starter-stats-2026.json","utf8"));
+const starters=Array.isArray(starterSrc)?starterSrc:(starterSrc.snapshots||starterSrc.games||starterSrc.data||[]);
+
+const bpSrc=JSON.parse(fs.readFileSync("data/kbo-historical-bullpen-quality-2026.json","utf8"));
+const bpSnaps=bpSrc.snapshots||[];
+const bpRows=bpSrc.gameBullpens||[];
+
+const starterMap=new Map(starters.map(x=>[x.gameId,x]));
+const bpMap=new Map(bpSnaps.map(x=>[x.gameId,x]));
+
+function n(v){
+  if(v===null||v===undefined||v==="") return null;
+  const x=Number(v);
+  return Number.isFinite(x)?x:null;
+}
+function mean(a){
+  const x=a.filter(Number.isFinite);
+  return x.length?x.reduce((s,v)=>s+v,0)/x.length:null;
+}
+function clamp(x,lolhi){ return Math.max(lo,Math.min(hi,x)); }
+
+function starterInfo(s){
+  const st=s?.stats;
+  if(!st) return null;
+
+  const seasonIP=n(st.innings);
+  const seasonG=n(st.games);
+  const r5IP=n(st.recent5?.innings);
+  const r5G=n(st.recent5?.games);
+
+  let ip=null;
+  if(r5IP!==null&&r5G!==null&&r5G>0) ip=r5IP/r5G;
+  else if(seasonIP!==null&&seasonG!==null&&seasonG>0) ip=seasonIP/seasonG;
+  if(ip===null) return null;
+  ip=clamp(ip,3.5,7);
+
+  const era=n(st.era);
+  const r5era=n(st.recent5?.era);
+  let blended=null;
+  if(era!==null&&r5era!==null) blended=(era+r5era)/2;
+  else blended=era??r5era;
+  if(blended===null) return null;
+
+  return {ip,era:blended};
+}
+
+const leagueEraCache=new Map();
+function leaguePriorEra(date){
+  if(leagueEraCache.has(date)) return leagueEraCache.get(date);
+  let outs=0, er=0;
+  for(const r of bpRows){
+    if(r.date>=date) continue;
+    const o=n(r.outs),e=n(r.earnedRuns);
+    if(o!==null&&o>0&&e!==null){
+      outs+=o;
+      er+=e;
+    }
+  }
+  const era=outs>0?er*27/outs:4.5;
+  leagueEraCache.set(date,era);
+  return era;
+}
+
+function shrinkEra(q,date,pseudoIP){
+  if(!q) return null;
+  const outs=n(q.outs),er=n(q.earnedRuns);
+  if(outs===null||outs<=0||er===null) return null;
+  const ip=outs/3;
+  const raw=er*9/ip;
+  if(pseudoIP<=0) return raw;
+  const lg=leaguePriorEra(date);
+  return (raw*ip+lg*pseudoIP)/(ip+pseudoIP);
+}
+
+function bullpenEra(bpSide,date,kind,pseudoIP){
+  if(!bpSide) return null;
+  const season=shrinkEra(bpSide.season,date,pseudoIP);
+  const l30=shrinkEra(bpSide.recent30,date,pseudoIP);
+  const l14=shrinkEra(bpSide.recent14,date,pseudoIP);
+
+  if(kind==="SEASON") return season;
+  if

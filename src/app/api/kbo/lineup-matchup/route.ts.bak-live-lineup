@@ -1,0 +1,1189 @@
+﻿import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
+
+export const dynamic = "force-dynamic";
+
+const KBO_BVP_URL =
+  "https://www.koreabaseball.com/Record/Etc/HitVsPit.aspx";
+
+const PITCHER_TEAM =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlPitcherTeam";
+
+const PITCHER_PLAYER =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlPitcherPlayer";
+
+const HITTER_TEAM =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlHitterTeam";
+
+const HITTER_PLAYER =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$ddlHitterPlayer";
+
+const SEARCH_BUTTON =
+  "ctl00$ctl00$ctl00$cphContents$cphContents$cphContents$btnSearch";
+
+
+type LineupStrengthPlayer = {
+  order: number;
+  position: string;
+  name: string;
+  playerId: number | null;
+
+  stats: {
+    avg: number | null;
+    pa: number | null;
+    hr: number | null;
+    obp: number | null;
+    slg: number | null;
+    ops: number | null;
+  } | null;
+
+  score: number | null;
+};
+
+
+type BvpStats = {
+  avg: number | null;
+  pa: number | null;
+  ab: number | null;
+  hits: number | null;
+  doubles: number | null;
+  triples: number | null;
+  hr: number | null;
+  rbi: number | null;
+  bb: number | null;
+  hbp: number | null;
+  so: number | null;
+  slg: number | null;
+  obp: number | null;
+  ops: number | null;
+};
+
+
+function normalizeTeamName(
+  value: string | null | undefined
+) {
+  return (value ?? "")
+    .replace(/\s+/g, "")
+    .replace("두산베어스", "두산")
+    .replace("LG트윈스", "LG")
+    .replace("삼성라이온즈", "삼성")
+    .replace("KIA타이거즈", "KIA")
+    .replace("한화이글스", "한화")
+    .replace("롯데자이언츠", "롯데")
+    .replace("KT위즈", "KT")
+    .replace("NC다이노스", "NC")
+    .replace("SSG랜더스", "SSG")
+    .replace("키움히어로즈", "키움");
+}
+
+
+function teamCode(
+  team: string
+) {
+  const map:
+    Record<string,string> = {
+      KT: "KT",
+      삼성: "SS",
+      LG: "LG",
+      KIA: "HT",
+      두산: "OB",
+      NC: "NC",
+      한화: "HH",
+      SSG: "SK",
+      롯데: "LT",
+      키움: "WO",
+    };
+
+  return (
+    map[
+      normalizeTeamName(team)
+    ] ?? ""
+  );
+}
+
+
+function hiddenFields(
+  html: string
+) {
+  const $ =
+    cheerio.load(html);
+
+  const result:
+    Record<string,string> = {};
+
+  $("input[type=hidden]").each(
+    (_, el) => {
+      const name =
+        $(el).attr("name");
+
+      if (!name) return;
+
+      result[name] =
+        $(el).attr("value") ?? "";
+    }
+  );
+
+  return result;
+}
+
+
+async function requestPage(
+  method: "GET" | "POST",
+  body?: URLSearchParams,
+  cookie?: string
+) {
+  const response =
+    await fetch(
+      KBO_BVP_URL,
+      {
+        method,
+
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+
+          "Accept-Language":
+            "ko-KR,ko;q=0.9",
+
+          ...(method === "POST"
+            ? {
+                "Content-Type":
+                  "application/x-www-form-urlencoded",
+              }
+            : {}),
+
+          ...(cookie
+            ? {
+                Cookie: cookie,
+              }
+            : {}),
+        },
+
+        body:
+          method === "POST"
+            ? body
+            : undefined,
+
+        cache:
+          "no-store",
+      }
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      `KBO BvP HTTP ${response.status}`
+    );
+  }
+
+  return {
+    html:
+      await response.text(),
+
+    cookie:
+      response.headers.get(
+        "set-cookie"
+      ) ??
+      cookie ??
+      "",
+  };
+}
+
+
+async function postback(
+  html: string,
+  cookie: string,
+  eventTarget: string,
+  values:
+    Record<string,string>
+) {
+  const hidden =
+    hiddenFields(html);
+
+  const body =
+    new URLSearchParams();
+
+  for (
+    const [key,value]
+    of Object.entries(hidden)
+  ) {
+    body.set(
+      key,
+      value
+    );
+  }
+
+  body.set(
+    "__EVENTTARGET",
+    eventTarget
+  );
+
+  body.set(
+    "__EVENTARGUMENT",
+    ""
+  );
+
+  for (
+    const [key,value]
+    of Object.entries(values)
+  ) {
+    body.set(
+      key,
+      value
+    );
+  }
+
+  return requestPage(
+    "POST",
+    body,
+    cookie
+  );
+}
+
+
+function numberValue(
+  value:
+    string | undefined
+) {
+  if (
+    !value ||
+    value === "-"
+  ) {
+    return null;
+  }
+
+  const parsed =
+    Number(
+      value
+        .replace(/,/g, "")
+        .trim()
+    );
+
+  return Number.isFinite(parsed)
+    ? parsed
+    : null;
+}
+
+
+function parseBvp(
+  html: string
+): BvpStats | null {
+
+  const $ =
+    cheerio.load(html);
+
+  const tables =
+    $("table").toArray();
+
+  for (
+    const table of tables
+  ) {
+
+    const headers =
+      $(table)
+        .find("thead th")
+        .map(
+          (_, th) =>
+            $(th)
+              .text()
+              .replace(/\s+/g, " ")
+              .trim()
+              .toUpperCase()
+        )
+        .get();
+
+    const required =
+      [
+        "AVG",
+        "PA",
+        "AB",
+        "H",
+        "HR",
+        "SLG",
+        "OBP",
+        "OPS",
+      ];
+
+    if (
+      !required.every(
+        (header) =>
+          headers.includes(
+            header
+          )
+      )
+    ) {
+      continue;
+    }
+
+    const cells =
+      $(table)
+        .find("tbody tr")
+        .first()
+        .find("th,td")
+        .map(
+          (_, td) =>
+            $(td)
+              .text()
+              .replace(/\s+/g, " ")
+              .trim()
+        )
+        .get();
+
+    if (
+      cells.length <
+      headers.length
+    ) {
+      continue;
+    }
+
+    const row:
+      Record<string,string> = {};
+
+    headers.forEach(
+      (header,index) => {
+        row[header] =
+          cells[index] ?? "";
+      }
+    );
+
+    return {
+      avg:
+        numberValue(row.AVG),
+
+      pa:
+        numberValue(row.PA),
+
+      ab:
+        numberValue(row.AB),
+
+      hits:
+        numberValue(row.H),
+
+      doubles:
+        numberValue(
+          row["2B"]
+        ),
+
+      triples:
+        numberValue(
+          row["3B"]
+        ),
+
+      hr:
+        numberValue(row.HR),
+
+      rbi:
+        numberValue(row.RBI),
+
+      bb:
+        numberValue(row.BB),
+
+      hbp:
+        numberValue(row.HBP),
+
+      so:
+        numberValue(row.SO),
+
+      slg:
+        numberValue(row.SLG),
+
+      obp:
+        numberValue(row.OBP),
+
+      ops:
+        numberValue(row.OPS),
+    };
+  }
+
+  return null;
+}
+
+
+/*
+  BvP 신뢰도
+
+  적은 표본을 과도하게 믿지 않기 위해
+  PA에 따라 시즌 OPS 대비 BvP OPS의
+  반영 강도를 제한한다.
+*/
+function bvpWeight(
+  pa: number | null
+) {
+  if (
+    !pa ||
+    pa <= 0
+  ) {
+    return 0;
+  }
+
+  /*
+    BvP 표본 신뢰도
+
+    PA / (PA + 40)
+
+    적은 표본은 강하게 축소하고
+    표본이 커질수록 서서히 신뢰도를 높인다.
+
+    다만 BvP 하나가 모델을 지배하지 않도록
+    최대 50%까지만 허용.
+  */
+  return Math.min(
+    0.50,
+    pa / (pa + 40)
+  );
+}
+
+function matchupScore(
+  seasonScore: number | null,
+  seasonOps: number | null,
+  bvp: BvpStats | null
+) {
+  if (
+    seasonScore === null
+  ) {
+    return null;
+  }
+
+  if (
+    !bvp ||
+    bvp.ops === null ||
+    !bvp.pa ||
+    bvp.pa <= 0
+  ) {
+    return Number(
+      seasonScore.toFixed(1)
+    );
+  }
+
+  const baselineOps =
+    seasonOps ?? 0.700;
+
+  const reliability =
+    bvpWeight(
+      bvp.pa
+    );
+
+  /*
+    BvP OPS를 그대로 사용하지 않고
+    시즌 OPS 방향으로 회귀시킨다.
+  */
+  const regressedBvpOps =
+    baselineOps *
+      (1 - reliability) +
+    bvp.ops *
+      reliability;
+
+  /*
+    시즌 OPS 대비 회귀된 BvP OPS 차이를
+    점수로 변환.
+
+    OPS 0.100 차이 ≈ 1점.
+  */
+  const rawAdjustment =
+    (
+      regressedBvpOps -
+      baselineOps
+    ) *
+    10;
+
+  /*
+    작은 표본의 극단값 때문에
+    개인 점수가 지나치게 움직이지 않도록
+    최대 ±2점 제한.
+  */
+  const adjustment =
+    Math.max(
+      -2,
+      Math.min(
+        2,
+        rawAdjustment
+      )
+    );
+
+  return Number(
+    Math.max(
+      0,
+      Math.min(
+        100,
+        seasonScore +
+          adjustment
+      )
+    ).toFixed(1)
+  );
+}
+
+async function prepareBvpPage(
+  pitcherId: number,
+  pitcherTeam: string,
+  hitterTeam: string
+) {
+  const pitcherCode =
+    teamCode(
+      pitcherTeam
+    );
+
+  const hitterCode =
+    teamCode(
+      hitterTeam
+    );
+
+  if (
+    !pitcherCode ||
+    !hitterCode
+  ) {
+    throw new Error(
+      "KBO 팀코드 변환 실패"
+    );
+  }
+
+  const first =
+    await requestPage(
+      "GET"
+    );
+
+  const step1 =
+    await postback(
+      first.html,
+      first.cookie,
+      PITCHER_TEAM,
+      {
+        [PITCHER_TEAM]:
+          pitcherCode,
+
+        [PITCHER_PLAYER]:
+          "0",
+
+        [HITTER_TEAM]:
+          "",
+
+        [HITTER_PLAYER]:
+          "0",
+      }
+    );
+
+  const step2 =
+    await postback(
+      step1.html,
+      step1.cookie,
+      PITCHER_PLAYER,
+      {
+        [PITCHER_TEAM]:
+          pitcherCode,
+
+        [PITCHER_PLAYER]:
+          String(
+            pitcherId
+          ),
+
+        [HITTER_TEAM]:
+          "",
+
+        [HITTER_PLAYER]:
+          "0",
+      }
+    );
+
+  const step3 =
+    await postback(
+      step2.html,
+      step2.cookie,
+      HITTER_TEAM,
+      {
+        [PITCHER_TEAM]:
+          pitcherCode,
+
+        [PITCHER_PLAYER]:
+          String(
+            pitcherId
+          ),
+
+        [HITTER_TEAM]:
+          hitterCode,
+
+        [HITTER_PLAYER]:
+          "0",
+      }
+    );
+
+  return {
+    html:
+      step3.html,
+
+    cookie:
+      step3.cookie,
+
+    pitcherCode,
+    hitterCode,
+  };
+}
+
+
+async function searchOneBvp(
+  prepared: {
+    html: string;
+    cookie: string;
+    pitcherCode: string;
+    hitterCode: string;
+  },
+  pitcherId: number,
+  hitterId: number
+) {
+  const hidden =
+    hiddenFields(
+      prepared.html
+    );
+
+  const body =
+    new URLSearchParams();
+
+  for (
+    const [key,value]
+    of Object.entries(hidden)
+  ) {
+    body.set(
+      key,
+      value
+    );
+  }
+
+  body.set(
+    "__EVENTTARGET",
+    ""
+  );
+
+  body.set(
+    "__EVENTARGUMENT",
+    ""
+  );
+
+  body.set(
+    PITCHER_TEAM,
+    prepared.pitcherCode
+  );
+
+  body.set(
+    PITCHER_PLAYER,
+    String(
+      pitcherId
+    )
+  );
+
+  body.set(
+    HITTER_TEAM,
+    prepared.hitterCode
+  );
+
+  body.set(
+    HITTER_PLAYER,
+    String(
+      hitterId
+    )
+  );
+
+  body.set(
+    SEARCH_BUTTON,
+    "검색"
+  );
+
+  const result =
+    await requestPage(
+      "POST",
+      body,
+      prepared.cookie
+    );
+
+  return parseBvp(
+    result.html
+  );
+}
+
+
+async function enrichAgainstStarter(
+  players:
+    LineupStrengthPlayer[],
+  pitcherId:
+    number,
+  pitcherName:
+    string,
+  pitcherTeam:
+    string,
+  hitterTeam:
+    string
+) {
+  const prepared =
+    await prepareBvpPage(
+      pitcherId,
+      pitcherTeam,
+      hitterTeam
+    );
+
+  /*
+    KBO WebForms에 한 번에 과도한 요청을
+    보내지 않도록 순차 처리.
+    경기당 최대 9명.
+  */
+  const enriched = [];
+
+  for (
+    const player of players
+  ) {
+    let bvp:
+      BvpStats | null = null;
+
+    if (
+      player.playerId
+    ) {
+      try {
+        bvp =
+          await searchOneBvp(
+            prepared,
+            pitcherId,
+            player.playerId
+          );
+      } catch {
+        bvp = null;
+      }
+    }
+
+    const finalScore =
+      matchupScore(
+        player.score,
+        player.stats?.ops ??
+          null,
+        bvp
+      );
+
+    enriched.push({
+      ...player,
+
+      opponentStarter: {
+        id:
+          pitcherId,
+
+        name:
+          pitcherName,
+
+        team:
+          pitcherTeam,
+      },
+
+      bvp,
+
+      bvpWeight:
+        bvp
+          ? bvpWeight(
+              bvp.pa
+            )
+          : 0,
+
+      seasonScore:
+        player.score,
+
+      matchupScore:
+        finalScore,
+
+      adjustment:
+        player.score !== null &&
+        finalScore !== null
+          ? Number(
+              (
+                finalScore -
+                player.score
+              ).toFixed(1)
+            )
+          : 0,
+    });
+  }
+
+  return enriched;
+}
+
+
+function lineupMatchupSummary(
+  players:
+    Array<{
+      matchupScore:
+        number | null;
+
+      order:
+        number;
+    }>
+) {
+  const weights:
+    Record<number,number> = {
+      1: 1.08,
+      2: 1.10,
+      3: 1.13,
+      4: 1.16,
+      5: 1.12,
+      6: 1.00,
+      7: 0.94,
+      8: 0.90,
+      9: 0.88,
+    };
+
+  let total =
+    0;
+
+  let weightTotal =
+    0;
+
+  let count =
+    0;
+
+  for (
+    const player of players
+  ) {
+    if (
+      typeof player.matchupScore !==
+      "number"
+    ) {
+      continue;
+    }
+
+    const weight =
+      weights[
+        player.order
+      ] ?? 1;
+
+    total +=
+      player.matchupScore *
+      weight;
+
+    weightTotal +=
+      weight;
+
+    count++;
+  }
+
+  return {
+    playerCount:
+      count,
+
+    score:
+      weightTotal > 0
+        ? Number(
+            (
+              total /
+              weightTotal
+            ).toFixed(1)
+          )
+        : null,
+  };
+}
+
+
+export async function GET(
+  request: Request
+) {
+  const url =
+    new globalThis.URL(
+      request.url
+    );
+
+  const away =
+    normalizeTeamName(
+      url.searchParams.get(
+        "away"
+      )
+    );
+
+  const home =
+    normalizeTeamName(
+      url.searchParams.get(
+        "home"
+      )
+    );
+
+  const date =
+    url.searchParams.get(
+      "date"
+    );
+
+  if (
+    !away ||
+    !home ||
+    !date
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "away, home, date가 필요합니다.",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+
+  try {
+
+    const origin =
+      new globalThis.URL(
+        request.url
+      ).origin;
+
+
+    const [
+      gameResponse,
+      lineupResponse,
+    ] =
+      await Promise.all([
+        fetch(
+          `${origin}/api/kbo/today?date=${encodeURIComponent(date)}`,
+          {
+            cache:
+              "no-store",
+          }
+        ),
+
+        fetch(
+          `${origin}/api/kbo/lineup-strength?away=${encodeURIComponent(away)}&home=${encodeURIComponent(home)}&date=${encodeURIComponent(date)}`,
+          {
+            cache:
+              "no-store",
+          }
+        ),
+      ]);
+
+
+    if (
+      !gameResponse.ok
+    ) {
+      throw new Error(
+        "경기 정보 조회 실패"
+      );
+    }
+
+
+    if (
+      !lineupResponse.ok
+    ) {
+      throw new Error(
+        "라인업 조회 실패"
+      );
+    }
+
+
+    const gameJson =
+      await gameResponse.json();
+
+    const lineupJson =
+      await lineupResponse.json();
+
+
+    const games =
+      Array.isArray(
+        gameJson?.games
+      )
+        ? gameJson.games
+        : Array.isArray(
+            gameJson
+          )
+          ? gameJson
+          : [];
+
+
+    const game =
+      games.find(
+        (item: any) =>
+          normalizeTeamName(
+            item.awayTeamName
+          ) === away &&
+          normalizeTeamName(
+            item.homeTeamName
+          ) === home
+      );
+
+
+    if (!game) {
+      return NextResponse.json(
+        {
+          error:
+            "해당 경기를 찾지 못했습니다.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+
+    const awayStarter =
+      game.startingPitchers
+        ?.away;
+
+    const homeStarter =
+      game.startingPitchers
+        ?.home;
+
+
+    if (
+      !awayStarter?.id ||
+      !homeStarter?.id
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "양 팀 선발투수가 확정되지 않았습니다.",
+        },
+        {
+          status: 409,
+        }
+      );
+    }
+
+
+    const awayPlayers:
+      LineupStrengthPlayer[] =
+        Array.isArray(
+          lineupJson?.away
+            ?.players
+        )
+          ? lineupJson
+              .away.players
+          : [];
+
+
+    const homePlayers:
+      LineupStrengthPlayer[] =
+        Array.isArray(
+          lineupJson?.home
+            ?.players
+        )
+          ? lineupJson
+              .home.players
+          : [];
+
+
+    const [
+      awayMatchupPlayers,
+      homeMatchupPlayers,
+    ] =
+      await Promise.all([
+        /*
+          원정 타자들은
+          홈 선발 상대
+        */
+        enrichAgainstStarter(
+          awayPlayers,
+          homeStarter.id,
+          homeStarter.name ??
+            `${home} 선발`,
+          home,
+          away
+        ),
+
+        /*
+          홈 타자들은
+          원정 선발 상대
+        */
+        enrichAgainstStarter(
+          homePlayers,
+          awayStarter.id,
+          awayStarter.name ??
+            `${away} 선발`,
+          away,
+          home
+        ),
+      ]);
+
+
+    const awaySummary =
+      lineupMatchupSummary(
+        awayMatchupPlayers
+      );
+
+    const homeSummary =
+      lineupMatchupSummary(
+        homeMatchupPlayers
+      );
+
+
+    const edge =
+      typeof awaySummary.score ===
+        "number" &&
+      typeof homeSummary.score ===
+        "number"
+        ? Number(
+            (
+              awaySummary.score -
+              homeSummary.score
+            ).toFixed(1)
+          )
+        : null;
+
+
+    return NextResponse.json({
+      fetchedAt:
+        new Date()
+          .toISOString(),
+
+      date,
+
+      gameId:
+        game.gameId,
+
+      away: {
+        team:
+          away,
+
+        starter:
+          awayStarter,
+
+        opponentStarter:
+          homeStarter,
+
+        baseSummary:
+          lineupJson?.away
+            ?.summary ??
+          null,
+
+        matchupSummary:
+          awaySummary,
+
+        players:
+          awayMatchupPlayers,
+      },
+
+      home: {
+        team:
+          home,
+
+        starter:
+          homeStarter,
+
+        opponentStarter:
+          awayStarter,
+
+        baseSummary:
+          lineupJson?.home
+            ?.summary ??
+          null,
+
+        matchupSummary:
+          homeSummary,
+
+        players:
+          homeMatchupPlayers,
+      },
+
+      edge,
+    });
+
+  } catch (
+    error
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "unknown error",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
+
