@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { fetchKboGames } from "@/lib/kbo";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,204 @@ async function ensureUnlimitedBaseballs(
   if (error) {
     throw error;
   }
+}
+
+
+/*
+  BASEBALL_BET_GAME_STATUS_GUARD_V1
+
+  배팅 가능:
+  - 공식 경기 상태가 아직 시작 전
+  - 취소되지 않은 경기
+
+  배팅 불가:
+  - LIVE
+  - FINAL
+  - 이닝이 이미 시작됨
+  - 우천취소 등 취소 경기
+
+  프론트 상태는 조작 가능하므로
+  실제 야구공 차감 직전에 서버에서 KBO를 다시 확인한다.
+*/
+function getSelectionGameId(
+  selection: any
+) {
+  const value =
+    typeof selection?.gameId ===
+    "string"
+      ? selection.gameId.trim()
+      : "";
+
+  return value;
+}
+
+function isKboGameBettingClosed(
+  game: any
+) {
+  const stateCode =
+    String(
+      game?.status?.stateCode ||
+      ""
+    );
+
+  const cancelCode =
+    String(
+      game?.status?.cancelCode ||
+      "0"
+    );
+
+  const inning =
+    Number(
+      game?.status?.inning || 0
+    );
+
+  const topBottom =
+    String(
+      game?.status?.topBottom ||
+      ""
+    ).trim();
+
+  const cancelled =
+    !!cancelCode &&
+    cancelCode !== "0";
+
+  const started =
+    stateCode === "2" ||
+    stateCode === "3" ||
+    inning > 0 ||
+    !!topBottom;
+
+  return (
+    cancelled ||
+    started
+  );
+}
+
+async function checkSelectionsBettable(
+  selections: any[]
+) {
+  const rawGameIds =
+    selections.map(
+      getSelectionGameId
+    );
+
+  if (
+    rawGameIds.some(
+      (gameId) => !gameId
+    )
+  ) {
+    return {
+      ok: false,
+      error:
+        "INVALID_SELECTION_GAME",
+      closedGameIds: [],
+    };
+  }
+
+  const gameIds =
+    Array.from(
+      new Set(rawGameIds)
+    );
+
+  const dateKeys =
+    Array.from(
+      new Set(
+        gameIds.map(
+          (gameId) =>
+            gameId.slice(0, 8)
+        )
+      )
+    );
+
+  if (
+    dateKeys.some(
+      (dateKey) =>
+        !/^\d{8}$/.test(
+          dateKey
+        )
+    )
+  ) {
+    return {
+      ok: false,
+      error:
+        "INVALID_SELECTION_GAME",
+      closedGameIds: [],
+    };
+  }
+
+  const gameLists =
+    await Promise.all(
+      dateKeys.map(
+        async (dateKey) => ({
+          dateKey,
+          games:
+            await fetchKboGames(
+              dateKey
+            ),
+        })
+      )
+    );
+
+  const gameMap =
+    new Map<string, any>();
+
+  for (
+    const result of
+    gameLists
+  ) {
+    for (
+      const game of
+      result.games
+    ) {
+      gameMap.set(
+        game.gameId,
+        game
+      );
+    }
+  }
+
+  const missingGameIds =
+    gameIds.filter(
+      (gameId) =>
+        !gameMap.has(gameId)
+    );
+
+  if (
+    missingGameIds.length
+  ) {
+    return {
+      ok: false,
+      error:
+        "GAME_NOT_FOUND",
+      closedGameIds:
+        missingGameIds,
+    };
+  }
+
+  const closedGameIds =
+    gameIds.filter(
+      (gameId) =>
+        isKboGameBettingClosed(
+          gameMap.get(gameId)
+        )
+    );
+
+  if (
+    closedGameIds.length
+  ) {
+    return {
+      ok: false,
+      error:
+        "GAME_BETTING_CLOSED",
+      closedGameIds,
+    };
+  }
+
+  return {
+    ok: true,
+    error: null,
+    closedGameIds: [],
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -180,6 +379,53 @@ export async function POST(request: NextRequest) {
     }
     if (!referenceKey) {
       return NextResponse.json({ ok: false, error: "REFERENCE_KEY_REQUIRED" }, { status: 400 });
+    }
+
+    /*
+      실제 차감 직전 공식 KBO 상태 재검증.
+      사용자가 선택한 뒤 경기 시작된 경우도 여기서 차단한다.
+    */
+    let gameStatusCheck;
+
+    try {
+      gameStatusCheck =
+        await checkSelectionsBettable(
+          selections
+        );
+    } catch (statusError) {
+      console.error(
+        "baseball bet game status check failed",
+        statusError
+      );
+
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "GAME_STATUS_UNAVAILABLE",
+        },
+        {
+          status: 503,
+        }
+      );
+    }
+
+    if (
+      !gameStatusCheck.ok
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            gameStatusCheck.error,
+
+          closedGameIds:
+            gameStatusCheck.closedGameIds,
+        },
+        {
+          status: 409,
+        }
+      );
     }
 
     const admin = adminClient();

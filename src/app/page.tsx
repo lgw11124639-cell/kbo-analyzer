@@ -17061,6 +17061,18 @@ const [
                <div className="aiPickGameSelectorGrid">
                  {games.map((game) => {
                    const gameOdds = odds[game.gameId] || emptyOdds;
+
+                   const gameCancelled =
+                     !!game.status.cancelCode &&
+                     game.status.cancelCode !== "0";
+
+                   const gameBettingClosed =
+                     gameCancelled ||
+                     game.status.stateCode === "2" ||
+                     game.status.stateCode === "3" ||
+                     (game.status.inning ?? 0) > 0 ||
+                     !!game.status.topBottom;
+
                    const gamePicks = allPicks.filter((pick) => pick.gameId === game.gameId);
                    const mlPicks = gamePicks.filter((pick) => pick.market === "ML");
                    const handicapPicks = gamePicks.filter((pick) => pick.market === "HANDICAP");
@@ -17072,10 +17084,22 @@ const [
                        <button
                          type="button"
                          key={key}
-                         className={`aiPickSelectButton ${selected ? "isSelected" : ""}`}
-                         onClick={() => toggleGamePick(pick)}
+                         className={`aiPickSelectButton ${selected ? "isSelected" : ""} ${gameBettingClosed ? "isClosed" : ""}`}
+                         disabled={gameBettingClosed}
+                         onClick={() => {
+                           if (gameBettingClosed) return;
+                           toggleGamePick(pick);
+                         }}
                        >
-                         <span>{selected ? "✓ 배팅 선택됨" : "배팅 선택"}</span>
+                         <span>
+                           {gameBettingClosed
+                             ? gameCancelled
+                               ? "경기 취소"
+                               : "🔒 배팅 마감"
+                             : selected
+                             ? "✓ 배팅 선택됨"
+                             : "배팅 선택"}
+                         </span>
                          <b>{pick.label}</b>
                          <small>{pick.odds != null ? `${pick.odds.toFixed(2)}배` : "배당 대기"}</small>
                        </button>
@@ -17083,7 +17107,10 @@ const [
                    };
  
                    return (
-                     <article className="aiPickGameMarketCard" key={game.gameId}>
+                     <article
+                       className={`aiPickGameMarketCard ${gameBettingClosed ? "isBettingClosed" : ""}`}
+                       key={game.gameId}
+                     >
                        <div className="aiPickGameMarketTop">
                          <div>
                            <span>{game.time || "시간 미정"}</span>
@@ -17091,6 +17118,24 @@ const [
                          </div>
                          <button type="button" onClick={() => { setSelectedGameId(game.gameId); setActiveTab("games"); }}>상세분석 →</button>
                        </div>
+
+                       {gameBettingClosed && (
+                         <div className={`aiBettingClosedBanner ${gameCancelled ? "cancelled" : ""}`}>
+                           <strong>
+                             {gameCancelled
+                               ? `⛔ ${game.status.cancelName || "경기 취소"}`
+                               : "🔒 배팅 마감"}
+                           </strong>
+
+                           <span>
+                             {gameCancelled
+                               ? "취소된 경기는 배팅할 수 없습니다."
+                               : game.status.stateCode === "3"
+                               ? "경기가 종료되어 배팅이 마감되었습니다."
+                               : "경기가 시작되어 배팅이 마감되었습니다."}
+                           </span>
+                         </div>
+                       )}
  
                        <div className="aiPickMarketSection">
                          <div className="aiPickMarketTitle"><b>승패</b><small>베트맨 배당 기준</small></div>
@@ -17156,6 +17201,34 @@ const [
               ): pick is Pick =>
                 Boolean(pick)
             );
+
+        const closedSelectedPicks =
+          selectedPicks.filter((pick) => {
+            const targetGame =
+              games.find(
+                (game) =>
+                  game.gameId === pick.gameId
+              );
+
+            if (!targetGame) {
+              return true;
+            }
+
+            const cancelled =
+              !!targetGame.status.cancelCode &&
+              targetGame.status.cancelCode !== "0";
+
+            return (
+              cancelled ||
+              targetGame.status.stateCode === "2" ||
+              targetGame.status.stateCode === "3" ||
+              (targetGame.status.inning ?? 0) > 0 ||
+              !!targetGame.status.topBottom
+            );
+          });
+
+        const hasClosedSelection =
+          closedSelectedPicks.length > 0;
 
         const totalOdds =
           selectedPicks.reduce(
@@ -17269,6 +17342,16 @@ const [
                 {selectedPicks.length}개 선택
               </strong>
             </div>
+
+            {hasClosedSelection && (
+              <div className="manualGameComboClosedWarning">
+                <strong>🔒 배팅 마감 경기 포함</strong>
+                <span>
+                  이미 시작·종료·취소된 경기가 포함되어 있습니다.
+                  해당 픽을 제거하면 시작 전 경기만 계속 배팅할 수 있습니다.
+                </span>
+              </div>
+            )}
 
             {selectedPicks.length === 0 ? (
               <div className="manualGameComboEmpty">
@@ -17485,6 +17568,7 @@ const [
                     disabled={
                       manualGameComboSaveBusy ||
                       selectedPicks.length < 1 ||
+                      hasClosedSelection ||
                       !validOdds ||
                       stakeAmount < 1 ||
                       (authUser
@@ -17509,6 +17593,13 @@ const [
                           "배당이 없는 픽이 있어 배팅할 수 없습니다."
                         );
 
+                        return;
+                      }
+
+                      if (hasClosedSelection) {
+                        setManualGameComboSaveMessage(
+                          "🔒 배팅 마감: 시작·종료·취소된 경기가 포함되어 있습니다."
+                        );
                         return;
                       }
 
@@ -17699,6 +17790,24 @@ const [
                             throw new Error("이미 처리된 배팅입니다.");
                           }
 
+                          if (code === "GAME_BETTING_CLOSED") {
+                            throw new Error(
+                              "🔒 배팅 마감: 선택한 경기 중 이미 시작되었거나 마감된 경기가 있습니다."
+                            );
+                          }
+
+                          if (code === "GAME_NOT_FOUND") {
+                            throw new Error(
+                              "경기 정보를 확인할 수 없습니다."
+                            );
+                          }
+
+                          if (code === "GAME_STATUS_UNAVAILABLE") {
+                            throw new Error(
+                              "공식 경기 상태 확인이 지연되고 있습니다. 잠시 후 다시 시도해주세요."
+                            );
+                          }
+
                           throw new Error("야구공 배팅 처리에 실패했습니다.");
                         }
 
@@ -17754,8 +17863,10 @@ const [
                     {manualGameComboSaveBusy
                       ? "배팅 처리 중..."
                       : selectedPicks.length < 1
-                        ? "픽을 선택하세요"
-                        : "⚾ 배팅하기"}
+                      ? "픽을 선택하세요"
+                      : hasClosedSelection
+                      ? "🔒 마감 경기 제거 필요"
+                      : "⚾ 배팅하기"}
                   </button>
                 </div>
               </>
