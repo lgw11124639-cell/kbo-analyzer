@@ -1,5 +1,6 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { buildAutoPredictions } = require("./kbo-pregame-ai.cjs");
 process.chdir(path.resolve(__dirname, ".."));
 const root = "http://127.0.0.1:3200";
 async function api(url, body) {
@@ -28,9 +29,9 @@ async function run() {
   for (const game of games) {
     try {
       const payload = { starterStats: {}, teamForms: {}, bullpens: {} };
-      const save = async () => {
+      const save = async (allPredictions = []) => {
         if (!eligible(game, date)) return;
-        await api("/api/predictions/live", { date, engineVersion: "v0.1", allPredictions: [], aiPredictions: [], games: [{ ...game, pregameSnapshot: payload }] });
+        await api("/api/predictions/live", { date, engineVersion: "v0.1", allPredictions, aiPredictions: [], games: [{ ...game, pregameSnapshot: payload }] });
       };
       await save();
       for (const side of ["away", "home"]) {
@@ -53,6 +54,13 @@ async function run() {
         const bullpen = await optional("/api/kbo/bullpen" + query);
         if (bullpen) payload.bullpens[side] = bullpen;
         await save();
+      }
+      /* PREGAME_AI_AUTOSAVE_V1 */
+      if (eligible(game, date)) {
+        const begins = new Date(date + "T" + game.time + ":00+09:00").toISOString();
+        const allPredictions = await buildAutoPredictions(date, game, payload, begins);
+        if (allPredictions.length) await save(allPredictions);
+        console.log("[PREGAME_AI_STORED]", JSON.stringify({ date, gameId: game.gameId, count: allPredictions.length, markets: allPredictions.map(x => x.market) }));
       }
       const stored = JSON.parse(await fs.readFile("data/kbo-pregame-analysis-snapshots.json", "utf8"));
       const row = stored.snapshots.find(x => x.date === date && x.gameId === game.gameId);

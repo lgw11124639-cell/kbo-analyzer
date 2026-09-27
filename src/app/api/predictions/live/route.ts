@@ -1330,7 +1330,79 @@ export async function PUT(request: Request) {
     if (!token || request.headers.get("authorization") !== "Bearer " + token) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
     const initial = await readStore();
     const today = todayKst();
-    const dates = [...new Set(initial.predictions.filter(p => p.result === "PENDING" && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && p.date <= today).map(p => p.date))].sort().reverse().slice(0, 14);
+
+    let historyAnalysisRows: any[] = [];
+
+    try {
+      const analysisRaw =
+        JSON.parse(
+          await fs.readFile(
+            path.join(
+              process.cwd(),
+              "data",
+              "kbo-pregame-analysis-snapshots.json"
+            ),
+            "utf8"
+          )
+        );
+
+      historyAnalysisRows =
+        Array.isArray(
+          analysisRaw?.snapshots
+        )
+          ? analysisRaw.snapshots
+          : [];
+    } catch {
+      historyAnalysisRows = [];
+    }
+
+    const predictionDates =
+      initial.predictions
+        .filter(
+          (p) =>
+            p.result === "PENDING" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(
+              p.date
+            ) &&
+            p.date <= today
+        )
+        .map(
+          (p) => p.date
+        );
+
+    const analysisDates =
+      historyAnalysisRows
+        .filter(
+          (row: any) =>
+            row?.capturePhase === "PREGAME" &&
+            /^\d{4}-\d{2}-\d{2}$/.test(
+              String(
+                row?.date ||
+                ""
+              )
+            ) &&
+            String(
+              row.date
+            ) <= today &&
+            !row?.result
+        )
+        .map(
+          (row: any) =>
+            String(
+              row.date
+            )
+        );
+
+    const dates =
+      [
+        ...new Set([
+          ...predictionDates,
+          ...analysisDates,
+        ]),
+      ]
+        .sort()
+        .reverse()
+        .slice(0, 14);
     const official = new Map<string, any>();
     const failures: string[] = [];
     for (const date of dates) {
@@ -1363,6 +1435,150 @@ export async function PUT(request: Request) {
         settled++;
       }
       if (settled > 0) await writeStore(store);
+
+      /* HISTORY_ANALYSIS_RESULT_ARCHIVE_V20 */
+      try {
+        const analysisFile =
+          path.join(
+            process.cwd(),
+            "data",
+            "kbo-pregame-analysis-snapshots.json"
+          );
+
+        const analysisStore =
+          JSON.parse(
+            await fs.readFile(
+              analysisFile,
+              "utf8"
+            )
+          );
+
+        const rows =
+          Array.isArray(
+            analysisStore?.snapshots
+          )
+            ? analysisStore.snapshots
+            : [];
+
+        let archivedAnalysis = 0;
+
+        for (const row of rows) {
+          if (
+            !dates.includes(
+              String(
+                row?.date ||
+                ""
+              )
+            ) ||
+            !row?.gameId
+          ) {
+            continue;
+          }
+
+          const game =
+            official.get(
+              `${row.date}|${row.gameId}`
+            );
+
+          if (!game) {
+            continue;
+          }
+
+          const canceled =
+            String(
+              game?.status?.cancelName ||
+              ""
+            ).trim();
+
+          if (
+            canceled &&
+            canceled !== "정상경기"
+          ) {
+            continue;
+          }
+
+          const awayScore =
+            game?.score?.away;
+
+          const homeScore =
+            game?.score?.home;
+
+          if (
+            String(
+              game?.status?.stateCode ||
+              ""
+            ) !== "3" ||
+            !Number.isInteger(
+              awayScore
+            ) ||
+            !Number.isInteger(
+              homeScore
+            ) ||
+            awayScore < 0 ||
+            homeScore < 0
+          ) {
+            continue;
+          }
+
+          if (
+            row?.result?.awayScore ===
+              awayScore &&
+            row?.result?.homeScore ===
+              homeScore
+          ) {
+            continue;
+          }
+
+          row.result = {
+            awayScore,
+            homeScore,
+
+            winner:
+              awayScore > homeScore
+                ? "AWAY"
+                : awayScore < homeScore
+                  ? "HOME"
+                  : "DRAW",
+
+            totalRuns:
+              awayScore +
+              homeScore,
+
+            settledAt:
+              now,
+          };
+
+          archivedAnalysis += 1;
+        }
+
+        if (
+          archivedAnalysis > 0
+        ) {
+          const temp =
+            analysisFile +
+            `.tmp-history-${process.pid}-${Date.now()}`;
+
+          await fs.writeFile(
+            temp,
+            JSON.stringify(
+              analysisStore,
+              null,
+              2
+            ),
+            "utf8"
+          );
+
+          await fs.rename(
+            temp,
+            analysisFile
+          );
+        }
+      } catch (error) {
+        console.error(
+          "[HISTORY_ANALYSIS_RESULT_ARCHIVE_FAILED]",
+          error
+        );
+      }
       return NextResponse.json({ ok: failures.length === 0, settled, checkedDates: dates, failedDates: failures, remaining: store.predictions.filter(p => p.result === "PENDING").length }, { headers: { "Cache-Control": "no-store" } });
     });
   } catch (error) {

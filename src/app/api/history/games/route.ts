@@ -78,12 +78,69 @@ export async function GET(request: Request) {
 
   /* HISTORY_ANALYSIS_DETAIL_V18 */
   const analysisStore = await readJson("kbo-pregame-analysis-snapshots.json", { snapshots: [] });
+  const analysisRows = Array.isArray(analysisStore?.snapshots) ? analysisStore.snapshots : [];
   const analysisById = new Map<string, any>();
-  for (const row of Array.isArray(analysisStore?.snapshots) ? analysisStore.snapshots : []) {
+
+  for (const row of analysisRows) {
     const captured = Date.parse(row?.capturedAt), start = Date.parse(row?.commenceTime);
     if (row?.capturePhase !== "PREGAME" || !Number.isFinite(captured) || !Number.isFinite(start) || captured >= start) continue;
     analysisById.set(gameKey(row.date, row.gameId), row);
   }
+
+  /* HISTORY_ANALYSIS_SOURCE_V20 */
+  const analysisCompletedSnapshots = analysisRows.flatMap((row: any) => {
+    const awayScore = num(row?.result?.awayScore);
+    const homeScore = num(row?.result?.homeScore);
+
+    if (
+      row?.capturePhase !== "PREGAME" ||
+      !row?.date ||
+      !row?.gameId ||
+      awayScore === null ||
+      homeScore === null ||
+      !Number.isInteger(awayScore) ||
+      !Number.isInteger(homeScore) ||
+      awayScore < 0 ||
+      homeScore < 0
+    ) {
+      return [];
+    }
+
+    const awayTeam =
+      text(
+        row?.game?.awayTeamName ??
+        row?.game?.awayTeam
+      );
+
+    const homeTeam =
+      text(
+        row?.game?.homeTeamName ??
+        row?.game?.homeTeam
+      );
+
+    if (
+      !awayTeam ||
+      !homeTeam
+    ) {
+      return [];
+    }
+
+    return [{
+      id: row.gameId,
+      gameId: row.gameId,
+      date: row.date,
+      commenceTime: row.commenceTime ?? null,
+      stadium: row?.game?.stadium ?? null,
+      awayTeam,
+      homeTeam,
+      actualScore: {
+        away: awayScore,
+        home: homeScore,
+      },
+      canceled: false,
+      analysisSnapshot: true,
+    }];
+  });
 
   /* HISTORY_RECOVERED_DETAILS_V19 */
   const recoveredDetailsStore = await readJson("kbo-recovered-game-details.json", { snapshots: [] });
@@ -166,6 +223,45 @@ export async function GET(request: Request) {
     snapshotGames.set(key, { id, gameId: id, date, awayTeam: awayOf(row), homeTeam: homeOf(row), actualScore: { away, home }, canceled: false, liveSnapshot: true });
   }
   const completedSnapshots = [...snapshotGames.entries()].filter(([key]) => !conflictingScores.has(key)).map(([, game]) => game);
+
+  const completedGameIds =
+    new Set(
+      completedSnapshots.map(
+        (game: any) =>
+          gameKey(
+            game.date,
+            game.gameId
+          )
+      )
+    );
+
+  for (
+    const game of
+    analysisCompletedSnapshots
+  ) {
+    const key =
+      gameKey(
+        game.date,
+        game.gameId
+      );
+
+    if (
+      completedGameIds.has(
+        key
+      )
+    ) {
+      continue;
+    }
+
+    completedGameIds.add(
+      key
+    );
+
+    completedSnapshots.push(
+      game
+    );
+  }
+
   const snapshotMatches = new Set(completedSnapshots.map(g => matchKey(g.date, g.awayTeam, g.homeTeam)));
   const historySources = [...completedSnapshots, ...betmanGames.filter((g: any) => !snapshotMatches.has(matchKey(g?.date, g?.awayTeam, g?.homeTeam)))];
   const seen = new Set<string>();
@@ -676,7 +772,7 @@ export async function GET(request: Request) {
 
       return {
         gameId: resolvedGameId, betmanId, date,
-        commenceTime:g?.commenceTime ?? null, stadium:g?.stadium ?? null,
+        commenceTime:g?.commenceTime ?? analysisSnapshot?.commenceTime ?? null, stadium:g?.stadium ?? analysisSnapshot?.game?.stadium ?? null,
         awayTeamName:text(g?.awayTeam ?? lastOdds?.awayTeam ?? lastOdds?.awayTeamName), homeTeamName:text(g?.homeTeam ?? lastOdds?.homeTeam ?? lastOdds?.homeTeamName),
         awayScore, homeScore, finalScoreRaw:g?.actualScore ?? null,
         ai:{
