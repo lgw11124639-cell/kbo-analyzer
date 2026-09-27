@@ -67,6 +67,163 @@ async function ensureUnlimitedBaseballs(
 
 const reply = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { "Cache-Control": "private, no-store" } });
 
+/* ANALYSIS_PURCHASE_HISTORY_API_V1 */
+
+const KBO_TEAM_CODE_NAMES:
+  Record<string, string> = {
+    HT: "KIA",
+    OB: "두산",
+    SS: "삼성",
+    LG: "LG",
+    LT: "롯데",
+    HH: "한화",
+    SK: "SSG",
+    KT: "KT",
+    NC: "NC",
+    WO: "키움",
+  };
+
+function analysisPurchaseGameMeta(
+  gameId: string
+) {
+  const match =
+    /^(\d{4})(\d{2})(\d{2})([A-Z]{2})([A-Z]{2})/
+      .exec(gameId);
+
+  if (!match) {
+    return {
+      gameDate: "",
+      awayTeamName: "",
+      homeTeamName: "",
+    };
+  }
+
+  const [
+    ,
+    year,
+    month,
+    day,
+    awayCode,
+    homeCode,
+  ] = match;
+
+  return {
+    gameDate:
+      `${year}-${month}-${day}`,
+
+    awayTeamName:
+      KBO_TEAM_CODE_NAMES[
+        awayCode
+      ] || awayCode,
+
+    homeTeamName:
+      KBO_TEAM_CODE_NAMES[
+        homeCode
+      ] || homeCode,
+  };
+}
+
+async function handleUnlockList(
+  request: NextRequest
+) {
+  try {
+    const auth =
+      await requireUser(
+        request
+      );
+
+    if (
+      auth.error ||
+      !auth.user
+    ) {
+      return reply(
+        {
+          ok: false,
+          error:
+            "로그인이 필요합니다.",
+        },
+        401
+      );
+    }
+
+    const admin =
+      adminClient();
+
+    const {
+      data,
+      error,
+    } =
+      await admin
+        .from(
+          "kbo_analysis_unlocks"
+        )
+        .select(
+          "game_id,price,created_at"
+        )
+        .eq(
+          "user_id",
+          auth.user.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        )
+        .limit(100);
+
+    if (error) {
+      throw error;
+    }
+
+    const items =
+      (data || []).map(
+        (row) => {
+          const meta =
+            analysisPurchaseGameMeta(
+              row.game_id
+            );
+
+          return {
+            gameId:
+              row.game_id,
+
+            price:
+              Number(
+                row.price ?? 3000
+              ) || 3000,
+
+            createdAt:
+              row.created_at,
+
+            ...meta,
+          };
+        }
+      );
+
+    return reply({
+      ok: true,
+      items,
+      count:
+        items.length,
+    });
+  } catch (error) {
+    console.error(
+      "analysis purchase history failed",
+      error
+    );
+
+    return reply(
+      {
+        ok: false,
+        error:
+          "구매한 경기분석 내역을 불러오지 못했습니다.",
+      },
+      500
+    );
+  }
+}
+
 async function handleUnlock(request: NextRequest, purchase: boolean) {
   try {
     const auth = await requireUser(request);
@@ -138,5 +295,20 @@ async function handleUnlock(request: NextRequest, purchase: boolean) {
   }
 }
 
-export async function GET(request: NextRequest) { return handleUnlock(request, false); }
+export async function GET(request: NextRequest) {
+  if (
+    request.nextUrl.searchParams.get(
+      "list"
+    ) === "1"
+  ) {
+    return handleUnlockList(
+      request
+    );
+  }
+
+  return handleUnlock(
+    request,
+    false
+  );
+}
 export async function POST(request: NextRequest) { return handleUnlock(request, true); }

@@ -2189,6 +2189,7 @@ function selectHandicap15Direction(
 function GameCard({
   analysisUserId,
   onAnalysisBalanceChange,
+  openPurchasedAnalysis = false,
   game,
   odds,
   setOdds,
@@ -2222,6 +2223,7 @@ function GameCard({
   frozenPicks: Pick[];
   analysisUserId: string | null;
   onAnalysisBalanceChange: (balance: number) => void;
+  openPurchasedAnalysis?: boolean;
 }) {
 
   const awayStarterStats =
@@ -2449,7 +2451,7 @@ function GameCard({
   /*
     추천 자격:
     - 배당 존재
-    - 기대수익률 양수
+    - 시장 가치 양수
     - A/B급
 
     조건을 못 넘으면 억지 추천 대신 관망.
@@ -2800,7 +2802,7 @@ function GameCard({
       market:
         "TOTAL" as const,
       title:
-        "오버/언더",
+        "O/U 확률",
       picks:
         sortPredictionPicks(
           "TOTAL",
@@ -2895,6 +2897,7 @@ function GameCard({
   };
   useEffect(() => {
     let cancelled = false;
+    if (openPurchasedAnalysis) { setAnalysisUnlocked(true); setAnalysisPurchaseReady(true); setAnalysisPurchaseMessage(""); return; }
     setAnalysisUnlocked(false);
     setAnalysisPurchaseReady(false);
     setAnalysisPurchaseMessage("");
@@ -2929,6 +2932,20 @@ function GameCard({
   };
 
   const [analysisSection, setAnalysisSection] = useState<"summary" | "starter" | "lineup" | "flow" | "ai" | "picks">("ai");
+
+  /* PURCHASED_ANALYSIS_AUTO_OPEN_V1 */
+  useEffect(() => {
+    if (
+      openPurchasedAnalysis
+    ) {
+      setAnalysisSection(
+        "ai"
+      );
+    }
+  }, [
+    openPurchasedAnalysis,
+    game.gameId,
+  ]);
 
 
 
@@ -2980,7 +2997,7 @@ function GameCard({
     </div>
 
     <section className="gameAnalysisHeroV1"><div className="gameAnalysisHeroTeamV1 away"><div className="gameAnalysisHeroPhotoV1"><span>{(game.startingPitchers.away?.name || game.awayTeamName || "?").slice(0,1)}</span>{game.startingPitchers.away?.id && <img src={kboPlayerPhoto(game.startingPitchers.away.id)} alt={game.startingPitchers.away?.name || "원정 선발"} onError={(e)=>{e.currentTarget.style.display="none";}} />}<img className="gameAnalysisHeroLogoV1" src={`/api/kbo/team-logo?team=${encodeURIComponent(game.awayTeamName)}`} alt="" /></div><small>AWAY</small><h2>{game.awayTeamName}</h2><p>선발 <b>{game.startingPitchers.away?.name || "미정"}</b></p><span>{game.awayRank ? `${game.awayRank}위` : "순위 확인중"}</span></div><div className="gameAnalysisHeroCenterV1"><div className="gameAnalysisHeroMetaV1"><span>{game.time || "시간 미정"}</span><i>·</i><span>{game.stadium || "구장 미정"}</span></div><div className="gameAnalysisHeroScoreV1"><b>{awayDisplayScore ?? "-"}</b><em>:</em><b>{homeDisplayScore ?? "-"}</b></div>{!hasActualScore && projectedScores && <small className="gameAnalysisExpectedV1">AI 예상점수</small>}<strong className={`gameAnalysisStatusV1 ${isLiveGame?"live":isFinishedGame?"done":"pregame"}`}>{isFinishedGame?"경기 종료":isLiveGame?(liveInningLabel || "경기중"):game.status.cancelCode && game.status.cancelCode!=="0"?(game.status.cancelName || "경기 취소"):"경기 전"}</strong><div className="gameAnalysisHeroInfoV1"><div><span>원정 선발</span><b>{awayStarterStats?.era!=null?`ERA ${awayStarterStats.era.toFixed(2)}`:"ERA -"}</b></div><div><span>홈 선발</span><b>{homeStarterStats?.era!=null?`ERA ${homeStarterStats.era.toFixed(2)}`:"ERA -"}</b></div></div></div><div className="gameAnalysisHeroTeamV1 home"><div className="gameAnalysisHeroPhotoV1"><span>{(game.startingPitchers.home?.name || game.homeTeamName || "?").slice(0,1)}</span>{game.startingPitchers.home?.id && <img src={kboPlayerPhoto(game.startingPitchers.home.id)} alt={game.startingPitchers.home?.name || "홈 선발"} onError={(e)=>{e.currentTarget.style.display="none";}} />}<img className="gameAnalysisHeroLogoV1" src={`/api/kbo/team-logo?team=${encodeURIComponent(game.homeTeamName)}`} alt="" /></div><small>HOME</small><h2>{game.homeTeamName}</h2><p>선발 <b>{game.startingPitchers.home?.name || "미정"}</b></p><span>{game.homeRank ? `${game.homeRank}위` : "순위 확인중"}</span></div></section>
-    <nav className="gameAnalysisTabsV2">{([["ai","AI 분석"],["starter","선발"],["lineup","타선·라인업"],["flow","팀흐름·불펜"],["picks",analysisUnlocked ? "전체 픽 🔓" : "전체 픽 🔒"]] as const).map(([key,label])=><button type="button" key={key} className={analysisSection===key?"active":""} onClick={()=>setAnalysisSection(key)}>{label}</button>)}</nav>
+    <nav className="gameAnalysisTabsV2">{([["ai","AI 분석"],["starter","선발"],["lineup","타선·라인업"],["flow","팀흐름·불펜"],["picks",analysisUnlocked ? "프리미엄 분석 🔓" : "프리미엄 분석 🔒"]] as const).map(([key,label])=><button type="button" key={key} className={analysisSection===key?"active":""} onClick={()=>setAnalysisSection(key)}>{label}</button>)}</nav>
     {analysisSection !== "picks" && <section className="analysisLogicProV11">
       <div className="analysisLogicTitleV11"><div><small>PRO ANALYSIS LOGIC</small><h3>왜 이렇게 판단했나</h3><p>실제 경기 전 데이터 → 비교 기준 → 우위/열세 → 반대 근거 → 불확실성 순서로 설명합니다.</p></div><span>배당 미사용 · 모델 로직 유지</span></div>
 
@@ -3038,7 +3055,161 @@ function GameCard({
     {analysisSection === "lineup" && <section className="gameAnalysisSectionHeadV3"><small>OFFENSE / LINEUP</small><h3>타선·라인업 상세 분석</h3><p>공식 타순 기준 시즌 OPS · 출루율 · 장타율 · 상대 선발 상성 · 타순 가중치를 확인합니다.</p></section>}
     {analysisSection === "flow" && <><section className="gameAnalysisSectionHeadV3"><small>RECENT FORM / BULLPEN</small><h3>팀흐름·불펜 상세 분석</h3><p>최근 10경기 득실 흐름과 최근 3일 불펜 사용량을 함께 비교합니다.</p></section><section className="gameFlowDetailV3"><article><small>AWAY · 최근 10경기</small><h4>{game.awayTeamName}</h4><b>{awayTeamForm ? `${awayTeamForm.wins}승 ${awayTeamForm.losses}패${awayTeamForm.draws ? ` ${awayTeamForm.draws}무` : ""}` : "-"}</b><div><span>평균 득점 <strong>{awayTeamForm?.avgRuns?.toFixed(1) ?? "-"}</strong></span><span>평균 실점 <strong>{awayTeamForm?.avgRunsAllowed?.toFixed(1) ?? "-"}</strong></span><span>득실차 <strong>{awayTeamForm ? `${awayTeamForm.runDifferential > 0 ? "+" : ""}${awayTeamForm.runDifferential}` : "-"}</strong></span><span>폼 지수 <strong>{awayTeamFormRating?.score ?? "-"}</strong></span></div></article><article><small>HOME · 최근 10경기</small><h4>{game.homeTeamName}</h4><b>{homeTeamForm ? `${homeTeamForm.wins}승 ${homeTeamForm.losses}패${homeTeamForm.draws ? ` ${homeTeamForm.draws}무` : ""}` : "-"}</b><div><span>평균 득점 <strong>{homeTeamForm?.avgRuns?.toFixed(1) ?? "-"}</strong></span><span>평균 실점 <strong>{homeTeamForm?.avgRunsAllowed?.toFixed(1) ?? "-"}</strong></span><span>득실차 <strong>{homeTeamForm ? `${homeTeamForm.runDifferential > 0 ? "+" : ""}${homeTeamForm.runDifferential}` : "-"}</strong></span><span>폼 지수 <strong>{homeTeamFormRating?.score ?? "-"}</strong></span></div></article><article><small>AWAY · 불펜</small><h4>{game.awayTeamName}</h4><b>피로도 {awayBullpen?.summary.fatigueIndex.toFixed(1) ?? "-"}</b><div><span>최근 3일 <strong>{awayBullpen?.summary.totalPitches ?? "-"}구</strong></span><span>전일 <strong>{awayBullpen?.summary.yesterdayPitches ?? "-"}구</strong></span><span>등판 <strong>{awayBullpen?.summary.bullpenAppearances ?? "-"}회</strong></span><span>연투 <strong>{awayBullpen?.summary.backToBackCount ?? "-"}명</strong></span></div><p>{awayBullpenRating?.status ?? "상태 확인 중"}</p></article><article><small>HOME · 불펜</small><h4>{game.homeTeamName}</h4><b>피로도 {homeBullpen?.summary.fatigueIndex.toFixed(1) ?? "-"}</b><div><span>최근 3일 <strong>{homeBullpen?.summary.totalPitches ?? "-"}구</strong></span><span>전일 <strong>{homeBullpen?.summary.yesterdayPitches ?? "-"}구</strong></span><span>등판 <strong>{homeBullpen?.summary.bullpenAppearances ?? "-"}회</strong></span><span>연투 <strong>{homeBullpen?.summary.backToBackCount ?? "-"}명</strong></span></div><p>{homeBullpenRating?.status ?? "상태 확인 중"}</p></article></section><section className="gameFlowEdgeV3"><span>종합 흐름</span><b>{Math.abs(teamFormEdgeScore)<2 ? "최근 흐름은 대등" : teamFormEdgeScore>0 ? `${game.awayTeamName} 최근 흐름 우위` : `${game.homeTeamName} 최근 흐름 우위`}</b><p>{Math.abs(bullpenEdgeScore)<3 ? "불펜 상태는 큰 차이가 없습니다." : bullpenEdgeScore>0 ? `${game.awayTeamName}이 후반 불펜 운용에서 상대적으로 유리합니다.` : `${game.homeTeamName}이 후반 불펜 운용에서 상대적으로 유리합니다.`}</p></section></>}
     {analysisSection === "ai" && <section className="gameAnalysisSectionHeadV3"><small>AI BASEBALL REPORT</small><h3>AI 종합 분석</h3><p>배당과 시장 라인을 제외하고 선발 · 타선 · 최근 흐름 · 불펜 · 예상 득점 · 경기 변수를 종합합니다.</p></section>}
-    {analysisSection === "picks" && <section className="gameAnalysisLockedV2 analysisPurchasePanelV1"><div className="gameAnalysisLockIconV2">{analysisUnlocked ? "🔓" : "🔒"}</div><div><small>PREMIUM AI PICKS</small><h3>{analysisUnlocked ? "전체 AI 픽 · 이용 가능" : "전체 AI 픽 잠금해제"}</h3><p>승패 · 핸디캡 · 언더오버 · 모델 확률 · 기대수익률 · 최종 판단</p>{!analysisUnlocked && <><p>경기 1개당 3,000⚾ · 구매한 경기는 같은 계정으로 다시 볼 수 있습니다.</p><button type="button" className="analysisPurchaseButtonV1" disabled={!analysisPurchaseReady || analysisPurchaseBusy || picks.length === 0} onClick={() => void purchaseAnalysis()}>{!analysisPurchaseReady ? "구매 내역 확인 중…" : analysisPurchaseBusy ? "결제 처리 중…" : picks.length === 0 ? "분석 데이터 준비 중" : !analysisUserId ? "로그인 후 이용 가능" : "⚾ 3,000개로 잠금해제"}</button></>}{analysisUnlocked && <span>구매 완료 · 추가 차감 없이 이용할 수 있습니다.</span>}{analysisPurchaseMessage && <p className="analysisPurchaseMessageV1" role="status">{analysisPurchaseMessage}</p>}</div></section>}
+    {/* PREMIUM_PICKS_PURCHASE_V2 */}
+    {analysisSection === "picks" && (
+      <section
+        className={`gameAnalysisLockedV2 analysisPurchasePanelV1 ${
+          analysisUnlocked
+            ? "isUnlocked"
+            : "isLocked"
+        }`}
+      >
+        <div className="analysisPurchaseAuraV2" />
+
+        <div className="analysisPurchaseIconWrapV2">
+          <div className="analysisPurchaseIconV2">
+            {analysisUnlocked
+              ? "✓"
+              : "⚾"}
+          </div>
+
+          <small>
+            {analysisUnlocked
+              ? "ACCESS GRANTED"
+              : "PREMIUM ACCESS"}
+          </small>
+        </div>
+
+        <div className="analysisPurchaseCopyV2">
+          <div className="analysisPurchaseEyebrowV2">
+            <span>
+              PREMIUM MARKET ANALYSIS
+            </span>
+
+            <em>
+              {analysisUnlocked
+                ? "UNLOCKED"
+                : "LOCKED REPORT"}
+            </em>
+          </div>
+
+          <h3>
+            {analysisUnlocked
+              ? "프리미엄 시장 분석이 열렸습니다"
+              : "승패 · 핸디캡 · O/U 확률 심층 분석"}
+          </h3>
+
+          <p className="analysisPurchaseLeadV2">
+            승패 · 핸디캡 · O/U 확률을 각각 독립적으로 분석합니다.
+            시장별 모델 확률과 확률 차이, 선발, 최근 흐름, 불펜,
+            확정 라인업이 왜 그 수치에 반영됐는지 설명합니다.
+          </p>
+
+          <div className="analysisPurchaseFeatureGridV2">
+            <span>
+              <i>01</i>
+              승패 확률
+            </span>
+
+            <span>
+              <i>02</i>
+              핸디캡 확률
+            </span>
+
+            <span>
+              <i>03</i>
+              O/U 확률
+            </span>
+
+            <span>
+              <i>04</i>
+              모델 확률
+            </span>
+
+            <span>
+              <i>05</i>
+              시장 가치
+            </span>
+
+            <span>
+              <i>06</i>
+              판단 근거
+            </span>
+          </div>
+
+          {!analysisUnlocked ? (
+            <div className="analysisPurchaseActionRowV2">
+              <div className="analysisPurchasePriceV2">
+                <small>
+                  GAME REPORT
+                </small>
+
+                <strong>
+                  3,000
+                  <em>⚾</em>
+                </strong>
+
+                <span>
+                  1회 구매 · 동일 계정 영구 열람
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="analysisPurchaseButtonV1"
+                disabled={
+                  !analysisPurchaseReady ||
+                  analysisPurchaseBusy ||
+                  picks.length === 0
+                }
+                onClick={() =>
+                  void purchaseAnalysis()
+                }
+              >
+                {!analysisPurchaseReady
+                  ? "구매 내역 확인 중…"
+                  : analysisPurchaseBusy
+                  ? "결제 처리 중…"
+                  : picks.length === 0
+                  ? "분석 데이터 준비 중"
+                  : !analysisUserId
+                  ? "로그인 후 이용 가능"
+                  : "프리미엄 분석 잠금해제"}
+              </button>
+            </div>
+          ) : (
+            <div className="analysisPurchaseUnlockedV2">
+              <div>
+                <span>✓</span>
+
+                <p>
+                  <b>
+                    PREMIUM REPORT ACTIVE
+                  </b>
+
+                  <small>
+                    구매 완료 · 추가 차감 없이 열람 가능
+                  </small>
+                </p>
+              </div>
+
+              <strong>
+                🔓 UNLOCKED
+              </strong>
+            </div>
+          )}
+
+          {analysisPurchaseMessage && (
+            <p
+              className="analysisPurchaseMessageV1"
+              role="status"
+            >
+              {analysisPurchaseMessage}
+            </p>
+          )}
+        </div>
+      </section>
+    )}
     {analysisSection === "starter" && <div className="starterCompare">
 
       <div className="starterBox awayStarter">
@@ -3828,7 +3999,7 @@ function GameCard({
         </b>
 
         <small>
-          승패 · 핸디캡 · 오버/언더 배당 직접 수정
+          승패 · 핸디캡 · O/U 확률 배당 직접 수정
         </small>
       </div>
 
@@ -4064,7 +4235,7 @@ function GameCard({
           <div>
             <b>시장별 모델 확률</b>
             <small>
-              승패 · 핸디캡 · 오버/언더 전체 비교
+              승패 · 핸디캡 · O/U 확률 전체 비교
             </small>
           </div>
         </div>
@@ -4506,7 +4677,7 @@ function GameCard({
         <div>
           <b>📊 전체 예측 · 직접 선택</b>
           <small>
-            승패 · 핸디캡 · 오버/언더 모든 방향 선택 가능
+            승패 · 핸디캡 · O/U 확률 모든 방향 선택 가능
           </small>
         </div>
 
@@ -5290,19 +5461,174 @@ function GameCard({
             </div>
 
             <ul className="premiumCheckList">
-              <li>양 팀 선발의 1~3회 볼넷과 선두타자 출루 억제</li>
-              <li>4~6회 두 번째 타순 진입 이후 선발 대응력</li>
+
+              <li>
+                {`선발 비교 · ${
+                  game.startingPitchers.away?.name ||
+                  game.awayTeamName
+                } ${
+                  awayStarterRating?.score ?? "-"
+                } vs ${
+                  game.startingPitchers.home?.name ||
+                  game.homeTeamName
+                } ${
+                  homeStarterRating?.score ?? "-"
+                }${
+                  starterEdge?.text
+                    ? ` · ${starterEdge.text}`
+                    : ""
+                }`}
+              </li>
+
+              <li>
+                {awayTeamForm &&
+                homeTeamForm
+                  ? `최근 10경기 · ${
+                      game.awayTeamName
+                    } ${
+                      awayTeamForm.wins
+                    }승 ${
+                      awayTeamForm.losses
+                    }패${
+                      awayTeamForm.draws
+                        ? ` ${awayTeamForm.draws}무`
+                        : ""
+                    } (득실차 ${
+                      awayTeamForm.runDifferential >
+                      0
+                        ? "+"
+                        : ""
+                    }${
+                      awayTeamForm.runDifferential
+                    }) vs ${
+                      game.homeTeamName
+                    } ${
+                      homeTeamForm.wins
+                    }승 ${
+                      homeTeamForm.losses
+                    }패${
+                      homeTeamForm.draws
+                        ? ` ${homeTeamForm.draws}무`
+                        : ""
+                    } (득실차 ${
+                      homeTeamForm.runDifferential >
+                      0
+                        ? "+"
+                        : ""
+                    }${
+                      homeTeamForm.runDifferential
+                    })`
+                  : "최근 10경기 팀 흐름 데이터 확인"}
+              </li>
+
               <li>
                 {lineupMatchup?.ready
-                  ? "확정 라인업 중심타선과 상대 선발 BvP"
-                  : "공식 라인업 발표 여부와 중심타선 변동"}
+                  ? `확정 라인업 · ${
+                      game.awayTeamName
+                    } ${
+                      lineupMatchup.away
+                        ?.matchupSummary
+                        ?.score ?? "-"
+                    } vs ${
+                      game.homeTeamName
+                    } ${
+                      lineupMatchup.home
+                        ?.matchupSummary
+                        ?.score ?? "-"
+                    } · ${
+                      Math.abs(
+                        lineupMatchupEdgeScore
+                      ) < 1
+                        ? "타선 매치업 대등"
+                        : `${
+                            lineupMatchupEdgeScore >
+                            0
+                              ? game.awayTeamName
+                              : game.homeTeamName
+                          } 타선 우위 ${
+                            Math.abs(
+                              lineupMatchupEdgeScore
+                            ).toFixed(1)
+                          }`
+                    }`
+                  : "공식 라인업 발표 여부와 중심타선 변동 확인"}
               </li>
+
               <li>
-                {awayBullpen && homeBullpen
-                  ? `불펜 피로도 ${awayBullpen.summary.fatigueIndex.toFixed(1)} vs ${homeBullpen.summary.fatigueIndex.toFixed(1)}`
-                  : "최근 불펜 소모 및 연투 여부"}
+                {awayBullpen &&
+                homeBullpen
+                  ? `불펜 · ${
+                      game.awayTeamName
+                    } 피로도 ${
+                      awayBullpen.summary
+                        .fatigueIndex
+                        .toFixed(1)
+                    } / 최근 3일 ${
+                      awayBullpen.summary
+                        .totalPitches
+                    }구 vs ${
+                      game.homeTeamName
+                    } 피로도 ${
+                      homeBullpen.summary
+                        .fatigueIndex
+                        .toFixed(1)
+                    } / 최근 3일 ${
+                      homeBullpen.summary
+                        .totalPitches
+                    }구 · ${
+                      Math.abs(
+                        bullpenEdgeScore
+                      ) < 3
+                        ? "불펜 차이 크지 않음"
+                        : `${
+                            bullpenEdgeScore >
+                            0
+                              ? game.awayTeamName
+                              : game.homeTeamName
+                          } 불펜 우위`
+                    }`
+                  : "최근 불펜 소모와 연투 여부 확인"}
               </li>
-              <li>선취점 이후 추가 득점과 7회 이후 불펜 운용</li>
+
+              <li>
+                {awayMlPick &&
+                homeMlPick
+                  ? `승률 모델 · ${
+                      game.awayTeamName
+                    } ${(
+                      awayMlPick.confidence *
+                      100
+                    ).toFixed(1)}% vs ${
+                      game.homeTeamName
+                    } ${(
+                      homeMlPick.confidence *
+                      100
+                    ).toFixed(1)}%${
+                      projectedScores
+                        ? ` · 예상점수 ${
+                            game.awayTeamName
+                          } ${projectedScores.awayRuns.toFixed(
+                            1
+                          )} : ${projectedScores.homeRuns.toFixed(
+                            1
+                          )} ${
+                            game.homeTeamName
+                          }`
+                        : ""
+                    }`
+                  : projectedScores
+                    ? `예상점수 · ${
+                        game.awayTeamName
+                      } ${projectedScores.awayRuns.toFixed(
+                        1
+                      )} : ${projectedScores.homeRuns.toFixed(
+                        1
+                      )} ${
+                        game.homeTeamName
+                      }`
+                    : "승률 모델과 예상 득점 변화 확인"}
+              </li>
+
             </ul>
           </article>
         </div>
@@ -5315,37 +5641,171 @@ function GameCard({
 
           <p>
             {(() => {
-              const edges = [
-                {
-                  team:
-                    teamFormEdgeScore > 0
-                      ? game.awayTeamName
-                      : game.homeTeamName,
-                  strength: Math.abs(teamFormEdgeScore),
-                },
-                {
-                  team:
-                    bullpenEdgeScore > 0
-                      ? game.awayTeamName
-                      : game.homeTeamName,
-                  strength: Math.abs(bullpenEdgeScore),
-                },
-              ].sort((a, b) => b.strength - a.strength);
 
-              const lead =
-                edges[0]?.strength >= 2
-                  ? edges[0].team
+              const awayWinPct =
+                awayMlPick
+                  ? awayMlPick.confidence *
+                    100
                   : null;
 
-              if (!lead) {
-                return "선발·타선·불펜 지표가 한쪽으로 크게 기울지 않은 접전형 경기로, 초반 실수와 불펜 교체 타이밍이 승부를 가를 가능성이 큽니다.";
+              const homeWinPct =
+                homeMlPick
+                  ? homeMlPick.confidence *
+                    100
+                  : null;
+
+
+              const modelDiff =
+                awayWinPct !== null &&
+                homeWinPct !== null
+                  ? awayWinPct -
+                    homeWinPct
+                  : null;
+
+
+              const lead =
+                modelDiff !== null &&
+                Math.abs(modelDiff) >= 2
+                  ? modelDiff > 0
+                    ? game.awayTeamName
+                    : game.homeTeamName
+                  : null;
+
+
+              const support:
+                string[] = [];
+
+              const caution:
+                string[] = [];
+
+
+              const addFactor = (
+                label: string,
+                edge: number,
+                threshold: number
+              ) => {
+
+                if (
+                  Math.abs(edge) <
+                  threshold
+                ) {
+                  return;
+                }
+
+                const team =
+                  edge > 0
+                    ? game.awayTeamName
+                    : game.homeTeamName;
+
+                const text =
+                  `${label} ${team} 우위`;
+
+                if (
+                  lead &&
+                  team === lead
+                ) {
+                  support.push(text);
+                } else {
+                  caution.push(text);
+                }
+              };
+
+
+              /*
+                현재 승률 모델에 실제 반영되는
+                세부 방향을 한줄평 근거로 사용.
+              */
+              addFactor(
+                "선발",
+                starterScoreEdge,
+                2
+              );
+
+              addFactor(
+                "최근 흐름",
+                teamFormEdgeScore,
+                2
+              );
+
+              addFactor(
+                "불펜",
+                bullpenEdgeScore,
+                3
+              );
+
+              if (
+                lineupMatchup?.ready
+              ) {
+                addFactor(
+                  "라인업",
+                  lineupMatchupEdgeScore,
+                  1
+                );
               }
 
-              return `${lead} 쪽에 일부 우세 지표가 모여 있지만, ${
-                lineupMatchup?.ready
-                  ? "확정 라인업과 후반 불펜 운용"
-                  : "라인업 발표와 실제 선발 컨디션"
-              }에 따라 경기 흐름이 달라질 수 있는 매치업입니다.`;
+
+              /*
+                승률 모델이 거의 50:50이면
+                억지로 한 팀 우세라고 하지 않는다.
+              */
+              if (
+                !lead ||
+                awayWinPct === null ||
+                homeWinPct === null
+              ) {
+
+                const mixed =
+                  [
+                    ...support,
+                    ...caution,
+                  ]
+                    .slice(
+                      0,
+                      3
+                    )
+                    .join(
+                      " · "
+                    );
+
+                return mixed
+                  ? `현재 승률 모델은 접전에 가깝습니다. ${mixed} 등 세부 지표가 엇갈려 경기 내 변수가 큰 매치업입니다.`
+                  : "현재 승률 모델은 접전에 가깝고 세부 지표도 한쪽으로 뚜렷하게 기울지 않습니다.";
+              }
+
+
+              const probabilityText =
+                `${game.awayTeamName} ${awayWinPct.toFixed(
+                  1
+                )}%, ${game.homeTeamName} ${homeWinPct.toFixed(
+                  1
+                )}%`;
+
+
+              const supportText =
+                support.length > 0
+                  ? `${support
+                      .slice(
+                        0,
+                        3
+                      )
+                      .join(
+                        " · "
+                      )}가 같은 방향으로 반영됐습니다.`
+                  : "세부 지표는 일부 엇갈리지만 종합 승률 모델에서는 차이가 발생했습니다.";
+
+
+              const cautionText =
+                caution.length > 0
+                  ? ` 반면 ${caution[0]}는 반대 변수입니다.`
+                  : "";
+
+
+              return (
+                `현재 승률 모델은 ${probabilityText}로 ${lead} 쪽이 앞섭니다. ` +
+                supportText +
+                cautionText
+              );
+
             })()}
           </p>
         </div>
@@ -5354,19 +5814,805 @@ function GameCard({
 
     {analysisSection === "picks" && analysisUnlocked && expanded && (
       <div className="detailedOverallAnalysis analysisPurchasedContentV1" data-ui="PURCHASED_ANALYSIS_V1">
+
+        {/* PREMIUM_MARKET_REPORT_V4 */}
+        {(() => {
+
+          type PremiumMarketRow = {
+            label: string;
+            confidence: number;
+            odds: number | null;
+          };
+
+
+          const marketRows = (
+            market: Pick["market"]
+          ): PremiumMarketRow[] => {
+
+            const rows =
+              [...picks]
+                .filter(
+                  (pick) =>
+                    pick.market === market
+                )
+                .sort(
+                  (a, b) =>
+                    b.confidence -
+                    a.confidence
+                )
+                .slice(
+                  0,
+                  2
+                )
+                .map(
+                  (pick) => ({
+                    label:
+                      pick.label,
+
+                    confidence:
+                      pick.confidence,
+
+                    odds:
+                      typeof pick.odds === "number" &&
+                      Number.isFinite(
+                        pick.odds
+                      ) &&
+                      pick.odds > 1
+                        ? pick.odds
+                        : null,
+                  })
+                );
+
+            /*
+              모델이 한 방향만 생성한 경우에도
+              승패 확률은 반대쪽을 보완해서 표시한다.
+            */
+            if (
+              rows.length === 1 &&
+              market === "ML"
+            ) {
+              const first =
+                rows[0];
+
+              const oppositeLabel =
+                first.label.includes(
+                  game.awayTeamName
+                )
+                  ? `${game.homeTeamName} 승`
+                  : `${game.awayTeamName} 승`;
+
+              const oppositeOdds =
+                first.label.includes(
+                  game.awayTeamName
+                )
+                  ? odds.homeMl
+                  : odds.awayMl;
+
+              rows.push({
+                label:
+                  oppositeLabel,
+
+                confidence:
+                  Math.max(
+                    0,
+                    Math.min(
+                      1,
+                      1 -
+                        first.confidence
+                    )
+                  ),
+
+                odds:
+                  typeof oppositeOdds ===
+                    "number"
+                    ? oppositeOdds
+                    : null,
+              });
+            }
+
+            return rows;
+          };
+
+
+          const mlRows =
+            marketRows("ML");
+
+          const handicapRows =
+            marketRows(
+              "HANDICAP"
+            );
+
+          const totalRows =
+            marketRows(
+              "TOTAL"
+            );
+
+
+          const pct = (
+            value:
+              number |
+              null |
+              undefined
+          ) =>
+            typeof value ===
+              "number"
+              ? `${(
+                  value *
+                  100
+                ).toFixed(
+                  1
+                )}%`
+              : "-";
+
+
+          const impliedProbabilities = (
+            rows:
+              PremiumMarketRow[]
+          ) => {
+
+            const raws =
+              rows.map(
+                (row) =>
+                  row.odds &&
+                  row.odds > 1
+                    ? 1 /
+                      row.odds
+                    : null
+              );
+
+            const valid =
+              raws.filter(
+                (
+                  value
+                ): value is number =>
+                  typeof value ===
+                  "number"
+              );
+
+            if (
+              valid.length !==
+              rows.length ||
+              valid.length < 2
+            ) {
+              return rows.map(
+                () => null
+              );
+            }
+
+            const total =
+              valid.reduce(
+                (sum, value) =>
+                  sum + value,
+                0
+              );
+
+            if (
+              total <= 0
+            ) {
+              return rows.map(
+                () => null
+              );
+            }
+
+            return valid.map(
+              (value) =>
+                value /
+                total
+            );
+          };
+
+
+          const probabilityGap = (
+            rows:
+              PremiumMarketRow[]
+          ) => {
+
+            if (
+              rows.length < 2
+            ) {
+              return "-";
+            }
+
+            return `${Math.abs(
+              (
+                rows[0]
+                  .confidence -
+                rows[1]
+                  .confidence
+              ) *
+                100
+            ).toFixed(
+              1
+            )}%p`;
+          };
+
+
+          const renderMarketRows = (
+            rows:
+              PremiumMarketRow[],
+            emptyText:
+              string
+          ) => {
+
+            if (
+              rows.length === 0
+            ) {
+              return (
+                <div className="premiumMarketEmptyV4">
+                  <strong>
+                    계산 대기
+                  </strong>
+
+                  <span>
+                    {emptyText}
+                  </span>
+                </div>
+              );
+            }
+
+            const marketProb =
+              impliedProbabilities(
+                rows
+              );
+
+            return (
+              <div className="premiumMarketRowsV4">
+                {rows.map(
+                  (
+                    row,
+                    index
+                  ) => {
+
+                    const modelPct =
+                      row.confidence *
+                      100;
+
+                    const marketPct =
+                      marketProb[
+                        index
+                      ] !== null
+                        ? (
+                            marketProb[
+                              index
+                            ]! *
+                            100
+                          )
+                        : null;
+
+                    const diff =
+                      marketPct !==
+                      null
+                        ? modelPct -
+                          marketPct
+                        : null;
+
+                    return (
+                      <div
+                        className="premiumMarketRowV4"
+                        key={
+                          `${row.label}-${index}`
+                        }
+                      >
+                        <div className="premiumMarketRowTopV4">
+                          <strong>
+                            {
+                              row.label
+                            }
+                          </strong>
+
+                          <b>
+                            {pct(
+                              row.confidence
+                            )}
+                          </b>
+                        </div>
+
+                        <div className="premiumMarketBarV4">
+                          <i
+                            style={{
+                              width:
+                                `${Math.max(
+                                  2,
+                                  Math.min(
+                                    100,
+                                    modelPct
+                                  )
+                                )}%`,
+                            }}
+                          />
+                        </div>
+
+                        <div className="premiumMarketNumbersV4">
+
+                          <span>
+                            <small>
+                              MODEL
+                            </small>
+
+                            <b>
+                              {modelPct.toFixed(
+                                1
+                              )}
+                              %
+                            </b>
+                          </span>
+
+                          <span>
+                            <small>
+                              ODDS
+                            </small>
+
+                            <b>
+                              {row.odds
+                                ? row.odds.toFixed(
+                                    2
+                                  )
+                                : "-"}
+                            </b>
+                          </span>
+
+                          <span>
+                            <small>
+                              MARKET
+                            </small>
+
+                            <b>
+                              {marketPct !==
+                              null
+                                ? `${marketPct.toFixed(
+                                    1
+                                  )}%`
+                                : "-"}
+                            </b>
+                          </span>
+
+                          <span>
+                            <small>
+                              GAP
+                            </small>
+
+                            <b
+                              className={
+                                diff ===
+                                null
+                                  ? ""
+                                  : diff > 0
+                                    ? "positive"
+                                    : diff < 0
+                                      ? "negative"
+                                      : ""
+                              }
+                            >
+                              {diff !==
+                              null
+                                ? `${diff >=
+                                  0
+                                    ? "+"
+                                    : ""}${diff.toFixed(
+                                    1
+                                  )}%p`
+                                : "-"}
+                            </b>
+                          </span>
+
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+            );
+          };
+
+
+          const mlReasonParts:
+            string[] = [];
+
+          if (
+            starterEdge
+          ) {
+            mlReasonParts.push(
+              starterEdge.text
+            );
+          }
+
+          if (
+            Math.abs(
+              teamFormEdgeScore
+            ) < 2
+          ) {
+            mlReasonParts.push(
+              "최근 흐름 대등"
+            );
+          } else {
+            mlReasonParts.push(
+              `최근 흐름 ${
+                teamFormEdgeScore >
+                0
+                  ? game.awayTeamName
+                  : game.homeTeamName
+              } 우위`
+            );
+          }
+
+          if (
+            Math.abs(
+              bullpenEdgeScore
+            ) < 3
+          ) {
+            mlReasonParts.push(
+              "불펜 여건 대등"
+            );
+          } else {
+            mlReasonParts.push(
+              `불펜 ${
+                bullpenEdgeScore >
+                0
+                  ? game.awayTeamName
+                  : game.homeTeamName
+              } 우위`
+            );
+          }
+
+          if (
+            lineupMatchup?.ready
+          ) {
+            if (
+              Math.abs(
+                lineupMatchupEdgeScore
+              ) < 1
+            ) {
+              mlReasonParts.push(
+                "확정 라인업 대등"
+              );
+            } else {
+              mlReasonParts.push(
+                `라인업 ${
+                  lineupMatchupEdgeScore >
+                  0
+                    ? game.awayTeamName
+                    : game.homeTeamName
+                } 우위`
+              );
+            }
+          } else {
+            mlReasonParts.push(
+              "공식 라인업 미발표"
+            );
+          }
+
+
+          const predictedGap =
+            projectedScores
+              ? Math.abs(
+                  projectedScores
+                    .awayRuns -
+                    projectedScores
+                      .homeRuns
+                )
+              : null;
+
+
+          const handicapReason =
+            handicapRows.length >
+            0
+              ? (
+                  `예상 점수 차 ${
+                    predictedGap !==
+                    null
+                      ? `${predictedGap.toFixed(
+                          1
+                        )}점`
+                      : "계산 대기"
+                  }, 승패 확률 차 ${probabilityGap(
+                    mlRows
+                  )}, 선발·최근 흐름·불펜·라인업 차이를 핸디캡 기준점과 함께 반영했습니다.`
+                )
+              : (
+                  `예상 점수 차 ${
+                    predictedGap !==
+                    null
+                      ? `${predictedGap.toFixed(
+                          1
+                        )}점`
+                      : "계산 대기"
+                  }입니다. 저장된 핸디캡 기준점이 확인되면 양쪽 커버 확률을 표시합니다.`
+                );
+
+
+          const totalReason =
+            projectedTotal !==
+              null &&
+            odds.totalLine !==
+              null
+              ? (
+                  projectedTotal >
+                  odds.totalLine
+                    ? `예상 총점 ${projectedTotal.toFixed(
+                        1
+                      )}점이 당시 기준점 ${odds.totalLine.toFixed(
+                        1
+                      )}점보다 ${(
+                        projectedTotal -
+                        odds.totalLine
+                      ).toFixed(
+                        1
+                      )}점 높습니다. 선발 실점 억제력, 최근 득실, 불펜 소모와 함께 오버·언더 확률에 반영했습니다.`
+                    : projectedTotal <
+                        odds.totalLine
+                      ? `예상 총점 ${projectedTotal.toFixed(
+                          1
+                        )}점이 당시 기준점 ${odds.totalLine.toFixed(
+                          1
+                        )}점보다 ${(
+                          odds.totalLine -
+                          projectedTotal
+                        ).toFixed(
+                          1
+                        )}점 낮습니다. 선발 실점 억제력, 최근 득실, 불펜 소모와 함께 오버·언더 확률에 반영했습니다.`
+                      : `예상 총점과 당시 기준점이 ${odds.totalLine.toFixed(
+                          1
+                        )}점으로 같습니다. 선발·타선·불펜 변수를 함께 반영해 양쪽 확률을 계산했습니다.`
+                )
+              : projectedTotal !==
+                  null
+                ? `모델 예상 총점은 ${projectedTotal.toFixed(
+                    1
+                  )}점입니다. 당시 오버/언더 기준점이 복원되면 양쪽 확률과 시장 차이를 계산합니다.`
+                : "예상 총점과 당시 기준점을 확인한 뒤 오버·언더 확률을 계산합니다.";
+
+
+          return (
+            <section className="premiumMarketReportV4">
+
+              <div className="premiumMarketReportHeadV4">
+
+                <div>
+                  <small>
+                    KBO ANALYZER · PREMIUM MARKET REPORT
+                  </small>
+
+                  <h2>
+                    시장별 확률 분석
+                  </h2>
+
+                  <p>
+                    {game.awayTeamName}
+                    <i>VS</i>
+                    {game.homeTeamName}
+                  </p>
+                </div>
+
+              </div>
+
+
+              <div className="premiumMarketNoticeV4">
+                <p>
+                  승패 · 핸디캡 · O/U 확률을 각각 독립적으로 분석합니다.
+                  시장별 모델 확률과 확률 차이, 선발, 최근 흐름, 불펜,
+                  확정 라인업이 왜 그 수치에 반영됐는지 설명합니다.
+                </p>
+              </div>
+
+
+              <div className="premiumMarketGridV4">
+
+                <article className="premiumMarketCardV4">
+
+                  <div className="premiumMarketTitleV4">
+                    <div>
+                      <small>
+                        MONEYLINE
+                      </small>
+
+                      <h3>
+                        승패
+                      </h3>
+                    </div>
+
+                    <span>
+                      확률차{" "}
+                      {probabilityGap(
+                        mlRows
+                      )}
+                    </span>
+                  </div>
+
+                  {renderMarketRows(
+                    mlRows,
+                    "승패 확률을 계산할 데이터가 부족합니다."
+                  )}
+
+                  <div className="premiumMarketWhyV4">
+                    <small>
+                      WHY
+                    </small>
+
+                    <p>
+                      {mlReasonParts.join(
+                        " · "
+                      )}
+                    </p>
+                  </div>
+
+                </article>
+
+
+                <article className="premiumMarketCardV4">
+
+                  <div className="premiumMarketTitleV4">
+                    <div>
+                      <small>
+                        HANDICAP
+                      </small>
+
+                      <h3>
+                        핸디캡
+                      </h3>
+                    </div>
+
+                    <span>
+                      확률차{" "}
+                      {probabilityGap(
+                        handicapRows
+                      )}
+                    </span>
+                  </div>
+
+                  {renderMarketRows(
+                    handicapRows,
+                    "당시 핸디캡 기준점 또는 배당 정보가 없습니다."
+                  )}
+
+                  <div className="premiumMarketWhyV4">
+                    <small>
+                      WHY
+                    </small>
+
+                    <p>
+                      {
+                        handicapReason
+                      }
+                    </p>
+                  </div>
+
+                </article>
+
+
+                <article className="premiumMarketCardV4">
+
+                  <div className="premiumMarketTitleV4">
+                    <div>
+                      <small>
+                        TOTAL
+                      </small>
+
+                      <h3>
+                        오버 / 언더
+                      </h3>
+                    </div>
+
+                    <span>
+                      기준{" "}
+                      {odds.totalLine !==
+                      null
+                        ? odds.totalLine.toFixed(
+                            1
+                          )
+                        : "-"}
+                    </span>
+                  </div>
+
+                  {renderMarketRows(
+                    totalRows,
+                    "당시 오버/언더 기준점 또는 배당 정보가 없습니다."
+                  )}
+
+                  <div className="premiumMarketWhyV4">
+                    <small>
+                      WHY
+                    </small>
+
+                    <p>
+                      {
+                        totalReason
+                      }
+                    </p>
+                  </div>
+
+                </article>
+
+              </div>
+
+
+              <div className="premiumEvidenceStripV4">
+
+                <span>
+                  <small>
+                    예상 점수
+                  </small>
+
+                  <b>
+                    {projectedScores
+                      ? `${projectedScores.awayRuns.toFixed(
+                          1
+                        )} : ${projectedScores.homeRuns.toFixed(
+                          1
+                        )}`
+                      : "-"}
+                  </b>
+                </span>
+
+                <span>
+                  <small>
+                    예상 총점
+                  </small>
+
+                  <b>
+                    {projectedTotal !==
+                    null
+                      ? projectedTotal.toFixed(
+                          1
+                        )
+                      : "-"}
+                  </b>
+                </span>
+
+                <span>
+                  <small>
+                    당시 O/U
+                  </small>
+
+                  <b>
+                    {odds.totalLine !==
+                    null
+                      ? odds.totalLine.toFixed(
+                          1
+                        )
+                      : "-"}
+                  </b>
+                </span>
+
+                <span>
+                  <small>
+                    선발
+                  </small>
+
+                  <b>
+                    {starterEdge?.text ||
+                      "확인 중"}
+                  </b>
+                </span>
+
+                <span>
+                  <small>
+                    라인업
+                  </small>
+
+                  <b>
+                    {lineupMatchup?.ready
+                      ? "확정 반영"
+                      : "발표 대기"}
+                  </b>
+                </span>
+
+              </div>
+
+            </section>
+          );
+        })()}
+
         <div className="detailedAnalysisHeader">
           <div>
             <b>경기 종합 분석</b>
             <small>
-              시장·선발·최근 흐름·불펜·라인업 종합 판단
+              시장별 확률 · 선발 · 최근 흐름 · 불펜 · 라인업 상세 근거
             </small>
           </div>
 
-          {(best || topCandidate) && (
-            <span>
-              최종 후보 · {(best ?? topCandidate)?.label}
-            </span>
-          )}
+          <span>
+            승패 · 핸디캡 · 오버/언더 확률 근거
+          </span>
         </div>
 
         <div className="detailedAnalysisGrid">
@@ -5383,7 +6629,7 @@ function GameCard({
 
                 if (!selected) {
                   return (
-                    "배당 입력이 완료되지 않아 승패·핸디캡·오버/언더의 " +
+                    "배당 입력이 완료되지 않아 승패·핸디캡·O/U 확률의 " +
                     "확률과 기대수익을 비교할 수 없습니다."
                   );
                 }
@@ -5444,12 +6690,12 @@ function GameCard({
                     ? "승패"
                     : selected.market === "HANDICAP"
                       ? "핸디캡"
-                      : "오버/언더";
+                      : "O/U 확률";
 
                 return (
-                  `승패 최고 기대수익률 ${formatEv(mlEv)}, ` +
-                  `핸디캡 최고 기대수익률 ${formatEv(handicapEv)}, ` +
-                  `오버/언더 최고 기대수익률 ${formatEv(totalEv)}로 비교했습니다. ` +
+                  `승패 최고 시장 가치 ${formatEv(mlEv)}, ` +
+                  `핸디캡 최고 시장 가치 ${formatEv(handicapEv)}, ` +
+                  `O/U 확률 최고 시장 가치 ${formatEv(totalEv)}로 비교했습니다. ` +
                   `${selected.label}이 전체 후보 중 가장 높은 평가를 받아 ` +
                   `${selectedMarket} 시장을 우선했습니다.`
                 );
@@ -5612,20 +6858,20 @@ function GameCard({
 
                 if (!selected) {
                   return (
-                    "추천 후보를 계산하려면 각 시장의 기준점과 배당 입력이 필요합니다."
+                    "각 시장의 확률을 계산하려면 해당 시장의 기준점 정보가 필요합니다."
                   );
                 }
 
                 return (
                   `${selected.label}의 모델 확률은 ` +
                   `${(selected.confidence * 100).toFixed(1)}%이며, ` +
-                  `현재 배당 기준 기대수익률은 ` +
+                  `현재 배당 기준 시장 가치은 ` +
                   `${selected.ev !== null
                     ? `${selected.ev >= 0 ? "+" : ""}${(selected.ev * 100).toFixed(1)}%`
                     : "계산 대기"}입니다. ` +
                   `${best
-                    ? "현재 시장의 경기 추천 기준을 충족했습니다."
-                    : "전체 후보 중 평가는 가장 높지만 시장별 경기 추천 기준에는 미달합니다."}`
+                    ? "현재 시장에서 모델 확률과 가격 조건이 함께 높게 나타납니다."
+                    : "모델 확률은 상대적으로 높지만 현재 시장 가격 조건은 강하지 않습니다."}`
                 );
               })()}
             </p>
@@ -5696,8 +6942,8 @@ function GameCard({
 
                 const evText =
                   pick.ev === null
-                    ? "기대수익률 계산 대기"
-                    : `기대수익률 ${
+                    ? "시장 가치 계산 대기"
+                    : `시장 가치 ${
                         pick.ev >= 0
                           ? "+"
                           : ""
@@ -5756,7 +7002,7 @@ function GameCard({
                   handicapPick
                 ),
                 describePick(
-                  "오버/언더",
+                  "O/U 확률",
                   totalPick
                 ),
               ];
@@ -5887,7 +7133,7 @@ function GameCard({
                   `모델 확률 ${(best.confidence * 100).toFixed(
                     1
                   )}% ${best.grade}급, ` +
-                  `기대수익률 ${
+                  `시장 가치 ${
                     best.ev !== null &&
                     best.ev >= 0
                       ? "+"
@@ -5913,7 +7159,7 @@ function GameCard({
                     ).toFixed(
                       1
                     )}% ${highest.grade}급이지만, ` +
-                    `승패·핸디캡·오버/언더를 함께 비교하면 ` +
+                    `승패·핸디캡·O/U 확률를 함께 비교하면 ` +
                     `신뢰도와 배당 가치가 동시에 충족되는 시장이 없어 최종 추천은 보류합니다.`;
                 } else {
                   conclusion =
@@ -5933,7 +7179,7 @@ function GameCard({
                         const titles = [
                           "승패",
                           "핸디캡",
-                          "오버/언더",
+                          "O/U 확률",
                         ];
 
                         const title =
@@ -6585,7 +7831,7 @@ function pickMarketLabel(
 ============================================================
 DISPLAY ONLY LIVE PROBABILITY
 
-- 추천 엔진 / V3.7 confidence / 기대수익률 수정 안 함
+- 추천 엔진 / V3.7 confidence / 시장 가치 수정 안 함
 - 현재 점수 + 이닝 + 초/말만 이용한 표시용 실시간 추정치
 ============================================================
 */
@@ -6794,7 +8040,7 @@ function liveDisplayProbability(
   }
 
   /*
-    오버/언더
+    O/U 확률
   */
   else if (
     pick.market === "TOTAL"
@@ -7142,12 +8388,480 @@ export default function Home() {
     setAuthReady,
   ] = useState(false);
 
-  
+
   /* BASEBALL_BALANCE_CLIENT_V2 */
   const [
     baseballBalance,
     setBaseballBalance,
   ] = useState<number | null>(null);
+
+
+  /* MYPAGE_ACCOUNT_SETTINGS_V3 */
+
+  const [
+    myPageAccountOpen,
+    setMyPageAccountOpen,
+  ] = useState(false);
+
+  const [
+    myPageNickname,
+    setMyPageNickname,
+  ] = useState("");
+
+  const [
+    myPageNewPassword,
+    setMyPageNewPassword,
+  ] = useState("");
+
+  const [
+    myPageAccountBusy,
+    setMyPageAccountBusy,
+  ] = useState(false);
+
+  const [
+    myPageAccountMessage,
+    setMyPageAccountMessage,
+  ] = useState("");
+
+
+  useEffect(() => {
+
+    setMyPageNickname(
+      String(
+        authUser?.user_metadata
+          ?.nickname ??
+        ""
+      )
+    );
+
+  }, [
+    authUser?.id,
+    authUser?.user_metadata
+      ?.nickname,
+  ]);
+
+
+  async function
+  saveMyPageNickname() {
+
+    if (!authUser) {
+      return;
+    }
+
+    const nickname =
+      myPageNickname
+        .trim();
+
+    if (
+      nickname.length < 2 ||
+      nickname.length > 16
+    ) {
+      setMyPageAccountMessage(
+        "닉네임은 2~16자로 입력해주세요."
+      );
+      return;
+    }
+
+    setMyPageAccountBusy(true);
+    setMyPageAccountMessage("");
+
+    try {
+
+      const {
+        data,
+        error,
+      } =
+        await supabase.auth
+          .updateUser({
+            data: {
+              ...(
+                authUser.user_metadata ??
+                {}
+              ),
+              nickname,
+            },
+          });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        setAuthUser(
+          data.user
+        );
+      }
+
+      setMyPageAccountMessage(
+        "✓ 닉네임이 저장되었습니다."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "nickname update failed",
+        error
+      );
+
+      setMyPageAccountMessage(
+        "닉네임 저장에 실패했습니다."
+      );
+
+    } finally {
+
+      setMyPageAccountBusy(false);
+
+    }
+  }
+
+
+  async function
+  saveMyPagePassword() {
+
+    if (!authUser) {
+      return;
+    }
+
+    if (
+      myPageNewPassword.length < 6
+    ) {
+      setMyPageAccountMessage(
+        "새 비밀번호는 6자 이상 입력해주세요."
+      );
+      return;
+    }
+
+    setMyPageAccountBusy(true);
+    setMyPageAccountMessage("");
+
+    try {
+
+      const {
+        error,
+      } =
+        await supabase.auth
+          .updateUser({
+            password:
+              myPageNewPassword,
+          });
+
+      if (error) {
+        throw error;
+      }
+
+      setMyPageNewPassword("");
+
+      setMyPageAccountMessage(
+        "✓ 비밀번호가 변경되었습니다."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "password update failed",
+        error
+      );
+
+      setMyPageAccountMessage(
+        "비밀번호 변경에 실패했습니다."
+      );
+
+    } finally {
+
+      setMyPageAccountBusy(false);
+
+    }
+  }
+
+
+  /* MYPAGE_PURCHASED_ANALYSIS_V1 */
+  type PurchasedAnalysisItem = {
+    gameId: string;
+    price: number;
+    createdAt: string;
+    gameDate: string;
+    awayTeamName: string;
+    homeTeamName: string;
+  };
+
+  const [
+    purchasedAnalyses,
+    setPurchasedAnalyses,
+  ] =
+    useState<
+      PurchasedAnalysisItem[]
+    >([]);
+
+  const [
+    purchasedAnalysesLoading,
+    setPurchasedAnalysesLoading,
+  ] =
+    useState(false);
+
+  const [
+    purchasedAnalysesError,
+    setPurchasedAnalysesError,
+  ] =
+    useState("");
+
+  const [
+    purchasedAnalysisTarget,
+    setPurchasedAnalysisTarget,
+  ] =
+    useState<string | null>(
+      null
+    );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPurchasedAnalyses =
+      async () => {
+        if (!authUser) {
+          if (!cancelled) {
+            setPurchasedAnalyses(
+              []
+            );
+
+            setPurchasedAnalysesError(
+              ""
+            );
+          }
+
+          return;
+        }
+
+        if (
+          activeTab !==
+          "my-combos"
+        ) {
+          return;
+        }
+
+        setPurchasedAnalysesLoading(
+          true
+        );
+
+        setPurchasedAnalysesError(
+          ""
+        );
+
+        try {
+          const {
+            data,
+          } =
+            await supabase.auth
+              .getSession();
+
+          const token =
+            data.session
+              ?.access_token;
+
+          if (!token) {
+            throw new Error(
+              "로그인 세션을 확인할 수 없습니다."
+            );
+          }
+
+          const response =
+            await fetch(
+              "/api/baseball/unlock?list=1",
+              {
+                headers: {
+                  Authorization:
+                    `Bearer ${token}`,
+                },
+                cache:
+                  "no-store",
+              }
+            );
+
+          const body =
+            await response
+              .json()
+              .catch(
+                () => null
+              );
+
+          if (
+            !response.ok ||
+            !body?.ok
+          ) {
+            throw new Error(
+              body?.error ||
+              "구매내역 조회 실패"
+            );
+          }
+
+          if (!cancelled) {
+            setPurchasedAnalyses(
+              Array.isArray(
+                body.items
+              )
+                ? body.items
+                : []
+            );
+          }
+        } catch (error) {
+          console.error(
+            "purchased analyses load failed",
+            error
+          );
+
+          if (!cancelled) {
+            setPurchasedAnalysesError(
+              error instanceof Error
+                ? error.message
+                : "구매내역 조회 실패"
+            );
+          }
+        } finally {
+          if (!cancelled) {
+            setPurchasedAnalysesLoading(
+              false
+            );
+          }
+        }
+      };
+
+    void loadPurchasedAnalyses();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    authUser?.id,
+    activeTab,
+  ]);
+
+  /* PURCHASED_ANALYSIS_INLINE_REPLAY_V1 */
+  type PurchasedReplayData = {
+    gameId: string;
+    capturedAt: string;
+    game: KboGame;
+    odds: OddsInput;
+    pitcherStats: Record<number, PitcherStats>;
+    teamForms: Record<string, TeamForm>;
+    bullpens: Record<string, BullpenData>;
+    lineup: LineupMatchupData | null;
+  };
+
+  const [purchasedReplay, setPurchasedReplay] =
+    useState<PurchasedReplayData | null>(null);
+
+  const [purchasedReplayLoading, setPurchasedReplayLoading] =
+    useState(false);
+
+  const [purchasedReplayError, setPurchasedReplayError] =
+    useState("");
+
+  const [purchasedReplayCache, setPurchasedReplayCache] =
+    useState<Record<string, PurchasedReplayData>>({});
+
+
+  const openPurchasedAnalysis = async (
+    item: PurchasedAnalysisItem
+  ) => {
+    setPurchasedAnalysesError("");
+    setPurchasedReplayError("");
+    setPurchasedAnalysisTarget(null);
+
+    const cached =
+      purchasedReplayCache[item.gameId];
+
+    if (cached) {
+      setPurchasedReplay(cached);
+
+      window.requestAnimationFrame(() =>
+        document
+          .getElementById("purchased-analysis-replay")
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+      );
+
+      return;
+    }
+
+    setPurchasedReplayLoading(true);
+
+    try {
+      const { data } =
+        await supabase.auth.getSession();
+
+      const token =
+        data.session?.access_token;
+
+      if (!token) {
+        throw new Error(
+          "로그인 세션을 확인할 수 없습니다."
+        );
+      }
+
+      const response =
+        await fetch(
+          `/api/kbo/premium-replay?gameId=${encodeURIComponent(
+            item.gameId
+          )}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            cache: "no-store",
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if (
+        !response.ok ||
+        !result?.ok ||
+        !result?.game
+      ) {
+        throw new Error(
+          result?.error ||
+          "저장된 경기분석을 불러오지 못했습니다."
+        );
+      }
+
+      const replay =
+        result as PurchasedReplayData;
+
+      setPurchasedReplay(replay);
+
+      setPurchasedReplayCache(
+        (current) => ({
+          ...current,
+          [item.gameId]: replay,
+        })
+      );
+
+      window.requestAnimationFrame(() =>
+        document
+          .getElementById("purchased-analysis-replay")
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+      );
+    } catch (error) {
+      console.error(
+        "purchased replay load failed",
+        error
+      );
+
+      setPurchasedReplayError(
+        error instanceof Error
+          ? error.message
+          : "저장된 경기분석을 불러오지 못했습니다."
+      );
+    } finally {
+      setPurchasedReplayLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     let cancelled = false;
@@ -8560,9 +10274,13 @@ const [
       */
       if (historyResponse.ok) {
         try {
+          /* HISTORICAL_ODDS_AUTO_RESTORE_V2 */
           type HistoricalOddsSnapshot = {
             id?: string;
             gameId?: string;
+            date?: string;
+            capturedAt?: string;
+            source?: "AUTO" | "MANUAL";
             awayMl?: number | null;
             homeMl?: number | null;
             awayHandicapLine?: number | null;
@@ -8579,13 +10297,41 @@ const [
               snapshots?: HistoricalOddsSnapshot[];
             };
 
+          /*
+            과거 배당은 실제 자동 저장된 AUTO 스냅샷을 사용한다.
+
+            기존 코드는 id가 "historical-"로 시작하는 자료만
+            허용해서 실제 자동 수집 배당을 전부 버리고 있었다.
+
+            - AUTO 저장본 허용
+            - 예전 historical-* 레거시 자료도 허용
+            - MANUAL 공용 스냅샷은 사용하지 않음
+          */
           const historicalSnapshots =
             Array.isArray(historyJson.snapshots)
               ? historyJson.snapshots.filter(
-                  (item) =>
-                    String(item?.id ?? "").startsWith(
-                      "historical-"
-                    )
+                  (item) => {
+                    if (!item?.gameId) {
+                      return false;
+                    }
+
+                    const source =
+                      String(
+                        item.source ?? ""
+                      ).toUpperCase();
+
+                    const legacyHistorical =
+                      String(
+                        item.id ?? ""
+                      ).startsWith(
+                        "historical-"
+                      );
+
+                    return (
+                      source === "AUTO" ||
+                      legacyHistorical
+                    );
+                  }
                 )
               : [];
 
@@ -8597,12 +10343,47 @@ const [
               >();
 
             for (const item of historicalSnapshots) {
-              if (!item.gameId) continue;
+              if (!item.gameId) {
+                continue;
+              }
 
-              historicalByGame.set(
-                item.gameId,
-                item
-              );
+              const previous =
+                historicalByGame.get(
+                  item.gameId
+                );
+
+              if (!previous) {
+                historicalByGame.set(
+                  item.gameId,
+                  item
+                );
+                continue;
+              }
+
+              /*
+                같은 경기의 스냅샷이 여러 개면
+                가장 마지막에 저장된 실제 배당을 사용한다.
+              */
+              const previousTime =
+                String(
+                  previous.capturedAt ?? ""
+                );
+
+              const currentTime =
+                String(
+                  item.capturedAt ?? ""
+                );
+
+              if (
+                !previousTime ||
+                !currentTime ||
+                currentTime >= previousTime
+              ) {
+                historicalByGame.set(
+                  item.gameId,
+                  item
+                );
+              }
             }
 
             setAllOdds((prev) => {
@@ -9703,7 +11484,7 @@ const [
     - 기존 LIVE_PREDICTION_CAPTURE_V1
       선정 규칙을 그대로 유지
     - 배당 존재
-    - 기대수익률 > 0
+    - 시장 가치 > 0
     - C등급 제외
 
     과거 날짜는 서버가 새 LIVE 생성을
@@ -9737,7 +11518,7 @@ const [
             즉 경기당 최대:
             - 승패 1개
             - 핸디캡 1개
-            - 오버/언더 1개
+            - O/U 확률 1개
           */
           const allPredictionMap =
             new Map<
@@ -10506,7 +12287,7 @@ const [
     AI 카드 표시 전용.
 
     TOTAL:
-      홈팀 + 오버/언더
+      홈팀 + O/U 확률
 
     예:
       한화 언더 11.5
@@ -10914,7 +12695,7 @@ const [
 
           /*
             가치형:
-            승률 + 기대수익률 + 배당가치의
+            승률 + 시장 가치 + 배당가치의
             균형을 본다.
           */
           if (
@@ -11752,7 +13533,7 @@ const [
 
     if (positiveEvCount > 0) {
       parts.push(
-        `양수 기대수익률 ${positiveEvCount}픽`
+        `양수 시장 가치 ${positiveEvCount}픽`
       );
     }
 
@@ -12688,8 +14469,8 @@ const [
   /*
     FROZEN_V37_2COMBO_BUILDER
 
-    A = V3.7 HANDICAP 기대수익률 > 0 #1
-    B = V3.7 HANDICAP 기대수익률 > 0 #2,
+    A = V3.7 HANDICAP 시장 가치 > 0 #1
+    B = V3.7 HANDICAP 시장 가치 > 0 #2,
         A와 다른 경기
 
     C = ML partnerScore #1,
@@ -13917,14 +15698,14 @@ const [
                 <div>
                   <h2>📊 경기별 전체 예측</h2>
                   <p>
-                    승패 · 핸디캡 · 오버/언더를 비교하고
+                    승패 · 핸디캡 · O/U 확률를 비교하고
                     경기 종료 후 실제 점수로 자동 판정합니다.
                   </p>
                 </div>
-      
+
                 <span>{games.length}경기 분석</span>
               </div>
-      
+
               <div className="gamePredictionGrid">
                 {games.map((game) => {
                   const gamePicks =
@@ -13932,7 +15713,7 @@ const [
                       (pick) =>
                         pick.gameId === game.gameId
                     );
-      
+
                   const pickScore = (
                     pick: (typeof gamePicks)[number]
                   ) => {
@@ -13942,14 +15723,14 @@ const [
                         : pick.grade === "B"
                           ? 200
                           : 100;
-      
+
                     return (
                       gradeScore +
                       pick.confidence * 100 +
                       (pick.ev ?? -1) * 100
                     );
                   };
-      
+
                   /*
                     MARKET_DIRECTION_CONFIDENCE_V1
 
@@ -14002,16 +15783,16 @@ const [
                         }
                       )[0];
                   };
-      
+
                   const mlPick =
                     selectMarketPick("ML");
-      
+
                   const handicapPick =
                     selectMarketPick("HANDICAP");
-      
+
                   const totalPick =
                     selectMarketPick("TOTAL");
-      
+
                   const availablePicks = [
                     mlPick,
                     handicapPick,
@@ -14023,77 +15804,77 @@ const [
                       typeof pick
                     > => Boolean(pick)
                   );
-      
+
                   const finalPick =
                     [...availablePicks].sort(
                       (a, b) =>
                         pickScore(b) -
                         pickScore(a)
                     )[0];
-      
+
                   const currentOdds =
                     odds[game.gameId] ||
                     emptyOdds;
-      
+
                   const settlePrediction = (
                     pick:
                       | (typeof gamePicks)[number]
                       | undefined
                   ) => {
                     if (!pick) return "VOID" as const;
-      
+
                     const snapshot:
                       SavedComboSnapshot = {
                         id:
                           `${date}-${game.gameId}-${pick.market}-prediction`,
-      
+
                         date,
                         savedAt:
                           new Date().toISOString(),
-      
+
                         name: `${game.awayTeamName} vs ${game.homeTeamName}`,
                         style: "SAFE",
-      
+
                         odds:
                           pick.odds ?? 1,
-      
+
                         probability:
                           pick.confidence,
-      
+
                         averageConfidence:
                           pick.confidence,
-      
+
                         averageEv:
                           pick.ev,
-      
+
                         picks: [{ ...pick }],
-      
+
                         oddsByGame: {
                           [game.gameId]: {
                             ...currentOdds,
                           },
                         },
-      
+
                         games: {
                           [game.gameId]: {
                             awayTeamName:
                               game.awayTeamName,
-      
+
                             homeTeamName:
                               game.homeTeamName,
-      
+
                             stadium:
                               game.stadium || "",
                           },
                         },
                       };
-      
+
                     return settleSavedCombo(
                       snapshot,
                       games
                     ).pickResults[0];
                   };
-      
+
                   const marketRows = [
                     {
                       title: "승패",
@@ -14106,36 +15887,36 @@ const [
                       pick: handicapPick,
                     },
                     {
-                      title: "오버/언더",
+                      title: "O/U 확률",
                       icon: "📈",
                       pick: totalPick,
                     },
                   ];
-      
+
                   const mlEv =
                     mlPick?.ev ?? null;
-      
+
                   const handicapEv =
                     handicapPick?.ev ?? null;
-      
+
                   const totalEv =
                     totalPick?.ev ?? null;
-      
+
                   const reason =
                     !finalPick
                       ? "입력된 배당과 기준점이 부족해 최종 예측을 대기하고 있습니다."
                       : finalPick.market === "ML"
-                        ? `승패 시장의 모델 확률 ${(finalPick.confidence * 100).toFixed(1)}%와 기대수익률 ${finalPick.ev !== null ? `${finalPick.ev >= 0 ? "+" : ""}${(finalPick.ev * 100).toFixed(1)}%` : "-"}가 핸디캡 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}, 오버/언더 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 종합 점수가 높아 승패를 우선 선택했습니다.`
+                        ? `승패 시장의 모델 확률 ${(finalPick.confidence * 100).toFixed(1)}%와 시장 가치 ${finalPick.ev !== null ? `${finalPick.ev >= 0 ? "+" : ""}${(finalPick.ev * 100).toFixed(1)}%` : "-"}가 핸디캡 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}, O/U 확률 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 종합 점수가 높아 승패를 우선 선택했습니다.`
                         : finalPick.market === "HANDICAP"
-                          ? `핸디캡 시장이 승패 기대수익률 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 오버/언더 기대수익률 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 가격 가치와 모델 확률의 균형이 좋아 최종 선택했습니다.`
-                          : `예상 득점 흐름과 현재 기준점의 차이가 승패 기대수익률 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 핸디캡 기대수익률 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}보다 뚜렷해 오버/언더를 최종 선택했습니다.`;
-      
+                          ? `핸디캡 시장이 승패 시장 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 O/U 확률 시장 가치 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 가격 가치와 모델 확률의 균형이 좋아 최종 선택했습니다.`
+                          : `예상 득점 흐름과 현재 기준점의 차이가 승패 시장 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 핸디캡 시장 가치 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}보다 뚜렷해 O/U 확률를 최종 선택했습니다.`;
+
                   const predictionResults =
                     availablePicks.map(
                       (pick) =>
                         settlePrediction(pick)
                     );
-      
+
                   /*
                     모두 적중 = 전체 적중
                     모두 미적중 = 전체 미적중
@@ -14145,10 +15926,10 @@ const [
                   const hasScore =
                     game.score.away !== null &&
                     game.score.home !== null;
-      
+
                   const isFinal =
                     game.status.stateCode === "3";
-      
+
                   const isLive =
                     !isFinal &&
                     hasScore &&
@@ -14156,7 +15937,7 @@ const [
                       game.status.inning !== null ||
                       !!game.status.topBottom
                     );
-      
+
                   const finalResult =
                     predictionResults.length === 0
                       ? "WAITING"
@@ -14181,7 +15962,7 @@ const [
                               )
                               ? "VOID"
                               : "PARTIAL";
-      
+
                   return (
                     <article
                       className="gamePredictionCard"
@@ -14195,14 +15976,14 @@ const [
                             {game.stadium ||
                               "구장 미정"}
                           </small>
-      
+
                           <h3>
                             {game.awayTeamName}
                             <span>VS</span>
                             {game.homeTeamName}
                           </h3>
                         </div>
-      
+
                         <div
                           className={
                             `predictionResult result-${finalResult.toLowerCase()}`
@@ -14221,14 +16002,14 @@ const [
                                     : "↔ 무효"}
                         </div>
                       </div>
-      
+
                       <div className="predictionMarketList">
                         {marketRows.map((row) => {
                           const result =
                             settlePrediction(
                               row.pick
                             );
-      
+
                           const liveProbability =
                             row.pick
                               ? liveDisplayProbability(
@@ -14236,7 +16017,7 @@ const [
                                   game
                                 )
                               : null;
-      
+
                           return (
                             <div
                               className="predictionMarketRow"
@@ -14248,14 +16029,14 @@ const [
                                 <span>{row.icon}</span>
                                 <b>{row.title}</b>
                               </div>
-      
+
                               {row.pick ? (
                                 <>
                                   <div className="predictionPick">
                                     <strong>
                                       {row.pick.label}
                                     </strong>
-      
+
                                     <div className="predictionLiveLine">
                                       <span
                                         className={
@@ -14279,7 +16060,7 @@ const [
                                         %
                                       </span>
                                     </div>
-      
+
                                     <small className="predictionEvLine">
                                       EV{" "}
                                       {row.pick.ev !== null
@@ -14287,7 +16068,7 @@ const [
                                         : "-"}
                                     </small>
                                   </div>
-      
+
                                   <span
                                     className={
                                       `predictionGrade grade-${row.pick.grade}`
@@ -14295,7 +16076,7 @@ const [
                                   >
                                     {row.pick.grade}
                                   </span>
-      
+
                                   <span
                                     className={
                                       `predictionRowResult result-${result.toLowerCase()}`
@@ -14315,15 +16096,15 @@ const [
                           );
                         })}
                       </div>
-      
+
                       <div className="predictionFinal">
                         <span>최종 선택</span>
-      
+
                         <strong>
                           {finalPick?.label ||
                             "분석 대기"}
                         </strong>
-      
+
                         {finalPick && (
                           <b>
                             {finalPick.grade}등급 ·{" "}
@@ -14335,11 +16116,11 @@ const [
                           </b>
                         )}
                       </div>
-      
+
                       <p className="predictionReason">
                         {reason}
                       </p>
-      
+
                       {game.score.away !== null &&
                        game.score.home !== null && (
                         <div className="predictionActualScore">
@@ -14439,6 +16220,32 @@ const [
       }));
     }
   }
+
+
+  /* PURCHASED_ANALYSIS_TARGET_SYNC_V1 */
+  useEffect(() => {
+    if (
+      !purchasedAnalysisTarget
+    ) {
+      return;
+    }
+
+    const exists =
+      games.some(
+        (game) =>
+          game.gameId ===
+          purchasedAnalysisTarget
+      );
+
+    if (exists) {
+      setSelectedGameId(
+        purchasedAnalysisTarget
+      );
+    }
+  }, [
+    games,
+    purchasedAnalysisTarget,
+  ]);
 
 
   /* SINGLE_MATCH_WEBSITE_V1 */
@@ -16471,7 +18278,7 @@ const [
                       </section>
                     )}
 
-                    
+
 
                   </div>
                 </>
@@ -16485,7 +18292,7 @@ const [
                   </p>
                 </div>
               )}
-            
+
                 </section>
               </div>
             )}
@@ -16746,6 +18553,10 @@ const [
   key={g.gameId + ":" + (authUser?.id || "guest")}
   analysisUserId={authUser?.id || null}
   onAnalysisBalanceChange={setBaseballBalance}
+  openPurchasedAnalysis={
+    purchasedAnalysisTarget ===
+    g.gameId
+  }
   game={g}
   odds={odds[g.gameId] || emptyOdds}
   pitcherStats={pitcherStats}
@@ -16980,7 +18791,7 @@ const [
                         <div className="aiSingleMetrics">
                           <div><span>모델 확률</span><strong>{(pick.confidence * 100).toFixed(1)}%</strong></div>
                           <div><span>배당</span><strong>{pick.odds != null ? pick.odds.toFixed(2) : "-"}</strong></div>
-                          <div><span>기대수익률</span><strong>{pick.ev != null ? `${pick.ev >= 0 ? "+" : ""}${(pick.ev * 100).toFixed(1)}%` : "-"}</strong></div>
+                          <div><span>시장 가치</span><strong>{pick.ev != null ? `${pick.ev >= 0 ? "+" : ""}${(pick.ev * 100).toFixed(1)}%` : "-"}</strong></div>
                         </div>
 
                         <div className="aiSingleLock">
@@ -17052,11 +18863,11 @@ const [
                <div>
                  <span>GAME BETTING</span>
                  <h3>경기별 야구공 배팅</h3>
-                 <p>배당을 직접 수정하고 원하는 승패 · 핸디캡 · 오버/언더 픽을 선택하세요. 선택한 픽은 아래 직접 조합에 바로 반영됩니다.</p>
+                 <p>배당을 직접 수정하고 원하는 승패 · 핸디캡 · O/U 확률 픽을 선택하세요. 선택한 픽은 아래 직접 조합에 바로 반영됩니다.</p>
                </div>
                <strong>{selectedGamePickKeys.length}개 선택</strong>
              </div>
- 
+
              {games.length > 0 ? (
                <div className="aiPickGameSelectorGrid">
                  {games.map((game) => {
@@ -17105,7 +18916,7 @@ const [
                        </button>
                      );
                    };
- 
+
                    return (
                      <article
                        className={`aiPickGameMarketCard ${gameBettingClosed ? "isBettingClosed" : ""}`}
@@ -17136,7 +18947,7 @@ const [
                            </span>
                          </div>
                        )}
- 
+
                        <div className="aiPickMarketSection">
                          <div className="aiPickMarketTitle"><b>승패</b><small>베트맨 배당 기준</small></div>
                          <div className="aiPickOddsInputs two">
@@ -17145,7 +18956,7 @@ const [
                          </div>
                          <div className="aiPickChoiceGrid">{mlPicks.map(renderPickButton)}</div>
                        </div>
- 
+
                        <div className="aiPickMarketSection">
                          <div className="aiPickMarketTitle"><b>핸디캡</b><small>홈팀 기준점</small></div>
                          <div className="aiPickOddsInputs handicap">
@@ -17155,7 +18966,7 @@ const [
                          </div>
                          <div className="aiPickChoiceGrid">{handicapPicks.map(renderPickButton)}</div>
                        </div>
- 
+
                        <div className="aiPickMarketSection">
                          <div className="aiPickMarketTitle"><b>오버 / 언더</b><small>베트맨 기준점 · 배당</small></div>
                          <div className="aiPickOddsInputs handicap">
@@ -17173,7 +18984,7 @@ const [
                <div className="aiPickCenterEmpty"><b>오늘 경기가 없습니다.</b><span>경기가 등록되면 배당과 개별 픽 선택 기능이 표시됩니다.</span></div>
              )}
            </section>
- 
+
           <div className="aiPickCenterDivider">
             <span>COMBINATION BUILDER</span>
             <h3>직접 조합 · AI 자동조합</h3>
@@ -18004,7 +19815,7 @@ const [
               ? "예상 적중확률과 평균 예측확률을 가장 중요하게 평가합니다."
               : aiPickMode === "VALUE"
                 ? "예상 적중확률과 EV, 배당가치를 함께 평가합니다."
-                : "높은 배당 후보 중 확률과 기대수익률 품질까지 함께 평가합니다."}
+                : "높은 배당 후보 중 확률과 시장 가치 품질까지 함께 평가합니다."}
           </div>
 
           <div className="aiPickRecommendationGrid">
@@ -19900,6 +21711,547 @@ const [
             </div>
           ) : (
             <>
+              {/* MYPAGE_PREMIUM_V2 */}
+              <section className="myPageHeroV2">
+                <div className="myPageHeroIdentityV2">
+                  <div className="myPageAvatarV2">
+                    {(
+                      authUser.email ||
+                      "K"
+                    )
+                      .slice(
+                        0,
+                        1
+                      )
+                      .toUpperCase()}
+                  </div>
+
+                  <div>
+                    <small>
+                      MY KBO PICKS
+                    </small>
+
+                    <span className="myPageTitleV3">
+                      마이페이지
+                    </span>
+
+                    <div className="myPageIdentityNameV3">
+                      <h2>
+                        {String(
+                          authUser.user_metadata
+                            ?.nickname ??
+                          ""
+                        ).trim() ||
+                          "닉네임 미설정"}
+                      </h2>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMyPageAccountOpen(
+                            (prev) => !prev
+                          );
+
+                          setMyPageAccountMessage(
+                            ""
+                          );
+                        }}
+                      >
+                        {myPageAccountOpen
+                          ? "닫기"
+                          : "계정 수정"}
+                      </button>
+                    </div>
+
+                    <p>
+                      {authUser.email}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="myPageHeroStatsV2">
+                  <article>
+                    <span>
+                      BASEBALL
+                    </span>
+
+                    <small>
+                      보유 야구공
+                    </small>
+
+                    <strong>
+                      ⚾{" "}
+                      {baseballBalance ===
+                      null
+                        ? "-"
+                        : baseballBalance >=
+                            1_000_000_000
+                          ? "∞"
+                          : baseballBalance.toLocaleString(
+                              "ko-KR"
+                            )}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>
+                      PREMIUM
+                    </span>
+
+                    <small>
+                      구매한 경기분석
+                    </small>
+
+                    <strong>
+                      {purchasedAnalysesLoading
+                        ? "..."
+                        : purchasedAnalyses.length}
+                      건
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>
+                      COMBOS
+                    </span>
+
+                    <small>
+                      이번 달 조합
+                    </small>
+
+                    <strong>
+                      {
+                        myComboMonthItems.length
+                      }
+                      개
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>
+                      PROFIT
+                    </span>
+
+                    <small>
+                      이번 달 야구공 손익
+                    </small>
+
+                    <strong
+                      className={
+                        myComboMonthlyStats.realizedProfit >
+                        0
+                          ? "positive"
+                          : myComboMonthlyStats.realizedProfit <
+                              0
+                            ? "negative"
+                            : ""
+                      }
+                    >
+                      {myComboMonthlyStats.resolvedCount >
+                      0
+                        ? `${myComboMonthlyStats.realizedProfit >
+                          0
+                            ? "+"
+                            : ""}${myComboMonthlyStats.realizedProfit.toLocaleString(
+                            "ko-KR"
+                          )}⚾`
+                        : "-"}
+                    </strong>
+                  </article>
+                </div>
+              </section>
+
+
+              {/* MYPAGE_ACCOUNT_PANEL_V3 */}
+              {myPageAccountOpen && (
+                <section className="myPageAccountPanelV3">
+
+                  <div className="myPageAccountHeadV3">
+                    <div>
+                      <small>
+                        ACCOUNT SETTINGS
+                      </small>
+
+                      <h3>
+                        계정 설정
+                      </h3>
+
+                      <p>
+                        닉네임과 비밀번호를 관리할 수 있습니다.
+                      </p>
+                    </div>
+
+                    <span>
+                      로그인 계정
+                    </span>
+                  </div>
+
+
+                  <div className="myPageAccountGridV3">
+
+                    <article>
+                      <label>
+                        닉네임
+                      </label>
+
+                      <div className="myPageAccountInputRowV3">
+                        <input
+                          type="text"
+                          value={
+                            myPageNickname
+                          }
+                          maxLength={16}
+                          placeholder="닉네임 입력"
+                          onChange={(
+                            event
+                          ) =>
+                            setMyPageNickname(
+                              event.target.value
+                            )
+                          }
+                        />
+
+                        <button
+                          type="button"
+                          disabled={
+                            myPageAccountBusy
+                          }
+                          onClick={() =>
+                            void saveMyPageNickname()
+                          }
+                        >
+                          저장
+                        </button>
+                      </div>
+
+                      <small>
+                        2~16자 · 마이페이지와 향후 커뮤니티에서 사용
+                      </small>
+                    </article>
+
+
+                    <article>
+                      <label>
+                        이메일
+                      </label>
+
+                      <div className="myPageReadonlyV3">
+                        {authUser.email}
+                      </div>
+
+                      <small>
+                        현재 로그인 계정 이메일
+                      </small>
+                    </article>
+
+
+                    <article>
+                      <label>
+                        새 비밀번호
+                      </label>
+
+                      <div className="myPageAccountInputRowV3">
+                        <input
+                          type="password"
+                          autoComplete="new-password"
+                          value={
+                            myPageNewPassword
+                          }
+                          placeholder="새 비밀번호"
+                          onChange={(
+                            event
+                          ) =>
+                            setMyPageNewPassword(
+                              event.target.value
+                            )
+                          }
+                        />
+
+                        <button
+                          type="button"
+                          disabled={
+                            myPageAccountBusy
+                          }
+                          onClick={() =>
+                            void saveMyPagePassword()
+                          }
+                        >
+                          변경
+                        </button>
+                      </div>
+
+                      <small>
+                        비밀번호는 6자 이상
+                      </small>
+                    </article>
+
+                  </div>
+
+
+                  {myPageAccountMessage && (
+                    <div
+                      className="myPageAccountMessageV3"
+                      role="status"
+                    >
+                      {
+                        myPageAccountMessage
+                      }
+                    </div>
+                  )}
+
+                </section>
+              )}
+
+
+              {/* MYPAGE_PURCHASED_REPLAY_PANEL_V1 */}
+              {(purchasedReplay ||
+                purchasedReplayLoading ||
+                purchasedReplayError) && (
+                <section
+                  id="purchased-analysis-replay"
+                  className="purchasedReplayPanelV4"
+                >
+                  <div className="purchasedReplayHeadV4">
+                    <div>
+                      <small>SAVED GAME ANALYSIS</small>
+                      <h3>구매한 경기 전체 분석</h3>
+                      <p>
+                        저장된 경기 당시 전체 분석을 표시합니다.
+                        다른 경기는 표시하지 않으며 홈 날짜도 변경되지 않습니다.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPurchasedReplay(null);
+                        setPurchasedReplayError("");
+                        setPurchasedAnalysisTarget(null);
+                      }}
+                    >
+                      닫기
+                    </button>
+                  </div>
+
+                  {purchasedReplayLoading && (
+                    <div className="purchasedReplayStatusV4">
+                      저장된 분석을 불러오는 중...
+                    </div>
+                  )}
+
+                  {purchasedReplayError && (
+                    <div className="purchasedReplayErrorV4">
+                      {purchasedReplayError}
+                    </div>
+                  )}
+
+                  {purchasedReplay && (
+                    <div className="purchasedReplayGameV4">
+                      <GameCard
+                        key={`replay:${purchasedReplay.gameId}`}
+                        analysisUserId={authUser?.id || null}
+                        onAnalysisBalanceChange={setBaseballBalance}
+                        openPurchasedAnalysis={true}
+                        game={purchasedReplay.game}
+                        odds={purchasedReplay.odds || emptyOdds}
+                        setOdds={() => {}}
+                        pitcherStats={purchasedReplay.pitcherStats || {}}
+                        teamForms={purchasedReplay.teamForms || {}}
+                        bullpens={purchasedReplay.bullpens || {}}
+                        lineupMatchups={
+                          purchasedReplay.lineup
+                            ? {
+                                [purchasedReplay.gameId]:
+                                  purchasedReplay.lineup,
+                              }
+                            : {}
+                        }
+                        frozenPicks={[]}
+                        selectedPickKeys={[]}
+                        onTogglePick={() => {}}
+                        oddsLocked={true}
+                        oddsSaveBusy={false}
+                        oddsSaveMessage=""
+                        onSaveOdds={() => {}}
+                        onUnlockOdds={() => {}}
+                      />
+                    </div>
+                  )}
+                </section>
+              )}
+
+
+              <section className="purchasedAnalysisSectionV2">
+                <div className="purchasedAnalysisHeadV2">
+                  <div>
+                    <small>
+                      PREMIUM LIBRARY
+                    </small>
+
+                    <h3>
+                      구매한 경기분석
+                    </h3>
+
+                    <p>
+                      야구공으로 잠금해제한 경기분석은
+                      계정에 보관되며 다시 확인할 수 있습니다.
+                    </p>
+                  </div>
+
+                  <span>
+                    {
+                      purchasedAnalyses.length
+                    }
+                    건 보관중
+                  </span>
+                </div>
+
+                {purchasedAnalysesLoading ? (
+                  <div className="purchasedAnalysisEmptyV2">
+                    <b>
+                      구매내역 불러오는 중
+                    </b>
+
+                    <span>
+                      계정의 프리미엄 경기분석을 확인하고 있습니다.
+                    </span>
+                  </div>
+                ) : purchasedAnalysesError ? (
+                  <div className="purchasedAnalysisEmptyV2 error">
+                    <b>
+                      구매내역을 불러오지 못했습니다
+                    </b>
+
+                    <span>
+                      {
+                        purchasedAnalysesError
+                      }
+                    </span>
+                  </div>
+                ) : purchasedAnalyses.length ===
+                  0 ? (
+                  <div className="purchasedAnalysisEmptyV2">
+                    <b>
+                      아직 구매한 경기분석이 없습니다
+                    </b>
+
+                    <span>
+                      경기분석의 프리미엄 분석을 잠금해제하면 여기에 보관됩니다.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="purchasedAnalysisGridV2">
+                    {purchasedAnalyses.map(
+                      (item) => (
+                        <article
+                          className="purchasedAnalysisCardV2"
+                          key={
+                            item.gameId
+                          }
+                        >
+                          <div className="purchasedAnalysisCardTopV2">
+                            <div>
+                              <span>
+                                PREMIUM
+                              </span>
+
+                              <em>
+                                🔓 해금 완료
+                              </em>
+                            </div>
+
+                            <small>
+                              {
+                                item.gameDate ||
+                                "-"
+                              }
+                            </small>
+                          </div>
+
+                          <div className="purchasedAnalysisMatchV2">
+                            <strong>
+                              {
+                                item.awayTeamName ||
+                                "원정팀"
+                              }
+                            </strong>
+
+                            <span>
+                              VS
+                            </span>
+
+                            <strong>
+                              {
+                                item.homeTeamName ||
+                                "홈팀"
+                              }
+                            </strong>
+                          </div>
+
+                          <div className="purchasedAnalysisMetaV2">
+                            <span>
+                              <small>
+                                사용 야구공
+                              </small>
+
+                              <b>
+                                {item.price.toLocaleString(
+                                  "ko-KR"
+                                )}
+                                ⚾
+                              </b>
+                            </span>
+
+                            <span>
+                              <small>
+                                구매일
+                              </small>
+
+                              <b>
+                                {item.createdAt
+                                  ? new Date(
+                                      item.createdAt
+                                    ).toLocaleString(
+                                      "ko-KR",
+                                      {
+                                        timeZone:
+                                          "Asia/Seoul",
+                                        month:
+                                          "2-digit",
+                                        day:
+                                          "2-digit",
+                                        hour:
+                                          "2-digit",
+                                        minute:
+                                          "2-digit",
+                                      }
+                                    )
+                                  : "-"}
+                              </b>
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openPurchasedAnalysis(
+                                item
+                              )
+                            }
+                          >
+                            프리미엄 분석 다시보기
+                            <span>
+                              →
+                            </span>
+                          </button>
+                        </article>
+                      )
+                    )}
+                  </div>
+                )}
+              </section>
+
+
               <section className="myComboMonthHeader">
                 <button
                   type="button"
@@ -19947,14 +22299,14 @@ const [
               <section className="myComboMonthSummary">
                 <div>
                   <span>
-                    총 베팅금액
+                    총 배팅 야구공
                   </span>
 
                   <strong>
                     {myComboMonthTotalStake.toLocaleString(
                       "ko-KR"
                     )}
-                    원
+                    ⚾
                   </strong>
 
                   <small>
@@ -20014,7 +22366,7 @@ const [
 
                 <div>
                   <span>
-                    실현손익
+                    야구공 손익
                   </span>
 
                   <strong
@@ -20035,7 +22387,7 @@ const [
                           ? "+"
                           : ""}${myComboMonthlyStats.realizedProfit.toLocaleString(
                           "ko-KR"
-                        )}원`
+                        )}⚾`
                       : myComboResultsLoading
                         ? "계산중..."
                         : "-"}
@@ -20314,7 +22666,7 @@ const [
                                       ? "+"
                                       : ""}${dayRealizedProfit.toLocaleString(
                                       "ko-KR"
-                                    )}원`
+                                    )}⚾`
                                   : myComboResultsLoading
                                     ? "정산 확인중"
                                     : "정산 대기"}
@@ -20558,7 +22910,7 @@ const [
                                                                     )
                                                                   : "-"}
                                                               </span>
-                                                              
+
                                                               <span
                                                                 className={`myPickResultBadge status-${pickResult.toLowerCase()}`}
                                                               >
@@ -20595,8 +22947,7 @@ const [
                                                     <span>
                                                       {stake.toLocaleString(
                                                         "ko-KR"
-                                                      )}
-                                                      원
+                                                      )} ⚾
                                                     </span>
 
                                                     <strong>
@@ -20781,18 +23132,6 @@ const [
                                         }
                                       >
                                         <summary className="manualSavedCardHead">
-                                          <div>
-                                            <span className="myComboBadge manual">
-                                              AI 추천픽
-                                            </span>
-
-                                            <h3>
-                                              {
-                                                item.name
-                                              }
-                                            </h3>
-                                          </div>
-
                                           <div className="manualSavedResult">
                                             <em
                                               className={`mySettlementBadge status-${(
@@ -20899,7 +23238,7 @@ const [
                                             {hasStake
                                               ? `${stake.toLocaleString(
                                                   "ko-KR"
-                                                )}원`
+                                                )}⚾`
                                               : "-"}
                                           </b>
                                         </div>
@@ -20913,7 +23252,7 @@ const [
                                               {hasStake
                                                 ? `${expectedReturn.toLocaleString(
                                                     "ko-KR"
-                                                  )}원`
+                                                  )}⚾`
                                                 : "-"}
                                             </b>
                                           </span>
@@ -20935,14 +23274,14 @@ const [
                                                     ? "+"
                                                     : ""}${expectedProfit.toLocaleString(
                                                     "ko-KR"
-                                                  )}원`
+                                                  )}⚾`
                                                 : "-"}
                                             </b>
                                           </span>
                                         </div>
 
 
-                                        
+
                                         {/* MY_COMBO_DETAIL_V2 */}
                                         <div className="myComboCompactSettlement">
                                           <div className="myComboStakeManage">
@@ -20953,8 +23292,7 @@ const [
                                                   <strong>
                                                     {stake.toLocaleString(
                                                       "ko-KR"
-                                                    )}
-                                                    원
+                                                    )} ⚾
                                                   </strong>
                                                 </span>
 
@@ -21099,7 +23437,7 @@ const [
                                                 {realizedReturn !== null
                                                   ? `${realizedReturn.toLocaleString(
                                                       "ko-KR"
-                                                    )}원`
+                                                    )}⚾`
                                                   : "-"}
                                               </b>
                                             </span>
@@ -21122,7 +23460,7 @@ const [
                                                       ? "+"
                                                       : ""}${realizedProfit.toLocaleString(
                                                       "ko-KR"
-                                                    )}원`
+                                                    )}⚾`
                                                   : "-"}
                                               </b>
                                             </span>
@@ -21183,18 +23521,3 @@ const [
     </section>
   </main>;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

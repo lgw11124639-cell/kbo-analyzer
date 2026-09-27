@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import { promises as fs } from "fs";
+import * as path from "path";
 import { isHistoricalDate } from "@/lib/kboHistoricalPlayerStats";
 
 /* HISTORICAL_BVP_LEAK_BLOCK_V1 */
@@ -27,6 +29,162 @@ const matchupCache =
     string,
     MatchupCacheItem
   >();
+
+
+/* HISTORICAL_PREGAME_BVP_RESTORE_FINAL_V3 */
+async function loadHistoricalPregameSnapshot(
+  date: string,
+  away: string,
+  home: string
+) {
+  try {
+    const filePath =
+      path.join(
+        process.cwd(),
+        "data",
+        "kbo-pregame-analysis-snapshots.json"
+      );
+
+    const raw =
+      await fs.readFile(
+        filePath,
+        "utf8"
+      );
+
+    const parsed =
+      JSON.parse(raw);
+
+    const snapshots =
+      Array.isArray(
+        parsed?.snapshots
+      )
+        ? parsed.snapshots
+        : [];
+
+    const rows =
+      snapshots
+        .filter(
+          (row: any) =>
+            row?.date === date &&
+            row?.lineup?.ready === true
+        )
+        .sort(
+          (a: any, b: any) =>
+            String(
+              b?.capturedAt ?? ""
+            ).localeCompare(
+              String(
+                a?.capturedAt ?? ""
+              )
+            )
+        );
+
+    for (
+      const row of rows
+    ) {
+      const lineup =
+        row?.lineup;
+
+      if (
+        !lineup ||
+        typeof lineup !==
+          "object"
+      ) {
+        continue;
+      }
+
+      const savedAway =
+        normalizeTeamName(
+          lineup?.away?.team
+        );
+
+      const savedHome =
+        normalizeTeamName(
+          lineup?.home?.team
+        );
+
+      if (
+        savedAway !== away ||
+        savedHome !== home
+      ) {
+        continue;
+      }
+
+      const awayPlayers =
+        Array.isArray(
+          lineup?.away?.players
+        )
+          ? lineup.away.players
+          : [];
+
+      const homePlayers =
+        Array.isArray(
+          lineup?.home?.players
+        )
+          ? lineup.home.players
+          : [];
+
+      const awayBvp =
+        awayPlayers.filter(
+          (player: any) =>
+            Number(
+              player?.bvp?.pa ?? 0
+            ) > 0
+        ).length;
+
+      const homeBvp =
+        homePlayers.filter(
+          (player: any) =>
+            Number(
+              player?.bvp?.pa ?? 0
+            ) > 0
+        ).length;
+
+      return {
+        ...lineup,
+
+        date,
+
+        historical:
+          true,
+
+        bvpApplied:
+          awayBvp +
+            homeBvp >
+          0,
+
+        historicalSource:
+          "PREGAME_SNAPSHOT",
+
+        historicalCapturedAt:
+          row?.capturedAt ??
+          null,
+
+        historicalBvpCount: {
+          away:
+            awayBvp,
+
+          home:
+            homeBvp,
+        },
+
+        cached:
+          false,
+      };
+    }
+
+    return null;
+
+  } catch (error) {
+    console.error(
+      "[historical BVP snapshot]",
+      error
+    );
+
+    return null;
+  }
+}
+
 
 
 const KBO_BVP_URL =
@@ -962,6 +1120,34 @@ export async function GET(
       }
     );
   }
+
+
+  /* HISTORICAL_BVP_EARLY_RETURN_FINAL_V3 */
+  if (
+    historicalDate
+  ) {
+    const savedPregame =
+      await loadHistoricalPregameSnapshot(
+        date,
+        away,
+        home
+      );
+
+    if (
+      savedPregame
+    ) {
+      return NextResponse.json(
+        savedPregame,
+        {
+          headers: {
+            "Cache-Control":
+              "private, no-store",
+          },
+        }
+      );
+    }
+  }
+
 
   try {
 

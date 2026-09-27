@@ -29648,3 +29648,5635 @@ html body .analysisPurchasePanelV1 .analysisPurchaseMessageV1{margin-top:12px!im
   }
 }
 
+/* =========================================================
+   PREMIUM_ALL_PICKS_UI_V2
+   ========================================================= */
+
+/* ---------- LOCK / PURCHASE ---------- */
+
+html body .analysisPurchasePanelV1 {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 150px minmax(0, 1fr) !important;
+  gap: 30px !important;
+  overflow: hidden !important;
+  width: min(var(--site-max, 1440px), calc(100% - 48px)) !important;
+  margin: 28px auto 24px !important;
+  padding: 34px !important;
+  border: 1px solid rgba(104, 139, 200, .26) !important;
+  border-radius: 24px !important;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(55, 113, 214, .28), transparent 32%),
+    radial-gradient(circle at 91% 84%, rgba(32, 75, 146, .22), transparent 30%),
+    linear-gradient(135deg, #07111f 0%, #0d1c31 48%, #102744 100%) !important;
+  box-shadow:
+    0 28px 70px rgba(5, 17, 36, .20),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  color: #fff !important;
+}
+
+html body .analysisPurchasePanelV1::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0 42%,
+      rgba(255,255,255,.035) 42% 43%,
+      transparent 43% 100%
+    ) !important;
+}
+
+html body .analysisPurchaseAuraV2 {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: -190px;
+  right: -80px;
+  border-radius: 999px;
+  background: rgba(86, 142, 255, .15);
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+html body .analysisPurchaseIconWrapV2 {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 20px;
+  background: rgba(255,255,255,.045);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+html body .analysisPurchaseIconV2 {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(134, 176, 255, .32);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(60, 118, 225, .32),
+      rgba(26, 67, 139, .24)
+    );
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.14);
+  font-size: 32px;
+  font-weight: 900;
+}
+
+html body .analysisPurchaseIconWrapV2 > small {
+  color: #8fa9ce !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: .16em !important;
+}
+
+html body .analysisPurchaseCopyV2 {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+html body .analysisPurchaseEyebrowV2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+html body .analysisPurchaseEyebrowV2 span {
+  color: #7fa9ed;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+html body .analysisPurchaseEyebrowV2 em {
+  padding: 4px 8px;
+  border: 1px solid rgba(105, 155, 238, .28);
+  border-radius: 999px;
+  background: rgba(74, 125, 210, .12);
+  color: #b8d0f7;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .07em;
+}
+
+html body .analysisPurchasePanelV1 h3 {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: clamp(24px, 2.2vw, 34px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -.035em !important;
+}
+
+html body .analysisPurchaseLeadV2 {
+  max-width: 850px;
+  margin: 12px 0 0 !important;
+  color: #aebfd5 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.7 !important;
+}
+
+html body .analysisPurchaseFeatureGridV2 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  margin-top: 20px;
+}
+
+html body .analysisPurchaseFeatureGridV2 span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 11px;
+  background: rgba(255,255,255,.035);
+  color: #d7e2ef;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+html body .analysisPurchaseFeatureGridV2 i {
+  color: #6f9eea;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+html body .analysisPurchaseActionRowV2 {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+html body .analysisPurchasePriceV2 {
+  display: flex;
+  flex-direction: column;
+}
+
+html body .analysisPurchasePriceV2 > small {
+  color: #7189aa;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+html body .analysisPurchasePriceV2 strong {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 2px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasePriceV2 strong em {
+  color: #79aaff;
+  font-size: 19px;
+  font-style: normal;
+}
+
+html body .analysisPurchasePriceV2 > span {
+  margin-top: 2px;
+  color: #8298b5;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+html body .analysisPurchasePanelV1 .analysisPurchaseButtonV1 {
+  min-width: 230px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 24px !important;
+  border: 1px solid rgba(128,171,246,.34) !important;
+  border-radius: 13px !important;
+  background:
+    linear-gradient(
+      135deg,
+      #1e4f9d,
+      #326dcc
+    ) !important;
+  box-shadow:
+    0 12px 28px rgba(27, 78, 160, .28),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+html body .analysisPurchasePanelV1 .analysisPurchaseButtonV1:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background:
+    linear-gradient(
+      135deg,
+      #255db4,
+      #3c7be0
+    ) !important;
+}
+
+html body .analysisPurchaseUnlockedV2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+  padding: 15px 17px;
+  border: 1px solid rgba(81, 193, 147, .20);
+  border-radius: 13px;
+  background: rgba(42, 151, 108, .09);
+}
+
+html body .analysisPurchaseUnlockedV2 > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+html body .analysisPurchaseUnlockedV2 > div > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(72, 196, 146, .16);
+  color: #78d6af;
+  font-weight: 900;
+}
+
+html body .analysisPurchaseUnlockedV2 p {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+}
+
+html body .analysisPurchaseUnlockedV2 b {
+  color: #e8fff5;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+html body .analysisPurchaseUnlockedV2 small {
+  margin-top: 2px;
+  color: #85ad9d;
+  font-size: 10px;
+}
+
+html body .analysisPurchaseUnlockedV2 > strong {
+  color: #74d5ad;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+html body .analysisPurchasePanelV1 .analysisPurchaseMessageV1 {
+  margin: 12px 0 0 !important;
+  color: #8fb7f6 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+}
+
+
+/* ---------- PURCHASED CONTENT ---------- */
+
+html body .unifiedWebsite.active-games
+.analysisWebsiteMatch[data-analysis-section="picks"]
+>.detailedOverallAnalysis.analysisPurchasedContentV1 {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: min(var(--site-max,1440px), calc(100% - 48px)) !important;
+  margin: 0 auto 34px !important;
+  padding: 0 26px 28px !important;
+  overflow: hidden !important;
+  border: 1px solid #d9e1eb !important;
+  border-radius: 24px !important;
+  background: #f8fafc !important;
+  box-shadow: 0 24px 60px rgba(24, 42, 70, .10) !important;
+}
+
+
+/* ---------- TOP HERO ---------- */
+
+html body .premiumPicksHeroV2 {
+  position: relative;
+  margin: 0 -26px 24px;
+  overflow: hidden;
+  padding: 30px 30px 24px;
+  background:
+    radial-gradient(circle at 84% 0%, rgba(61,118,214,.25), transparent 31%),
+    linear-gradient(135deg,#07111f 0%,#0e213b 55%,#12305a 100%);
+  color: #fff;
+}
+
+html body .premiumPicksHeroV2::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -120px;
+  bottom: -160px;
+  border-radius: 999px;
+  border: 44px solid rgba(255,255,255,.025);
+}
+
+html body .premiumPicksHeroTopV2,
+html body .premiumPicksHeroMainV2,
+html body .premiumPicksDataRailV2 {
+  position: relative;
+  z-index: 1;
+}
+
+html body .premiumPicksHeroTopV2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+html body .premiumPicksHeroTopV2 small {
+  color: #729bd8;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+html body .premiumPicksHeroTopV2 h2 {
+  margin: 5px 0 0;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 950;
+  letter-spacing: -.04em;
+}
+
+html body .premiumPicksHeroTopV2 p {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 6px 0 0;
+  color: #a9bad1;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+html body .premiumPicksHeroTopV2 p i {
+  color: #5579aa;
+  font-size: 9px;
+  font-style: normal;
+}
+
+html body .premiumPicksAccessBadgeV2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid rgba(112,203,162,.22);
+  border-radius: 11px;
+  background: rgba(49,151,108,.10);
+}
+
+html body .premiumPicksAccessBadgeV2 > span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(88,205,155,.16);
+  color: #7ad7b0;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+html body .premiumPicksAccessBadgeV2 div {
+  display: flex;
+  flex-direction: column;
+}
+
+html body .premiumPicksAccessBadgeV2 b {
+  color: #d9fff0;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+html body .premiumPicksAccessBadgeV2 small {
+  margin-top: 2px;
+  color: #6fae94;
+  font-size: 8px;
+  letter-spacing: .08em;
+}
+
+html body .premiumPicksHeroMainV2 {
+  display: grid;
+  grid-template-columns: minmax(0,1.15fr) minmax(420px,.85fr);
+  gap: 28px;
+  align-items: end;
+  margin-top: 30px;
+}
+
+html body .premiumPicksPrimaryV2 > span {
+  color: #6f9fe7;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+
+html body .premiumPicksPrimaryV2 > strong {
+  display: block;
+  margin-top: 5px;
+  color: #fff;
+  font-size: clamp(26px,3vw,42px);
+  font-weight: 950;
+  letter-spacing: -.055em;
+  line-height: 1.08;
+}
+
+html body .premiumPicksPrimaryV2 > p {
+  max-width: 570px;
+  margin: 10px 0 0;
+  color: #9eb1ca;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+html body .premiumPicksPrimaryMetaV2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+html body .premiumPicksPrimaryMetaV2 em {
+  padding: 6px 9px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 999px;
+  background: rgba(255,255,255,.045);
+  color: #bfd0e5;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+html body .premiumPicksMetricGridV2 {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 8px;
+}
+
+html body .premiumPicksMetricGridV2 article {
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  background: rgba(255,255,255,.04);
+}
+
+html body .premiumPicksMetricGridV2 article > span {
+  display: block;
+  color: #5479aa;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+html body .premiumPicksMetricGridV2 article > small {
+  display: block;
+  margin-top: 3px;
+  color: #8ea2bc;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+html body .premiumPicksMetricGridV2 article > b {
+  display: block;
+  margin-top: 5px;
+  color: #f7fbff;
+  font-size: 19px;
+  font-weight: 950;
+}
+
+html body .premiumPicksDataRailV2 {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 1px;
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  background: rgba(255,255,255,.07);
+}
+
+html body .premiumPicksDataRailV2 > span {
+  min-width: 0;
+  padding: 11px 13px;
+  background: rgba(7,17,31,.70);
+}
+
+html body .premiumPicksDataRailV2 small {
+  display: block;
+  color: #5476a3;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+html body .premiumPicksDataRailV2 b {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: #c8d6e7;
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ---------- EXISTING DETAIL CONTENT UPGRADE ---------- */
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 0 0 16px;
+  padding: 0 2px 15px;
+  border-bottom: 1px solid #e1e7ef;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader b {
+  color: #0f2138;
+  font-size: 19px;
+  font-weight: 950;
+  letter-spacing: -.03em;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader small {
+  display: block;
+  margin-top: 3px;
+  color: #8190a3;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader > span {
+  padding: 7px 10px;
+  border: 1px solid #cddaea;
+  border-radius: 999px;
+  background: #eef4fb;
+  color: #29568d;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisGrid {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  gap: 11px !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem {
+  min-width: 0;
+  padding: 18px !important;
+  border: 1px solid #e0e6ee !important;
+  border-radius: 15px !important;
+  background: #fff !important;
+  box-shadow: 0 5px 18px rgba(20,39,65,.035) !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailTitle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 11px;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailTitle > span {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border-radius: 8px;
+  background: #0d284b;
+  color: #9fc1ef;
+  font-size: 9px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailTitle > b {
+  color: #172b43;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem > p {
+  margin: 0 !important;
+  color: #59697d !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.75 !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem > p b {
+  color: #172b43;
+  font-weight: 900;
+}
+
+
+/* ---------- FINAL DECISION ---------- */
+
+html body .analysisPurchasedContentV1 .detailedFinalDecision {
+  margin-top: 18px !important;
+  overflow: hidden;
+  border: 1px solid #182f4c !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(
+      135deg,
+      #091422,
+      #102843
+    ) !important;
+  box-shadow: 0 18px 40px rgba(9,20,34,.12);
+}
+
+html body .analysisPurchasedContentV1 .detailedFinalDecision > span {
+  display: block;
+  padding: 14px 18px 0;
+  color: #6995d4;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionBody {
+  padding: 15px 18px 18px;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionMarketGrid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 8px;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionMarket {
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 11px;
+  background: rgba(255,255,255,.035);
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionMarket > span {
+  color: #79a5e1;
+  font-size: 9px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionMarket > strong {
+  display: block;
+  margin-top: 6px;
+  color: #dce7f5;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.6;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionFactors {
+  margin-top: 9px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 11px;
+  background: rgba(255,255,255,.025);
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionFactors b {
+  display: block;
+  color: #7ca8e5;
+  font-size: 9px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionFactors span {
+  display: block;
+  margin-top: 4px;
+  color: #aebfd3;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionSummary {
+  margin-top: 9px;
+  padding: 15px;
+  border: 1px solid rgba(89,148,229,.20);
+  border-radius: 12px;
+  background: rgba(54,105,177,.10);
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionSummary b {
+  color: #81aeea;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+html body .analysisPurchasedContentV1 .finalDecisionSummary p {
+  margin: 6px 0 0;
+  color: #ecf3fb;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.7;
+}
+
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 900px) {
+  html body .analysisPurchasePanelV1 {
+    grid-template-columns: 110px minmax(0,1fr) !important;
+    gap: 20px !important;
+    padding: 24px !important;
+  }
+
+  html body .analysisPurchaseFeatureGridV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  html body .premiumPicksHeroMainV2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  html body .analysisPurchasePanelV1 {
+    width: calc(100% - 28px) !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin: 16px auto 18px !important;
+    padding: 18px !important;
+    border-radius: 18px !important;
+  }
+
+  html body .analysisPurchaseIconWrapV2 {
+    min-height: 96px;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  html body .analysisPurchaseIconV2 {
+    width: 48px;
+    height: 48px;
+    margin: 0;
+    border-radius: 15px;
+    font-size: 22px;
+  }
+
+  html body .analysisPurchaseFeatureGridV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 6px;
+  }
+
+  html body .analysisPurchaseFeatureGridV2 span {
+    min-height: 38px;
+    padding: 8px;
+    font-size: 10px;
+  }
+
+  html body .analysisPurchaseActionRowV2 {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  html body .analysisPurchasePanelV1 .analysisPurchaseButtonV1 {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  html body .unifiedWebsite.active-games
+  .analysisWebsiteMatch[data-analysis-section="picks"]
+  >.detailedOverallAnalysis.analysisPurchasedContentV1 {
+    width: calc(100% - 28px) !important;
+    padding: 0 14px 18px !important;
+    border-radius: 18px !important;
+  }
+
+  html body .premiumPicksHeroV2 {
+    margin: 0 -14px 18px;
+    padding: 20px 16px 16px;
+  }
+
+  html body .premiumPicksHeroTopV2 {
+    flex-direction: column;
+  }
+
+  html body .premiumPicksHeroTopV2 h2 {
+    font-size: 24px;
+  }
+
+  html body .premiumPicksPrimaryV2 > strong {
+    font-size: 28px;
+  }
+
+  html body .premiumPicksMetricGridV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  html body .premiumPicksDataRailV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  html body .analysisPurchasedContentV1 .detailedAnalysisGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body .analysisPurchasedContentV1 .detailedAnalysisHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  html body .analysisPurchasedContentV1 .finalDecisionMarketGrid {
+    grid-template-columns: 1fr;
+  }
+
+  html body .analysisPurchaseUnlockedV2 {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+/* =========================================================
+   MYPAGE_PREMIUM_UI_V2
+   ========================================================= */
+
+html body .myCombosPage {
+  width: min(1440px, calc(100% - 48px));
+  margin: 0 auto 60px;
+}
+
+html body .myPageHeroV2 {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px,.72fr) minmax(0,1.28fr);
+  gap: 26px;
+  overflow: hidden;
+  margin: 22px 0 18px;
+  padding: 30px;
+  border: 1px solid rgba(91,132,197,.24);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 88% 5%, rgba(59,116,213,.25), transparent 30%),
+    linear-gradient(135deg,#07111f 0%,#0d1e34 56%,#12305a 100%);
+  box-shadow: 0 25px 60px rgba(15,32,56,.15);
+}
+
+html body .myPageHeroV2::after {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -130px;
+  bottom: -190px;
+  border: 44px solid rgba(255,255,255,.025);
+  border-radius: 999px;
+}
+
+html body .myPageHeroIdentityV2,
+html body .myPageHeroStatsV2 {
+  position: relative;
+  z-index: 1;
+}
+
+html body .myPageHeroIdentityV2 {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+html body .myPageAvatarV2 {
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  flex: 0 0 74px;
+  border: 1px solid rgba(130,170,236,.27);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg,rgba(55,113,214,.35),rgba(30,71,145,.22));
+  color: #fff;
+  font-size: 29px;
+  font-weight: 950;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.13),
+    0 14px 30px rgba(0,0,0,.18);
+}
+
+html body .myPageHeroIdentityV2 small {
+  color: #719ee0;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+html body .myPageHeroIdentityV2 h2 {
+  margin: 4px 0 3px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -.045em;
+}
+
+html body .myPageHeroIdentityV2 p {
+  margin: 0;
+  color: #9db0c8;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+html body .myPageHeroStatsV2 {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 8px;
+}
+
+html body .myPageHeroStatsV2 article {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 13px;
+  background: rgba(255,255,255,.04);
+}
+
+html body .myPageHeroStatsV2 article > span {
+  display: block;
+  color: #557cac;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+html body .myPageHeroStatsV2 article > small {
+  display: block;
+  margin-top: 5px;
+  color: #899db8;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+html body .myPageHeroStatsV2 article > strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 5px;
+  color: #f4f8fd;
+  font-size: 18px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html body .myPageHeroStatsV2 article > strong.positive {
+  color: #7ad8ae;
+}
+
+html body .myPageHeroStatsV2 article > strong.negative {
+  color: #ff9696;
+}
+
+
+/* PURCHASED ANALYSIS */
+
+html body .purchasedAnalysisSectionV2 {
+  margin: 18px 0;
+  padding: 22px;
+  border: 1px solid #dce4ee;
+  border-radius: 21px;
+  background: #f8fafc;
+  box-shadow: 0 12px 34px rgba(22,39,65,.055);
+}
+
+html body .purchasedAnalysisHeadV2 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 2px 2px 17px;
+  border-bottom: 1px solid #e1e7ef;
+}
+
+html body .purchasedAnalysisHeadV2 small {
+  color: #4677b6;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+
+html body .purchasedAnalysisHeadV2 h3 {
+  margin: 4px 0 3px;
+  color: #10243e;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -.035em;
+}
+
+html body .purchasedAnalysisHeadV2 p {
+  margin: 0;
+  color: #78889c;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+html body .purchasedAnalysisHeadV2 > span {
+  padding: 7px 10px;
+  border: 1px solid #d0ddeb;
+  border-radius: 999px;
+  background: #eef4fb;
+  color: #345f93;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+html body .purchasedAnalysisGridV2 {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 11px;
+  margin-top: 16px;
+}
+
+html body .purchasedAnalysisCardV2 {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  padding: 17px;
+  border: 1px solid #dde5ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(23,42,69,.04);
+}
+
+html body .purchasedAnalysisCardV2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(#2b69bc,#6ca0e4);
+}
+
+html body .purchasedAnalysisCardTopV2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+html body .purchasedAnalysisCardTopV2 > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+html body .purchasedAnalysisCardTopV2 span {
+  color: #3468aa;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .12em;
+}
+
+html body .purchasedAnalysisCardTopV2 em {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: #edf9f4;
+  color: #278760;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+html body .purchasedAnalysisCardTopV2 > small {
+  color: #8b98a8;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+html body .purchasedAnalysisMatchV2 {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 15px 10px;
+  border-radius: 12px;
+  background: #f6f8fb;
+}
+
+html body .purchasedAnalysisMatchV2 strong {
+  min-width: 0;
+  color: #172c45;
+  font-size: 15px;
+  font-weight: 950;
+  text-align: center;
+}
+
+html body .purchasedAnalysisMatchV2 span {
+  color: #9ba7b5;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+html body .purchasedAnalysisMetaV2 {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 8px;
+  margin-top: 11px;
+}
+
+html body .purchasedAnalysisMetaV2 > span {
+  padding: 9px 10px;
+  border: 1px solid #e8edf3;
+  border-radius: 10px;
+}
+
+html body .purchasedAnalysisMetaV2 small {
+  display: block;
+  color: #9aa6b3;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+html body .purchasedAnalysisMetaV2 b {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #34475d;
+  font-size: 10px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html body .purchasedAnalysisCardV2 > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #102b50;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+html body .purchasedAnalysisCardV2 > button:hover {
+  background: #174078;
+}
+
+html body .purchasedAnalysisCardV2 > button span {
+  color: #83ace4;
+  font-size: 14px;
+}
+
+html body .purchasedAnalysisEmptyV2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  margin-top: 16px;
+  border: 1px dashed #d7e0ea;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+}
+
+html body .purchasedAnalysisEmptyV2 b {
+  color: #31465f;
+  font-size: 13px;
+}
+
+html body .purchasedAnalysisEmptyV2 span {
+  margin-top: 5px;
+  color: #8b98a8;
+  font-size: 10px;
+}
+
+html body .purchasedAnalysisEmptyV2.error b {
+  color: #a33d3d;
+}
+
+
+/* EXISTING MY COMBOS POLISH */
+
+html body .myComboMonthHeader {
+  margin-top: 18px;
+  border-radius: 18px;
+  border: 1px solid #dce4ed;
+  background: #fff;
+  box-shadow: 0 9px 26px rgba(22,39,65,.045);
+}
+
+html body .myComboMonthSummary {
+  gap: 9px;
+}
+
+html body .myComboMonthSummary > div {
+  border: 1px solid #e0e7ef;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(22,39,65,.035);
+}
+
+html body .myComboDaySection {
+  border-radius: 16px;
+  border-color: #dce4ed;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(22,39,65,.04);
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+  html body .myPageHeroV2 {
+    grid-template-columns: 1fr;
+  }
+
+  html body .purchasedAnalysisGridV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  html body .myCombosPage {
+    width: calc(100% - 28px);
+  }
+
+  html body .myPageHeroV2 {
+    gap: 18px;
+    padding: 19px;
+    border-radius: 18px;
+  }
+
+  html body .myPageAvatarV2 {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+    border-radius: 17px;
+    font-size: 22px;
+  }
+
+  html body .myPageHeroIdentityV2 h2 {
+    font-size: 25px;
+  }
+
+  html body .myPageHeroStatsV2 {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  html body .purchasedAnalysisSectionV2 {
+    padding: 15px;
+    border-radius: 17px;
+  }
+
+  html body .purchasedAnalysisHeadV2 {
+    flex-direction: column;
+  }
+
+  html body .purchasedAnalysisGridV2 {
+    grid-template-columns: 1fr;
+  }
+
+  html body .purchasedAnalysisMatchV2 strong {
+    font-size: 14px;
+  }
+}
+
+/* =========================================================
+   PREMIUM_MARKET_ANALYSIS_V3
+   추천이 아닌 시장별 확률/근거 전용 UI
+   ========================================================= */
+
+html body .premiumMarketHeroV3 {
+  position: relative;
+  overflow: hidden;
+  margin: 0 -26px 24px;
+  padding: 30px;
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(49, 108, 201, .27),
+      transparent 29%
+    ),
+    linear-gradient(
+      135deg,
+      #07111f 0%,
+      #0d213b 55%,
+      #12325b 100%
+    );
+  color: #fff;
+}
+
+html body .premiumMarketHeroV3::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: -150px;
+  bottom: -190px;
+  border: 48px solid rgba(255,255,255,.024);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+html body .premiumMarketHeroHeadV3,
+html body .premiumMarketIntroV3,
+html body .premiumMarketAnalysisGridV3,
+html body .premiumMarketEvidenceV3 {
+  position: relative;
+  z-index: 1;
+}
+
+html body .premiumMarketHeroHeadV3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+html body .premiumMarketHeroHeadV3 small {
+  color: #769fd9;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .15em;
+}
+
+html body .premiumMarketHeroHeadV3 h2 {
+  margin: 6px 0 0;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -.045em;
+}
+
+html body .premiumMarketHeroHeadV3 p {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 7px 0 0;
+  color: #a8bad1;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+html body .premiumMarketHeroHeadV3 p i {
+  color: #5578a7;
+  font-size: 8px;
+  font-style: normal;
+}
+
+html body .premiumMarketNoPickV3 {
+  min-width: 180px;
+  padding: 11px 13px;
+  border: 1px solid rgba(111, 163, 232, .20);
+  border-radius: 12px;
+  background: rgba(59, 111, 184, .09);
+}
+
+html body .premiumMarketNoPickV3 span {
+  display: block;
+  color: #6f9edf;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+html body .premiumMarketNoPickV3 strong {
+  display: block;
+  margin-top: 3px;
+  color: #eef5ff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+html body .premiumMarketNoPickV3 small {
+  display: block;
+  margin-top: 3px;
+  color: #8ea5c1;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+html body .premiumMarketIntroV3 {
+  margin-top: 25px;
+  padding: 15px 17px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 13px;
+  background: rgba(255,255,255,.035);
+}
+
+html body .premiumMarketIntroV3 strong {
+  display: block;
+  color: #e9f2ff;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+html body .premiumMarketIntroV3 p {
+  margin: 5px 0 0;
+  color: #9eb1c9;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+html body .premiumMarketAnalysisGridV3 {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 10px;
+  margin-top: 13px;
+}
+
+html body .premiumMarketAnalysisCardV3 {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 15px;
+  background: rgba(5, 16, 31, .42);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+html body .premiumMarketCardHeadV3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+html body .premiumMarketCardHeadV3 span {
+  display: block;
+  color: #648cc2;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+html body .premiumMarketCardHeadV3 h3 {
+  margin: 3px 0 0;
+  color: #f7fbff;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+html body .premiumMarketCardHeadV3 > b {
+  padding: 5px 7px;
+  border: 1px solid rgba(110, 156, 217, .15);
+  border-radius: 999px;
+  color: #93aed0;
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+html body .premiumProbabilityRowsV3 {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+html body .premiumProbabilityRowsV3 > div {
+  padding: 10px 11px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 10px;
+  background: rgba(255,255,255,.027);
+}
+
+html body .premiumProbabilityRowsV3 > div.leading {
+  border-color: rgba(87,145,226,.25);
+  background: rgba(57,109,185,.10);
+}
+
+html body .premiumProbabilityRowsV3 > div > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+html body .premiumProbabilityRowsV3 span {
+  overflow: hidden;
+  color: #cbd8e8;
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html body .premiumProbabilityRowsV3 em {
+  color: #6f9fe1;
+  font-size: 7px;
+  font-style: normal;
+  font-weight: 950;
+  letter-spacing: .08em;
+}
+
+html body .premiumProbabilityRowsV3 strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 950;
+}
+
+html body .premiumProbabilityBarV3 {
+  height: 4px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+}
+
+html body .premiumProbabilityBarV3 i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #396cb2,
+      #6d9fe4
+    );
+}
+
+html body .premiumMarketReasonV3 {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+html body .premiumMarketReasonV3 small {
+  color: #557ba9;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+
+html body .premiumMarketReasonV3 p {
+  margin: 4px 0 0;
+  color: #9eb0c6;
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.6;
+}
+
+html body .premiumMarketWaitingV3 {
+  display: flex;
+  min-height: 108px;
+  margin-top: 16px;
+  padding: 14px;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px dashed rgba(130,155,190,.17);
+  border-radius: 10px;
+  background: rgba(255,255,255,.02);
+}
+
+html body .premiumMarketWaitingV3 strong {
+  color: #d2dce8;
+  font-size: 12px;
+}
+
+html body .premiumMarketWaitingV3 span {
+  margin-top: 4px;
+  color: #758aa4;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+html body .premiumMarketEvidenceV3 {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 1px;
+  margin-top: 13px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 11px;
+  background: rgba(255,255,255,.07);
+}
+
+html body .premiumMarketEvidenceV3 > div {
+  min-width: 0;
+  padding: 10px 12px;
+  background: rgba(6,17,31,.82);
+}
+
+html body .premiumMarketEvidenceV3 span {
+  display: block;
+  color: #5578a4;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .10em;
+}
+
+html body .premiumMarketEvidenceV3 strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: #c8d6e7;
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/*
+  이전 버전의 "시장 최고 후보 / 최종 추천" 영역은
+  유료 분석에서 사용하지 않는다.
+*/
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem.marketDetail,
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem.probabilityDetail,
+
+html body
+.analysisPurchasedContentV1
+.detailedFinalDecision {
+  display: none !important;
+}
+
+
+/*
+  남는 상세 분석:
+  선발 / 최근 흐름 / 불펜 / 라인업
+*/
+html body
+.analysisPurchasedContentV1
+.detailedAnalysisGrid {
+  grid-template-columns:
+    repeat(2,minmax(0,1fr))
+    !important;
+}
+
+
+@media (max-width: 980px) {
+  html body
+  .premiumMarketAnalysisGridV3 {
+    grid-template-columns: 1fr;
+  }
+
+  html body
+  .premiumMarketEvidenceV3 {
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  html body
+  .premiumMarketHeroV3 {
+    margin:
+      0 -14px 18px;
+    padding:
+      20px 15px 16px;
+  }
+
+  html body
+  .premiumMarketHeroHeadV3 {
+    flex-direction: column;
+  }
+
+  html body
+  .premiumMarketNoPickV3 {
+    width: 100%;
+  }
+
+  html body
+  .premiumMarketEvidenceV3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  html body
+  .analysisPurchasedContentV1
+  .detailedAnalysisGrid {
+    grid-template-columns:
+      1fr !important;
+  }
+}
+
+
+/* =========================================================
+   PREMIUM_MARKET_REPORT_V4
+   ========================================================= */
+
+html body .premiumMarketReportV4 {
+  position: relative;
+  overflow: hidden;
+  margin: 0 -26px 24px;
+  padding: 30px;
+  color: #fff;
+  background:
+    radial-gradient(
+      circle at 88% 0%,
+      rgba(58,116,211,.27),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #07111f 0%,
+      #0d213b 56%,
+      #12315a 100%
+    );
+}
+
+html body .premiumMarketReportV4::after {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: -160px;
+  bottom: -210px;
+  border: 50px solid rgba(255,255,255,.025);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+html body .premiumMarketReportHeadV4,
+html body .premiumMarketNoticeV4,
+html body .premiumMarketGridV4,
+html body .premiumEvidenceStripV4 {
+  position: relative;
+  z-index: 1;
+}
+
+html body .premiumMarketReportHeadV4 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+html body .premiumMarketReportHeadV4 small {
+  color: #719bd8;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .15em;
+}
+
+html body .premiumMarketReportHeadV4 h2 {
+  margin: 5px 0 0;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -.045em;
+}
+
+html body .premiumMarketReportHeadV4 p {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 7px 0 0;
+  color: #a5b8d0;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+html body .premiumMarketReportHeadV4 p i {
+  color: #5478a8;
+  font-size: 8px;
+  font-style: normal;
+}
+
+html body .premiumAnalysisOnlyV4 {
+  min-width: 185px;
+  padding: 11px 13px;
+  border: 1px solid rgba(100,151,221,.22);
+  border-radius: 12px;
+  background: rgba(57,108,183,.10);
+}
+
+html body .premiumAnalysisOnlyV4 span {
+  display: block;
+  color: #72a0e0;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .12em;
+}
+
+html body .premiumAnalysisOnlyV4 strong {
+  display: block;
+  margin-top: 3px;
+  color: #eef5ff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+html body .premiumAnalysisOnlyV4 small {
+  display: block;
+  margin-top: 3px;
+  color: #91a6c0;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+html body .premiumMarketNoticeV4 {
+  margin-top: 22px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 12px;
+  background: rgba(255,255,255,.035);
+}
+
+html body .premiumMarketNoticeV4 strong {
+  color: #edf5ff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+html body .premiumMarketNoticeV4 p {
+  margin: 4px 0 0;
+  color: #9eafc5;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+html body .premiumMarketGridV4 {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+html body .premiumMarketCardV4 {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 15px;
+  background: rgba(4,15,29,.42);
+}
+
+html body .premiumMarketTitleV4 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+html body .premiumMarketTitleV4 small {
+  color: #628ac0;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+html body .premiumMarketTitleV4 h3 {
+  margin: 3px 0 0;
+  color: #f6faff;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+html body .premiumMarketTitleV4 > span {
+  padding: 5px 7px;
+  border: 1px solid rgba(103,149,212,.16);
+  border-radius: 999px;
+  color: #9aafcb;
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+html body .premiumMarketRowsV4 {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+html body .premiumMarketRowV4 {
+  padding: 11px;
+  border: 1px solid rgba(255,255,255,.065);
+  border-radius: 11px;
+  background: rgba(255,255,255,.027);
+}
+
+html body .premiumMarketRowTopV4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 9px;
+}
+
+html body .premiumMarketRowTopV4 strong {
+  overflow: hidden;
+  color: #cdd9e8;
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html body .premiumMarketRowTopV4 b {
+  color: #fff;
+  font-size: 21px;
+  font-weight: 950;
+}
+
+html body .premiumMarketBarV4 {
+  height: 4px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+}
+
+html body .premiumMarketBarV4 i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #376bb1,
+    #75a6e7
+  );
+}
+
+html body .premiumMarketNumbersV4 {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 5px;
+  margin-top: 9px;
+}
+
+html body .premiumMarketNumbersV4 > span {
+  min-width: 0;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.035);
+}
+
+html body .premiumMarketNumbersV4 small {
+  display: block;
+  color: #5f7da4;
+  font-size: 6px;
+  font-weight: 950;
+  letter-spacing: .08em;
+}
+
+html body .premiumMarketNumbersV4 b {
+  display: block;
+  margin-top: 2px;
+  color: #c9d7e7;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+html body .premiumMarketNumbersV4 b.positive {
+  color: #72d1aa;
+}
+
+html body .premiumMarketNumbersV4 b.negative {
+  color: #e89999;
+}
+
+html body .premiumMarketWhyV4 {
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+html body .premiumMarketWhyV4 small {
+  color: #567ca9;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .14em;
+}
+
+html body .premiumMarketWhyV4 p {
+  margin: 4px 0 0;
+  color: #9eafc5;
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+html body .premiumMarketEmptyV4 {
+  display: flex;
+  min-height: 140px;
+  margin-top: 14px;
+  padding: 14px;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px dashed rgba(130,156,190,.18);
+  border-radius: 11px;
+  background: rgba(255,255,255,.02);
+}
+
+html body .premiumMarketEmptyV4 strong {
+  color: #d1dce9;
+  font-size: 12px;
+}
+
+html body .premiumMarketEmptyV4 span {
+  margin-top: 4px;
+  color: #7d90a8;
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+html body .premiumEvidenceStripV4 {
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 1px;
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 11px;
+  background: rgba(255,255,255,.07);
+}
+
+html body .premiumEvidenceStripV4 > span {
+  min-width: 0;
+  padding: 10px 12px;
+  background: rgba(6,17,31,.82);
+}
+
+html body .premiumEvidenceStripV4 small {
+  display: block;
+  color: #5578a3;
+  font-size: 7px;
+  font-weight: 950;
+  letter-spacing: .10em;
+}
+
+html body .premiumEvidenceStripV4 b {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: #cad8e8;
+  font-size: 9px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/*
+  기존 유료영역의 추천/최종선택 UI는 표시하지 않는다.
+  데이터 계산 로직은 다른 기능에서 쓸 수 있으므로 삭제하지 않는다.
+*/
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem.marketDetail,
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem.probabilityDetail,
+
+html body
+.analysisPurchasedContentV1
+.detailedFinalDecision {
+  display: none !important;
+}
+
+
+@media (max-width: 1000px) {
+
+  html body .premiumMarketGridV4 {
+    grid-template-columns: 1fr;
+  }
+
+  html body .premiumEvidenceStripV4 {
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  html body .premiumMarketReportV4 {
+    margin: 0 -14px 18px;
+    padding: 20px 15px 16px;
+  }
+
+  html body .premiumMarketReportHeadV4 {
+    flex-direction: column;
+  }
+
+  html body .premiumAnalysisOnlyV4 {
+    width: 100%;
+  }
+
+  html body .premiumMarketNumbersV4 {
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  html body .premiumEvidenceStripV4 {
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+}
+
+
+/* =========================================================
+   READABILITY_HOTFIX_V1
+   프리미엄 분석 / 라인업 / 상세분석 가독성 개선
+   ========================================================= */
+
+/* 공통 */
+html body .analysisPurchasedContentV1,
+html body .premiumMarketReportV4,
+html body .premiumMarketHeroV3,
+html body .premiumMarketReportV4 * {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* =========================================================
+   프리미엄 상단 히어로
+   ========================================================= */
+
+html body .premiumMarketReportV4,
+html body .premiumMarketHeroV3 {
+  background:
+    radial-gradient(circle at 88% 0%, rgba(75,135,230,.24), transparent 32%),
+    linear-gradient(135deg, #0a1830 0%, #0f2646 55%, #143660 100%) !important;
+}
+
+html body .premiumMarketReportHeadV4 small,
+html body .premiumMarketHeroHeadV3 small {
+  color: #9fc0ef !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: .12em !important;
+}
+
+html body .premiumMarketReportHeadV4 h2,
+html body .premiumMarketHeroHeadV3 h2 {
+  color: #ffffff !important;
+  font-size: 44px !important;
+  line-height: 1.18 !important;
+  font-weight: 950 !important;
+  letter-spacing: -.03em !important;
+}
+
+html body .premiumMarketReportHeadV4 p,
+html body .premiumMarketHeroHeadV3 p {
+  color: #d9e7f8 !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  line-height: 1.45 !important;
+}
+
+html body .premiumMarketReportHeadV4 p i,
+html body .premiumMarketHeroHeadV3 p i {
+  color: #8cb1e8 !important;
+  font-size: 12px !important;
+}
+
+html body .premiumAnalysisOnlyV4,
+html body .premiumMarketNoPickV3 {
+  border: 1px solid rgba(151,189,242,.30) !important;
+  background: rgba(255,255,255,.08) !important;
+  border-radius: 16px !important;
+  padding: 16px 18px !important;
+}
+
+html body .premiumAnalysisOnlyV4 span,
+html body .premiumMarketNoPickV3 span {
+  color: #9fc4ff !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+}
+
+html body .premiumAnalysisOnlyV4 strong,
+html body .premiumMarketNoPickV3 strong {
+  color: #ffffff !important;
+  font-size: 20px !important;
+  font-weight: 950 !important;
+}
+
+html body .premiumAnalysisOnlyV4 small,
+html body .premiumMarketNoPickV3 small {
+  color: #d1e0f3 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+}
+
+/* 안내문 */
+html body .premiumMarketNoticeV4,
+html body .premiumMarketIntroV3 {
+  border: 1px solid rgba(255,255,255,.12) !important;
+  background: rgba(255,255,255,.08) !important;
+  border-radius: 16px !important;
+  padding: 18px 20px !important;
+}
+
+html body .premiumMarketNoticeV4 strong,
+html body .premiumMarketIntroV3 strong {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 950 !important;
+}
+
+html body .premiumMarketNoticeV4 p,
+html body .premiumMarketIntroV3 p {
+  color: #e2edf9 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.7 !important;
+  margin-top: 8px !important;
+}
+
+/* =========================================================
+   프리미엄 시장 카드
+   ========================================================= */
+
+html body .premiumMarketGridV4,
+html body .premiumMarketAnalysisGridV3 {
+  gap: 16px !important;
+  margin-top: 18px !important;
+}
+
+html body .premiumMarketCardV4,
+html body .premiumMarketAnalysisCardV3 {
+  border: 1px solid rgba(255,255,255,.14) !important;
+  border-radius: 18px !important;
+  background: rgba(8, 20, 38, .70) !important;
+  padding: 22px !important;
+}
+
+html body .premiumMarketTitleV4 small,
+html body .premiumMarketCardHeadV3 span {
+  color: #96bdf2 !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+  letter-spacing: .12em !important;
+}
+
+html body .premiumMarketTitleV4 h3,
+html body .premiumMarketCardHeadV3 h3 {
+  color: #ffffff !important;
+  font-size: 26px !important;
+  line-height: 1.24 !important;
+  font-weight: 950 !important;
+  margin-top: 6px !important;
+}
+
+html body .premiumMarketTitleV4 > span,
+html body .premiumMarketCardHeadV3 > b {
+  color: #d9e6f7 !important;
+  border: 1px solid rgba(157,193,242,.24) !important;
+  background: rgba(255,255,255,.05) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  padding: 7px 10px !important;
+}
+
+/* 확률 행 */
+html body .premiumMarketRowsV4,
+html body .premiumProbabilityRowsV3 {
+  gap: 12px !important;
+  margin-top: 18px !important;
+}
+
+html body .premiumMarketRowV4,
+html body .premiumProbabilityRowsV3 > div {
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,.10) !important;
+  background: rgba(255,255,255,.06) !important;
+  padding: 16px !important;
+}
+
+html body .premiumProbabilityRowsV3 > div.leading {
+  border-color: rgba(112,167,243,.34) !important;
+  background: rgba(78,130,214,.14) !important;
+}
+
+html body .premiumMarketRowTopV4 strong,
+html body .premiumProbabilityRowsV3 span {
+  color: #f4f8ff !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+}
+
+html body .premiumMarketRowTopV4 b,
+html body .premiumProbabilityRowsV3 strong {
+  color: #ffffff !important;
+  font-size: 30px !important;
+  font-weight: 950 !important;
+  line-height: 1.1 !important;
+}
+
+html body .premiumProbabilityRowsV3 em {
+  color: #a9ccff !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+}
+
+html body .premiumMarketBarV4,
+html body .premiumProbabilityBarV3 {
+  height: 8px !important;
+  margin-top: 10px !important;
+  background: rgba(255,255,255,.14) !important;
+}
+
+html body .premiumMarketBarV4 i,
+html body .premiumProbabilityBarV3 i {
+  background: linear-gradient(90deg, #4d88db, #8bbaff) !important;
+}
+
+/* 숫자 요약 */
+html body .premiumMarketNumbersV4 {
+  grid-template-columns: repeat(4,minmax(0,1fr)) !important;
+  gap: 8px !important;
+  margin-top: 12px !important;
+}
+
+html body .premiumMarketNumbersV4 > span {
+  padding: 10px !important;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,.07) !important;
+}
+
+html body .premiumMarketNumbersV4 small {
+  color: #9dc0e9 !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+  letter-spacing: .08em !important;
+}
+
+html body .premiumMarketNumbersV4 b {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  margin-top: 4px !important;
+}
+
+html body .premiumMarketNumbersV4 b.positive {
+  color: #8ef0bd !important;
+}
+
+html body .premiumMarketNumbersV4 b.negative {
+  color: #ffaaaa !important;
+}
+
+/* WHY 설명 */
+html body .premiumMarketWhyV4,
+html body .premiumMarketReasonV3 {
+  margin-top: 14px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid rgba(255,255,255,.10) !important;
+}
+
+html body .premiumMarketWhyV4 small,
+html body .premiumMarketReasonV3 small {
+  color: #8db7ef !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+  letter-spacing: .12em !important;
+}
+
+html body .premiumMarketWhyV4 p,
+html body .premiumMarketReasonV3 p {
+  color: #eef5ff !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.72 !important;
+  margin-top: 8px !important;
+}
+
+/* 데이터 없을 때 */
+html body .premiumMarketEmptyV4,
+html body .premiumMarketWaitingV3 {
+  border: 1px dashed rgba(170,197,233,.32) !important;
+  background: rgba(255,255,255,.05) !important;
+  border-radius: 14px !important;
+  min-height: 150px !important;
+}
+
+html body .premiumMarketEmptyV4 strong,
+html body .premiumMarketWaitingV3 strong {
+  color: #ffffff !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+html body .premiumMarketEmptyV4 span,
+html body .premiumMarketWaitingV3 span {
+  color: #d7e4f3 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.65 !important;
+}
+
+/* 하단 스트립 */
+html body .premiumEvidenceStripV4,
+html body .premiumMarketEvidenceV3 {
+  margin-top: 18px !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.12) !important;
+}
+
+html body .premiumEvidenceStripV4 > span,
+html body .premiumMarketEvidenceV3 > div {
+  background: rgba(10,22,40,.92) !important;
+  padding: 14px 16px !important;
+}
+
+html body .premiumEvidenceStripV4 small,
+html body .premiumMarketEvidenceV3 span {
+  color: #90b5e5 !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+  letter-spacing: .08em !important;
+}
+
+html body .premiumEvidenceStripV4 b,
+html body .premiumMarketEvidenceV3 strong {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  margin-top: 5px !important;
+}
+
+/* =========================================================
+   상세분석 / 라인업 / 카드 텍스트 가독성
+   ========================================================= */
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader h3,
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader h2 {
+  color: #12233a !important;
+  font-size: 24px !important;
+  font-weight: 950 !important;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader p,
+html body .analysisPurchasedContentV1 .detailedAnalysisHeader span {
+  color: #4d617a !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  line-height: 1.6 !important;
+}
+
+html body .analysisPurchasedContentV1 .detailedAnalysisGrid {
+  gap: 14px !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem {
+  border: 1px solid #d8e2ee !important;
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 18px !important;
+  box-shadow: 0 8px 22px rgba(20,40,68,.05) !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem h4,
+html body .analysisPurchasedContentV1 .analysisDetailItem h3,
+html body .analysisPurchasedContentV1 .analysisDetailItem strong {
+  color: #13263f !important;
+  font-size: 19px !important;
+  font-weight: 950 !important;
+  line-height: 1.35 !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem p,
+html body .analysisPurchasedContentV1 .analysisDetailItem span,
+html body .analysisPurchasedContentV1 .analysisDetailItem li,
+html body .analysisPurchasedContentV1 .analysisDetailItem div {
+  color: #30465f !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.75 !important;
+}
+
+html body .analysisPurchasedContentV1 .analysisDetailItem small {
+  color: #5a6f87 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+/* 라인업 관련 가능성 있는 클래스들 전부 보정 */
+html body .analysisPurchasedContentV1 .lineupSection,
+html body .analysisPurchasedContentV1 .lineupCard,
+html body .analysisPurchasedContentV1 .lineupPanel,
+html body .analysisPurchasedContentV1 .lineupTeamCard,
+html body .analysisPurchasedContentV1 .lineupSummaryCard,
+html body .analysisPurchasedContentV1 .lineupComparisonCard,
+html body .analysisPurchasedContentV1 .lineupBox,
+html body .analysisPurchasedContentV1 .lineupContainer {
+  background: #ffffff !important;
+  border: 1px solid #d8e2ee !important;
+  border-radius: 16px !important;
+  color: #22354c !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection h3,
+html body .analysisPurchasedContentV1 .lineupSection h4,
+html body .analysisPurchasedContentV1 .lineupCard h3,
+html body .analysisPurchasedContentV1 .lineupCard h4,
+html body .analysisPurchasedContentV1 .lineupPanel h3,
+html body .analysisPurchasedContentV1 .lineupPanel h4,
+html body .analysisPurchasedContentV1 .lineupTeamCard h3,
+html body .analysisPurchasedContentV1 .lineupTeamCard h4,
+html body .analysisPurchasedContentV1 .lineupSummaryCard h3,
+html body .analysisPurchasedContentV1 .lineupComparisonCard h3 {
+  color: #12243d !important;
+  font-size: 20px !important;
+  font-weight: 950 !important;
+  line-height: 1.35 !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection p,
+html body .analysisPurchasedContentV1 .lineupSection span,
+html body .analysisPurchasedContentV1 .lineupSection li,
+html body .analysisPurchasedContentV1 .lineupCard p,
+html body .analysisPurchasedContentV1 .lineupCard span,
+html body .analysisPurchasedContentV1 .lineupCard li,
+html body .analysisPurchasedContentV1 .lineupPanel p,
+html body .analysisPurchasedContentV1 .lineupPanel span,
+html body .analysisPurchasedContentV1 .lineupPanel li,
+html body .analysisPurchasedContentV1 .lineupTeamCard p,
+html body .analysisPurchasedContentV1 .lineupTeamCard span,
+html body .analysisPurchasedContentV1 .lineupTeamCard li,
+html body .analysisPurchasedContentV1 .lineupSummaryCard p,
+html body .analysisPurchasedContentV1 .lineupSummaryCard span,
+html body .analysisPurchasedContentV1 .lineupComparisonCard p,
+html body .analysisPurchasedContentV1 .lineupComparisonCard span {
+  color: #314a67 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.75 !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection small,
+html body .analysisPurchasedContentV1 .lineupCard small,
+html body .analysisPurchasedContentV1 .lineupPanel small,
+html body .analysisPurchasedContentV1 .lineupTeamCard small,
+html body .analysisPurchasedContentV1 .lineupSummaryCard small,
+html body .analysisPurchasedContentV1 .lineupComparisonCard small {
+  color: #5d7490 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection table,
+html body .analysisPurchasedContentV1 .lineupCard table,
+html body .analysisPurchasedContentV1 .lineupPanel table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection th,
+html body .analysisPurchasedContentV1 .lineupSection td,
+html body .analysisPurchasedContentV1 .lineupCard th,
+html body .analysisPurchasedContentV1 .lineupCard td,
+html body .analysisPurchasedContentV1 .lineupPanel th,
+html body .analysisPurchasedContentV1 .lineupPanel td {
+  padding: 10px 8px !important;
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection th,
+html body .analysisPurchasedContentV1 .lineupCard th,
+html body .analysisPurchasedContentV1 .lineupPanel th {
+  color: #17314d !important;
+  background: #eff5fb !important;
+  font-weight: 950 !important;
+}
+
+html body .analysisPurchasedContentV1 .lineupSection td,
+html body .analysisPurchasedContentV1 .lineupCard td,
+html body .analysisPurchasedContentV1 .lineupPanel td {
+  color: #334d67 !important;
+  font-weight: 700 !important;
+  border-top: 1px solid #e5edf6 !important;
+}
+
+/* 버튼류 */
+html body .analysisPurchasedContentV1 button,
+html body .analysisPurchasedContentV1 .button,
+html body .analysisPurchasedContentV1 .tabButton {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+/* =========================================================
+   반응형
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  html body .premiumMarketReportHeadV4 h2,
+  html body .premiumMarketHeroHeadV3 h2 {
+    font-size: 36px !important;
+  }
+
+  html body .premiumMarketNumbersV4 {
+    grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  html body .premiumMarketReportHeadV4 h2,
+  html body .premiumMarketHeroHeadV3 h2 {
+    font-size: 30px !important;
+  }
+
+  html body .premiumMarketReportHeadV4 p,
+  html body .premiumMarketHeroHeadV3 p {
+    font-size: 16px !important;
+  }
+
+  html body .premiumMarketTitleV4 h3,
+  html body .premiumMarketCardHeadV3 h3 {
+    font-size: 22px !important;
+  }
+
+  html body .premiumMarketRowTopV4 b,
+  html body .premiumProbabilityRowsV3 strong {
+    font-size: 24px !important;
+  }
+
+  html body .premiumMarketWhyV4 p,
+  html body .premiumMarketReasonV3 p,
+  html body .analysisPurchasedContentV1 .analysisDetailItem p,
+  html body .analysisPurchasedContentV1 .analysisDetailItem span,
+  html body .analysisPurchasedContentV1 .lineupSection p,
+  html body .analysisPurchasedContentV1 .lineupSection span {
+    font-size: 14px !important;
+  }
+}
+
+/* =========================================================
+   FINAL_READABILITY_FIX_V2
+   프리미엄 분석 + 실제 라인업 클래스 가독성 통일
+   ========================================================= */
+
+
+/* =========================================================
+   1. PREMIUM MARKET REPORT
+   어두운 배경에서는 밝은 글씨 강제
+   ========================================================= */
+
+html body .premiumMarketReportV4 {
+  color: #ffffff !important;
+  background:
+    radial-gradient(
+      circle at 88% 0%,
+      rgba(72, 133, 224, .26),
+      transparent 31%
+    ),
+    linear-gradient(
+      135deg,
+      #0b1b32 0%,
+      #102a4c 55%,
+      #163c6a 100%
+    ) !important;
+}
+
+
+/* 제목 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketReportHeadV4
+h2 {
+  color: #ffffff !important;
+  font-size: 34px !important;
+  font-weight: 950 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.035em !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketReportHeadV4
+> div > small {
+  color: #a9c9f5 !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketReportHeadV4
+p {
+  color: #e3eefb !important;
+  font-size: 15px !important;
+  font-weight: 850 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketReportHeadV4
+p i {
+  color: #9ebce5 !important;
+}
+
+
+/* ANALYSIS ONLY */
+
+html body
+.premiumMarketReportV4
+.premiumAnalysisOnlyV4 {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(179,209,248,.30) !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+span {
+  color: #a9cbf8 !important;
+  font-size: 11px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+strong {
+  color: #ffffff !important;
+  font-size: 17px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+small {
+  color: #dae8f8 !important;
+  font-size: 12px !important;
+}
+
+
+/* 안내문 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNoticeV4 {
+  background: rgba(255,255,255,.10) !important;
+  border-color: rgba(255,255,255,.17) !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNoticeV4
+strong {
+  color: #ffffff !important;
+  font-size: 17px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNoticeV4
+p {
+  color: #e5eef9 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.7 !important;
+}
+
+
+/* 승패 / 핸디 / O-U 카드 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketCardV4 {
+  background: rgba(5, 17, 34, .72) !important;
+  border-color: rgba(188,213,247,.16) !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketTitleV4
+small {
+  color: #9fc3f0 !important;
+  font-size: 11px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketTitleV4
+h3 {
+  color: #ffffff !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketTitleV4
+> span {
+  color: #e4eef9 !important;
+  background: rgba(255,255,255,.07) !important;
+  font-size: 12px !important;
+}
+
+
+/* 선택 방향 이름 / 확률 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketRowV4 {
+  background: rgba(255,255,255,.07) !important;
+  border-color: rgba(255,255,255,.12) !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketRowTopV4
+strong {
+  color: #ffffff !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketRowTopV4
+b {
+  color: #ffffff !important;
+  font-size: 25px !important;
+  font-weight: 950 !important;
+}
+
+
+/* MODEL / ODDS / MARKET / GAP */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span {
+  background: rgba(255,255,255,.09) !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+small {
+  color: #abc9ee !important;
+  font-size: 10px !important;
+  font-weight: 950 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.positive {
+  color: #8ff0bf !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.negative {
+  color: #ffaaaa !important;
+}
+
+
+/* WHY */
+
+html body
+.premiumMarketReportV4
+.premiumMarketWhyV4
+small {
+  color: #9fc5f4 !important;
+  font-size: 11px !important;
+  font-weight: 950 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketWhyV4
+p {
+  color: #f0f5fc !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.75 !important;
+}
+
+
+/* 하단 예상점수 / 총점 / 선발 / 라인업 */
+
+html body
+.premiumMarketReportV4
+.premiumEvidenceStripV4
+> span {
+  background: #0b1b30 !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumEvidenceStripV4
+small {
+  color: #9ebfea !important;
+  font-size: 11px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumEvidenceStripV4
+b {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   2. LINEUP PAGE
+   실제 현재 클래스 기준
+   ========================================================= */
+
+html body .lineupAnalysis {
+  color: #17283c !important;
+  font-size: 15px !important;
+}
+
+
+/* 상단 제목 */
+
+html body .lineupAnalysisHead {
+  padding: 18px 20px !important;
+}
+
+html body .lineupAnalysisHead b {
+  color: #12243a !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupAnalysisHead small {
+  color: #5e7086 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  margin-top: 5px !important;
+}
+
+html body .lineupAnalysisHead > span {
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+
+/* 팀 점수 비교 */
+
+html body .lineupScoreCompare {
+  padding: 20px !important;
+}
+
+html body .lineupScoreCompare span {
+  color: #273d56 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+html body .lineupScoreCompare strong {
+  color: #0d2037 !important;
+  font-size: 32px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupScoreCompare small {
+  color: #566b84 !important;
+  font-size: 14px !important;
+  font-weight: 750 !important;
+}
+
+html body .lineupScoreCompare em {
+  color: #72849a !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 모델 평가 이유 */
+
+html body .lineupWhy {
+  margin-top: 20px !important;
+}
+
+html body .lineupWhy > b {
+  color: #11263e !important;
+  font-size: 20px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupWhyGrid {
+  gap: 16px !important;
+  margin-top: 13px !important;
+}
+
+html body .lineupWhyGrid > div {
+  padding: 18px !important;
+  border: 1px solid #dce4ed !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+}
+
+html body .lineupWhyGrid strong {
+  color: #152c47 !important;
+  font-size: 17px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupWhyGrid ul {
+  margin-top: 10px !important;
+}
+
+html body .lineupWhyGrid li {
+  color: #3a5069 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.75 !important;
+  margin: 5px 0 !important;
+}
+
+
+/* 양 팀 컬럼 */
+
+html body .lineupPlayerColumns {
+  gap: 20px !important;
+  margin-top: 26px !important;
+}
+
+html body .lineupTeamTitle {
+  min-height: 46px !important;
+  padding: 0 8px 10px !important;
+}
+
+html body .lineupTeamTitle strong {
+  color: #10253d !important;
+  font-size: 19px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupTeamTitle span {
+  color: #667b93 !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+}
+
+
+/* 선수 한 줄 */
+
+html body .lineupPlayerRow {
+  min-height: 118px !important;
+  padding: 15px 12px !important;
+  gap: 12px !important;
+  border-bottom-color: #dfe6ee !important;
+}
+
+
+/* 타순 번호 */
+
+html body .lineupOrder {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 선수 사진 */
+
+html body .lineupPlayerPhoto {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+}
+
+
+/* 선수 본문 */
+
+html body .lineupPlayerBody {
+  min-width: 0 !important;
+  gap: 6px !important;
+}
+
+
+/* 이름 / 포지션 */
+
+html body .lineupPlayerName strong {
+  color: #14283f !important;
+  font-size: 17px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupPlayerName span {
+  color: #60758d !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+}
+
+
+/* AVG OPS HR */
+
+html body .lineupPlayerStats {
+  gap: 12px !important;
+}
+
+html body .lineupPlayerStats span {
+  color: #536981 !important;
+  font-size: 14px !important;
+  font-weight: 750 !important;
+}
+
+html body .lineupPlayerStats b {
+  color: #152a43 !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 상대 선발 BvP */
+
+html body .lineupBvp {
+  margin-top: 5px !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  background: #f3f6f9 !important;
+}
+
+html body .lineupBvp span {
+  color: #536b84 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+html body .lineupBvp b {
+  color: #203a55 !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+}
+
+
+/* 시즌점수 → 매치업점수 */
+
+html body .lineupScoreFlow {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-top: 5px !important;
+}
+
+html body .lineupScoreFlow span {
+  color: #526a83 !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+}
+
+html body .lineupScoreFlow span b {
+  color: #142b45 !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupScoreFlow i {
+  color: #778ba0 !important;
+  font-size: 13px !important;
+}
+
+html body .lineupScoreFlow em {
+  font-size: 13px !important;
+  font-weight: 950 !important;
+}
+
+html body .lineupScoreFlow em.plus {
+  color: #13795b !important;
+}
+
+html body .lineupScoreFlow em.minus {
+  color: #c44848 !important;
+}
+
+
+/* 선수 평가 문구 */
+
+html body .lineupVerdict {
+  margin-top: 5px !important;
+  padding: 6px 9px !important;
+  border-radius: 7px !important;
+  font-size: 13px !important;
+  font-weight: 850 !important;
+  line-height: 1.45 !important;
+}
+
+
+/* =========================================================
+   3. 라인업 탭의 설명 테이블도 크기 통일
+   ========================================================= */
+
+html body
+.analysisLogicProV11
+.analysisLogicLeadV11
+b {
+  font-size: 19px !important;
+}
+
+html body
+.analysisLogicProV11
+.analysisLogicLeadV11
+p {
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+
+html body .analysisLogicTableV11 > div {
+  min-height: 46px !important;
+}
+
+html body .analysisLogicTableV11 span,
+html body .analysisLogicTableV11 b,
+html body .analysisLogicTableV11 strong {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+html body .analysisLogicNotesV11 article b {
+  font-size: 16px !important;
+}
+
+html body .analysisLogicNotesV11 article p {
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+  html body
+  .premiumMarketReportV4
+  .premiumMarketReportHeadV4
+  h2 {
+    font-size: 28px !important;
+  }
+
+  html body
+  .premiumMarketReportV4
+  .premiumMarketTitleV4
+  h3 {
+    font-size: 20px !important;
+  }
+
+  html body .lineupPlayerColumns {
+    grid-template-columns: 1fr !important;
+  }
+
+  html body .lineupAnalysisHead b {
+    font-size: 20px !important;
+  }
+
+  html body .lineupWhy > b {
+    font-size: 18px !important;
+  }
+
+  html body .lineupPlayerName strong {
+    font-size: 16px !important;
+  }
+
+  html body .lineupPlayerStats span,
+  html body .lineupPlayerStats b,
+  html body .lineupBvp b,
+  html body .lineupScoreFlow span,
+  html body .lineupScoreFlow span b {
+    font-size: 13px !important;
+  }
+}
+
+
+
+/* =========================================================
+   PREMIUM_ALL_WHITE_TEXT_V3
+   다크 영역 글씨는 전부 밝게 강제
+   ========================================================= */
+
+/*
+  구매 완료 상단 패널
+*/
+html body .analysisPurchasePanelV1,
+html body .analysisPurchasePanelV1 * {
+  color: #ffffff !important;
+}
+
+html body .analysisPurchasePanelV1 p,
+html body .analysisPurchasePanelV1 small,
+html body .analysisPurchasePanelV1 span,
+html body .analysisPurchasePanelV1 em {
+  color: #eef5ff !important;
+}
+
+html body .analysisPurchasePanelV1 h2,
+html body .analysisPurchasePanelV1 h3,
+html body .analysisPurchasePanelV1 h4,
+html body .analysisPurchasePanelV1 b,
+html body .analysisPurchasePanelV1 strong {
+  color: #ffffff !important;
+}
+
+
+/*
+  PREMIUM REPORT ACTIVE 왼쪽 체크
+*/
+html body
+.analysisPurchaseUnlockedV2
+> div
+> span {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+
+  border: 2px solid #a7f3d0 !important;
+  border-radius: 999px !important;
+
+  background: #16a36a !important;
+  color: #ffffff !important;
+
+  font-size: 21px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+
+  opacity: 1 !important;
+
+  box-shadow:
+    0 0 0 4px rgba(22,163,106,.15),
+    0 7px 18px rgba(0,0,0,.20) !important;
+}
+
+html body
+.analysisPurchaseUnlockedV2
+b {
+  color: #ffffff !important;
+  font-size: 14px !important;
+}
+
+html body
+.analysisPurchaseUnlockedV2
+small {
+  color: #d7f7e8 !important;
+  font-size: 12px !important;
+}
+
+html body
+.analysisPurchaseUnlockedV2
+> strong {
+  color: #b7f7d8 !important;
+  font-size: 12px !important;
+}
+
+
+/*
+  시장 리포트 전체 다크영역
+  기존 CSS가 어떤 색을 주더라도 흰색 우선
+*/
+html body .premiumMarketReportV4,
+html body .premiumMarketReportV4 * {
+  color: #ffffff !important;
+}
+
+
+/*
+  다만 의미색은 유지
+*/
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.positive {
+  color: #8df3bd !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.negative {
+  color: #ffaaaa !important;
+}
+
+
+/*
+  MARKET / MONEYLINE / HANDICAP / TOTAL 같은 보조 라벨도
+  너무 흐리지 않게 밝은 파랑
+*/
+html body
+.premiumMarketReportV4
+.premiumMarketTitleV4
+small,
+
+html body
+.premiumMarketReportV4
+.premiumMarketWhyV4
+small,
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+small,
+
+html body
+.premiumMarketReportV4
+.premiumEvidenceStripV4
+small {
+  color: #b7d5ff !important;
+}
+
+
+/*
+  WHY 본문
+*/
+html body
+.premiumMarketReportV4
+.premiumMarketWhyV4
+p {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.75 !important;
+}
+
+
+/*
+  안내 설명
+*/
+html body
+.premiumMarketReportV4
+.premiumMarketNoticeV4
+p {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+}
+
+
+/*
+  카드 이름 / 확률
+*/
+html body
+.premiumMarketReportV4
+.premiumMarketRowTopV4
+strong {
+  color: #ffffff !important;
+  font-size: 17px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketRowTopV4
+b {
+  color: #ffffff !important;
+  font-size: 27px !important;
+}
+
+
+/* =========================================================
+   LINEUP_FONT_MATCH_V3
+   다른 상세 페이지 수준으로 타자정보 확대
+   ========================================================= */
+
+html body .lineupAnalysis {
+  font-size: 16px !important;
+}
+
+html body .lineupAnalysisHead b {
+  font-size: 24px !important;
+}
+
+html body .lineupAnalysisHead small {
+  font-size: 15px !important;
+}
+
+html body .lineupScoreCompare span {
+  font-size: 16px !important;
+}
+
+html body .lineupScoreCompare strong {
+  font-size: 36px !important;
+}
+
+html body .lineupScoreCompare small {
+  font-size: 15px !important;
+}
+
+
+/*
+  모델이 타선을 이렇게 평가한 이유
+*/
+html body .lineupWhy > b {
+  font-size: 22px !important;
+}
+
+html body .lineupWhyGrid strong {
+  font-size: 18px !important;
+}
+
+html body .lineupWhyGrid li {
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+}
+
+
+/*
+  팀 제목
+*/
+html body .lineupTeamTitle strong {
+  font-size: 20px !important;
+}
+
+html body .lineupTeamTitle span {
+  font-size: 14px !important;
+}
+
+
+/*
+  각 타자 카드
+*/
+html body .lineupPlayerRow {
+  min-height: 132px !important;
+  padding: 17px 14px !important;
+}
+
+html body .lineupOrder {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  font-size: 15px !important;
+}
+
+html body .lineupPlayerPhoto {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+}
+
+
+/*
+  선수명 / 포지션
+*/
+html body .lineupPlayerName strong {
+  font-size: 19px !important;
+  line-height: 1.35 !important;
+}
+
+html body .lineupPlayerName span {
+  font-size: 14px !important;
+}
+
+
+/*
+  AVG / OPS / HR
+*/
+html body .lineupPlayerStats span {
+  font-size: 15px !important;
+}
+
+html body .lineupPlayerStats b {
+  font-size: 15px !important;
+}
+
+
+/*
+  vs 상대선발 / BvP
+*/
+html body .lineupBvp {
+  padding: 9px 11px !important;
+}
+
+html body .lineupBvp span {
+  font-size: 14px !important;
+}
+
+html body .lineupBvp b {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+
+/*
+  시즌점수 → 매치업 점수
+*/
+html body .lineupScoreFlow span {
+  font-size: 14px !important;
+}
+
+html body .lineupScoreFlow span b {
+  font-size: 15px !important;
+}
+
+html body .lineupScoreFlow i,
+html body .lineupScoreFlow em {
+  font-size: 14px !important;
+}
+
+
+/*
+  최종 타자 평가
+*/
+html body .lineupVerdict {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  padding: 7px 10px !important;
+}
+
+
+/*
+  분석 로직 표도 동일 크기
+*/
+html body
+.analysisLogicTableV11
+span,
+
+html body
+.analysisLogicTableV11
+b,
+
+html body
+.analysisLogicTableV11
+strong {
+  font-size: 15px !important;
+}
+
+html body
+.analysisLogicNotesV11
+article
+b {
+  font-size: 17px !important;
+}
+
+html body
+.analysisLogicNotesV11
+article
+p {
+  font-size: 15px !important;
+}
+
+
+/* 모바일 */
+@media (max-width: 760px) {
+
+  html body .lineupPlayerName strong {
+    font-size: 18px !important;
+  }
+
+  html body .lineupPlayerStats span,
+  html body .lineupPlayerStats b {
+    font-size: 14px !important;
+  }
+
+  html body .lineupBvp span,
+  html body .lineupBvp b {
+    font-size: 13px !important;
+  }
+
+  html body .lineupScoreFlow span,
+  html body .lineupScoreFlow span b {
+    font-size: 13px !important;
+  }
+}
+
+
+/* =========================================================
+   LINEUP_FINAL_EDGE_READABILITY_V1
+   ========================================================= */
+
+html body .lineupFinalEdge {
+  display: grid !important;
+  grid-template-columns: auto auto 1fr !important;
+  align-items: center !important;
+  gap: 16px !important;
+
+  margin-top: 22px !important;
+  padding: 18px 22px !important;
+
+  border: 1px solid #263b59 !important;
+  border-radius: 14px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #09172a 0%,
+      #10233d 100%
+    ) !important;
+
+  box-shadow:
+    0 8px 22px rgba(15, 31, 53, .12) !important;
+}
+
+
+/* 최종 타선 판단 */
+
+html body .lineupFinalEdge > span {
+  color: #9fc4f2 !important;
+  font-size: 15px !important;
+  font-weight: 950 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -.01em !important;
+  white-space: nowrap !important;
+}
+
+
+/* KT 우위 +8.5 */
+
+html body .lineupFinalEdge > b {
+  color: #ffffff !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+}
+
+
+/* EDGE 설명 */
+
+html body .lineupFinalEdge > small {
+  color: #e6effa !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.65 !important;
+  opacity: 1 !important;
+}
+
+
+/* 모바일 */
+
+@media (max-width: 760px) {
+
+  html body .lineupFinalEdge {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 16px !important;
+  }
+
+  html body .lineupFinalEdge > span {
+    font-size: 14px !important;
+  }
+
+  html body .lineupFinalEdge > b {
+    font-size: 20px !important;
+  }
+
+  html body .lineupFinalEdge > small {
+    font-size: 14px !important;
+  }
+}
+
+
+/* =========================================================
+   LINEUP_FINAL_EDGE_READABILITY_V1
+   ========================================================= */
+
+html body .lineupFinalEdge {
+  display: grid !important;
+  grid-template-columns: auto auto 1fr !important;
+  align-items: center !important;
+  gap: 16px !important;
+
+  margin-top: 22px !important;
+  padding: 18px 22px !important;
+
+  border: 1px solid #263b59 !important;
+  border-radius: 14px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #09172a 0%,
+      #10233d 100%
+    ) !important;
+
+  box-shadow:
+    0 8px 22px rgba(15, 31, 53, .12) !important;
+}
+
+
+/* 최종 타선 판단 */
+
+html body .lineupFinalEdge > span {
+  color: #9fc4f2 !important;
+  font-size: 15px !important;
+  font-weight: 950 !important;
+  line-height: 1.4 !important;
+  letter-spacing: -.01em !important;
+  white-space: nowrap !important;
+}
+
+
+/* KT 우위 +8.5 */
+
+html body .lineupFinalEdge > b {
+  color: #ffffff !important;
+  font-size: 22px !important;
+  font-weight: 950 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+}
+
+
+/* EDGE 설명 */
+
+html body .lineupFinalEdge > small {
+  color: #e6effa !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.65 !important;
+  opacity: 1 !important;
+}
+
+
+/* 모바일 */
+
+@media (max-width: 760px) {
+
+  html body .lineupFinalEdge {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    padding: 16px !important;
+  }
+
+  html body .lineupFinalEdge > span {
+    font-size: 14px !important;
+  }
+
+  html body .lineupFinalEdge > b {
+    font-size: 20px !important;
+  }
+
+  html body .lineupFinalEdge > small {
+    font-size: 14px !important;
+  }
+}
+
+
+/* =========================================================
+   PREMIUM_TEXT_VISIBILITY_FINAL_V4
+   ========================================================= */
+
+/*
+  예전 CSS의 어두운 color / opacity / filter까지 전부 제거
+*/
+
+html body .analysisPurchasePanelV1,
+html body .analysisPurchasePanelV1 > *,
+html body .analysisPurchaseCopyV2,
+html body .analysisPurchaseFeatureGridV2,
+html body .analysisPurchaseFeatureGridV2 > *,
+
+html body .analysisPurchasedContentV1,
+html body .premiumMarketReportV4,
+html body .premiumMarketReportV4 > *,
+html body .premiumMarketReportHeadV4,
+html body .premiumMarketNoticeV4,
+html body .premiumMarketGridV4,
+html body .premiumMarketCardV4,
+html body .premiumMarketCardV4 > *,
+html body .premiumMarketRowsV4,
+html body .premiumMarketRowV4,
+html body .premiumMarketWhyV4,
+html body .premiumEvidenceStripV4 {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+
+/* 상단 구매완료 패널 글씨 */
+
+html body
+.analysisPurchasePanelV1
+:is(
+  h1,h2,h3,h4,
+  p,span,strong,b,
+  small,em,i
+) {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/* 프리미엄 리포트 글씨 */
+
+html body
+.premiumMarketReportV4
+:is(
+  h1,h2,h3,h4,
+  p,span,strong,b,
+  small,em,i
+) {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+
+/* 상단 메인 제목 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketReportHeadV4
+h2 {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 34px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 설명 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNoticeV4
+p {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+}
+
+
+/* WHY */
+
+html body
+.premiumMarketReportV4
+.premiumMarketWhyV4
+p {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.75 !important;
+}
+
+
+/* 시장 제목 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketTitleV4
+h3 {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 22px !important;
+}
+
+
+/* MODEL / ODDS / MARKET / GAP */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+small {
+  color: #d3e6ff !important;
+  opacity: 1 !important;
+  font-size: 11px !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  font-size: 15px !important;
+}
+
+
+/* 의미색만 예외 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.positive {
+  color: #8df3bd !important;
+}
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.negative {
+  color: #ffaaaa !important;
+}
+
+
+/* PREMIUM REPORT ACTIVE 체크 */
+
+html body
+.analysisPurchaseUnlockedV2
+> div
+> span {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+
+  border: 2px solid #b7f7d8 !important;
+  border-radius: 999px !important;
+
+  background: #18a96e !important;
+  color: #ffffff !important;
+
+  font-size: 22px !important;
+  font-weight: 950 !important;
+
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   LINEUP_FINAL_EDGE_READABILITY_FINAL_V2
+   ========================================================= */
+
+html body .lineupFinalEdge {
+  display: grid !important;
+  grid-template-columns:
+    auto auto minmax(0,1fr)
+    !important;
+
+  align-items: center !important;
+  gap: 18px !important;
+
+  margin-top: 24px !important;
+  padding: 20px 24px !important;
+
+  border: 1px solid #294363 !important;
+  border-radius: 14px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #08172a,
+      #112b49
+    ) !important;
+
+  opacity: 1 !important;
+}
+
+
+/* 최종 타선 판단 */
+
+html body
+.lineupFinalEdge
+> span {
+  color: #b4d4ff !important;
+  opacity: 1 !important;
+
+  font-size: 16px !important;
+  font-weight: 950 !important;
+
+  white-space: nowrap !important;
+}
+
+
+/* KT 우위 +8.5 */
+
+html body
+.lineupFinalEdge
+> b {
+  color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 24px !important;
+  font-weight: 950 !important;
+
+  white-space: nowrap !important;
+}
+
+
+/* 설명 */
+
+html body
+.lineupFinalEdge
+> small {
+  color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.65 !important;
+}
+
+
+@media (max-width: 760px) {
+
+  html body .lineupFinalEdge {
+    grid-template-columns:
+      1fr !important;
+
+    gap: 7px !important;
+    padding: 17px !important;
+  }
+
+  html body
+  .lineupFinalEdge
+  > span {
+    font-size: 14px !important;
+  }
+
+  html body
+  .lineupFinalEdge
+  > b {
+    font-size: 21px !important;
+  }
+
+  html body
+  .lineupFinalEdge
+  > small {
+    font-size: 14px !important;
+  }
+}
+
+
+/* =========================================================
+   PREMIUM_FORCE_WHITE_HARD_V5
+   기존 !important specificity까지 완전히 덮어씀
+   ========================================================= */
+
+/*
+  동일 클래스를 반복해 specificity를 강하게 올림.
+  프리미엄 리포트 내부 모든 텍스트를 흰색으로 고정.
+*/
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+* {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+  filter: none !important;
+  text-shadow: none !important;
+}
+
+
+/* 리포트 제목 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketReportHeadV4
+h2 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 34px !important;
+  font-weight: 950 !important;
+}
+
+
+/* KBO ANALYZER · PREMIUM MARKET REPORT */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketReportHeadV4
+small {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 12px !important;
+  font-weight: 900 !important;
+}
+
+
+/* KT VS 두산 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketReportHeadV4
+p,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketReportHeadV4
+p i {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 15px !important;
+  font-weight: 850 !important;
+}
+
+
+/* ANALYSIS ONLY 박스 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+span,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+strong,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumAnalysisOnlyV4
+small {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/* 특정 픽을 고르지 않습니다 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNoticeV4
+strong {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 17px !important;
+}
+
+
+/* 안내 설명 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNoticeV4
+p {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.7 !important;
+}
+
+
+/* MONEYLINE / HANDICAP / TOTAL */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketTitleV4
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketTitleV4
+h3,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketTitleV4
+span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/* KT 승 / 두산 승 / 핸디 / O-U */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketRowTopV4
+strong,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketRowTopV4
+b {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/* MODEL / ODDS / MARKET / GAP */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+b {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/* WHY */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketWhyV4
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketWhyV4
+p {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketWhyV4
+p {
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.75 !important;
+}
+
+
+/* 예상점수 / 예상총점 / 당시 O-U / 선발 / 라인업 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumEvidenceStripV4
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumEvidenceStripV4
+b {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+
+/*
+  부모에 opacity가 걸리는 경우까지 차단
+*/
+html body
+.analysisPurchasedContentV1
+.premiumMarketReportV4,
+
+html body
+.analysisPurchasedContentV1
+.premiumMarketReportV4
+.premiumMarketGridV4,
+
+html body
+.analysisPurchasedContentV1
+.premiumMarketReportV4
+.premiumMarketCardV4,
+
+html body
+.analysisPurchasedContentV1
+.premiumMarketReportV4
+.premiumMarketNoticeV4 {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+
+/* 브라우저 텍스트 투명 처리까지 방지 */
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+::before,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+::after {
+  opacity: 1 !important;
+}
+
+
+/* =========================================================
+   PREMIUM_VISUAL_CLEAN_V6
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   상단 설명문
+   --------------------------------------------------------- */
+
+html body
+.analysisPurchasePanelV1
+.analysisPurchaseLeadV2 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+
+  opacity: 1 !important;
+  filter: none !important;
+
+  font-size: 15px !important;
+  font-weight: 750 !important;
+  line-height: 1.8 !important;
+}
+
+
+/* 혹시 이전 JSX/CSS 잔여가 있어도 숨김 */
+
+html body .premiumAnalysisOnlyV4 {
+  display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   프리미엄 메인 설명
+   --------------------------------------------------------- */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNoticeV4 {
+  padding: 17px 19px !important;
+
+  background:
+    rgba(72, 111, 166, .30) !important;
+
+  border:
+    1px solid rgba(164, 199, 247, .25) !important;
+}
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNoticeV4
+p {
+  margin: 0 !important;
+
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+
+  opacity: 1 !important;
+
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  line-height: 1.8 !important;
+}
+
+
+/* =========================================================
+   MODEL / ODDS / MARKET / GAP 색상 분리
+   ========================================================= */
+
+
+/* MODEL - 청록 */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(1)
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(1)
+b {
+  color: #67e8f9 !important;
+  -webkit-text-fill-color: #67e8f9 !important;
+  opacity: 1 !important;
+}
+
+
+/* ODDS - 골드 */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(2)
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(2)
+b {
+  color: #fbbf24 !important;
+  -webkit-text-fill-color: #fbbf24 !important;
+  opacity: 1 !important;
+}
+
+
+/* MARKET - 보라 */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(3)
+small,
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(3)
+b {
+  color: #c4b5fd !important;
+  -webkit-text-fill-color: #c4b5fd !important;
+  opacity: 1 !important;
+}
+
+
+/* GAP 라벨 */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span:nth-child(4)
+small {
+  color: #86efac !important;
+  -webkit-text-fill-color: #86efac !important;
+  opacity: 1 !important;
+}
+
+
+/* GAP + */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.positive {
+  color: #6ee7b7 !important;
+  -webkit-text-fill-color: #6ee7b7 !important;
+}
+
+
+/* GAP - */
+
+html body
+.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4.premiumMarketReportV4
+.premiumMarketNumbersV4
+b.negative {
+  color: #fca5a5 !important;
+  -webkit-text-fill-color: #fca5a5 !important;
+}
+
+
+/* 숫자 카드 배경도 조금 더 진하게 */
+
+html body
+.premiumMarketReportV4
+.premiumMarketNumbersV4
+> span {
+  background:
+    rgba(255,255,255,.10) !important;
+
+  border:
+    1px solid rgba(255,255,255,.08) !important;
+}
+
+
+/* =========================================================
+   상세 분석 02 / 03 / 04 / 05 숫자 배지
+   ========================================================= */
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailTitle
+> span {
+  display: inline-grid !important;
+  place-items: center !important;
+
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+
+  border-radius: 9px !important;
+
+  background: #173c6b !important;
+  border: 1px solid #2d5e98 !important;
+
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+
+  opacity: 1 !important;
+  filter: none !important;
+
+  font-size: 13px !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+
+  box-shadow:
+    0 4px 10px rgba(21, 52, 89, .16) !important;
+}
+
+
+/* 상세 카드 제목 */
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailTitle
+> b {
+  color: #13263f !important;
+  -webkit-text-fill-color: #13263f !important;
+
+  opacity: 1 !important;
+
+  font-size: 17px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 상세 카드 본문도 흐려지지 않게 */
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem
+> p {
+  color: #344b64 !important;
+  -webkit-text-fill-color: #344b64 !important;
+
+  opacity: 1 !important;
+
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.75 !important;
+}
+
+html body
+.analysisPurchasedContentV1
+.analysisDetailItem
+> p
+b {
+  color: #10263f !important;
+  -webkit-text-fill-color: #10263f !important;
+
+  font-weight: 950 !important;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+
+  html body
+  .analysisPurchasePanelV1
+  .analysisPurchaseLeadV2 {
+    font-size: 14px !important;
+  }
+
+  html body
+  .premiumMarketReportV4
+  .premiumMarketNoticeV4
+  p {
+    font-size: 14px !important;
+  }
+
+  html body
+  .analysisPurchasedContentV1
+  .analysisDetailTitle
+  > span {
+    width: 31px !important;
+    height: 31px !important;
+    min-width: 31px !important;
+
+    font-size: 12px !important;
+  }
+}
+
+
+/* =========================================================
+   FLOW_CARD_FONT_MATCH_V1
+   팀흐름 / 불펜 카드 내부 글씨 크기 통일
+   ========================================================= */
+
+
+/* 최근 10경기 카드 */
+html body .gameFlowDetailV3 > article {
+  padding: 20px !important;
+}
+
+
+/* AWAY / HOME 라벨 */
+html body
+.gameFlowDetailV3
+> article
+> small {
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  line-height: 1.4 !important;
+}
+
+
+/* 팀명 */
+html body
+.gameFlowDetailV3
+> article
+> h4 {
+  font-size: 21px !important;
+  font-weight: 950 !important;
+  line-height: 1.3 !important;
+  margin-top: 6px !important;
+}
+
+
+/* 6승 3패 1무 */
+html body
+.gameFlowDetailV3
+> article
+> b {
+  font-size: 17px !important;
+  font-weight: 900 !important;
+  line-height: 1.4 !important;
+}
+
+
+/* 평균 득점 / 평균 실점 / 득실차 / 폼 지수 칸 */
+html body
+.gameFlowDetailV3
+> article
+> div {
+  gap: 8px !important;
+  margin-top: 14px !important;
+}
+
+html body
+.gameFlowDetailV3
+> article
+> div
+> span {
+  min-height: 42px !important;
+  padding: 10px 12px !important;
+
+  font-size: 14px !important;
+  font-weight: 750 !important;
+  line-height: 1.45 !important;
+
+  color: #5a6f87 !important;
+}
+
+
+/* 6.2 / 5.6 / +6 / 56.7 */
+html body
+.gameFlowDetailV3
+> article
+> div
+> span
+> strong {
+  font-size: 16px !important;
+  font-weight: 950 !important;
+  line-height: 1.3 !important;
+
+  color: #10263f !important;
+}
+
+
+/* =========================================================
+   불펜 카드 내부도 같은 크기로
+   ========================================================= */
+
+html body
+.gameFlowDetailV3
+.bullpenBox,
+
+html body
+.gameFlowDetailV3
+article.bullpenBox {
+  padding: 20px !important;
+}
+
+html body
+.gameFlowDetailV3
+.bullpenBox
+span,
+
+html body
+.gameFlowDetailV3
+.bullpenBox
+small {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+html body
+.gameFlowDetailV3
+.bullpenBox
+strong,
+
+html body
+.gameFlowDetailV3
+.bullpenBox
+b {
+  font-size: 16px !important;
+  font-weight: 950 !important;
+}
+
+
+/* 모바일 */
+@media (max-width: 760px) {
+
+  html body
+  .gameFlowDetailV3
+  > article
+  > div
+  > span {
+    font-size: 13px !important;
+  }
+
+  html body
+  .gameFlowDetailV3
+  > article
+  > div
+  > span
+  > strong {
+    font-size: 15px !important;
+  }
+
+  html body
+  .gameFlowDetailV3
+  > article
+  > h4 {
+    font-size: 19px !important;
+  }
+}
+
+
+/* =========================================================
+   PREMIUM_FEATURE_FONT_UP_V1
+   01~06 기능 안내 글씨만 확대
+   ========================================================= */
+
+html body
+.analysisPurchasePanelV1
+.analysisPurchaseFeatureGridV2
+> span {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.4 !important;
+
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+
+  opacity: 1 !important;
+}
+
+html body
+.analysisPurchasePanelV1
+.analysisPurchaseFeatureGridV2
+> span
+> i {
+  font-size: 12px !important;
+  font-weight: 950 !important;
+
+  color: #9fc7ff !important;
+  -webkit-text-fill-color: #9fc7ff !important;
+
+  opacity: 1 !important;
+}
+
+@media (max-width: 760px) {
+
+  html body
+  .analysisPurchasePanelV1
+  .analysisPurchaseFeatureGridV2
+  > span {
+    font-size: 14px !important;
+  }
+
+  html body
+  .analysisPurchasePanelV1
+  .analysisPurchaseFeatureGridV2
+  > span
+  > i {
+    font-size: 11px !important;
+  }
+}
+
+
+/* =========================================================
+   MYPAGE_READABILITY_ACCOUNT_LIST_V3
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   전체 폭
+   --------------------------------------------------------- */
+
+html body .myCombosPage {
+  width:
+    min(
+      1460px,
+      calc(100% - 40px)
+    ) !important;
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+html body .myPageHeroV2 {
+  padding: 32px 34px !important;
+}
+
+html body .myPageHeroIdentityV2 {
+  gap: 20px !important;
+}
+
+html body .myPageAvatarV2 {
+  width: 82px !important;
+  height: 82px !important;
+  flex-basis: 82px !important;
+
+  font-size: 32px !important;
+}
+
+html body .myPageHeroIdentityV2 > div > small {
+  font-size: 11px !important;
+}
+
+html body .myPageTitleV3 {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #8eadd7;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+html body .myPageIdentityNameV3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 2px;
+}
+
+html body .myPageIdentityNameV3 h2 {
+  margin: 0 !important;
+
+  color: #ffffff !important;
+  font-size: 28px !important;
+  font-weight: 950 !important;
+}
+
+html body .myPageIdentityNameV3 button {
+  min-height: 34px;
+
+  padding: 0 13px;
+
+  border:
+    1px solid
+    rgba(164,199,247,.30);
+
+  border-radius: 9px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+html body .myPageIdentityNameV3 button:hover {
+  background:
+    rgba(255,255,255,.15);
+}
+
+html body .myPageHeroIdentityV2 p {
+  margin-top: 6px !important;
+
+  color: #c5d4e8 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+
+
+/* HERO 숫자 카드 */
+
+html body .myPageHeroStatsV2 article {
+  min-height: 96px !important;
+
+  padding: 17px 18px !important;
+}
+
+html body .myPageHeroStatsV2 article > span {
+  font-size: 10px !important;
+}
+
+html body .myPageHeroStatsV2 article > small {
+  margin-top: 4px !important;
+
+  color: #b8cbe4 !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+html body .myPageHeroStatsV2 article > strong {
+  margin-top: 9px !important;
+
+  font-size: 23px !important;
+}
+
+
+/* =========================================================
+   ACCOUNT SETTINGS
+   ========================================================= */
+
+html body .myPageAccountPanelV3 {
+  margin: 20px 0;
+
+  padding: 24px;
+
+  border: 1px solid #d8e2ed;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 34px
+    rgba(22,39,65,.055);
+}
+
+html body .myPageAccountHeadV3 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding-bottom: 17px;
+
+  border-bottom:
+    1px solid #e4eaf1;
+}
+
+html body .myPageAccountHeadV3 small {
+  color: #4779ba;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .12em;
+}
+
+html body .myPageAccountHeadV3 h3 {
+  margin: 4px 0 4px;
+
+  color: #10243e;
+  font-size: 24px;
+  font-weight: 950;
+}
+
+html body .myPageAccountHeadV3 p {
+  margin: 0;
+
+  color: #62768e;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+html body .myPageAccountHeadV3 > span {
+  padding: 8px 12px;
+
+  border: 1px solid #d4e0ed;
+  border-radius: 999px;
+
+  background: #f1f6fb;
+
+  color: #365f91;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+html body .myPageAccountGridV3 {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+html body .myPageAccountGridV3 article {
+  padding: 17px;
+
+  border: 1px solid #e0e7ef;
+  border-radius: 14px;
+
+  background: #f8fafc;
+}
+
+html body .myPageAccountGridV3 label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #253a53;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+html body .myPageAccountInputRowV3 {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    auto;
+
+  gap: 8px;
+}
+
+html body .myPageAccountInputRowV3 input {
+  min-width: 0;
+  height: 44px;
+
+  padding: 0 13px;
+
+  border: 1px solid #ccd8e5;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #172d46;
+  font-size: 14px;
+  font-weight: 750;
+
+  outline: none;
+}
+
+html body .myPageAccountInputRowV3 input:focus {
+  border-color: #4b83ca;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(67,125,198,.10);
+}
+
+html body .myPageAccountInputRowV3 button {
+  min-width: 74px;
+
+  border: 0;
+  border-radius: 10px;
+
+  background: #12345e;
+
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+html body .myPageReadonlyV3 {
+  display: flex;
+  align-items: center;
+
+  min-height: 44px;
+
+  padding: 0 13px;
+
+  border: 1px solid #dce4ed;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #304760;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+html body .myPageAccountGridV3 article > small {
+  display: block;
+
+  margin-top: 8px;
+
+  color: #72849a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+html body .myPageAccountMessageV3 {
+  margin-top: 14px;
+
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  background: #edf5ff;
+
+  color: #24548d;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+
+/* =========================================================
+   PURCHASED ANALYSIS
+   카드 3열 -> 경기기록 같은 1줄 리스트
+   ========================================================= */
+
+html body .purchasedAnalysisSectionV2 {
+  padding: 25px !important;
+}
+
+html body .purchasedAnalysisHeadV2 small {
+  font-size: 11px !important;
+}
+
+html body .purchasedAnalysisHeadV2 h3 {
+  font-size: 25px !important;
+}
+
+html body .purchasedAnalysisHeadV2 p {
+  color: #64778d !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+html body .purchasedAnalysisHeadV2 > span {
+  font-size: 12px !important;
+}
+
+
+/* 무조건 1열 */
+
+html body .purchasedAnalysisGridV2 {
+  display: grid !important;
+
+  grid-template-columns:
+    1fr !important;
+
+  gap: 9px !important;
+}
+
+
+/* 한 경기를 가로 1줄 */
+
+html body .purchasedAnalysisCardV2 {
+  display: grid !important;
+
+  grid-template-columns:
+    155px
+    minmax(220px,1fr)
+    minmax(260px,.9fr)
+    210px !important;
+
+  align-items: center !important;
+
+  gap: 17px !important;
+
+  padding: 14px 16px !important;
+
+  border-radius: 13px !important;
+}
+
+
+/* PREMIUM / 해금완료 / 경기일 */
+
+html body .purchasedAnalysisCardTopV2 {
+  display: flex !important;
+  flex-direction: column !important;
+
+  gap: 7px !important;
+}
+
+html body .purchasedAnalysisCardTopV2 > div {
+  gap: 7px !important;
+}
+
+html body .purchasedAnalysisCardTopV2 span {
+  font-size: 10px !important;
+}
+
+html body .purchasedAnalysisCardTopV2 em {
+  padding: 5px 8px !important;
+
+  font-size: 10px !important;
+}
+
+html body .purchasedAnalysisCardTopV2 > small {
+  color: #65778b !important;
+
+  font-size: 12px !important;
+  font-weight: 850 !important;
+}
+
+
+/* 팀명 */
+
+html body .purchasedAnalysisMatchV2 {
+  margin: 0 !important;
+
+  padding: 13px 14px !important;
+}
+
+html body .purchasedAnalysisMatchV2 strong {
+  font-size: 18px !important;
+}
+
+html body .purchasedAnalysisMatchV2 span {
+  font-size: 10px !important;
+}
+
+
+/* 사용 야구공 / 구매일 */
+
+html body .purchasedAnalysisMetaV2 {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0,1fr)
+    ) !important;
+
+  gap: 8px !important;
+
+  margin: 0 !important;
+}
+
+html body .purchasedAnalysisMetaV2 > span {
+  padding: 9px 11px !important;
+}
+
+html body .purchasedAnalysisMetaV2 small {
+  color: #74869b !important;
+
+  font-size: 10px !important;
+}
+
+html body .purchasedAnalysisMetaV2 b {
+  margin-top: 4px !important;
+
+  color: #203b59 !important;
+
+  font-size: 13px !important;
+}
+
+
+/* 다시보기 버튼 */
+
+html body .purchasedAnalysisCardV2 > button {
+  min-height: 44px !important;
+
+  margin: 0 !important;
+
+  padding: 0 15px !important;
+
+  font-size: 13px !important;
+}
+
+
+/* =========================================================
+   월별 기록 글씨 확대 + 야구공 UI
+   ========================================================= */
+
+html body .myComboMonthHeader {
+  min-height: 76px !important;
+}
+
+html body .myComboMonthHeader small {
+  font-size: 11px !important;
+}
+
+html body .myComboMonthHeader h2 {
+  font-size: 24px !important;
+}
+
+
+html body .myComboMonthSummary {
+  gap: 11px !important;
+}
+
+html body .myComboMonthSummary > div {
+  min-height: 92px !important;
+
+  padding: 16px !important;
+}
+
+html body .myComboMonthSummary span {
+  color: #62758b !important;
+
+  font-size: 13px !important;
+  font-weight: 850 !important;
+}
+
+html body .myComboMonthSummary strong {
+  margin-top: 7px !important;
+
+  font-size: 19px !important;
+}
+
+html body .myComboMonthSummary small {
+  color: #72849a !important;
+
+  font-size: 12px !important;
+}
+
+
+/* 날짜별 한 줄 기록 */
+
+html body .myComboDaySection {
+  font-size: 14px !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  html body
+  .purchasedAnalysisCardV2 {
+    grid-template-columns:
+      135px
+      minmax(190px,1fr)
+      minmax(220px,1fr)
+      180px !important;
+  }
+
+  html body
+  .myPageAccountGridV3 {
+    grid-template-columns:
+      1fr 1fr;
+  }
+}
+
+
+@media (max-width: 760px) {
+
+  html body .myCombosPage {
+    width:
+      calc(100% - 24px)
+      !important;
+  }
+
+  html body .myPageHeroV2 {
+    padding: 20px !important;
+  }
+
+  html body
+  .myPageIdentityNameV3 {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  html body
+  .myPageIdentityNameV3 h2 {
+    font-size: 24px !important;
+  }
+
+  html body
+  .myPageHeroStatsV2 {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+  html body
+  .myPageHeroStatsV2
+  article > strong {
+    font-size: 19px !important;
+  }
+
+
+  html body
+  .myPageAccountGridV3 {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  html body
+  .purchasedAnalysisCardV2 {
+    grid-template-columns:
+      1fr !important;
+
+    gap: 10px !important;
+
+    padding: 14px !important;
+  }
+
+  html body
+  .purchasedAnalysisCardTopV2 {
+    flex-direction:
+      row !important;
+
+    justify-content:
+      space-between !important;
+  }
+
+  html body
+  .purchasedAnalysisCardV2
+  > button {
+    width: 100% !important;
+  }
+
+  html body
+  .purchasedAnalysisMatchV2 strong {
+    font-size: 16px !important;
+  }
+
+
+  html body
+  .myComboMonthSummary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0,1fr)
+      ) !important;
+  }
+
+  html body
+  .myComboMonthSummary strong {
+    font-size: 17px !important;
+  }
+}
+
+
+/* PURCHASED_ANALYSIS_INLINE_REPLAY_UI_V1 */
+.purchasedReplayPanelV4{margin:20px 0;padding:22px;border:1px solid #d8e3ef;border-radius:20px;background:#f7faff;box-shadow:0 12px 34px rgba(20,48,82,.07)}
+.purchasedReplayHeadV4{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.purchasedReplayHeadV4 small{color:#4779ba;font-size:11px;font-weight:950;letter-spacing:.12em}
+.purchasedReplayHeadV4 h3{margin:4px 0;color:#10243e;font-size:24px;font-weight:950}
+.purchasedReplayHeadV4 p{margin:0;color:#62768e;font-size:14px;font-weight:700}
+.purchasedReplayHeadV4 button{min-width:72px;min-height:38px;border:1px solid #ccd9e7;border-radius:10px;background:#fff;color:#23486f;font-size:13px;font-weight:900}
+.purchasedReplayStatusV4,.purchasedReplayErrorV4{padding:14px;border-radius:12px;font-size:14px;font-weight:850}
+.purchasedReplayStatusV4{background:#edf5ff;color:#24548d}
+.purchasedReplayErrorV4{background:#fff1f1;color:#b42318}
+@media (max-width:760px){.purchasedReplayPanelV4{padding:14px}.purchasedReplayHeadV4 h3{font-size:20px}.purchasedReplayHeadV4 p{font-size:13px}}
+
+/* MYPAGE_PREMIUM_REPLAY_SHOW_V1 */
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="picks"]>.detailedOverallAnalysis.analysisPurchasedContentV1{display:block!important;visibility:visible!important;opacity:1!important;width:min(var(--site-max,1440px),calc(100%% - 24px))!important;box-sizing:border-box!important;margin:0 auto 28px!important;padding:20px!important;border:1px solid #dbe3ec!important;border-radius:18px!important;background:#fff!important}
+/* MYPAGE_FULL_GAME_REPLAY_V2 */
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub{display:block!important;visibility:visible!important;opacity:1!important}
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="starter"]>.gameStarterRatingV3,html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare{display:grid!important;visibility:visible!important;opacity:1!important}
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="lineup"]>.lineupAnalysis{display:block!important;visibility:visible!important;opacity:1!important}
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="flow"]>.gameFlowDetailV3{display:grid!important;visibility:visible!important;opacity:1!important}
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="flow"]>.gameFlowEdgeV3{display:block!important;visibility:visible!important;opacity:1!important}
+html body .myCombosPage .analysisWebsiteMatch[data-analysis-section="picks"]>.detailedOverallAnalysis.analysisPurchasedContentV1{display:block!important;visibility:visible!important;opacity:1!important;width:min(var(--site-max,1440px),calc(100% - 24px))!important;margin:0 auto 28px!important}
+/* MYPAGE_REPLAY_TABS_V3 */
+html body .myCombosPage .analysisWebsiteMatch>.gameAnalysisTabsV2{display:grid!important;visibility:visible!important;opacity:1!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;width:calc(100% - 24px)!important;margin:0 auto 18px!important;padding:6px!important;border:1px solid #e2e8f0!important;border-radius:15px!important;background:#fff!important;box-shadow:0 7px 20px rgba(15,23,42,.05)!important}
+html body .myCombosPage .analysisWebsiteMatch>.gameAnalysisTabsV2 button{min-height:46px!important;border:0!important;border-radius:10px!important;background:transparent!important;color:#64748b!important;font-size:14px!important;font-weight:850!important}
+html body .myCombosPage .analysisWebsiteMatch>.gameAnalysisTabsV2 button.active{background:#0b1d35!important;color:#fff!important}
+@media(max-width:700px){html body .myCombosPage .analysisWebsiteMatch>.gameAnalysisTabsV2{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:calc(100% - 16px)!important}html body .myCombosPage .analysisWebsiteMatch>.gameAnalysisTabsV2 button{font-size:13px!important}}
+/* MYPAGE_COMBO_TEXT_MATCH_V4 */
+html body .myCombosPage .manualSavedCardHead{justify-content:flex-end!important;padding:20px 22px!important}
+html body .myCombosPage .manualSavedResult{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;gap:14px!important}
+html body .myCombosPage .mySettlementBadge{font-size:14px!important;font-weight:900!important;padding:7px 12px!important}
+html body .myCombosPage .myTotalOdds span{font-size:13px!important;font-weight:800!important}
+html body .myCombosPage .myTotalOdds strong{font-size:18px!important;font-weight:950!important}
+html body .myCombosPage .manualSavedPicks{gap:10px!important;padding:16px!important}
+html body .myCombosPage .manualSavedPick{padding:14px 15px!important}
+html body .myCombosPage .manualSavedPick>b{font-size:16px!important;font-weight:900!important}
+html body .myCombosPage .manualSavedPickOdds{font-size:14px!important;font-weight:850!important}
+html body .myCombosPage .myPickResultBadge{font-size:13px!important;font-weight:900!important}
+html body .myCombosPage .manualSavedPick>span:last-child{font-size:13px!important;font-weight:750!important}
+html body .myCombosPage .manualStakeBox.saved span{font-size:14px!important;font-weight:800!important}
+html body .myCombosPage .manualStakeBox.saved b{font-size:17px!important;font-weight:950!important}
+html body .myCombosPage .manualSavedCalc>span{font-size:14px!important;font-weight:800!important}
+html body .myCombosPage .manualSavedCalc>span>b{font-size:17px!important;font-weight:950!important}
+html body .myCombosPage .myComboCompactSettlement span{font-size:13px!important}
+html body .myCombosPage .myComboCompactSettlement b,html body .myCombosPage .myComboCompactSettlement strong{font-size:16px!important}
+html body .myCombosPage .manualSavedCard button{font-size:14px!important;font-weight:850!important}
+@media(max-width:700px){html body .myCombosPage .manualSavedCardHead{padding:16px!important}html body .myCombosPage .manualSavedPick>b{font-size:15px!important}html body .myCombosPage .manualSavedPickOdds{font-size:13px!important}html body .myCombosPage .manualSavedCalc>span>b{font-size:16px!important}}
+/* MYPAGE_COMBO_ROW_UNIT_V5 */
+html body .myCombosPage .manualSavedCardHead{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:12px!important;padding:18px!important}
+html body .myCombosPage .manualSavedResult{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:16px!important;flex-wrap:nowrap!important;width:auto!important;min-width:0!important}
+html body .myCombosPage .mySettlementBadge{font-size:15px!important;font-weight:950!important;padding:8px 13px!important;white-space:nowrap!important}
+html body .myCombosPage .myTotalOdds{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:7px!important;margin:0!important;white-space:nowrap!important}
+html body .myCombosPage .myTotalOdds>span{font-size:14px!important;font-weight:850!important}
+html body .myCombosPage .myTotalOdds>strong{font-size:19px!important;font-weight:950!important}
+html body .myCombosPage .myComboDayHead::after{font-size:14px!important;font-weight:900!important;padding:8px 12px!important}
+html body .myCombosPage .manualSavedCardHead::after,html body .myCombosPage .bankrollSavedGroupHead::after{font-size:14px!important;font-weight:900!important;padding:8px 12px!important;margin-left:0!important;white-space:nowrap!important}
+@media(max-width:560px){html body .myCombosPage .manualSavedCardHead{grid-template-columns:minmax(0,1fr) auto!important;padding:15px!important;gap:8px!important}html body .myCombosPage .manualSavedResult{gap:10px!important}html body .myCombosPage .mySettlementBadge{font-size:14px!important;padding:7px 10px!important}html body .myCombosPage .myTotalOdds>span{font-size:13px!important}html body .myCombosPage .myTotalOdds>strong{font-size:18px!important}html body .myCombosPage .manualSavedCardHead::after{font-size:13px!important;padding:7px 9px!important}}
