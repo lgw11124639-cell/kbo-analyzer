@@ -4,7 +4,28 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const publishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "";
 const secret = process.env.SUPABASE_SECRET_KEY || "";
+
+function authClient() {
+  if (!url || !publishableKey) {
+    throw new Error(
+      "SUPABASE_PUBLIC_ENV_MISSING"
+    );
+  }
+
+  return createClient(
+    url,
+    publishableKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
+}
 
 function adminClient() {
   if (!url || !secret) throw new Error("SUPABASE_SERVER_ENV_MISSING");
@@ -18,9 +39,51 @@ async function requireUser(request: NextRequest) {
   const token = auth.replace(/^Bearer\s+/i, "").trim();
   if (!token) return { error: "UNAUTHORIZED" as const, user: null };
   const admin = adminClient();
-  const { data, error } = await admin.auth.getUser(token);
+  const { data, error } =
+    await authClient().auth.getUser(token);
   if (error || !data.user) return { error: "UNAUTHORIZED" as const, user: null };
   return { error: null, user: data.user };
+}
+
+
+const ADMIN_BASEBALL_BALANCE =
+  2_000_000_000;
+
+function hasUnlimitedBaseballs(
+  user: any
+) {
+  return (
+    user?.app_metadata?.role ===
+      "admin" &&
+    user?.app_metadata
+      ?.unlimited_baseballs === true
+  );
+}
+
+async function ensureUnlimitedBaseballs(
+  admin: any,
+  userId: string
+) {
+  const {
+    error,
+  } =
+    await admin
+      .from("kbo_baseball_wallets")
+      .update({
+        balance:
+          ADMIN_BASEBALL_BALANCE,
+
+        updated_at:
+          new Date().toISOString(),
+      })
+      .eq(
+        "user_id",
+        userId
+      );
+
+  if (error) {
+    throw error;
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -31,6 +94,18 @@ export async function GET(request: NextRequest) {
     }
 
     const admin = adminClient();
+
+    const unlimited =
+      hasUnlimitedBaseballs(
+        auth.user
+      );
+
+    if (unlimited) {
+      await ensureUnlimitedBaseballs(
+        admin,
+        auth.user.id
+      );
+    }
     const [{ data: wallet, error: walletError }, { data: bets, error: betsError }] =
       await Promise.all([
         admin
@@ -49,11 +124,24 @@ export async function GET(request: NextRequest) {
     if (walletError) throw walletError;
     if (betsError) throw betsError;
 
-    return NextResponse.json({
-      ok: true,
-      wallet: wallet || { balance: 0, lifetime_earned: 0, lifetime_spent: 0 },
-      bets: bets || [],
-    });
+    return NextResponse.json(
+      {
+        ok: true,
+        wallet:
+          wallet || {
+            balance: 0,
+            lifetime_earned: 0,
+            lifetime_spent: 0,
+          },
+        bets: bets || [],
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "private, no-store, max-age=0",
+        },
+      }
+    );
   } catch (error) {
     console.error("baseball wallet GET failed", error);
     return NextResponse.json(
@@ -95,6 +183,19 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = adminClient();
+
+    const unlimited =
+      hasUnlimitedBaseballs(
+        auth.user
+      );
+
+    if (unlimited) {
+      await ensureUnlimitedBaseballs(
+        admin,
+        auth.user.id
+      );
+    }
+
     const { data, error } = await admin.rpc("kbo_place_baseball_bet", {
       p_user_id: auth.user.id,
       p_stake: stake,
@@ -115,7 +216,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: known }, { status: 400 });
     }
 
-    return NextResponse.json(data || { ok: true });
+    if (unlimited) {
+      await ensureUnlimitedBaseballs(
+        admin,
+        auth.user.id
+      );
+
+      const responseData =
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data)
+          ? data
+          : { ok: true };
+
+      return NextResponse.json({
+        ...responseData,
+        balance:
+          ADMIN_BASEBALL_BALANCE,
+        unlimited: true,
+      });
+    }
+
+    return NextResponse.json(
+      data || { ok: true }
+    );
   } catch (error) {
     console.error("baseball wallet POST failed", error);
     return NextResponse.json(

@@ -7137,55 +7137,290 @@ export default function Home() {
   ] = useState(false);
 
   
-  /* BASEBALL_BALANCE_CLIENT_V1 */
-  const [baseballBalance, setBaseballBalance] = useState<number | null>(null);
+  /* BASEBALL_BALANCE_CLIENT_V2 */
+  const [
+    baseballBalance,
+    setBaseballBalance,
+  ] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const loadBaseballWallet = async () => {
-      if (!authUser) {
-        if (!cancelled) setBaseballBalance(null);
+    const cacheKey =
+      authUser?.id
+        ? `kbo_baseball_balance_${authUser.id}`
+        : "";
+
+    const restoreCachedBalance = () => {
+      if (!cacheKey) {
         return;
       }
 
       try {
-        const { data } = await supabase.auth.getSession();
-        const token = data.session?.access_token;
+        const cached =
+          window.localStorage.getItem(
+            cacheKey
+          );
 
-        if (!token) {
-          if (!cancelled) setBaseballBalance(null);
-          return;
-        }
-
-        const response = await fetch("/api/baseball/wallet", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          cache: "no-store",
-        });
-
-        const body = await response.json().catch(() => null);
-
-        if (!response.ok || !body?.ok) {
-          throw new Error(body?.error || "WALLET_LOAD_FAILED");
-        }
-
-        if (!cancelled) {
+        if (
+          cached !== null &&
+          Number.isFinite(
+            Number(cached)
+          )
+        ) {
           setBaseballBalance(
-            Math.max(0, Number(body?.wallet?.balance ?? 0) || 0)
+            Math.max(
+              0,
+              Number(cached)
+            )
           );
         }
-      } catch (error) {
-        console.error("baseball wallet load failed", error);
-        if (!cancelled) setBaseballBalance(null);
+      } catch {
+        //
       }
     };
 
+    const saveCachedBalance = (
+      balance: number
+    ) => {
+      if (!cacheKey) {
+        return;
+      }
+
+      try {
+        window.localStorage.setItem(
+          cacheKey,
+          String(balance)
+        );
+      } catch {
+        //
+      }
+    };
+
+    const wait = (
+      ms: number
+    ) =>
+      new Promise<void>(
+        (resolve) =>
+          window.setTimeout(
+            resolve,
+            ms
+          )
+      );
+
+    const getAccessToken =
+      async () => {
+        /*
+          authUser가 먼저 복구되고
+          storage session 반영이 약간 늦는 환경 대응.
+        */
+        for (
+          let attempt = 0;
+          attempt < 4;
+          attempt += 1
+        ) {
+          const {
+            data,
+          } =
+            await supabase.auth
+              .getSession();
+
+          const token =
+            data.session
+              ?.access_token;
+
+          if (token) {
+            return token;
+          }
+
+          await wait(
+            250 +
+              attempt * 250
+          );
+        }
+
+        /*
+          기존 refresh token이 있다면
+          세션을 한 번 명시적으로 갱신한다.
+        */
+        const {
+          data,
+        } =
+          await supabase.auth
+            .refreshSession();
+
+        return (
+          data.session
+            ?.access_token ??
+          null
+        );
+      };
+
+    const requestWallet =
+      async (
+        token: string
+      ) => {
+        return fetch(
+          "/api/baseball/wallet",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+            cache: "no-store",
+          }
+        );
+      };
+
+    const loadBaseballWallet =
+      async () => {
+        if (!authUser) {
+          if (!cancelled) {
+            setBaseballBalance(
+              null
+            );
+          }
+
+          return;
+        }
+
+        restoreCachedBalance();
+
+        try {
+          let token =
+            await getAccessToken();
+
+          if (!token) {
+            throw new Error(
+              "SESSION_TOKEN_NOT_READY"
+            );
+          }
+
+          let response =
+            await requestWallet(
+              token
+            );
+
+          /*
+            access token 만료/불일치면
+            refresh 후 바로 재요청.
+          */
+          if (
+            response.status ===
+            401
+          ) {
+            const {
+              data,
+            } =
+              await supabase.auth
+                .refreshSession();
+
+            token =
+              data.session
+                ?.access_token ??
+              null;
+
+            if (token) {
+              response =
+                await requestWallet(
+                  token
+                );
+            }
+          }
+
+          const body =
+            await response
+              .json()
+              .catch(
+                () => null
+              );
+
+          if (
+            !response.ok ||
+            !body?.ok
+          ) {
+            throw new Error(
+              body?.error ||
+                `WALLET_LOAD_FAILED_${response.status}`
+            );
+          }
+
+          const nextBalance =
+            Math.max(
+              0,
+              Number(
+                body?.wallet
+                  ?.balance ??
+                  0
+              ) || 0
+            );
+
+          if (!cancelled) {
+            setBaseballBalance(
+              nextBalance
+            );
+
+            saveCachedBalance(
+              nextBalance
+            );
+          }
+        } catch (error) {
+          /*
+            정상 로그인 상태에서 일시적인
+            네트워크/세션 오류가 발생해도
+            기존에 표시하던 잔액을 지우지 않는다.
+          */
+          console.error(
+            "baseball wallet load failed",
+            error
+          );
+        }
+      };
+
+    if (!authUser) {
+      setBaseballBalance(
+        null
+      );
+
+      return () => {
+        cancelled = true;
+      };
+    }
+
     void loadBaseballWallet();
+
+    const refreshOnFocus =
+      () => {
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+          void loadBaseballWallet();
+        }
+      };
+
+    window.addEventListener(
+      "focus",
+      refreshOnFocus
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      refreshOnFocus
+    );
 
     return () => {
       cancelled = true;
+
+      window.removeEventListener(
+        "focus",
+        refreshOnFocus
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        refreshOnFocus
+      );
     };
   }, [authUser?.id]);
 
@@ -7281,12 +7516,11 @@ const [
 
     if (!login) {
       setAuthMessage(
-        authMode === "login"
-          ? "아이디 또는 이메일을 입력해주세요."
-          : "아이디를 입력해주세요."
+        "아이디 또는 이메일를 입력해주세요."
       );
       return;
     }
+
 
     if (
       authMode === "signup" &&
@@ -7324,7 +7558,7 @@ const [
       )
     ) {
       setAuthMessage(
-        "아이디는 영문 소문자, 숫자, ., _, - 조합으로 3~30자 입력해주세요."
+        "아이디 또는 이메일는 영문 소문자, 숫자, ., _, - 조합으로 3~30자 입력해주세요."
       );
       return;
     }
@@ -7409,7 +7643,7 @@ const [
       ) {
         throw new Error(
           result?.error ||
-          "아이디 또는 비밀번호를 확인해주세요."
+          "아이디 또는 이메일 또는 비밀번호를 확인해주세요."
         );
       }
 
@@ -14140,11 +14374,7 @@ const [
           </div>
 
           <label className="authField">
-            <span>
-              {authMode === "login"
-                ? "아이디 또는 이메일"
-                : "아이디"}
-            </span>
+            <span>아이디 또는 이메일</span>
 
             <input
               type="text"
@@ -14153,7 +14383,7 @@ const [
               placeholder={
                 authMode === "login"
                   ? "아이디 또는 이메일"
-                  : "사용할 아이디"
+                  : "사용할 아이디 또는 이메일"
               }
               onChange={(event) =>
                 setAuthLogin(
@@ -14282,7 +14512,11 @@ const [
           <div className="accountArea">
             <div className="baseballHeaderBalance" title="야구공 상자">
               <span>⚾</span>
-              <b>{baseballBalance === null ? "-" : baseballBalance.toLocaleString("ko-KR")}</b>
+              <b>{baseballBalance === null
+                ? "-"
+                : baseballBalance >= 1_000_000_000
+                  ? "∞"
+                  : baseballBalance.toLocaleString("ko-KR")}</b>
             </div>
             {!authReady ? (
               <span className="accountLoading">
@@ -14334,8 +14568,28 @@ const [
               games.find((g) => g.status.stateCode === "2") ??
               games[0];
 
-            const isLive = liveGame.status.stateCode === "2";
-            const isFinished = liveGame.status.stateCode === "3";
+            const isCancelled =
+              !!liveGame.status.cancelCode &&
+              liveGame.status.cancelCode !== "0";
+
+            const isLive =
+              liveGame.status.stateCode === "2" &&
+              !isCancelled;
+
+            const isFinished =
+              liveGame.status.stateCode === "3" &&
+              !isCancelled;
+
+            const hasGameStarted =
+              (liveGame.status.inning ?? 0) > 0 ||
+              liveGame.flags.scoreAvailable ||
+              liveGame.score.away !== null ||
+              liveGame.score.home !== null;
+
+            const cancelLabel =
+              liveGame.status.cancelName ||
+              (isCancelled ? "경기 취소" : "");
+
             const relay = homeLiveRelay[liveGame.gameId];
 
             const logoMap: Record<string, string> = {
@@ -14364,9 +14618,53 @@ const [
             const awayRole = isLive ? (isTop ? "현재 타자" : isBottom ? "현재 투수" : "선수") : "선발투수";
             const homeRole = isLive ? (isTop ? "현재 투수" : isBottom ? "현재 타자" : "선수") : "선발투수";
             const pitchList = relay?.pitches ?? [];
-            const displayPitches = pitchList.slice(-6).reverse();
 
-            const mainStatus = isFinished
+            /*
+              같은 현재 타석에서 동일 pitchNum이
+              relay 중복으로 들어오는 경우 마지막 데이터만 유지.
+            */
+            const uniquePitchMap =
+              new Map<number, (typeof pitchList)[number]>();
+
+            for (const pitch of pitchList) {
+              const num = Number(pitch.pitchNum);
+
+              if (
+                Number.isFinite(num) &&
+                num > 0
+              ) {
+                uniquePitchMap.set(
+                  num,
+                  pitch
+                );
+              }
+            }
+
+            const displayPitches =
+              [...uniquePitchMap.values()]
+                .sort(
+                  (a, b) =>
+                    Number(b.pitchNum) -
+                    Number(a.pitchNum)
+                )
+                .slice(0, 6);
+
+            /*
+              좌표 없는 투구를 스트라이크존 중앙에
+              임의 표시하지 않는다.
+            */
+            const zonePitches =
+              displayPitches.filter(
+                (pitch) =>
+                  typeof pitch.x === "number" &&
+                  Number.isFinite(pitch.x) &&
+                  typeof pitch.z === "number" &&
+                  Number.isFinite(pitch.z)
+              );
+
+            const mainStatus = isCancelled
+              ? cancelLabel
+              : isFinished
               ? "경기 종료"
               : isLive && relay?.inning
               ? relay.inning
@@ -14374,7 +14672,11 @@ const [
               ? `${liveGame.status.inning}회 ${liveGame.status.topBottom || ""}`
               : "경기 전";
 
-            const mainMessage = isLive
+            const mainMessage = isCancelled
+              ? hasGameStarted
+                ? `${liveGame.awayTeamName} ${liveGame.score.away ?? "-"} : ${liveGame.score.home ?? "-"} ${liveGame.homeTeamName} · ${cancelLabel}`
+                : `${liveGame.awayTeamName} vs ${liveGame.homeTeamName} · ${cancelLabel}`
+              : isLive
               ? relay?.recentPlays?.length
                 ? relay.recentPlays.slice(0, 2).join(" · ")
                 : `${relay?.pitcher || "투수 확인중"} vs ${relay?.batter || "타자 확인중"}`
@@ -14388,8 +14690,33 @@ const [
                   {games.map((g) => {
                     const gRelay = homeLiveRelay[g.gameId];
                     const active = g.gameId === liveGame.gameId;
-                    const live = g.status.stateCode === "2";
-                    const done = g.status.stateCode === "3";
+                    const cancelled =
+                      !!g.status.cancelCode &&
+                      g.status.cancelCode !== "0";
+
+                    const live =
+                      g.status.stateCode === "2" &&
+                      !cancelled;
+
+                    const done =
+                      g.status.stateCode === "3" &&
+                      !cancelled;
+
+                    const gameStarted =
+                      (g.status.inning ?? 0) > 0 ||
+                      g.flags.scoreAvailable ||
+                      g.score.away !== null ||
+                      g.score.home !== null;
+
+                    const gameStatusLabel =
+                      cancelled
+                        ? (g.status.cancelName || "취소")
+                        : live
+                        ? "LIVE"
+                        : done
+                        ? "FINAL"
+                        : "경기전";
+
                     const gAwayLogo = logoMap[g.awayTeamName] || "";
                     const gHomeLogo = logoMap[g.homeTeamName] || "";
 
@@ -14402,7 +14729,9 @@ const [
                       >
                         <div className="homeGameChipTopV2">
                           <span>{g.time || "-"}</span>
-                          <b>{live ? "LIVE" : done ? "FINAL" : "경기전"}</b>
+                          <b className={cancelled ? "cancelled" : ""}>
+                            {gameStatusLabel}
+                          </b>
                         </div>
                         <div className="homeGameChipTeamsV2">
                           <div>
@@ -14413,7 +14742,11 @@ const [
                             )}
                             <strong>{g.awayTeamName}</strong>
                           </div>
-                          <em>{g.score.away ?? 0} : {g.score.home ?? 0}</em>
+                          <em>
+                            {cancelled && !gameStarted
+                              ? "취소"
+                              : `${g.score.away ?? 0} : ${g.score.home ?? 0}`}
+                          </em>
                           <div>
                             {gHomeLogo ? (
                               <img src={gHomeLogo} alt="" className="homeGameChipLogoV2" onError={(e) => { e.currentTarget.style.display = "none"; }} />
@@ -14513,23 +14846,69 @@ const [
                       <strong>스트라이크존</strong>
                     </div>
 
-                    <div className="homeZoneBoxV2">
-                      <div className="homeZoneGridV2">
-                        {Array.from({ length: 9 }, (_, i) => (
-                          <span key={`zone-grid-${i}`}></span>
-                        ))}
+                    <div className="homePitchCanvasV4">
+
+                      {/* 실제 기준 스트라이크존 */}
+                      <div className="homeActualZoneV4">
+                        <div className="homeActualZoneGridV4">
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <span key={`actual-zone-${i}`}></span>
+                          ))}
+                        </div>
                       </div>
 
-                      {displayPitches.length > 0 ? (
-                        displayPitches.map((pitch) => {
-                          const px = typeof pitch.x === "number" ? Math.max(-1.5, Math.min(1.5, pitch.x)) : 0;
-                          const pz = typeof pitch.z === "number" ? Math.max(1.0, Math.min(4.5, pitch.z)) : 2.75;
-                          const left = `${((px + 1.5) / 3) * 100}%`;
-                          const top = `${((4.5 - pz) / 3.5) * 100}%`;
+                      {/* 홈플레이트 방향 표시 */}
+                      <div className="homePlateGuideV4">
+                        <span></span>
+                      </div>
+
+                      {zonePitches.length > 0 ? (
+                        zonePitches.map((pitch) => {
+                          /*
+                            표시 영역
+                            X: -2.0 ~ +2.0
+                            Z:  0.5 ~ 4.5
+
+                            존 밖 공도 화면 안에 그대로 표시한다.
+                            극단값만 외곽 2% 지점에서 제한.
+                          */
+                          const rawX = pitch.x as number;
+                          const rawZ = pitch.z as number;
+
+                          const px = Math.max(
+                            -2.0,
+                            Math.min(2.0, rawX)
+                          );
+
+                          const pz = Math.max(
+                            0.5,
+                            Math.min(4.5, rawZ)
+                          );
+
+                          const leftNumber =
+                            ((px + 2.0) / 4.0) * 100;
+
+                          const topNumber =
+                            ((4.5 - pz) / 4.0) * 100;
+
+                          const left =
+                            `${Math.max(
+                              2,
+                              Math.min(98, leftNumber)
+                            )}%`;
+
+                          const top =
+                            `${Math.max(
+                              2,
+                              Math.min(98, topNumber)
+                            )}%`;
+
                           const resultClass =
                             pitch.pitchResult === "B"
                               ? "ball"
-                              : pitch.pitchResult === "T" || pitch.pitchResult === "S"
+                              : ["T", "S", "W", "V"].includes(
+                                  pitch.pitchResult
+                                )
                               ? "strike"
                               : pitch.pitchResult === "F"
                               ? "foul"
@@ -14539,18 +14918,47 @@ const [
 
                           return (
                             <span
-                              key={pitch.pitchId || `pitch-${pitch.pitchNum}`}
+                              key={
+                                pitch.pitchId &&
+                                pitch.pitchId !== "-1"
+                                  ? pitch.pitchId
+                                  : `pitch-${pitch.pitchNum}`
+                              }
                               className={`homePitchDotV2 ${resultClass}`}
-                              style={{ left, top }}
-                              title={`${pitch.pitchNum}구 ${pitch.stuff || "-"} ${pitch.speed ? `${pitch.speed}km/h` : ""} ${pitch.text || ""}`}
+                              style={{
+                                left,
+                                top,
+                              }}
+                              title={`${pitch.pitchNum}구 · ${
+                                pitch.stuff || "-"
+                              } · ${
+                                pitch.speed
+                                  ? `${pitch.speed}km/h`
+                                  : "-"
+                              } · X ${
+                                rawX.toFixed(2)
+                              } / Z ${
+                                rawZ.toFixed(2)
+                              } · ${
+                                pitch.text || ""
+                              }`}
                             >
                               {pitch.pitchNum}
                             </span>
                           );
                         })
                       ) : (
-                        <div className="homeZoneEmptyV2">데이터 대기</div>
+                        <div className="homeZoneEmptyV2">
+                          {displayPitches.length > 0
+                            ? "투구 위치 데이터 대기"
+                            : "데이터 대기"}
+                        </div>
                       )}
+                    </div>
+
+                    <div className="homeZoneGuideTextV4">
+                      <span>존 밖까지 실제 위치 표시</span>
+                      <small>가운데 박스 = 기준 스트라이크존</small>
                     </div>
 
                     <div className="homeZoneLegendV2">
@@ -14575,7 +14983,7 @@ const [
                             className={`homePitchLogItemV2 ${
                               pitch.pitchResult === "B"
                                 ? "ball"
-                                : pitch.pitchResult === "T" || pitch.pitchResult === "S"
+                                : ["T", "S", "W", "V"].includes(pitch.pitchResult)
                                 ? "strike"
                                 : pitch.pitchResult === "F"
                                 ? "foul"
@@ -14733,7 +15141,11 @@ const [
                     <h3>⚾ 야구공 상자</h3>
                   </div>
                 </div>
-                <strong className="communityStarAmountV3">{baseballBalance === null ? "⚾ -" : `⚾ ${baseballBalance.toLocaleString("ko-KR")}`}</strong>
+                <strong className="communityStarAmountV3">{baseballBalance === null
+                  ? "⚾ -"
+                  : baseballBalance >= 1_000_000_000
+                    ? "⚾ ∞"
+                    : `⚾ ${baseballBalance.toLocaleString("ko-KR")}`}</strong>
                 <p>보유 야구공과 참여·정산 내역이 표시됩니다.</p>
               </section>
 
@@ -16792,7 +17204,11 @@ const [
 
                 <div className="baseballCartBalance">
                   <span>보유 야구공</span>
-                  <strong>{baseballBalance === null ? "⚾ -" : `⚾ ${baseballBalance.toLocaleString("ko-KR")}`}</strong>
+                  <strong>{baseballBalance === null
+                  ? "⚾ -"
+                  : baseballBalance >= 1_000_000_000
+                    ? "⚾ ∞"
+                    : `⚾ ${baseballBalance.toLocaleString("ko-KR")}`}</strong>
                 </div>
 
                 <div className="manualGameComboMoney">

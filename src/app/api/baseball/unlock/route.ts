@@ -24,6 +24,47 @@ async function requireUser(request: NextRequest) {
 }
 
 
+
+const ADMIN_BASEBALL_BALANCE =
+  2_000_000_000;
+
+function hasUnlimitedBaseballs(
+  user: any
+) {
+  return (
+    user?.app_metadata?.role ===
+      "admin" &&
+    user?.app_metadata
+      ?.unlimited_baseballs === true
+  );
+}
+
+async function ensureUnlimitedBaseballs(
+  admin: any,
+  userId: string
+) {
+  const {
+    error,
+  } =
+    await admin
+      .from("kbo_baseball_wallets")
+      .update({
+        balance:
+          ADMIN_BASEBALL_BALANCE,
+
+        updated_at:
+          new Date().toISOString(),
+      })
+      .eq(
+        "user_id",
+        userId
+      );
+
+  if (error) {
+    throw error;
+  }
+}
+
 const reply = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: { "Cache-Control": "private, no-store" } });
 
 async function handleUnlock(request: NextRequest, purchase: boolean) {
@@ -39,13 +80,57 @@ async function handleUnlock(request: NextRequest, purchase: boolean) {
       if (error) throw error;
       return reply({ ok: true, gameId, unlocked: !!data, price: 3000 });
     }
-    const { data, error } = await admin.rpc("kbo_unlock_analysis", { p_user_id: auth.user.id, p_game_id: gameId });
+    const unlimited =
+      hasUnlimitedBaseballs(
+        auth.user
+      );
+
+    if (unlimited) {
+      await ensureUnlimitedBaseballs(
+        admin,
+        auth.user.id
+      );
+    }
+
+    const { data, error } =
+      await admin.rpc(
+        "kbo_unlock_analysis",
+        {
+          p_user_id:
+            auth.user.id,
+
+          p_game_id:
+            gameId,
+        }
+      );
     if (error) {
       if (error.message.includes("INSUFFICIENT_BASEBALLS")) return reply({ ok: false, error: "보유 야구공이 부족합니다." }, 400);
       if (error.message.includes("WALLET_NOT_FOUND")) return reply({ ok: false, error: "야구공 상자를 찾을 수 없습니다." }, 400);
       throw error;
     }
-    if (!data?.ok || !data?.unlocked) throw new Error("UNEXPECTED_UNLOCK_RESPONSE");
+    if (
+      !data?.ok ||
+      !data?.unlocked
+    ) {
+      throw new Error(
+        "UNEXPECTED_UNLOCK_RESPONSE"
+      );
+    }
+
+    if (unlimited) {
+      await ensureUnlimitedBaseballs(
+        admin,
+        auth.user.id
+      );
+
+      return reply({
+        ...data,
+        balance:
+          ADMIN_BASEBALL_BALANCE,
+        unlimited: true,
+      });
+    }
+
     return reply(data);
   } catch (error) {
     console.error("baseball analysis unlock failed", error);

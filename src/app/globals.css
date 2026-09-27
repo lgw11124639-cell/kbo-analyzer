@@ -29297,3 +29297,221 @@ html body .analysisPurchasePanelV1 .analysisPurchaseButtonV1:focus-visible{outli
 html body .analysisPurchasePanelV1 p{line-height:1.65!important}
 html body .analysisPurchasePanelV1 .analysisPurchaseMessageV1{margin-top:12px!important;color:#173b75!important;font-weight:800!important}
 @media(max-width:760px){html body .analysisPurchasePanelV1{flex-direction:column!important;gap:12px!important;padding:20px!important}html body .analysisPurchasePanelV1 .analysisPurchaseButtonV1{width:100%!important}html body .unifiedWebsite.active-games .analysisWebsiteMatch[data-analysis-section="picks"]>.detailedOverallAnalysis.analysisPurchasedContentV1{width:calc(100% - 28px)!important;padding:16px!important}}
+
+/* =========================================================
+   HOME PITCH LOCATION CANVAS V4
+   전체 투구영역 + 가운데 기준 스트라이크존
+   ========================================================= */
+
+.communityHomeV3 .homePitchCanvasV4,
+.homePitchCanvasV4{
+  position:relative;
+  width:min(100%,220px);
+  aspect-ratio:1/1;
+  margin:4px auto 10px;
+  overflow:hidden;
+  border:1px solid #d8e1eb;
+  border-radius:16px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 49.7%,
+      rgba(100,116,139,.16) 49.7%,
+      rgba(100,116,139,.16) 50.3%,
+      transparent 50.3%
+    ),
+    linear-gradient(
+      180deg,
+      #f8fafc 0%,
+      #f4f7fb 68%,
+      #eef2f7 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.85),
+    0 6px 16px rgba(15,23,42,.06);
+}
+
+/*
+  기준 존:
+  전체 X -2 ~ +2 중 약 ±0.83ft
+  전체 Z 0.5 ~ 4.5 중 약 1.5 ~ 3.5ft
+
+  선수별 실제 존 높이는 달라질 수 있으므로
+  화면상 "기준 스트라이크존"으로 사용.
+*/
+.communityHomeV3 .homeActualZoneV4,
+.homeActualZoneV4{
+  position:absolute;
+  left:29.25%;
+  right:29.25%;
+  top:25%;
+  bottom:25%;
+  border:3px solid #475569;
+  background:rgba(255,255,255,.38);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.75),
+    0 4px 12px rgba(15,23,42,.08);
+  z-index:2;
+}
+
+.communityHomeV3 .homeActualZoneGridV4,
+.homeActualZoneGridV4{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+}
+
+.communityHomeV3 .homeActualZoneGridV4 span,
+.homeActualZoneGridV4 span{
+  border:1px solid rgba(100,116,139,.38);
+}
+
+.communityHomeV3 .homePlateGuideV4,
+.homePlateGuideV4{
+  position:absolute;
+  left:50%;
+  bottom:3%;
+  width:42px;
+  height:15px;
+  transform:translateX(-50%);
+  z-index:1;
+}
+
+.communityHomeV3 .homePlateGuideV4 span,
+.homePlateGuideV4 span{
+  position:absolute;
+  inset:0;
+  background:#cbd5e1;
+  clip-path:polygon(
+    12% 0,
+    88% 0,
+    100% 42%,
+    50% 100%,
+    0 42%
+  );
+  opacity:.75;
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2,
+.homePitchCanvasV4 .homePitchDotV2{
+  z-index:5;
+  width:28px;
+  height:28px;
+  border:2px solid #fff;
+  box-shadow:
+    0 4px 10px rgba(15,23,42,.28),
+    0 0 0 1px rgba(15,23,42,.12);
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2.ball,
+.homePitchCanvasV4 .homePitchDotV2.ball{
+  background:#ef4444!important;
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2.strike,
+.homePitchCanvasV4 .homePitchDotV2.strike{
+  background:#2563eb!important;
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2.foul,
+.homePitchCanvasV4 .homePitchDotV2.foul{
+  background:#f59e0b!important;
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2.inplay,
+.homePitchCanvasV4 .homePitchDotV2.inplay{
+  background:#10b981!important;
+}
+
+.communityHomeV3 .homeZoneGuideTextV4,
+.homeZoneGuideTextV4{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  margin:-2px 0 10px;
+  text-align:center;
+}
+
+.communityHomeV3 .homeZoneGuideTextV4 span,
+.homeZoneGuideTextV4 span{
+  color:#334155;
+  font-size:11px;
+  font-weight:800;
+}
+
+.communityHomeV3 .homeZoneGuideTextV4 small,
+.homeZoneGuideTextV4 small{
+  color:#94a3b8;
+  font-size:10px;
+  font-weight:700;
+}
+
+@media (max-width:700px){
+  .communityHomeV3 .homePitchCanvasV4,
+  .homePitchCanvasV4{
+    width:min(100%,200px);
+  }
+
+  .communityHomeV3 .homePitchCanvasV4 .homePitchDotV2,
+  .homePitchCanvasV4 .homePitchDotV2{
+    width:26px;
+    height:26px;
+    font-size:10px;
+  }
+}
+
+
+/* HOME CANCELLED GAME STATUS */
+.communityHomeV3 .homeGameChipTopV2 b.cancelled{
+  background:#64748b!important;
+  border-color:#94a3b8!important;
+  color:#fff!important;
+}
+
+
+/* =========================================================
+   HOME STRIKE ZONE POLISH V5
+   좌표비율 유지 + 전체 표시영역만 확대
+   ========================================================= */
+
+.communityHomeV3 .homePitchCanvasV4,
+.homePitchCanvasV4{
+  width:min(100%,250px)!important;
+}
+
+/*
+  실제 좌표 비율은 변경하지 않는다.
+  X -2~2 / Z 0.5~4.5 기준 유지.
+*/
+.communityHomeV3 .homeActualZoneV4,
+.homeActualZoneV4{
+  left:29.25%!important;
+  right:29.25%!important;
+  top:25%!important;
+  bottom:25%!important;
+}
+
+.communityHomeV3 .homePitchCanvasV4 .homePitchDotV2,
+.homePitchCanvasV4 .homePitchDotV2{
+  width:27px!important;
+  height:27px!important;
+  font-size:10px!important;
+}
+
+.communityHomeV3 .homeGameChipTopV2 b.cancelled{
+  background:#64748b!important;
+  border-color:#94a3b8!important;
+  color:#fff!important;
+  white-space:nowrap!important;
+}
+
+@media (max-width:700px){
+  .communityHomeV3 .homePitchCanvasV4,
+  .homePitchCanvasV4{
+    width:min(100%,225px)!important;
+  }
+}
+

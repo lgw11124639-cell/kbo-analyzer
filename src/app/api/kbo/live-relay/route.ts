@@ -86,8 +86,509 @@ export async function GET(req: NextRequest) {
     let pitcherId: string | null = null;
     let batterId: string | null = null;
 
-    let pitches: { pitchNum: number; text: string; pitchResult: string; stuff: string; speed: number | null; pitchId: string | null; x: number | null; z: number | null }[] = [];
-    try { const nr = await fetch(`https://api-gw.sports.naver.com/schedule/games/${gameId}${year}/relay?inning=${inningNo || 1}`, { headers: { "User-Agent": "Mozilla/5.0", Origin: "https://m.sports.naver.com", Referer: "https://m.sports.naver.com/" }, cache: "no-store" }); if (nr.ok) { const nj = await nr.json(); const all: any[] = []; const walk = (v: any) => { if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === "object") { all.push(v); Object.values(v).forEach(walk); } }; walk(nj); const findPlayerId = (name: string | null) => { if (!name) return null; for (const o of all) { const vals = Object.values(o).filter((v): v is string => typeof v === "string"); if (!vals.some((v) => v === name || v.includes(name))) continue; for (const k of ["playerId","playerCode","pcode","playerNo","personId","id","code"]) { const v = o[k]; if (v != null && /^\d+$/.test(String(v))) return String(v); } } return null; }; pitcherId = findPlayerId(pitcherName); batterId = findPlayerId(batterName); const track = new Map<string, any>(); all.forEach((o) => { if (o.pitchId && o.y0 != null && o.vy0 != null && o.ay != null) track.set(String(o.pitchId), o); }); const events = all.filter((o) => Number(o.pitchNum) > 0 && o.ptsPitchId && o.stuff); const current: any[] = []; for (const o of events) { if (current.length && Number(o.pitchNum) === 1) break; current.push(o); } pitches = current.map((o) => { const t = track.get(String(o.ptsPitchId)); let x: number | null = null; let z: number | null = null; if (t) { x = Number.isFinite(Number(t.crossPlateX)) ? Number(t.crossPlateX) : null; const y0=Number(t.y0),vy0=Number(t.vy0),ay=Number(t.ay),z0=Number(t.z0),vz0=Number(t.vz0),az=Number(t.az),ty=Number(t.crossPlateY ?? 0.7083); const d=vy0*vy0-2*ay*(y0-ty); if ([y0,vy0,ay,z0,vz0,az].every(Number.isFinite) && d>=0 && ay!==0) { const sec=(-vy0-Math.sqrt(d))/ay; if (Number.isFinite(sec) && sec>0) z=z0+vz0*sec+0.5*az*sec*sec; } } return { pitchNum:Number(o.pitchNum), text:String(o.text ?? ""), pitchResult:String(o.pitchResult ?? ""), stuff:String(o.stuff ?? ""), speed:Number.isFinite(Number(o.speed)) ? Number(o.speed) : null, pitchId:String(o.ptsPitchId ?? "") || null, x, z }; }); } } catch {}
+    let pitches: {
+      pitchNum: number;
+      text: string;
+      pitchResult: string;
+      stuff: string;
+      speed: number | null;
+      pitchId: string | null;
+      x: number | null;
+      z: number | null;
+    }[] = [];
+
+    try {
+      const naverGameId = `${gameId}${year}`;
+
+      const nr = await fetch(
+        `https://api-gw.sports.naver.com/schedule/games/${naverGameId}/relay?inning=${inningNo || 1}`,
+        {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            Origin: "https://m.sports.naver.com",
+            Referer: "https://m.sports.naver.com/",
+          },
+          cache: "no-store",
+        }
+      );
+
+      if (nr.ok) {
+        const nj = await nr.json();
+
+        /*
+        ============================================================
+        NAVER LIVE RELAY PARSER V2
+
+        1. 전체 객체는 선수 ID / PTS 트래킹 검색용
+        2. 투구 이벤트는 배열 단위로 따로 보존
+        3. 최신 타석 배열 하나만 선택
+        4. pitchNum 중복 제거
+        ============================================================
+        */
+
+        const allObjects: any[] = [];
+        const relayGroups: any[][] = [];
+
+        const walk = (value: any) => {
+          if (Array.isArray(value)) {
+            const pitchEvents = value.filter(
+              (item) =>
+                item &&
+                typeof item === "object" &&
+                Number(item.pitchNum) > 0 &&
+                (
+                  item.ptsPitchId != null ||
+                  item.stuff != null ||
+                  item.speed != null
+                )
+            );
+
+            if (pitchEvents.length > 0) {
+              relayGroups.push(pitchEvents);
+            }
+
+            value.forEach(walk);
+            return;
+          }
+
+          if (
+            value &&
+            typeof value === "object"
+          ) {
+            allObjects.push(value);
+            Object.values(value).forEach(walk);
+          }
+        };
+
+        walk(nj);
+
+        /*
+        선수 이름과 같은 객체 주변에서
+        숫자형 선수 식별자를 찾는다.
+        */
+        const findPlayerId = (
+          name: string | null
+        ) => {
+          if (!name) return null;
+
+          const normalizedName =
+            name.replace(/\s+/g, "");
+
+          for (const obj of allObjects) {
+            const stringValues =
+              Object.values(obj)
+                .filter(
+                  (value): value is string =>
+                    typeof value === "string"
+                )
+                .map((value) =>
+                  value.replace(/\s+/g, "")
+                );
+
+            const matched =
+              stringValues.some(
+                (value) =>
+                  value === normalizedName ||
+                  value.includes(
+                    normalizedName
+                  )
+              );
+
+            if (!matched) {
+              continue;
+            }
+
+            for (const key of [
+              "playerId",
+              "playerCode",
+              "pcode",
+              "playerNo",
+              "personId",
+              "id",
+              "code",
+            ]) {
+              const value = obj[key];
+
+              if (
+                value != null &&
+                /^\d+$/.test(
+                  String(value)
+                )
+              ) {
+                return String(value);
+              }
+            }
+          }
+
+          return null;
+        };
+
+        pitcherId =
+          findPlayerId(pitcherName);
+
+        batterId =
+          findPlayerId(batterName);
+
+        /*
+        PTS 궤적 데이터
+        */
+        /*
+        PTS 데이터는 반드시 ptsPitchId ↔ pitchId로만 연결한다.
+
+        pitchNum은 매 타석마다 1부터 다시 시작하기 때문에
+        다른 타석의 좌표가 현재 타석에 붙을 수 있어 사용하지 않는다.
+
+        네이버가 ptsPitchId=-1을 보내는 순간에는
+        좌표를 null로 유지하고 다음 polling에서 다시 확인한다.
+        */
+        const track =
+          new Map<string, any>();
+
+        for (const obj of allObjects) {
+          const hasTrajectory =
+            obj.y0 != null &&
+            obj.vy0 != null &&
+            obj.ay != null &&
+            obj.z0 != null &&
+            obj.vz0 != null &&
+            obj.az != null;
+
+          if (!hasTrajectory) {
+            continue;
+          }
+
+          const id =
+            obj.pitchId ??
+            obj.ptsPitchId ??
+            null;
+
+          if (
+            id == null ||
+            String(id) === "-1"
+          ) {
+            continue;
+          }
+
+          track.set(
+            String(id),
+            obj
+          );
+        }
+
+        /*
+        최신 타석 후보를 찾는다.
+
+        네이버 relay 응답은 최신 블록이
+        앞쪽에 오는 구조를 우선 사용한다.
+        */
+        let currentGroup: any[] = [];
+
+        for (const group of relayGroups) {
+          const valid =
+            group
+              .filter(
+                (item) =>
+                  Number(item.pitchNum) > 0
+              )
+              .sort(
+                (a, b) =>
+                  Number(a.pitchNum) -
+                  Number(b.pitchNum)
+              );
+
+          if (valid.length === 0) {
+            continue;
+          }
+
+          /*
+          한 타석은 일반적으로
+          1구부터 시작한다.
+          */
+          if (
+            valid.some(
+              (item) =>
+                Number(item.pitchNum) === 1
+            )
+          ) {
+            currentGroup = valid;
+            break;
+          }
+
+          if (
+            currentGroup.length === 0
+          ) {
+            currentGroup = valid;
+          }
+        }
+
+        /*
+        혹시 배열 구조가 예상과 달라도
+        전체 객체에서 마지막 안전망을 둔다.
+        */
+        if (
+          currentGroup.length === 0
+        ) {
+          const fallback =
+            allObjects.filter(
+              (obj) =>
+                Number(obj.pitchNum) > 0 &&
+                (
+                  obj.ptsPitchId != null ||
+                  obj.stuff != null
+                )
+            );
+
+          const reversed =
+            [...fallback].reverse();
+
+          const picked: any[] = [];
+
+          for (const obj of reversed) {
+            const pitchNum =
+              Number(obj.pitchNum);
+
+            if (
+              picked.length > 0 &&
+              pitchNum === 1
+            ) {
+              picked.push(obj);
+              break;
+            }
+
+            picked.push(obj);
+          }
+
+          currentGroup =
+            picked.reverse();
+        }
+
+        /*
+        같은 pitchNum이 재전송되는 경우
+        가장 마지막 값을 사용한다.
+        */
+        const deduped =
+          new Map<number, any>();
+
+        for (
+          const obj of currentGroup
+        ) {
+          const num =
+            Number(obj.pitchNum);
+
+          if (
+            Number.isFinite(num) &&
+            num > 0
+          ) {
+            deduped.set(
+              num,
+              obj
+            );
+          }
+        }
+
+        const currentEvents =
+          [...deduped.values()].sort(
+            (a, b) =>
+              Number(a.pitchNum) -
+              Number(b.pitchNum)
+          );
+
+        pitches =
+          currentEvents.map((obj) => {
+            const pitchId =
+              obj.ptsPitchId ??
+              obj.pitchId ??
+              null;
+
+            const tracking =
+              pitchId != null &&
+              String(pitchId) !== "-1"
+                ? track.get(
+                    String(pitchId)
+                  ) ?? null
+                : null;
+
+            let x: number | null =
+              null;
+
+            let z: number | null =
+              null;
+
+            if (tracking) {
+              const directX =
+                Number(
+                  tracking.crossPlateX
+                );
+
+              if (
+                Number.isFinite(
+                  directX
+                )
+              ) {
+                x = directX;
+              }
+
+              const y0 =
+                Number(tracking.y0);
+
+              const vy0 =
+                Number(tracking.vy0);
+
+              const ay =
+                Number(tracking.ay);
+
+              const z0 =
+                Number(tracking.z0);
+
+              const vz0 =
+                Number(tracking.vz0);
+
+              const az =
+                Number(tracking.az);
+
+              const crossPlateY =
+                Number(
+                  tracking.crossPlateY ??
+                  0.7083
+                );
+
+              const validTrajectory =
+                [
+                  y0,
+                  vy0,
+                  ay,
+                  z0,
+                  vz0,
+                  az,
+                  crossPlateY,
+                ].every(
+                  Number.isFinite
+                );
+
+              if (
+                validTrajectory &&
+                ay !== 0
+              ) {
+                const discriminant =
+                  vy0 * vy0 -
+                  2 *
+                    ay *
+                    (
+                      y0 -
+                      crossPlateY
+                    );
+
+                if (
+                  discriminant >= 0
+                ) {
+                  const sqrt =
+                    Math.sqrt(
+                      discriminant
+                    );
+
+                  const t1 =
+                    (
+                      -vy0 -
+                      sqrt
+                    ) / ay;
+
+                  const t2 =
+                    (
+                      -vy0 +
+                      sqrt
+                    ) / ay;
+
+                  const candidates =
+                    [t1, t2]
+                      .filter(
+                        (value) =>
+                          Number.isFinite(
+                            value
+                          ) &&
+                          value > 0
+                      )
+                      .sort(
+                        (a, b) =>
+                          a - b
+                      );
+
+                  const sec =
+                    candidates[0];
+
+                  if (
+                    sec != null
+                  ) {
+                    const calculatedZ =
+                      z0 +
+                      vz0 * sec +
+                      0.5 *
+                        az *
+                        sec *
+                        sec;
+
+                    if (
+                      Number.isFinite(
+                        calculatedZ
+                      )
+                    ) {
+                      z =
+                        calculatedZ;
+                    }
+                  }
+                }
+              }
+            }
+
+            return {
+              pitchNum:
+                Number(
+                  obj.pitchNum
+                ),
+
+              text:
+                String(
+                  obj.text ?? ""
+                ),
+
+              pitchResult:
+                String(
+                  obj.pitchResult ??
+                  ""
+                ),
+
+              stuff:
+                String(
+                  obj.stuff ?? ""
+                ),
+
+              speed:
+                Number.isFinite(
+                  Number(obj.speed)
+                )
+                  ? Number(
+                      obj.speed
+                    )
+                  : null,
+
+              pitchId:
+                pitchId != null
+                  ? String(
+                      pitchId
+                    )
+                  : null,
+
+              x,
+              z,
+            };
+          });
+      }
+    } catch (error) {
+      console.error(
+        "[NAVER LIVE RELAY PARSE ERROR]",
+        error
+      );
+    }
+
 
     const liveTexts: string[] = [];
     if (inningNo > 0) {
@@ -106,8 +607,10 @@ export async function GET(req: NextRequest) {
       balls: countMatch ? Number(countMatch[1]) : count(ballsBlock, /<li[^>]*class=["']on["'][^>]*>\s*ball\s*<\/li>/gi),
       strikes: countMatch ? Number(countMatch[2]) : count(strikesBlock, /<li[^>]*class=["']on["'][^>]*>\s*strike\s*<\/li>/gi),
       outs: countMatch ? Number(countMatch[3]) : count(outsBlock, /<li[^>]*class=["']on["'][^>]*>\s*out\s*<\/li>/gi),
-      pitcher: one(economy, /<li class=["']pitcher["']>([\s\S]*?)<\/li>/i) || null,
-      batter: one(economy, /<li class=["']supervision\d*["']>([\s\S]*?)<\/li>/i) || null,
+      pitcher: pitcherName,
+      pitcherId,
+      batter: batterName,
+      batterId,
       runners: { first: runner1, second: runner2, third: runner3 },
       baseCode,
       recentPlays: liveTexts.slice(0, 8),
