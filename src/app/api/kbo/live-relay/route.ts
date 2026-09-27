@@ -599,6 +599,44 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const finalSummary = {
+      winningPitcher:
+        liveTexts
+          .map((text) =>
+            text.match(
+              /^승리투수\s*[:：]\s*(.+)$/i
+            )?.[1]?.trim() || null
+          )
+          .find(Boolean) || null,
+
+      losingPitcher:
+        liveTexts
+          .map((text) =>
+            text.match(
+              /^패전투수\s*[:：]\s*(.+)$/i
+            )?.[1]?.trim() || null
+          )
+          .find(Boolean) || null,
+
+      savePitcher:
+        liveTexts
+          .map((text) =>
+            text.match(
+              /^세이브\s*[:：]\s*(.+)$/i
+            )?.[1]?.trim() || null
+          )
+          .find(Boolean) || null,
+
+      gameWinningHit:
+        liveTexts
+          .map((text) =>
+            text.match(
+              /^결승타\s*[:：]\s*(.+)$/i
+            )?.[1]?.trim() || null
+          )
+          .find(Boolean) || null,
+    };
+
     return NextResponse.json({
       ok: true,
       gameId,
@@ -613,7 +651,8 @@ export async function GET(req: NextRequest) {
       batterId,
       runners: { first: runner1, second: runner2, third: runner3 },
       baseCode,
-      recentPlays: liveTexts.slice(0, 8),
+      recentPlays: liveTexts.slice(0, 12),
+      finalSummary,
       pitches,
       scoreboard: scoreboardRows,
       source: "KBO_LIVE_TEXT",

@@ -6873,6 +6873,12 @@ type HomeLiveRelay = {
   runners: { first: string | null; second: string | null; third: string | null };
   baseCode: number;
   recentPlays: string[];
+  finalSummary?: {
+    winningPitcher: string | null;
+    losingPitcher: string | null;
+    savePitcher: string | null;
+    gameWinningHit: string | null;
+  };
   pitches?: { pitchNum: number; text: string; pitchResult: string; stuff: string; speed: number | null; pitchId: string | null; x: number | null; z: number | null }[];
   scoreboard: { team: string; innings: (number | null)[]; runs: number; hits: number; errors: number; walks: number }[];
   source: string;
@@ -7776,44 +7782,166 @@ const [
   ]);
   const [games,setGames] = useState<KboGame[]>([]);
 
-  /* HOME_LIVE_RELAY_POLL_V1 */
+  /*
+    HOME_LIVE_RELAY_POLL_V2
+
+    LIVE:
+    - 5초 polling
+
+    FINAL:
+    - 종료 상태가 확인되는 순간
+      마지막 relay를 1회 더 받아
+      최종 scoreboard / 승패투수 정보를 고정한다.
+
+    PRE / CANCEL:
+    - polling 하지 않는다.
+  */
   useEffect(() => {
-    if (activeTab !== "home" || games.length === 0) return;
+    if (
+      activeTab !== "home" ||
+      games.length === 0
+    ) {
+      return;
+    }
 
     const relayGame =
-      games.find((g) => g.gameId === selectedGameId) ??
-      games.find((g) => g.status.stateCode === "2") ??
+      games.find(
+        (g) =>
+          g.gameId ===
+          selectedGameId
+      ) ??
+      games.find(
+        (g) =>
+          g.status.stateCode ===
+          "2"
+      ) ??
       null;
 
-    if (!relayGame || relayGame.status.stateCode !== "2") return;
+    if (!relayGame) {
+      return;
+    }
+
+    const isCancelled =
+      !!relayGame.status.cancelCode &&
+      relayGame.status.cancelCode !==
+        "0";
+
+    const isLive =
+      relayGame.status.stateCode ===
+        "2" &&
+      !isCancelled;
+
+    const isFinished =
+      relayGame.status.stateCode ===
+        "3" &&
+      !isCancelled;
+
+    if (
+      !isLive &&
+      !isFinished
+    ) {
+      return;
+    }
 
     let cancelled = false;
     let refreshing = false;
 
-    const refreshHomeRelay = async () => {
-      if (cancelled || refreshing) return;
-      refreshing = true;
-      try {
-        const response = await fetch(`/api/kbo/live-relay?gameId=${encodeURIComponent(relayGame.gameId)}&year=${encodeURIComponent(String(relayGame.season || relayGame.gameId.slice(0, 4)))}`, { cache: "no-store" });
-        if (!response.ok || cancelled) return;
-        const json = await response.json();
-        if (!json?.ok || cancelled) return;
-        setHomeLiveRelay((prev) => ({ ...prev, [relayGame.gameId]: json as HomeLiveRelay }));
-      } catch (error) {
-        console.error("[HOME LIVE RELAY ERROR]", error);
-      } finally {
-        refreshing = false;
-      }
-    };
+    const refreshHomeRelay =
+      async () => {
+        if (
+          cancelled ||
+          refreshing
+        ) {
+          return;
+        }
 
+        refreshing = true;
+
+        try {
+          const response =
+            await fetch(
+              `/api/kbo/live-relay?gameId=${encodeURIComponent(
+                relayGame.gameId
+              )}&year=${encodeURIComponent(
+                String(
+                  relayGame.season ||
+                  relayGame.gameId.slice(
+                    0,
+                    4
+                  )
+                )
+              )}`,
+              {
+                cache: "no-store",
+              }
+            );
+
+          if (
+            !response.ok ||
+            cancelled
+          ) {
+            return;
+          }
+
+          const json =
+            await response.json();
+
+          if (
+            !json?.ok ||
+            cancelled
+          ) {
+            return;
+          }
+
+          setHomeLiveRelay(
+            (prev) => ({
+              ...prev,
+              [relayGame.gameId]:
+                json as HomeLiveRelay,
+            })
+          );
+        } catch (error) {
+          console.error(
+            "[HOME LIVE RELAY ERROR]",
+            error
+          );
+        } finally {
+          refreshing = false;
+        }
+      };
+
+    /*
+      LIVE / FINAL 모두 최초 1회 조회.
+      FINAL은 여기서 끝.
+    */
     void refreshHomeRelay();
-    const timer = window.setInterval(() => { void refreshHomeRelay(); }, 5000);
+
+    if (!isLive) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const timer =
+      window.setInterval(
+        () => {
+          void refreshHomeRelay();
+        },
+        5000
+      );
 
     return () => {
       cancelled = true;
-      window.clearInterval(timer);
+      window.clearInterval(
+        timer
+      );
     };
-  }, [activeTab, games, selectedGameId]);
+  }, [
+    activeTab,
+    games,
+    selectedGameId,
+  ]);
+
   const [odds,setAllOdds] = useState<Record<string,OddsInput>>({});
 
   // 사용자가 직접 저장한 경기별 배당
@@ -14582,15 +14710,21 @@ const [
 
             const hasGameStarted =
               (liveGame.status.inning ?? 0) > 0 ||
-              liveGame.flags.scoreAvailable ||
-              liveGame.score.away !== null ||
-              liveGame.score.home !== null;
+              !!liveGame.status.topBottom ||
+              liveGame.status.stateCode === "2" ||
+              liveGame.status.stateCode === "3";
 
             const cancelLabel =
               liveGame.status.cancelName ||
               (isCancelled ? "경기 취소" : "");
 
-            const relay = homeLiveRelay[liveGame.gameId];
+            const relay =
+              homeLiveRelay[
+                liveGame.gameId
+              ];
+
+            const finalSummary =
+              relay?.finalSummary;
 
             const logoMap: Record<string, string> = {
               KIA: "/api/kbo/team-logo?team=KIA",
@@ -14704,9 +14838,9 @@ const [
 
                     const gameStarted =
                       (g.status.inning ?? 0) > 0 ||
-                      g.flags.scoreAvailable ||
-                      g.score.away !== null ||
-                      g.score.home !== null;
+                      !!g.status.topBottom ||
+                      g.status.stateCode === "2" ||
+                      g.status.stateCode === "3";
 
                     const gameStatusLabel =
                       cancelled
@@ -14792,18 +14926,72 @@ const [
                         </div>
                         <div className="homeStatusV2">{mainStatus}</div>
 
-                        <div className="homeCountRowV2">
-                          <div className="homeCountBoxV2"><span>B</span><b>{relay?.balls ?? "—"}</b></div>
-                          <div className="homeCountBoxV2"><span>S</span><b>{relay?.strikes ?? "—"}</b></div>
-                          <div className="homeCountBoxV2"><span>O</span><b>{relay?.outs ?? "—"}</b></div>
-                        </div>
+                        {isFinished ? (
+                          <div className="homeFinalResultRowV5">
+                            <div>
+                              <span>승리투수</span>
+                              <b>
+                                {finalSummary?.winningPitcher || "-"}
+                              </b>
+                            </div>
+
+                            <div>
+                              <span>패전투수</span>
+                              <b>
+                                {finalSummary?.losingPitcher || "-"}
+                              </b>
+                            </div>
+
+                            <div>
+                              <span>세이브</span>
+                              <b>
+                                {finalSummary?.savePitcher || "-"}
+                              </b>
+                            </div>
+
+                            <div>
+                              <span>결승타</span>
+                              <b>
+                                {finalSummary?.gameWinningHit || "-"}
+                              </b>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="homeCountRowV2">
+                            <div className="homeCountBoxV2">
+                              <span>B</span>
+                              <b>{relay?.balls ?? "—"}</b>
+                            </div>
+
+                            <div className="homeCountBoxV2">
+                              <span>S</span>
+                              <b>{relay?.strikes ?? "—"}</b>
+                            </div>
+
+                            <div className="homeCountBoxV2">
+                              <span>O</span>
+                              <b>{relay?.outs ?? "—"}</b>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="homeInfoBarV2">
                           <strong>{mainMessage}</strong>
+
                           <small>
-                            투수 {relay?.pitcher || liveGame.startingPitchers.home?.name || liveGame.startingPitchers.away?.name || "-"}
-                            {" · "}
-                            타자 {relay?.batter || "경기 전"}
+                            {isFinished
+                              ? relay
+                                ? "공식 경기 종료 데이터 · 최종 기록 고정"
+                                : "최종 경기 기록 불러오는 중"
+                              : `투수 ${
+                                  relay?.pitcher ||
+                                  liveGame.startingPitchers.home?.name ||
+                                  liveGame.startingPitchers.away?.name ||
+                                  "-"
+                                } · 타자 ${
+                                  relay?.batter ||
+                                  "경기 전"
+                                }`}
                           </small>
                         </div>
                       </div>
