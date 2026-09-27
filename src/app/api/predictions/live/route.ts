@@ -1,6 +1,8 @@
+import { savePregameAnalysis, mergePregameResult } from "@/lib/pregame-analysis-store";
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { fetchKboGames } from "@/lib/kbo";
 
 export const dynamic = "force-dynamic";
 
@@ -88,8 +90,7 @@ type LivePrediction = {
 
   awayScore?: number | null;
 
-  homeScore?: number | null;
-};
+  homeScore?: number | null;    /*    * 경기기록 V2    */   starterSnapshot?: any;   lineupSnapshot?: any;   bullpenSnapshot?: any;   teamFormSnapshot?: any;   environmentSnapshot?: any; };
 
 type LiveStore = {
   version: 2;
@@ -1132,6 +1133,21 @@ async function postUnlocked(
               ? raw.promoted
               : undefined,
 
+          starterSnapshot:
+            previous?.starterSnapshot ?? raw?.starterSnapshot,
+
+          lineupSnapshot:
+            previous?.lineupSnapshot ?? raw?.lineupSnapshot,
+
+          bullpenSnapshot:
+            previous?.bullpenSnapshot ?? raw?.bullpenSnapshot,
+
+          teamFormSnapshot:
+            previous?.teamFormSnapshot ?? raw?.teamFormSnapshot,
+
+          environmentSnapshot:
+            previous?.environmentSnapshot ?? raw?.environmentSnapshot,
+
           firstCapturedAt:
             previous
               ?.firstCapturedAt ||
@@ -1274,6 +1290,8 @@ async function postUnlocked(
     store
   );
 
+  try { await savePregameAnalysis(date, games); } catch (error) { console.error("[PREGAME_ANALYSIS_SAVE_FAILED]", error); }
+
   return NextResponse.json({
     ok: true,
 
@@ -1303,3 +1321,52 @@ async function postUnlocked(
   });
 }
 
+
+
+/* SERVER_SNAPSHOT_SETTLEMENT_V1 */
+export async function PUT(request: Request) {
+  try {
+    const token = (await fs.readFile(path.join(process.cwd(), "data", ".history-settle-token"), "utf8")).trim();
+    if (!token || request.headers.get("authorization") !== "Bearer " + token) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+    const initial = await readStore();
+    const today = todayKst();
+    const dates = [...new Set(initial.predictions.filter(p => p.result === "PENDING" && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && p.date <= today).map(p => p.date))].sort().reverse().slice(0, 14);
+    const official = new Map<string, any>();
+    const failures: string[] = [];
+    for (const date of dates) {
+      try {
+        const games = await fetchKboGames(date.replaceAll("-", ""));
+        for (const game of games) official.set(date + "|" + game.gameId, game);
+      } catch (error) {
+        failures.push(date);
+        console.error("[HISTORY_SETTLEMENT_FETCH_FAILED]", date, error);
+      }
+    }
+    return await withStoreMutationLock(async () => {
+      const store = await readStore();
+      const now = new Date().toISOString();
+      let settled = 0;
+      for (const prediction of store.predictions) {
+        if (prediction.result !== "PENDING") continue;
+        const game = official.get(prediction.date + "|" + prediction.gameId);
+        if (!game) continue;
+        const canceled = String(game.status?.cancelName || "").trim();
+        const isCanceled = !!canceled && canceled !== "정상경기";
+        if (!isCanceled && (String(game.status?.stateCode) !== "3" || !Number.isInteger(game.score?.away) || !Number.isInteger(game.score?.home) || game.score.away < 0 || game.score.home < 0)) continue;
+        const result = settlePrediction(prediction, game);
+        if (result === "PENDING") continue;
+        prediction.result = result;
+         await mergePregameResult(prediction, game); 
+        prediction.settledAt = now;
+        prediction.awayScore = game.score?.away ?? null;
+        prediction.homeScore = game.score?.home ?? null;
+        settled++;
+      }
+      if (settled > 0) await writeStore(store);
+      return NextResponse.json({ ok: failures.length === 0, settled, checkedDates: dates, failedDates: failures, remaining: store.predictions.filter(p => p.result === "PENDING").length }, { headers: { "Cache-Control": "no-store" } });
+    });
+  } catch (error) {
+    console.error("[HISTORY_SETTLEMENT_FAILED]", error);
+    return NextResponse.json({ ok: false, error: "SETTLEMENT_FAILED" }, { status: 500 });
+  }
+}

@@ -60,10 +60,38 @@ export async function GET(request: Request) {
   ]);
 
   const betmanGames = Array.isArray(betman?.games) ? betman.games : [];
+  /* HISTORY_VERIFIED_BETMAN_V17 */
+  const betmanArchive = await readJson("kbo-betman-pregame-snapshots.json", { snapshots: [] });
+  const verifiedBetmanRows: any[] = Array.isArray(betmanArchive?.snapshots) ? betmanArchive.snapshots : [];
+  const verifiedBetmanByMatch = new Map<string, any[]>();
+  for (const row of verifiedBetmanRows) {
+    if (row?.source !== "BETMAN" || row?.capturePhase !== "PREGAME") continue;
+    const captured = Date.parse(row?.capturedAt), start = Date.parse(row?.commenceTime);
+    if (!Number.isFinite(captured) || !Number.isFinite(start) || captured >= start) continue;
+    addArray(verifiedBetmanByMatch, matchKey(row.date, row.awayTeamRaw, row.homeTeamRaw), row);
+  }
+
   const predictionRows = Array.isArray(predictions?.predictions) ? predictions.predictions : [];
   const recoveredRows = Array.isArray(recoveredAi?.predictions) ? recoveredAi.predictions : [];
   const oddsRows = Array.isArray(oddsHistory?.snapshots) ? oddsHistory.snapshots : [];
   const lineupRows = Array.isArray(lineups?.snapshots) ? lineups.snapshots : [];
+
+  /* HISTORY_ANALYSIS_DETAIL_V18 */
+  const analysisStore = await readJson("kbo-pregame-analysis-snapshots.json", { snapshots: [] });
+  const analysisById = new Map<string, any>();
+  for (const row of Array.isArray(analysisStore?.snapshots) ? analysisStore.snapshots : []) {
+    const captured = Date.parse(row?.capturedAt), start = Date.parse(row?.commenceTime);
+    if (row?.capturePhase !== "PREGAME" || !Number.isFinite(captured) || !Number.isFinite(start) || captured >= start) continue;
+    analysisById.set(gameKey(row.date, row.gameId), row);
+  }
+
+  /* HISTORY_RECOVERED_DETAILS_V19 */
+  const recoveredDetailsStore = await readJson("kbo-recovered-game-details.json", { snapshots: [] });
+  const recoveredDetailsById = new Map<string, any>();
+  for (const row of Array.isArray(recoveredDetailsStore?.snapshots) ? recoveredDetailsStore.snapshots : []) {
+    if (row?.capturePhase !== "RECOVERED" || row?.source !== "KBO_HISTORICAL_RECOVERY" || !row?.date || !row?.gameId || row?.game?.gameId !== row.gameId || String(row?.game?.status?.stateCode) !== "3") continue;
+    recoveredDetailsById.set(gameKey(row.date, row.gameId), row);
+  }
 
   const predById = new Map<string, any[]>();
   const predByMatch = new Map<string, any[]>();
@@ -122,14 +150,32 @@ export async function GET(request: Request) {
     }
   }
 
+  /* HISTORY_LIVE_SNAPSHOT_V16 */
+  const snapshotGames = new Map<string, any>();
+  const conflictingScores = new Set<string>();
+  for (const row of predictionRows) {
+    if (text(row?.engineVersion) !== "v0.1" || row?.scope !== "ALL") continue;
+    if (!["WIN", "LOSS", "PUSH"].includes(text(row?.result))) continue;
+    const date = text(row?.date), id = text(row?.gameId);
+    const away = num(row?.awayScore), home = num(row?.homeScore);
+    if (!date || !id || !awayOf(row) || !homeOf(row) || !row?.settledAt) continue;
+    if (away === null || home === null || !Number.isInteger(away) || !Number.isInteger(home) || away < 0 || home < 0) continue;
+    const key = gameKey(date, id);
+    const previous = snapshotGames.get(key);
+    if (previous && (previous.actualScore.away !== away || previous.actualScore.home !== home)) conflictingScores.add(key);
+    snapshotGames.set(key, { id, gameId: id, date, awayTeam: awayOf(row), homeTeam: homeOf(row), actualScore: { away, home }, canceled: false, liveSnapshot: true });
+  }
+  const completedSnapshots = [...snapshotGames.entries()].filter(([key]) => !conflictingScores.has(key)).map(([, game]) => game);
+  const snapshotMatches = new Set(completedSnapshots.map(g => matchKey(g.date, g.awayTeam, g.homeTeam)));
+  const historySources = [...completedSnapshots, ...betmanGames.filter((g: any) => !snapshotMatches.has(matchKey(g?.date, g?.awayTeam, g?.homeTeam)))];
   const seen = new Set<string>();
-  const games = betmanGames
+  const games = historySources
     .filter((g: any) => {
       const date = text(g?.date);
       if (!date.startsWith(year + "-")) return false;
       if (month && !date.startsWith(year + "-" + month.padStart(2, "0") + "-")) return false;
       if (g?.actualScore == null || g?.canceled) return false;
-      const mk = matchKey(date, g?.awayTeam, g?.homeTeam);
+      const mk = g?.liveSnapshot ? gameKey(date, g.gameId) : matchKey(date, g?.awayTeam, g?.homeTeam);
       if (seen.has(mk)) return false;
       seen.add(mk);
       return true;
@@ -141,7 +187,7 @@ export async function GET(request: Request) {
 
       const matchOdds = (oddsByMatch.get(mk) || []).slice().sort((a: any,b: any) => text(a?.capturedAt).localeCompare(text(b?.capturedAt)));
       const lastOdds = matchOdds.length ? matchOdds[matchOdds.length - 1] : null;
-      const resolvedGameId = text(lastOdds?.gameId) || text((lineupByMatch.get(mk) || {})?.gameId) || betmanId;
+      const resolvedGameId = text(g?.gameId) || text(lastOdds?.gameId) || text((lineupByMatch.get(mk) || {})?.gameId) || betmanId;
       const idKey = gameKey(date, resolvedGameId);
 
       const originalFrozen = (
@@ -198,7 +244,30 @@ export async function GET(request: Request) {
 
       const idOdds = (oddsById.get(idKey) || []).slice().sort((a: any,b: any) => text(a?.capturedAt).localeCompare(text(b?.capturedAt)));
       const finalOdds = idOdds.length ? idOdds[idOdds.length - 1] : lastOdds;
-      const lineup = lineupById.get(idKey) || lineupByMatch.get(mk) || null;
+      const verifiedCandidates = verifiedBetmanByMatch.get(mk) || [];
+      const archivedCandidates = betmanGames.filter((row: any) => matchKey(row?.date, row?.awayTeam, row?.homeTeam) === mk);
+      const verifiedRow = verifiedCandidates.length === 1 ? verifiedCandidates[0] : null;
+      const historicalRow = archivedCandidates.length === 1 ? archivedCandidates[0] : null;
+      const betmanRaw = verifiedRow || historicalRow;
+      const betmanOdds = betmanRaw ? {
+        capturedAt: verifiedRow?.capturedAt ?? null,
+        awayMl: betmanRaw.moneyline?.awayOdds ?? null, homeMl: betmanRaw.moneyline?.homeOdds ?? null,
+        awayHandicapLine: betmanRaw.spread?.awayLine ?? null, homeHandicapLine: betmanRaw.spread?.homeLine ?? null,
+        awayHandicap: betmanRaw.spread?.awayOdds ?? null, homeHandicap: betmanRaw.spread?.homeOdds ?? null,
+        totalLine: betmanRaw.total?.line ?? null, overOdds: betmanRaw.total?.overOdds ?? null, underOdds: betmanRaw.total?.underOdds ?? null,
+        source: verifiedRow ? "BETMAN_PREGAME" : "BETMAN_HISTORICAL"
+      } : null;
+
+      const analysisSnapshot = analysisById.get(idKey) || null;
+      const recoveredDetails = recoveredDetailsById.get(idKey) || null;
+      const savedLineup = analysisSnapshot?.lineup;
+      const lineup = savedLineup?.ready === true ? {
+        confirmed: true,
+        away: { lineup: savedLineup.away?.players ?? [], summary: savedLineup.away?.baseSummary ?? null },
+        home: { lineup: savedLineup.home?.players ?? [], summary: savedLineup.home?.baseSummary ?? null },
+        lineupEdge: savedLineup.edge ?? null
+      } : lineupById.get(idKey) || lineupByMatch.get(mk) || recoveredDetails?.lineup || null;
+      const recoveredLineupUsed = !!lineup && lineup === recoveredDetails?.lineup;
 
       let awayScore: number | null = null;
       let homeScore: number | null = null;
@@ -499,6 +568,8 @@ export async function GET(request: Request) {
           odds: pick?.odds ?? null,
           grade: text(pick?.grade) || null,
           ev: pick?.ev ?? null,
+          handicapLine: text(pick?.market) === "HANDICAP" ? (() => { const nums = text(pick?.label).match(/[+-]?\d+(?:\.\d+)?/g); return nums?.length ? Number(nums[nums.length - 1]) : null; })() : null,
+          totalLine: text(pick?.market) === "TOTAL" ? (num(pick?.totalLine) ?? (() => { const nums = text(pick?.label).match(/\d+(?:\.\d+)?/g); return nums?.length ? Number(nums[nums.length - 1]) : null; })()) : null,
           message,
         };
       });
@@ -606,7 +677,7 @@ export async function GET(request: Request) {
       return {
         gameId: resolvedGameId, betmanId, date,
         commenceTime:g?.commenceTime ?? null, stadium:g?.stadium ?? null,
-        awayTeamName:text(g?.awayTeam), homeTeamName:text(g?.homeTeam),
+        awayTeamName:text(g?.awayTeam ?? lastOdds?.awayTeam ?? lastOdds?.awayTeamName), homeTeamName:text(g?.homeTeam ?? lastOdds?.homeTeam ?? lastOdds?.homeTeamName),
         awayScore, homeScore, finalScoreRaw:g?.actualScore ?? null,
         ai:{
           frozen: picks.length > 0,
@@ -637,15 +708,18 @@ export async function GET(request: Request) {
         },
 
         feedback,
-        betman: finalOdds ? {
-          capturedAt:finalOdds.capturedAt ?? null,
-          awayMl:finalOdds.awayMl ?? null, homeMl:finalOdds.homeMl ?? null,
-          awayHandicapLine:finalOdds.awayHandicapLine ?? null, homeHandicapLine:finalOdds.homeHandicapLine ?? null,
-          awayHandicap:finalOdds.awayHandicap ?? null, homeHandicap:finalOdds.homeHandicap ?? null,
-          totalLine:finalOdds.totalLine ?? null, overOdds:finalOdds.overOdds ?? null, underOdds:finalOdds.underOdds ?? null,
-          source:finalOdds.source ?? null,
+        betman: betmanOdds ? {
+          capturedAt:betmanOdds.capturedAt ?? null,
+          awayMl:betmanOdds.awayMl ?? null, homeMl:betmanOdds.homeMl ?? null,
+          awayHandicapLine:betmanOdds.awayHandicapLine ?? null, homeHandicapLine:betmanOdds.homeHandicapLine ?? null,
+          awayHandicap:betmanOdds.awayHandicap ?? null, homeHandicap:betmanOdds.homeHandicap ?? null,
+          totalLine:betmanOdds.totalLine ?? null, overOdds:betmanOdds.overOdds ?? null, underOdds:betmanOdds.underOdds ?? null,
+          source:betmanOdds.source ?? null,
         } : null,
         lineup: lineup ? { confirmed:!!lineup.confirmed, away:lineup.away ?? null, home:lineup.home ?? null, lineupEdge:lineup.lineupEdge ?? null } : null,
+        pregameAnalysis: analysisSnapshot,
+        recoveredAnalysis: recoveredDetails,
+        lineupRecovered: recoveredLineupUsed,
         snapshotOnly:true,
         join:{
           matchupKey: mk,
@@ -666,12 +740,12 @@ export async function GET(request: Request) {
 
           oddsSource:
             finalOdds
-              ? "kbo-odds-history"
+              ? (betmanOdds?.source ?? "kbo-odds-history")
               : null,
 
           lineupSource:
             lineup
-              ? "kbo-historical-lineup-stats-2026"
+              ? (recoveredLineupUsed ? "KBO_HISTORICAL_RECOVERY" : savedLineup?.ready === true ? "kbo-pregame-analysis-snapshots" : "kbo-historical-lineup-stats-2026")
               : null,
         },
       };

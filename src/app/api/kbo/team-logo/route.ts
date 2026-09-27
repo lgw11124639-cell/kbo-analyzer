@@ -1,0 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
+const TEAM: Record<string,string> = { KIA:"HT", "두산":"OB", "삼성":"SS", LG:"LG", "롯데":"LT", "한화":"HH", SSG:"SK", KT:"KT", NC:"NC", "키움":"WO" };
+export async function GET(req: NextRequest) { const team=(req.nextUrl.searchParams.get("team")??"").trim(); const code=TEAM[team]; if(!code) return new NextResponse(null,{status:404}); try { const r=await fetch(`https://sports-phinf.pstatic.net/team/kbo/default/${code}.png`,{headers:{"User-Agent":"Mozilla/5.0",Referer:"https://m.sports.naver.com/"},cache:"force-cache"}); if(!r.ok) return new NextResponse(null,{status:502}); const b=await r.arrayBuffer(); return new NextResponse(b,{headers:{"Content-Type":r.headers.get("content-type")||"image/png","Cache-Control":"public, max-age=86400"}}); } catch { return new NextResponse(null,{status:502}); } }

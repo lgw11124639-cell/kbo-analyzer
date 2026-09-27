@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+const KBO_URL = "https://www.koreabaseball.com/Game/LiveTextView2.aspx";
+
+function decodeHtml(value: string) {
+  return value.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+}
+
+function clean(value = "") {
+  return decodeHtml(value.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+}
+
+function one(html: string, re: RegExp) {
+  return clean(html.match(re)?.[1] ?? "");
+}
+
+function count(html: string, re: RegExp) {
+  return Array.from(html.matchAll(re)).length;
+}
+
+export async function GET(req: NextRequest) {
+  const gameId = (req.nextUrl.searchParams.get("gameId") ?? "").trim();
+  const year = (req.nextUrl.searchParams.get("year") ?? gameId.slice(0, 4)).trim();
+
+  if (!/^\d{8}[A-Z0-9]{4,}$/.test(gameId) || !/^\d{4}$/.test(year)) {
+    return NextResponse.json({ ok: false, error: "invalid gameId/year" }, { status: 400 });
+  }
+
+  const body = new URLSearchParams({ leagueId: "1", seriesId: "0", gameId, gyear: year });
+
+  try {
+    const res = await fetch(KBO_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "User-Agent": "Mozilla/5.0 KBO-Analyzer/0.1",
+        Referer: `https://www.koreabaseball.com/Game/LiveText.aspx?leagueId=1&seriesId=0&gameId=${encodeURIComponent(gameId)}&gyear=${encodeURIComponent(year)}`,
+      },
+      body: body.toString(),
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return NextResponse.json({ ok: false, error: `KBO HTTP ${res.status}` }, { status: 502 });
+    }
+
+    const html = await res.text();
+    const economy = html.match(/<div class="economy">([\s\S]*?)<div class="broadcast">/i)?.[1] ?? "";
+    const baseBlock = economy.match(/<span class="base">([\s\S]*?)<\/span>/i)?.[1] ?? "";
+    const inningText = one(baseBlock, /<strong>([\s\S]*?)<\/strong>/i);
+    const strongs = Array.from(baseBlock.matchAll(/<strong>([\s\S]*?)<\/strong>/gi)).map((m) => clean(m[1]));
+    const countText = strongs[1] ?? "";
+    const countMatch = countText.match(/(\d+)\s*-\s*(\d+)\s+(\d+)\s*out/i);
+    const inningNo = Number(inningText.match(/(\d+)\s*회/)?.[1] ?? 0);
+    const ballsBlock = economy.match(/<div class="b">([\s\S]*?)<\/div>/i)?.[1] ?? "";
+    const strikesBlock = economy.match(/<div class="s">([\s\S]*?)<\/div>/i)?.[1] ?? "";
+    const outsBlock = economy.match(/<div class="o">([\s\S]*?)<\/div>/i)?.[1] ?? "";
+    const runner1 = one(economy, /<li class=['"]typing1['"]>([\s\S]*?)<\/li>/i) || null;
+    const runner2 = one(economy, /<li class=['"]typing2['"]>([\s\S]*?)<\/li>/i) || null;
+    const runner3 = one(economy, /<li class=['"]typing3['"]>([\s\S]*?)<\/li>/i) || null;
+    const baseCode = Number(economy.match(/ground_base(\d+)\.png/i)?.[1] ?? 0);
+
+    const liveTexts: string[] = [];
+    if (inningNo > 0) {
+      const re = new RegExp(`<span id=["']rptLiveText${inningNo}_spanLiveText_\\d+["'][^>]*>([\\s\\S]*?)<\\/span>`, "gi");
+      for (const m of html.matchAll(re)) {
+        const t = clean(m[1]);
+        if (t && t !== "-") liveTexts.push(t);
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      gameId,
+      inning: inningText || null,
+      countText: countText || null,
+      balls: countMatch ? Number(countMatch[1]) : count(ballsBlock, /<li[^>]*class=["']on["'][^>]*>\s*ball\s*<\/li>/gi),
+      strikes: countMatch ? Number(countMatch[2]) : count(strikesBlock, /<li[^>]*class=["']on["'][^>]*>\s*strike\s*<\/li>/gi),
+      outs: countMatch ? Number(countMatch[3]) : count(outsBlock, /<li[^>]*class=["']on["'][^>]*>\s*out\s*<\/li>/gi),
+      pitcher: one(economy, /<li class=["']pitcher["']>([\s\S]*?)<\/li>/i) || null,
+      batter: one(economy, /<li class=["']supervision\d*["']>([\s\S]*?)<\/li>/i) || null,
+      runners: { first: runner1, second: runner2, third: runner3 },
+      baseCode,
+      recentPlays: liveTexts.slice(-8),
+      source: "KBO_LIVE_TEXT",
+      fetchedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "live relay fetch failed" }, { status: 502 });
+  }
+}

@@ -351,6 +351,33 @@ function waitForResponseText(page, needle, timeout = 30000) {
   });
 }
 
+/* BETMAN_PREGAME_ARCHIVE_V1 */
+function archivePregameOdds(output) {
+  const file = path.join(ROOT, "data", "kbo-betman-pregame-snapshots.json");
+  let store = { version: 1, snapshots: [] };
+  if (fs.existsSync(file)) {
+    store = JSON.parse(fs.readFileSync(file, "utf8"));
+    if (!Array.isArray(store.snapshots)) throw new Error("INVALID_BETMAN_ARCHIVE");
+  }
+  const key = x => [x.date, x.awayTeamRaw, x.homeTeamRaw, x.commenceTime].join("|");
+  const rows = new Map(store.snapshots.map(x => [key(x), x]));
+  const captured = Date.parse(output.fetchedAt);
+  let saved = 0;
+  for (const event of output.events) {
+    const start = Date.parse(event.commenceTime);
+    if (event.provider !== "betman" || !Number.isFinite(start) || !Number.isFinite(captured) || captured >= start) continue;
+    const previous = rows.get(key(event));
+    if (previous && Date.parse(previous.capturedAt) >= captured) continue;
+    rows.set(key(event), { ...event, source: "BETMAN", capturedAt: output.fetchedAt, gmTs: output.gmTs, round: output.round, capturePhase: "PREGAME" });
+    saved++;
+  }
+  if (!saved) return;
+  const temp = file + ".tmp-" + process.pid;
+  fs.writeFileSync(temp, JSON.stringify({ version: 1, updatedAt: output.fetchedAt, snapshots: [...rows.values()] }, null, 2), "utf8");
+  fs.renameSync(temp, file);
+  console.log("[BETMAN_PREGAME_ARCHIVE] saved=" + saved + " total=" + rows.size);
+}
+
 async function collect() {
   console.log(
     "===== BETMAN KBO COLLECTOR ====="
@@ -614,6 +641,8 @@ async function collect() {
       tempFile,
       OUTPUT_FILE
     );
+
+    archivePregameOdds(output);
 
     console.log();
     console.log(
