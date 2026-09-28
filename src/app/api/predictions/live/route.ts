@@ -66,6 +66,7 @@ type LivePrediction = {
   bullpenEdge?: number | null;
   lineupEdge?: number | null;
   projectedTotal?: number | null;
+  projectedScore?: { awayRuns: number; homeRuns: number; total: number } | null;
 
   shadowRule?: string;
   baselineLabel?: string;
@@ -1093,6 +1094,21 @@ async function postUnlocked(
                   )
                   ? Number(raw.projectedTotal)
                   : undefined,
+
+          /* PREGAME_PROJECTED_SCORE_FREEZE_V1 */
+          projectedScore:
+            previous?.projectedScore !== undefined
+              ? previous.projectedScore
+              : raw?.projectedScore &&
+                Number.isFinite(Number(raw.projectedScore.awayRuns)) &&
+                Number.isFinite(Number(raw.projectedScore.homeRuns)) &&
+                Number.isFinite(Number(raw.projectedScore.total))
+                ? {
+                    awayRuns: Number(raw.projectedScore.awayRuns),
+                    homeRuns: Number(raw.projectedScore.homeRuns),
+                    total: Number(raw.projectedScore.total),
+                  }
+                : undefined,
 
           shadowRule:
             raw?.shadowRule

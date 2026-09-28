@@ -35,6 +35,22 @@ export async function savePregameAnalysis(date: string, incoming: any[]) {
     }
     const lineup = payload.lineup;
     if (lineup?.ready === true && lineup.gameId === game.gameId && lineup.date === date && lineup.away?.confirmed === true && lineup.home?.confirmed === true) next.lineup = lineup;
+
+    /* PREGAME_PROJECTED_SCORE_SNAPSHOT_V1 */
+    if (previous?.projectedScore === undefined) {
+      const predictions = Array.isArray((input as any)?.allPredictions) ? (input as any).allPredictions : [];
+      const score = predictions.find((x: any) =>
+        x?.projectedScore &&
+        Number.isFinite(Number(x.projectedScore.awayRuns)) &&
+        Number.isFinite(Number(x.projectedScore.homeRuns)) &&
+        Number.isFinite(Number(x.projectedScore.total))
+      )?.projectedScore;
+      if (score) next.projectedScore = {
+        awayRuns: Number(score.awayRuns),
+        homeRuns: Number(score.homeRuns),
+        total: Number(score.total),
+      };
+    }
     rows.set(key, next);
     saved++;
   }

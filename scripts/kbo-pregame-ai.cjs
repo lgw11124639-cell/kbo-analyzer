@@ -65,7 +65,7 @@ function projectedTotal(row) {
   const lc=(x)=>x===null?0:LB*(x-LM), sc=(x)=>x===null?0:SB*(x-SM);
   const common=(sc(num(af?.seasonAvgRuns))+sc(num(hf?.seasonAvgRuns)))/2;
   away+=lc(al)+common; home+=lc(hl)+common;
-  return Number((away+home).toFixed(2));
+  return { awayRuns:Number(away.toFixed(2)), homeRuns:Number(home.toFixed(2)), total:Number((away+home).toFixed(2)) };
 }
 
 const implied=o=>o&&o>1?1/o:null;
@@ -118,13 +118,13 @@ async function buildAutoPredictions(date,game,payload,commenceTime){
   const row={date,gameId:game.gameId,game,starterStats:payload?.starterStats||{},teamForms:payload?.teamForms||{},bullpens:payload?.bullpens||{},lineup:payload?.lineup||null};
   const odds=await oddsFor(date,game,commenceTime);
   const as=starterScore(row.starterStats.away), hs=starterScore(row.starterStats.home), af=formScore(row.teamForms.away), hf=formScore(row.teamForms.home), ab=bullpenScore(row.bullpens.away), hb=bullpenScore(row.bullpens.home);
-  const se=as!==null&&hs!==null?as-hs:0, fe=af!==null&&hf!==null?af-hf:0, be=ab!==null&&hb!==null?ab-hb:0, le=row.lineup?.ready&&num(row.lineup?.edge)!==null?Number(row.lineup.edge):0, pt=projectedTotal(row);
+  const se=as!==null&&hs!==null?as-hs:0, fe=af!==null&&hf!==null?af-hf:0, be=ab!==null&&hb!==null?ab-hb:0, le=row.lineup?.ready&&num(row.lineup?.edge)!==null?Number(row.lineup.edge):0, projectedScore=projectedTotal(row), pt=projectedScore?.total ?? null;
   const picks=analyze(game,odds,se,fe,be,le,pt);
   const selected=new Map();
   for(const p of picks){const q=selected.get(p.market);if(!q||p.confidence>q.confidence)selected.set(p.market,p);}
   const hc=picks.filter(p=>p.market==="HANDICAP"), minus=hc.find(p=>p.label.includes("-1.5")), plus=hc.find(p=>p.label.includes("+1.5"));
   if(minus&&plus){const mt=minus.label.startsWith(game.awayTeamName)?game.awayTeamName:(minus.label.startsWith(game.homeTeamName)?game.homeTeamName:null);const ml=picks.find(p=>p.market==="ML"&&p.label===`${mt} 승`);if(ml)selected.set("HANDICAP",ml.confidence>=0.675?minus:plus);}
-  return [...selected.values()].map(p=>({...p,starterEdge:se,formEdge:fe,bullpenEdge:be,lineupEdge:le,projectedTotal:pt,totalLine:odds.totalLine}));
+  return [...selected.values()].map(p=>({...p,starterEdge:se,formEdge:fe,bullpenEdge:be,lineupEdge:le,projectedTotal:pt,projectedScore,totalLine:odds.totalLine}));
 }
 
 module.exports={buildAutoPredictions};

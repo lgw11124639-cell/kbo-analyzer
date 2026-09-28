@@ -2189,7 +2189,7 @@ function selectHandicap15Direction(
 function GameCard({
   analysisUserId,
   onAnalysisBalanceChange,
-  openPurchasedAnalysis = false,   archiveMode = false, archiveFinalScore = null,   forcedAnalysisSection,   hideAnalysisTabs = false,
+  openPurchasedAnalysis = false,   archiveMode = false, archiveFinalScore = null, archiveProjectedScore = null,   forcedAnalysisSection,   hideAnalysisTabs = false,
   game,
   odds,
   setOdds,
@@ -2224,7 +2224,7 @@ function GameCard({
   analysisUserId: string | null;
   onAnalysisBalanceChange: (balance: number) => void;
   openPurchasedAnalysis?: boolean;   archiveMode?: boolean;
-  archiveFinalScore?: { away: number; home: number } | null;   forcedAnalysisSection?: "summary" | "starter" | "lineup" | "flow" | "ai" | "picks";   hideAnalysisTabs?: boolean;
+  archiveFinalScore?: { away: number; home: number } | null;   archiveProjectedScore?: { awayRuns: number; homeRuns: number; total: number } | null;   forcedAnalysisSection?: "summary" | "starter" | "lineup" | "flow" | "ai" | "picks";   hideAnalysisTabs?: boolean;
 }) {
 
   const awayStarterStats =
@@ -2340,9 +2340,10 @@ function GameCard({
       ? (() => { const savedPick = frozenPicks.find((item) => { const value = (item as Pick & { projectedTotal?: number | null }).projectedTotal; return typeof value === "number" && Number.isFinite(value); }); return savedPick ? (savedPick as Pick & { projectedTotal?: number | null }).projectedTotal ?? null : null; })()
       : null;
 
+  /* HISTORY_ARCHIVE_PROJECTED_SCORE_V2 */
   const projectedScores =
     archiveMode
-      ? null
+      ? archiveProjectedScore
       : estimateProjectedScores(
           awayTeamForm,
           homeTeamForm,
@@ -2355,7 +2356,9 @@ function GameCard({
         );
 
   const projectedTotal =
-    archiveMode ? archivedProjectedTotal : projectedScores?.total ?? null;
+    archiveMode
+      ? archiveProjectedScore?.total ?? archivedProjectedTotal
+      : projectedScores?.total ?? null;
 
   /*
     SCORE DISPLAY V1
@@ -17596,7 +17599,7 @@ const [
                       </section>
                     )}
 
-                    {/* HISTORY_REAL_GAMECARD_REUSE_V1 */}                     {historyDetailTab !== "summary" && historyDetailTab !== "betman" && (() => {                       const snap = selectedHistory?.pregameAnalysis;                       const archiveGame = snap?.game as KboGame | undefined;                       if (!archiveGame) return <section className="historyTabSectionV9"><div className="historyTabTitleV9"><div><small>PREGAME SNAPSHOT</small><h3>당시 경기 전 분석 저장본 없음</h3></div></div><p>이 경기는 경기 전 분석 화면 스냅샷이 저장되지 않아 원본 분석 화면을 재생할 수 없습니다.</p></section>;                       const starterMap: Record<number, PitcherStats> = {};                       const awayStarterId = archiveGame.startingPitchers?.away?.id;                       const homeStarterId = archiveGame.startingPitchers?.home?.id;                       if (awayStarterId && snap?.starterStats?.away) starterMap[awayStarterId] = snap.starterStats.away as PitcherStats;                       if (homeStarterId && snap?.starterStats?.home) starterMap[homeStarterId] = snap.starterStats.home as PitcherStats;                       const formMap: Record<string, TeamForm> = {};                       if (archiveGame.awayTeamCode && snap?.teamForms?.away) formMap[archiveGame.awayTeamCode] = snap.teamForms.away as TeamForm;                       if (archiveGame.homeTeamCode && snap?.teamForms?.home) formMap[archiveGame.homeTeamCode] = snap.teamForms.home as TeamForm;                       const bullpenMap: Record<string, BullpenData> = {};                       if (archiveGame.awayTeamCode && snap?.bullpens?.away) bullpenMap[archiveGame.awayTeamCode] = snap.bullpens.away as BullpenData;                       if (archiveGame.homeTeamCode && snap?.bullpens?.home) bullpenMap[archiveGame.homeTeamCode] = snap.bullpens.home as BullpenData;                       const savedLineup = (snap?.lineup ?? selectedHistory?.lineup) as LineupMatchupData | undefined;                       const lineupMap: Record<string, LineupMatchupData> = savedLineup ? { [archiveGame.gameId]: savedLineup } : {};                       const archiveOdds = ((selectedHistory?.betman?.odds ?? selectedHistory?.betman ?? {}) as OddsInput);                       const archiveSection = historyDetailTab === "premium" ? "picks" : historyDetailTab as "ai" | "starter" | "lineup" | "flow";                       return <div className="historyRealGameCardArchiveV1"><GameCard key={`${archiveGame.gameId}-${archiveSection}`} archiveMode hideAnalysisTabs forcedAnalysisSection={archiveSection} analysisUserId={null} onAnalysisBalanceChange={()=>{}} game={archiveGame} odds={archiveOdds} setOdds={()=>{}} pitcherStats={starterMap} teamForms={formMap} bullpens={bullpenMap} lineupMatchups={lineupMap} oddsLocked oddsSaveBusy={false} oddsSaveMessage="" onSaveOdds={()=>{}} onUnlockOdds={()=>{}} selectedPickKeys={[]} onTogglePick={()=>{}} archiveFinalScore={Number.isFinite(Number(selectedHistory?.awayScore)) && Number.isFinite(Number(selectedHistory?.homeScore)) ? { away: Number(selectedHistory?.awayScore), home: Number(selectedHistory?.homeScore) } : null} frozenPicks={(selectedHistory?.ai?.picks ?? []) as Pick[]} /></div>;                     })()}                     {/* HISTORY_PRO_BASEBALL_ANALYSIS_V9 */}
+                    {/* HISTORY_REAL_GAMECARD_REUSE_V1 */}                     {historyDetailTab !== "summary" && historyDetailTab !== "betman" && (() => {                       const snap = selectedHistory?.pregameAnalysis;                       const archiveGame = snap?.game as KboGame | undefined;                       if (!archiveGame) return <section className="historyTabSectionV9"><div className="historyTabTitleV9"><div><small>PREGAME SNAPSHOT</small><h3>당시 경기 전 분석 저장본 없음</h3></div></div><p>이 경기는 경기 전 분석 화면 스냅샷이 저장되지 않아 원본 분석 화면을 재생할 수 없습니다.</p></section>;                       const starterMap: Record<number, PitcherStats> = {};                       const awayStarterId = archiveGame.startingPitchers?.away?.id;                       const homeStarterId = archiveGame.startingPitchers?.home?.id;                       if (awayStarterId && snap?.starterStats?.away) starterMap[awayStarterId] = snap.starterStats.away as PitcherStats;                       if (homeStarterId && snap?.starterStats?.home) starterMap[homeStarterId] = snap.starterStats.home as PitcherStats;                       const formMap: Record<string, TeamForm> = {};                       if (archiveGame.awayTeamCode && snap?.teamForms?.away) formMap[archiveGame.awayTeamCode] = snap.teamForms.away as TeamForm;                       if (archiveGame.homeTeamCode && snap?.teamForms?.home) formMap[archiveGame.homeTeamCode] = snap.teamForms.home as TeamForm;                       const bullpenMap: Record<string, BullpenData> = {};                       if (archiveGame.awayTeamCode && snap?.bullpens?.away) bullpenMap[archiveGame.awayTeamCode] = snap.bullpens.away as BullpenData;                       if (archiveGame.homeTeamCode && snap?.bullpens?.home) bullpenMap[archiveGame.homeTeamCode] = snap.bullpens.home as BullpenData;                       const savedLineup = (snap?.lineup ?? selectedHistory?.lineup) as LineupMatchupData | undefined;                       const lineupMap: Record<string, LineupMatchupData> = savedLineup ? { [archiveGame.gameId]: savedLineup } : {};                       const archiveOdds = ((selectedHistory?.betman?.odds ?? selectedHistory?.betman ?? {}) as OddsInput);                       const archiveSection = historyDetailTab === "premium" ? "picks" : historyDetailTab as "ai" | "starter" | "lineup" | "flow";                       return <div className="historyRealGameCardArchiveV1"><GameCard key={`${archiveGame.gameId}-${archiveSection}`} archiveMode hideAnalysisTabs forcedAnalysisSection={archiveSection} analysisUserId={null} onAnalysisBalanceChange={()=>{}} game={archiveGame} odds={archiveOdds} setOdds={()=>{}} pitcherStats={starterMap} teamForms={formMap} bullpens={bullpenMap} lineupMatchups={lineupMap} oddsLocked oddsSaveBusy={false} oddsSaveMessage="" onSaveOdds={()=>{}} onUnlockOdds={()=>{}} selectedPickKeys={[]} onTogglePick={()=>{}} archiveFinalScore={Number.isFinite(Number(selectedHistory?.awayScore)) && Number.isFinite(Number(selectedHistory?.homeScore)) ? { away: Number(selectedHistory?.awayScore), home: Number(selectedHistory?.homeScore) } : null} archiveProjectedScore={snap?.projectedScore && Number.isFinite(Number(snap.projectedScore.awayRuns)) && Number.isFinite(Number(snap.projectedScore.homeRuns)) && Number.isFinite(Number(snap.projectedScore.total)) ? { awayRuns: Number(snap.projectedScore.awayRuns), homeRuns: Number(snap.projectedScore.homeRuns), total: Number(snap.projectedScore.total) } : null} frozenPicks={(selectedHistory?.ai?.picks ?? []) as Pick[]} /></div>;                     })()}                     {/* HISTORY_PRO_BASEBALL_ANALYSIS_V9 */}
 {false && historyDetailTab === "ai" && (() => {
   const picks = selectedHistory?.ai?.picks ?? [];
 

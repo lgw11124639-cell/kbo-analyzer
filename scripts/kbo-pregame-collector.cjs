@@ -31,7 +31,7 @@ async function run() {
       const payload = { starterStats: {}, teamForms: {}, bullpens: {} };
       const save = async (allPredictions = []) => {
         if (!eligible(game, date)) return;
-        await api("/api/predictions/live", { date, engineVersion: "v0.1", allPredictions, aiPredictions: [], games: [{ ...game, pregameSnapshot: payload }] });
+        await api("/api/predictions/live", { date, engineVersion: "v0.1", allPredictions, aiPredictions: [], games: [{ ...game, pregameSnapshot: payload, allPredictions }] });
       };
       await save();
       for (const side of ["away", "home"]) {
