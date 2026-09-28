@@ -6,6 +6,7 @@ export type MainSidebarTab =
   | "combos"
   | "history"
   | "community"
+  | "store"
   | "my-combos"
   | "settings";
 
@@ -81,6 +82,15 @@ export default function AppSidebar({
         </button>
 
         <button type="button" className={active === "community" ? "active" : ""} onClick={() => openMain("community")}>커뮤니티</button>
+
+        {/* STORE_SIDEBAR_NAV_V3 */}
+        <button
+          type="button"
+          className={active === "store" ? "active" : ""}
+          onClick={() => openMain("store")}
+        >
+          상점
+        </button>
 
         <button
           type="button"

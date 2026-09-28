@@ -1,6 +1,7 @@
 "use client";
 import AppSidebar from "../components/AppSidebar";
 import CommunityPage from "../components/CommunityPage";
+import StorePage from "../components/StorePage";
 
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -8213,6 +8214,70 @@ type HomeLiveRelay = {
   fetchedAt: string;
 };
 
+/* HOME_COMMUNITY_FEED_COMPONENT_V1 */
+function HomeCommunityFeedLoader({
+  onPosts,
+  onLoading,
+}: {
+  onPosts: (posts: Array<{
+    id: string;
+    author_name: string;
+    category: string;
+    title: string;
+    content: string;
+    is_notice?: boolean;
+    like_count: number;
+    comment_count: number;
+    created_at: string;
+  }>) => void;
+  onLoading: (loading: boolean) => void;
+}) {
+  useEffect(() => {
+    let alive = true;
+
+    const run = async () => {
+      onLoading(true);
+
+      try {
+        const response = await fetch(
+          "/api/community/posts?sort=latest",
+          { cache: "no-store" }
+        );
+
+        const json = await response.json();
+
+        if (
+          alive &&
+          response.ok &&
+          json?.ok
+        ) {
+          onPosts(
+            Array.isArray(json.posts)
+              ? json.posts
+              : []
+          );
+        }
+      } catch {
+        if (alive) {
+          onPosts([]);
+        }
+      } finally {
+        if (alive) {
+          onLoading(false);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      alive = false;
+    };
+  }, [onLoading, onPosts]);
+
+  return null;
+}
+
 /* ODDS_TWO_DECIMAL_DISPLAY_V1 */
 export default function Home() {
   const [selectedGameId, setSelectedGameId] =
@@ -8221,13 +8286,35 @@ export default function Home() {
   const [homeLiveRelay, setHomeLiveRelay] =
     useState<Record<string, HomeLiveRelay>>({});
 
+  /* HOME_COMMUNITY_FEED_V1 */
+  type HomeCommunityPost = {
+    id: string;
+    author_name: string;
+    category: string;
+    title: string;
+    content: string;
+    is_notice?: boolean;
+    like_count: number;
+    comment_count: number;
+    created_at: string;
+  };
+
+  const [homeCommunityPosts, setHomeCommunityPosts] =
+    useState<HomeCommunityPost[]>([]);
+
+  const [homeCommunityLoading, setHomeCommunityLoading] =
+    useState(false);
+
+  const [communityOpenPostId, setCommunityOpenPostId] =
+    useState<string | null>(null);
+
   const [activeTab, setActiveTab] =
     useState<
       "home" |
       "games" |
       "combos" |
       "history" |
-      "community" |
+      "community" | "store" |
       "my-combos" |
       "settings"
     >("home");
@@ -9229,6 +9316,41 @@ export default function Home() {
   }, [authUser?.id]);
 
 const [
+    myPageJerseyNumber,
+    setMyPageJerseyNumber,
+  ] = useState<string | null>(null);
+
+  const [
+    myPageJerseySelected,
+    setMyPageJerseySelected,
+  ] = useState("00");
+
+  const [
+    myPageJerseyFreeUsed,
+    setMyPageJerseyFreeUsed,
+  ] = useState(false);
+
+  const [
+    myPageJerseyTickets,
+    setMyPageJerseyTickets,
+  ] = useState(0);
+
+  const [
+    myPageJerseyLoading,
+    setMyPageJerseyLoading,
+  ] = useState(false);
+
+  const [
+    myPageJerseySaving,
+    setMyPageJerseySaving,
+  ] = useState(false);
+
+  const [
+    myPageJerseyMessage,
+    setMyPageJerseyMessage,
+  ] = useState("");
+
+  const [
     authOpen,
     setAuthOpen,
   ] = useState(false);
@@ -9254,6 +9376,11 @@ const [
     authPassword,
     setAuthPassword,
   ] = useState("");
+
+  const [
+    authJerseyNumber,
+    setAuthJerseyNumber,
+  ] = useState("00");
 
   const [
     authBusy,
@@ -9307,6 +9434,255 @@ const [
     };
   }, []);
 
+  async function loadMyPageJersey() {
+    if (!authUser) {
+      setMyPageJerseyNumber(null);
+      setMyPageJerseySelected("00");
+      setMyPageJerseyFreeUsed(false);
+      setMyPageJerseyTickets(0);
+      return;
+    }
+
+    setMyPageJerseyLoading(true);
+
+    try {
+      const {
+        data: {
+          session,
+        },
+      } =
+        await supabase.auth.getSession();
+
+      const token =
+        session?.access_token;
+
+      if (!token) {
+        return;
+      }
+
+      const response =
+        await fetch(
+          "/api/profile/jersey",
+          {
+            cache: "no-store",
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+            },
+          }
+        );
+
+      const json =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          json?.error ||
+            "등번호 정보를 불러오지 못했습니다."
+        );
+      }
+
+      const number =
+        json?.jerseyNumber
+          ? String(
+              json.jerseyNumber
+            ).padStart(2, "0")
+          : null;
+
+      setMyPageJerseyNumber(
+        number
+      );
+
+      setMyPageJerseySelected(
+        number || "00"
+      );
+
+      setMyPageJerseyFreeUsed(
+        Boolean(
+          json?.freeChangeUsed
+        )
+      );
+
+      setMyPageJerseyTickets(
+        Number(
+          json?.tickets || 0
+        )
+      );
+    } catch (error) {
+      console.error(
+        "MYPAGE_JERSEY_LOAD_ERROR",
+        error
+      );
+    } finally {
+      setMyPageJerseyLoading(false);
+    }
+  }
+
+  async function saveMyPageJersey() {
+    if (!authUser) {
+      return;
+    }
+
+    if (
+      myPageJerseyNumber ===
+      myPageJerseySelected
+    ) {
+      setMyPageJerseyMessage(
+        "현재 사용 중인 등번호입니다."
+      );
+      return;
+    }
+
+    const isInitial =
+      !myPageJerseyNumber;
+
+    const useFree =
+      !!myPageJerseyNumber &&
+      !myPageJerseyFreeUsed;
+
+    const useTicket =
+      !!myPageJerseyNumber &&
+      myPageJerseyFreeUsed;
+
+    if (
+      useTicket &&
+      myPageJerseyTickets <= 0
+    ) {
+      setMyPageJerseyMessage(
+        "무료 변경을 모두 사용했습니다. 상점에서 등번호 변경권이 필요합니다."
+      );
+      return;
+    }
+
+    const confirmText =
+      isInitial
+        ? `등번호 #${myPageJerseySelected}으로 설정할까요?\n최초 설정은 무료이며 무료 변경 1회는 그대로 남습니다.`
+        : useFree
+          ? `등번호를 #${myPageJerseySelected}으로 변경할까요?\n무료 변경 1회를 사용합니다.`
+          : `등번호를 #${myPageJerseySelected}으로 변경할까요?\n등번호 변경권 1장을 사용합니다.`;
+
+    if (
+      !window.confirm(
+        confirmText
+      )
+    ) {
+      return;
+    }
+
+    setMyPageJerseySaving(true);
+    setMyPageJerseyMessage("");
+
+    try {
+      const {
+        data: {
+          session,
+        },
+      } =
+        await supabase.auth.getSession();
+
+      const token =
+        session?.access_token;
+
+      if (!token) {
+        throw new Error(
+          "로그인이 필요합니다."
+        );
+      }
+
+      const response =
+        await fetch(
+          "/api/profile/jersey",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json",
+              Authorization:
+                `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              jerseyNumber:
+                myPageJerseySelected,
+            }),
+          }
+        );
+
+      const json =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          json?.error ||
+            "등번호 변경에 실패했습니다."
+        );
+      }
+
+      setMyPageJerseyNumber(
+        String(
+          json.jerseyNumber
+        ).padStart(2, "0")
+      );
+
+      setMyPageJerseyFreeUsed(
+        Boolean(
+          json.freeChangeUsed
+        )
+      );
+
+      setMyPageJerseyTickets(
+        Number(
+          json.tickets || 0
+        )
+      );
+
+      const method =
+        String(
+          json.changeMethod || ""
+        );
+
+      setMyPageJerseyMessage(
+        method === "initial"
+          ? `#${json.jerseyNumber} 등번호가 설정되었습니다. 무료 변경 1회가 남아 있습니다.`
+          : method === "free"
+            ? `#${json.jerseyNumber}으로 변경되었습니다. 무료 변경을 사용했습니다.`
+            : `#${json.jerseyNumber}으로 변경되었습니다. 변경권 1장을 사용했습니다.`
+      );
+
+      const {
+        data: {
+          user: refreshedUser,
+        },
+      } =
+        await supabase.auth.getUser();
+
+      if (refreshedUser) {
+        setAuthUser(
+          refreshedUser
+        );
+      }
+    } catch (error) {
+      setMyPageJerseyMessage(
+        error instanceof Error
+          ? error.message
+          : "등번호 변경에 실패했습니다."
+      );
+    } finally {
+      setMyPageJerseySaving(false);
+    }
+  }
+
+  useEffect(() => {
+    if (
+      authUser &&
+      activeTab === "my-combos"
+    ) {
+      void loadMyPageJersey();
+    }
+  }, [
+    authUser?.id,
+    activeTab,
+  ]);
+
   async function submitAuth() {
     const login =
       authLogin
@@ -9357,6 +9733,18 @@ const [
 
     if (
       authMode === "signup" &&
+      !/^(?:[0-9]|[1-9][0-9])$/.test(
+        String(Number(authJerseyNumber))
+      )
+    ) {
+      setAuthMessage(
+        "등번호는 00~99 중에서 선택해주세요."
+      );
+      return;
+    }
+
+    if (
+      authMode === "signup" &&
       !/^[a-z0-9._-]{3,30}$/.test(
         login
       )
@@ -9387,6 +9775,11 @@ const [
               data: {
                 login_id:
                   login,
+                jersey_number:
+                  authJerseyNumber.padStart(
+                    2,
+                    "0"
+                  ),
               },
             },
           });
@@ -9403,6 +9796,7 @@ const [
           setAuthLogin("");
           setAuthEmail("");
           setAuthPassword("");
+          setAuthJerseyNumber("00");
 
           setAuthOpen(false);
         } else {
@@ -16430,6 +16824,46 @@ const [
             </label>
           )}
 
+          {authMode === "signup" && (
+            <div className="authJerseyBlockV1">
+              <div className="authJerseyHeadV1">
+                <div>
+                  <span>등번호</span>
+                  <small>
+                    00~99 · 다른 회원과 중복 가능
+                  </small>
+                </div>
+
+                <strong>
+                  #{authJerseyNumber.padStart(2, "0")}
+                </strong>
+              </div>
+
+              <div className="authJerseyGridV1">
+                {Array.from(
+                  { length: 100 },
+                  (_, index) =>
+                    String(index).padStart(2, "0")
+                ).map((number) => (
+                  <button
+                    key={number}
+                    type="button"
+                    className={
+                      authJerseyNumber === number
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() =>
+                      setAuthJerseyNumber(number)
+                    }
+                  >
+                    {number}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <label className="authField">
             <span>비밀번호</span>
 
@@ -16522,7 +16956,14 @@ const [
           <button type="button" className={activeTab === "combos" ? "active" : ""} onClick={() => setActiveTab("combos")}>⚾ 야구공 배팅</button>
           <button type="button" className={activeTab === "history" ? "active" : ""} onClick={() => setActiveTab("history")}>경기기록</button>
           <button type="button" className={activeTab === "community" ? "active" : ""} onClick={() => setActiveTab("community")}>커뮤니티</button>
-          <button type="button" className={activeTab === "my-combos" ? "active" : ""} onClick={() => setActiveTab("my-combos")}>마이페이지</button>
+          {/* STORE_PAGE_NAV_V3 */}
+        <button
+          className={activeTab === "store" ? "active" : ""}
+          onClick={() => setActiveTab("store")}
+        >
+          상점
+        </button>
+        <button type="button" className={activeTab === "my-combos" ? "active" : ""} onClick={() => setActiveTab("my-combos")}>마이페이지</button>
           <a href="/stats">통계</a>
           <button type="button" className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>설정</button>
         </nav>
@@ -16577,6 +17018,14 @@ const [
         </div>
       </div>
 
+
+      {/* HOME_COMMUNITY_FEED_LOADER_V1 */}
+      {activeTab === "home" && (
+        <HomeCommunityFeedLoader
+          onLoading={setHomeCommunityLoading}
+          onPosts={setHomeCommunityPosts}
+        />
+      )}
 
       {/* COMMUNITY_HOME_V3 */}
       {activeTab === "home" && (
@@ -17129,6 +17578,185 @@ const [
             );
           })()}
 
+          {/* HOME_LIVE_EMPTY_STATE_V1 */}
+          {games.length === 0 && (
+            <section className="homeHubCardV2 homeLiveEmptyHubV5">
+              <div className="homeGameStripV2 homeEmptyGameStripV5">
+                <div className="homeEmptyGameChipV5">
+                  <span>오늘 경기</span>
+                  <b>중계 대기</b>
+                </div>
+              </div>
+
+              <div className="homeGameGridV2">
+                <article className="homeScoreCardV2">
+                  <div className="homeScoreHeaderV2">
+                    <span>KBO LIVE</span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("games")}
+                    >
+                      경기 분석 →
+                    </button>
+                  </div>
+
+                  <div className="homeScoreBodyV2">
+                    <div className="homeTeamBlockV2 away">
+                      <div className="homeEmptyTeamLogoV5">KBO</div>
+                      <small>AWAY</small>
+                      <strong>대기</strong>
+                      <span>
+                        <b className="homePlayerRoleV3">선발투수</b>
+                        경기 편성 대기
+                      </span>
+                    </div>
+
+                    <div className="homeScoreCenterV2">
+                      <div className="homeScoreNumbersV2">
+                        <b>-</b>
+                        <em>:</em>
+                        <b>-</b>
+                      </div>
+
+                      <div className="homeStatusV2">중계 대기</div>
+
+                      <div className="homeCountRowV2">
+                        <div className="homeCountBoxV2">
+                          <span>B</span>
+                          <b>—</b>
+                        </div>
+                        <div className="homeCountBoxV2">
+                          <span>S</span>
+                          <b>—</b>
+                        </div>
+                        <div className="homeCountBoxV2">
+                          <span>O</span>
+                          <b>—</b>
+                        </div>
+                      </div>
+
+                      <div className="homeInfoBarV2">
+                        <strong>오늘 예정된 경기가 없습니다.</strong>
+                        <small>경기가 편성되면 실시간 중계가 자동으로 연결됩니다.</small>
+                      </div>
+                    </div>
+
+                    <div className="homeTeamBlockV2 home">
+                      <div className="homeEmptyTeamLogoV5">KBO</div>
+                      <small>HOME</small>
+                      <strong>대기</strong>
+                      <span>
+                        <b className="homePlayerRoleV3">선발투수</b>
+                        경기 편성 대기
+                      </span>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="homeDiamondCardV2">
+                  <div className="homeSideCardHeadV2">
+                    <small>BASE STATE</small>
+                    <strong>주자 상황</strong>
+                  </div>
+
+                  <div className="homeDiamondV2">
+                    <i className="base second"></i>
+                    <i className="base third"></i>
+                    <i className="base first"></i>
+                    <i className="plate"></i>
+                    <span className="mound"></span>
+                  </div>
+
+                  <p className="homeSideTextV2">주자 정보 대기</p>
+                </article>
+
+                <article className="homeZoneCardV2">
+                  <div className="homeSideCardHeadV2">
+                    <small>PITCH LOCATION</small>
+                    <strong>스트라이크존</strong>
+                  </div>
+
+                  <div className="homePitchCanvasV4">
+                    <div className="homeActualZoneV4">
+                      <div className="homeActualZoneGridV4">
+                        {Array.from({ length: 9 }, (_, i) => (
+                          <span key={`empty-zone-${i}`}></span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="homePlateGuideV4">
+                      <span></span>
+                    </div>
+
+                    <div className="homeZoneEmptyV2">
+                      투구 위치 데이터 대기
+                    </div>
+                  </div>
+
+                  <div className="homeZoneGuideTextV4">
+                    <span>존 밖까지 실제 위치 표시</span>
+                    <small>가운데 박스 = 기준 스트라이크존</small>
+                  </div>
+
+                  <div className="homeZoneLegendV2">
+                    <span><i className="ball"></i>볼</span>
+                    <span><i className="strike"></i>스트라이크</span>
+                    <span><i className="foul"></i>파울</span>
+                    <span><i className="inplay"></i>타격</span>
+                  </div>
+                </article>
+
+                <article className="homePitchLogCardV2">
+                  <div className="homeSideCardHeadV2">
+                    <small>PITCH LOG</small>
+                    <strong>최근 투구 6구</strong>
+                  </div>
+
+                  <div className="homePitchLogListV2">
+                    <div className="homePitchLogEmptyV2">
+                      실시간 투구 데이터 연결 대기
+                    </div>
+                  </div>
+                </article>
+
+                <div className="homeBoardWrapV2">
+                  <div className="homeLiveScoreboardScrollV4">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>TEAM</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={`empty-score-head-${i}`}>{i + 1}</th>
+                          ))}
+                          <th className="total">R</th>
+                          <th>H</th>
+                          <th>E</th>
+                          <th>B</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {["AWAY", "HOME"].map((team) => (
+                          <tr key={`empty-score-${team}`}>
+                            <th>{team}</th>
+                            {Array.from({ length: 9 }, (_, i) => (
+                              <td key={`empty-score-${team}-${i}`}>-</td>
+                            ))}
+                            <td className="total">-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           <div className="communityLayoutV3">
             <main className="communityMainV3">
               <section className="communityCardV3">
@@ -17142,26 +17770,123 @@ const [
                     <button type="button" onClick={() => setActiveTab("games")}>오늘 경기</button>
                   </div>
                 </div>
-                <p>경기 분석 · AI 픽 · 커뮤니티를 하나의 공간에서 만나보세요.</p>
+                <p className="communityHeroDescriptionV4">경기 분석 · AI 픽 · 커뮤니티를 하나의 공간에서 만나보세요.</p>
               </section>
 
-              <section className="communityCardV3">
-                <div className="communityTabsV3">
-                  <b>🔥 인기글</b>
-                  <span>최신글</span>
-                  <span>⚾ 경기 토론</span>
-                  <span>🎯 픽 공유</span>
-                  <span>🏆 적중 인증</span>
+              <section className="communityCardV3 homeCommunityBoardV4">
+                <div className="communityTitleV3 homeCommunityBoardHeadV4">
+                  <div>
+                    <small>COMMUNITY</small>
+                    <h3>최신 커뮤니티</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCommunityOpenPostId(null);
+                      setActiveTab("community");
+                    }}
+                  >
+                    커뮤니티 들어가기 →
+                  </button>
                 </div>
-                <button type="button" className="communityWriteV3" onClick={() => setActiveTab("community")}>
-                  ⚾ 오늘 경기는 어떻게 보시나요?
-                </button>
-                <div className="communityEmptyV3">
-                  <strong>TALK</strong>
-                  <h3>야구 이야기가 시작되는 공간</h3>
-                  <p>경기 토론, 픽 공유, 적중 인증 게시물이 이곳에 표시됩니다.</p>
-                  <button type="button" onClick={() => setActiveTab("community")}>커뮤니티 들어가기</button>
-                </div>
+
+                {(() => {
+                  const notice = homeCommunityPosts.find((post) => post.is_notice);
+                  const normalPosts = homeCommunityPosts
+                    .filter((post) => !post.is_notice)
+                    .slice(0, 5);
+
+                  const openCommunityPost = (id: string) => {
+                    setCommunityOpenPostId(id);
+                    setActiveTab("community");
+                  };
+
+                  const categoryLabel = (category: string) =>
+                    category === "game"
+                      ? "경기토론"
+                      : category === "analysis"
+                      ? "AI 분석"
+                      : category === "combo"
+                      ? "내 조합"
+                      : "자유게시판";
+
+                  const dateLabel = (value: string) => {
+                    try {
+                      return new Intl.DateTimeFormat("ko-KR", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                        timeZone: "Asia/Seoul",
+                      }).format(new Date(value));
+                    } catch {
+                      return "";
+                    }
+                  };
+
+                  return (
+                    <>
+                      {notice && (
+                        <button
+                          type="button"
+                          className="homeNoticeRowV5"
+                          onClick={() => openCommunityPost(notice.id)}
+                        >
+                          <span>공지</span>
+                          <strong>{notice.title}</strong>
+                          <small>{dateLabel(notice.created_at)}</small>
+                        </button>
+                      )}
+
+                      <div className="homeCommunityFeedV4">
+                        {homeCommunityLoading ? (
+                          <div className="homeCommunityEmptyV4">
+                            게시글을 불러오는 중입니다.
+                          </div>
+                        ) : normalPosts.length > 0 ? (
+                          normalPosts.slice(0, 7).map((post) => (
+                            <button
+                              type="button"
+                              className="homeCommunityRowV5"
+                              key={post.id}
+                              onClick={() => openCommunityPost(post.id)}
+                            >
+                              <span className="homeCommunityCategoryV5">
+                                {categoryLabel(post.category)}
+                              </span>
+
+                              <strong className="homeCommunitySubjectV5">
+                                {post.title}
+                              </strong>
+
+                              <span className="homeCommunityAuthorV5">
+                                {post.author_name}
+                              </span>
+
+                              <span className="homeCommunityDateV5">
+                                {dateLabel(post.created_at)}
+                              </span>
+
+                              <span className="homeCommunityReactionV5">
+                                ♡ {post.like_count}
+                              </span>
+
+                              <span className="homeCommunityCommentV5">
+                                💬 {post.comment_count}
+                              </span>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="homeCommunityEmptyV4">
+                            <strong>아직 등록된 게시글이 없습니다.</strong>
+                            <span>첫 야구 이야기를 남겨보세요.</span>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
               </section>
 
               <section className="communityCardV3">
@@ -17175,10 +17900,10 @@ const [
                 <div className="communityAiV3">
                   <strong>⚾</strong>
                   <div>
-                    <b>AI 추천픽으로 야구공 참여</b>
-                    <p>AI가 추천한 승패·핸디캡·언더오버 픽에 베트맨 기준점과 배당으로 참여합니다.</p>
+                    <b>AI 분석 픽으로 야구공 참여</b>
+                    <p>AI가 분석한 승패·핸디캡·언더오버 픽을 베트맨 기준점과 배당으로 확인하고 참여합니다.</p>
                   </div>
-                  <button type="button" onClick={() => setActiveTab("combos")}>AI 추천픽 보기</button>
+                  <button type="button" onClick={() => setActiveTab("combos")}>AI 분석픽 보기</button>
                 </div>
               </section>
             </main>
@@ -18457,6 +19182,16 @@ const [
         <CommunityPage
           user={authUser}
           games={games}
+          openPostId={communityOpenPostId}
+          onPostOpened={() => setCommunityOpenPostId(null)}
+        />
+      )}
+
+      {/* STORE_CONTENT_V3 */}
+      {activeTab === "store" && (
+        <StorePage
+          user={authUser}
+          onBalanceChange={setBaseballBalance}
         />
       )}
 
@@ -21870,20 +22605,49 @@ const [
               {/* MYPAGE_PREMIUM_V2 */}
               <section className="myPageHeroV2">
                 <div className="myPageHeroIdentityV2">
-                  <div className="myPageAvatarV2">
-                    {(
-                      authUser.email ||
-                      "K"
-                    )
-                      .slice(
-                        0,
-                        1
-                      )
-                      .toUpperCase()}
+                  <div className="myPageUniformAvatarV1">
+                    <div className="myPageUniformSleeveV1 left" />
+                    <div className="myPageUniformSleeveV1 right" />
+
+                    <div className="myPageUniformBodyV1">
+                      <span className="myPageUniformBrandV1">
+                        KBO
+                      </span>
+
+                      <div className="myPageUniformMarkingV7">
+                        <span className="myPageUniformNameV7">
+                          {authUser?.user_metadata?.nickname ||
+                            authUser?.user_metadata?.name ||
+                            authUser?.user_metadata?.display_name ||
+                            authUser?.email?.split("@")[0] ||
+                            "PLAYER"}
+                        </span>
+
+                        <strong>
+                          {myPageJerseyLoading
+                            ? "--"
+                            : myPageJerseyNumber ||
+                              "00"}
+                        </strong>
+                      </div>
+                    </div>
                   </div>
 
-                  <div>
-                    <small>
+                  <div className="myPageFinalProfileRowV2">
+                    <div className="myPageShirtFinalV1" aria-hidden="true">
+              <div className="myPageShirtFinalV1Body">
+                <div className="myPageShirtFinalV1Collar" />
+                <div className="myPageShirtFinalV1Sleeve myPageShirtFinalV1SleeveLeft" />
+                <div className="myPageShirtFinalV1Sleeve myPageShirtFinalV1SleeveRight" />
+                <div className="myPageShirtFinalV1Name">
+                  {myPageNickname || "PLAYER"}
+                </div>
+                <div className="myPageShirtFinalV1Number">
+                  {myPageJerseyNumber ?? 99}
+                </div>
+              </div>
+            </div>
+            <small>
                       MY KBO PICKS
                     </small>
 
@@ -22042,6 +22806,128 @@ const [
                     </span>
                   </div>
 
+
+                  <section className="myPageJerseyManagerV1">
+                    <div className="myPageJerseyManagerHeadV1">
+                      <div>
+                        <small>
+                          UNIFORM NUMBER
+                        </small>
+
+                        <h4>
+                          내 유니폼 · 등번호
+                        </h4>
+
+                        <p>
+                          선택한 등번호가 마이페이지 유니폼에 마킹됩니다.
+                        </p>
+                      </div>
+
+                      <div className="myPageJerseyCurrentV1">
+                        <span>
+                          현재 등번호
+                        </span>
+
+                        <strong>
+                          #{myPageJerseyNumber ||
+                            "--"}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="myPageJerseyStatusV1">
+                      <span>
+                        {!myPageJerseyNumber
+                          ? "최초 등번호 설정 무료"
+                          : !myPageJerseyFreeUsed
+                            ? "무료 변경 1회 남음"
+                            : "무료 변경 사용 완료"}
+                      </span>
+
+                      <span>
+                        변경권
+                        <b>
+                          {myPageJerseyTickets}장
+                        </b>
+                      </span>
+                    </div>
+
+                    <div className="myPageJerseyPickerV1">
+                      {Array.from(
+                        {
+                          length: 100,
+                        },
+                        (_, index) =>
+                          String(
+                            index
+                          ).padStart(
+                            2,
+                            "0"
+                          )
+                      ).map(
+                        (number) => (
+                          <button
+                            key={
+                              number
+                            }
+                            type="button"
+                            className={
+                              myPageJerseySelected ===
+                              number
+                                ? "active"
+                                : ""
+                            }
+                            onClick={() =>
+                              setMyPageJerseySelected(
+                                number
+                              )
+                            }
+                          >
+                            {number}
+                          </button>
+                        )
+                      )}
+                    </div>
+
+                    <div className="myPageJerseyActionsV1">
+                      <div>
+                        선택 번호
+                        <strong>
+                          #{myPageJerseySelected}
+                        </strong>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={
+                          myPageJerseySaving ||
+                          myPageJerseyLoading ||
+                          myPageJerseySelected ===
+                            myPageJerseyNumber
+                        }
+                        onClick={() =>
+                          void saveMyPageJersey()
+                        }
+                      >
+                        {myPageJerseySaving
+                          ? "변경 중..."
+                          : !myPageJerseyNumber
+                            ? "등번호 설정"
+                            : !myPageJerseyFreeUsed
+                              ? "무료 변경하기"
+                              : myPageJerseyTickets >
+                                  0
+                                ? "변경권 사용"
+                                : "변경권 필요"}
+                      </button>
+                    </div>
+
+                    {myPageJerseyMessage && (
+                      <div className="myPageJerseyMessageV1">
+                        {myPageJerseyMessage}
+                      </div>
+                    )}
+                  </section>
 
                   <div className="myPageAccountGridV3">
 
