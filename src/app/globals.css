@@ -35289,3 +35289,2940 @@ html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-sect
 
 /* HISTORY_STICKY_HEADER_FIX_V1 */
 .historyModalV10 .historyModalTopV10{position:sticky!important;top:0!important;z-index:1000!important;background:#fff!important;isolation:isolate!important}.historyModalV10 .historyRealTabsV9{position:sticky!important;top:74px!important;z-index:999!important;background:#f8fafc!important;isolation:isolate!important;border-bottom:1px solid #dbe3ed!important;box-shadow:0 8px 14px rgba(15,23,42,.06)!important}.historyModalV10 .historyRealTabsV9::before{content:""!important;position:absolute!important;left:-100vw!important;right:-100vw!important;top:0!important;bottom:0!important;background:#f8fafc!important;z-index:-1!important;pointer-events:none!important}.historyModalV10 .historyTabPanelV9{position:relative!important;z-index:1!important}.historyModalV10 .historySummaryAiReviewV1,.historyModalV10 .historyFeedbackCardsV8,.historyModalV10 .historyFeedbackCardV8{position:relative!important;z-index:1!important}@media(max-width:700px){.historyModalV10 .historyModalTopV10{top:0!important}.historyModalV10 .historyRealTabsV9{top:64px!important}}
+/* LIVE_ALL_MARKET_PROBABILITY_STYLE_V1 */
+.liveMarketProbabilityV1{margin:18px;padding:18px;border:1px solid #dbe4ef;border-radius:20px;background:#fff;box-shadow:0 12px 34px rgba(15,23,42,.07)}
+.liveMarketProbabilityHeadV1{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}.liveMarketProbabilityHeadV1>div{display:flex;flex-direction:column;gap:4px}.liveMarketProbabilityHeadV1 strong{font-size:17px;font-weight:900}.liveMarketProbabilityHeadV1 span,.liveMarketProbabilityHeadV1 small{font-size:12px;color:#64748b}
+.liveMarketProbabilityGridV1{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.liveMarketProbabilityCardV1{padding:14px;border:1px solid #e2e8f0;border-radius:16px;background:#f8fafc;min-width:0}.liveMarketProbabilityTitleV1{display:block;margin-bottom:10px;font-size:12px;font-weight:900;color:#475569}
+.liveMarketProbabilitySidesV1{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);align-items:center;gap:4px}.liveMarketProbabilitySidesV1>div:last-child{text-align:right}.liveMarketProbabilitySidesV1 small{display:block;font-size:11px;color:#64748b}.liveMarketProbabilitySidesV1 b{display:block;margin-top:4px;font-size:20px;font-weight:950}.liveMarketProbabilitySidesV1 em{text-align:center;font-size:10px;font-style:normal;color:#94a3b8}
+.liveMarketProbabilityBarV1{position:relative;height:7px;margin-top:11px;overflow:hidden;border-radius:999px;background:#cbd5e1}.liveMarketProbabilityBarV1 i{position:absolute;inset:0 auto 0 0;display:block;border-radius:999px;background:currentColor}.liveMarketProbabilityWaitingV1{padding:12px 0;font-size:12px;color:#94a3b8}
+@media(max-width:760px){.liveMarketProbabilityV1{margin:12px 8px 16px;padding:13px;border-radius:16px}.liveMarketProbabilityHeadV1{display:block}.liveMarketProbabilityHeadV1>small{display:block;margin-top:5px}.liveMarketProbabilityGridV1{grid-template-columns:1fr}.liveMarketProbabilityCardV1{padding:12px 13px}}
+
+/* HISTORY_ARCHIVE_READABILITY_FIX_V3 */
+
+.historyModalV10 .historyTabPanelV9{width:100%!important;max-width:none!important;min-width:0!important;overflow-x:hidden!important;padding-left:0!important;padding-right:0!important}
+
+.historyRealGameCardArchiveV1{width:100%!important;max-width:100%!important;min-width:0!important;overflow:visible!important;box-sizing:border-box!important}
+
+.historyRealGameCardArchiveV1 .analysisWebsiteMatch{width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important;overflow:visible!important}
+
+.historyRealGameCardArchiveV1 .analysisWebsiteMatch>*{max-width:100%!important;box-sizing:border-box!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub,.historyRealGameCardArchiveV1 .starterCompare,.historyRealGameCardArchiveV1 .lineupAnalysis,.historyRealGameCardArchiveV1 .gameFlowDetailV3,.historyRealGameCardArchiveV1 .gameFlowEdgeV3{width:calc(100% - 32px)!important;max-width:none!important;min-width:0!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub *,.historyRealGameCardArchiveV1 .starterCompare *,.historyRealGameCardArchiveV1 .lineupAnalysis *,.historyRealGameCardArchiveV1 .gameFlowDetailV3 *,.historyRealGameCardArchiveV1 .gameFlowEdgeV3 *{box-sizing:border-box!important}
+
+.historyRealGameCardArchiveV1 h2,.historyRealGameCardArchiveV1 h3,.historyRealGameCardArchiveV1 h4{color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;opacity:1!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub h3,.historyRealGameCardArchiveV1 .starterCompare h3,.historyRealGameCardArchiveV1 .lineupAnalysis h3,.historyRealGameCardArchiveV1 .gameFlowDetailV3 h3,.historyRealGameCardArchiveV1 .gameFlowEdgeV3 h3{font-size:22px!important;line-height:1.35!important;font-weight:950!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub h4,.historyRealGameCardArchiveV1 .starterCompare h4,.historyRealGameCardArchiveV1 .lineupAnalysis h4,.historyRealGameCardArchiveV1 .gameFlowDetailV3 h4,.historyRealGameCardArchiveV1 .gameFlowEdgeV3 h4{font-size:18px!important;line-height:1.4!important;font-weight:950!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub p,.historyRealGameCardArchiveV1 .starterCompare p,.historyRealGameCardArchiveV1 .lineupAnalysis p,.historyRealGameCardArchiveV1 .gameFlowDetailV3 p,.historyRealGameCardArchiveV1 .gameFlowEdgeV3 p{font-size:14px!important;line-height:1.65!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:keep-all!important}
+
+.historyRealGameCardArchiveV1 .premiumDetailHub span,.historyRealGameCardArchiveV1 .starterCompare span,.historyRealGameCardArchiveV1 .lineupAnalysis span,.historyRealGameCardArchiveV1 .gameFlowDetailV3 span,.historyRealGameCardArchiveV1 .gameFlowEdgeV3 span{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:keep-all!important}
+
+.historyRealGameCardArchiveV1 .gameFlowDetailV3{display:grid!important;visibility:visible!important;opacity:1!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow:visible!important}
+
+.historyRealGameCardArchiveV1 .gameFlowDetailV3>article{min-width:0!important;overflow:visible!important;padding:24px 22px!important}
+
+.historyRealGameCardArchiveV1 .gameFlowDetailV3>article>div>span{color:#334155!important;-webkit-text-fill-color:#334155!important;opacity:1!important;font-size:14px!important;font-weight:850!important}
+
+.historyRealGameCardArchiveV1 .gameFlowDetailV3>article>div>span>strong{color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;font-size:17px!important;font-weight:950!important}
+
+.historyRealGameCardArchiveV1 .gameFlowDetailV3>article>h4{color:#0f172a!important;-webkit-text-fill-color:#0f172a!important;opacity:1!important;font-size:20px!important;font-weight:950!important}
+
+.historyRealGameCardArchiveV1 .gameFlowEdgeV3{display:block!important;visibility:visible!important;opacity:1!important;overflow:visible!important}
+
+.historyRealGameCardArchiveV1 .gameFlowEdgeV3 *{white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+
+.historyRealTabsV9{overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin!important}
+
+.historyRealTabsV9 button{flex:0 0 auto!important;min-height:46px!important;padding:0 17px!important;font-size:15px!important;font-weight:900!important;white-space:nowrap!important}
+
+@media(max-width:1000px){.historyRealGameCardArchiveV1 .gameFlowDetailV3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+@media(max-width:700px){.historyRealGameCardArchiveV1 .premiumDetailHub,.historyRealGameCardArchiveV1 .starterCompare,.historyRealGameCardArchiveV1 .lineupAnalysis,.historyRealGameCardArchiveV1 .gameFlowDetailV3,.historyRealGameCardArchiveV1 .gameFlowEdgeV3{width:calc(100% - 16px)!important}.historyRealGameCardArchiveV1 .gameFlowDetailV3{grid-template-columns:1fr!important}.historyRealGameCardArchiveV1 .gameFlowDetailV3>article{padding:18px 16px!important}.historyRealTabsV9 button{font-size:14px!important;padding:0 14px!important}}
+
+/* HISTORY_AI_STARTER_LAYOUT_FIX_V4 */
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;margin:0!important;padding-left:0!important;padding-right:0!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;overflow:hidden!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub>*{width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{width:100%!important;max-width:100%!important;min-width:0!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article{min-width:0!important;max-width:100%!important;overflow:visible!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub h3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub h4{overflow:visible!important;white-space:normal!important;text-overflow:clip!important;word-break:keep-all!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article>div:first-child,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article>header{color:#334155!important;-webkit-text-fill-color:#334155!important;opacity:1!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article h4{color:#334155!important;-webkit-text-fill-color:#334155!important;opacity:1!important;font-size:15px!important;font-weight:950!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare{position:relative!important;width:calc(100% - 32px)!important;max-width:none!important;min-width:0!important;margin:18px auto 28px!important;padding:12px!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare::before{content:"VS"!important;position:absolute!important;left:50%!important;top:50%!important;z-index:20!important;transform:translate(-50%,-50%)!important;display:flex!important;align-items:center!important;justify-content:center!important;width:62px!important;height:62px!important;border-radius:999px!important;background:#0b1d35!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:5px solid #fff!important;box-shadow:0 8px 24px rgba(15,23,42,.18)!important;font-size:18px!important;font-weight:950!important;letter-spacing:.04em!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>article,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>div{min-width:0!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>article{background:#fff!important;border:1px solid #dce4ed!important;box-shadow:0 10px 28px rgba(15,23,42,.06)!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>span,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>.vs,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>.starterVs{visibility:hidden!important;opacity:0!important}
+
+@media(max-width:900px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+@media(max-width:700px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare{width:calc(100% - 16px)!important;padding:6px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare::before{width:48px!important;height:48px!important;font-size:14px!important;border-width:4px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:1fr!important}}
+
+/* HISTORY_AI_STARTER_LAYOUT_FIX_V4 */
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]{width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;margin:0!important;padding-left:0!important;padding-right:0!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important;overflow:hidden!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub>*{width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{width:100%!important;max-width:100%!important;min-width:0!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article{min-width:0!important;max-width:100%!important;overflow:visible!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub h3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub h4{overflow:visible!important;white-space:normal!important;text-overflow:clip!important;word-break:keep-all!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article>div:first-child,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article>header{color:#334155!important;-webkit-text-fill-color:#334155!important;opacity:1!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article h4{color:#334155!important;-webkit-text-fill-color:#334155!important;opacity:1!important;font-size:15px!important;font-weight:950!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare{position:relative!important;width:calc(100% - 32px)!important;max-width:none!important;min-width:0!important;margin:18px auto 28px!important;padding:12px!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important;box-sizing:border-box!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare::before{content:"VS"!important;position:absolute!important;left:50%!important;top:50%!important;z-index:20!important;transform:translate(-50%,-50%)!important;display:flex!important;align-items:center!important;justify-content:center!important;width:62px!important;height:62px!important;border-radius:999px!important;background:#0b1d35!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:5px solid #fff!important;box-shadow:0 8px 24px rgba(15,23,42,.18)!important;font-size:18px!important;font-weight:950!important;letter-spacing:.04em!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>article,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>div{min-width:0!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>article{background:#fff!important;border:1px solid #dce4ed!important;box-shadow:0 10px 28px rgba(15,23,42,.06)!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>span,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>.vs,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare>.starterVs{visibility:hidden!important;opacity:0!important}
+
+@media(max-width:900px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+@media(max-width:700px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare{width:calc(100% - 16px)!important;padding:6px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="starter"]>.starterCompare::before{width:48px!important;height:48px!important;font-size:14px!important;border-width:4px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:1fr!important}}
+
+/* PREMIUM_OPEN_TEXT_WHITE_V1 */
+
+html body .analysisPurchasePanelV1 h3,html body .analysisPurchasePanelV1 h3 *,html body .analysisPurchasedContentV1 h3,html body .analysisPurchasedContentV1 h3 *{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}
+
+/* HISTORY_ORIGINAL_GAMECARD_LAYOUT_V5 */
+
+html body .historyModalV10 .historyTabPanelV9{width:100%!important;max-width:none!important;min-width:0!important;padding-left:0!important;padding-right:0!important;overflow-x:hidden!important}
+
+html body .historyRealGameCardArchiveV1{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important;overflow:visible!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch{max-width:none!important;min-width:0!important;margin-left:0!important;margin-right:0!important;overflow:visible!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]{max-width:none!important;min-width:0!important;overflow:visible!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub{display:revert!important;width:revert!important;max-width:revert!important;min-width:0!important;margin-left:revert!important;margin-right:revert!important;padding-left:revert!important;padding-right:revert!important;overflow:revert!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]>.premiumDetailHub>*{width:revert!important;max-width:revert!important;min-width:0!important;margin-left:revert!important;margin-right:revert!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{width:revert!important;max-width:revert!important;min-width:0!important;grid-template-columns:revert!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailHub article{max-width:none!important;min-width:0!important}
+
+@media(max-width:900px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:revert!important}}
+
+@media(max-width:700px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGridV3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumDetailGrid,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumAnalysisGridV3{grid-template-columns:revert!important}}
+
+/* HISTORY_ARCHIVE_SHELL_V6 */
+
+html body .historyModalV10>header,html body .historyModalV10>.historyFinalScoreV8{position:relative;z-index:20;background:#f8fafc}
+
+html body .historyModalV10 .historyRealTabsV9{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;width:100%!important;max-width:none!important;box-sizing:border-box!important;gap:8px!important;padding:10px 12px!important;overflow:visible!important;background:#f8fafc!important}
+
+html body .historyModalV10 .historyRealTabsV9 button{width:100%!important;min-width:0!important;height:48px!important;margin:0!important;justify-content:center!important;white-space:nowrap!important;font-size:14px!important;font-weight:800!important}
+
+html body .historyModalV10 .historyTabPanelV9{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding-left:0!important;padding-right:0!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;padding:0!important}
+
+@media(max-width:700px){html body .historyModalV10 .historyRealTabsV9{display:flex!important;grid-template-columns:none!important;gap:7px!important;padding:8px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin!important}html body .historyModalV10 .historyRealTabsV9 button{flex:0 0 auto!important;width:auto!important;min-width:92px!important;height:44px!important;padding:0 14px!important}}
+
+/* HISTORY_CONTENT_WIDTH_ALIGN_V7 */
+
+html body .historyModalV10 .historyTabPanelV9{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0!important;padding:28px 20px!important;overflow-x:hidden!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0 auto!important;padding:0!important;overflow:visible!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1>.analysisWebsiteMatch{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0 auto!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1 .analysisPurchasedContentV1{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important}
+
+html body .historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"]>.detailedOverallAnalysis.analysisPurchasedContentV1{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin-left:auto!important;margin-right:auto!important}
+
+@media(max-width:700px){html body .historyModalV10 .historyTabPanelV9{padding:16px 8px!important}}
+
+/* HISTORY_ARCHIVE_READABLE_V8 */
+
+html body .historyRealGameCardArchiveV1 .premiumDetailHub>.premiumHero{display:none!important}
+
+html body .historyModalV10 .historyFeedbackCardsV8{gap:14px!important;padding:0!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8{box-sizing:border-box!important;min-width:0!important;padding:20px 20px 18px!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;margin-bottom:18px!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header>div{min-width:0!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header small{display:block!important;font-size:13px!important;line-height:1.4!important;margin-bottom:5px!important;color:#64748b!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header strong{display:block!important;font-size:20px!important;line-height:1.3!important;font-weight:900!important;color:#0f172a!important;overflow:visible!important;white-space:normal!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header>b{flex:0 0 auto!important;font-size:13px!important;line-height:1!important;font-weight:900!important;padding:8px 10px!important;border-radius:999px!important;white-space:nowrap!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8{margin:0 0 14px!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8 span{display:block!important;font-size:13px!important;line-height:1.4!important;font-weight:800!important;margin-bottom:6px!important;color:#64748b!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8 strong{display:block!important;font-size:16px!important;line-height:1.65!important;font-weight:800!important;color:#0f172a!important;white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important}
+
+html body .historyModalV10 .historyFeedbackCardV8>p{font-size:13px!important;line-height:1.6!important;color:#64748b!important;margin:0!important;white-space:normal!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8{padding:20px!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8>strong{font-size:18px!important;line-height:1.45!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8>p{font-size:14px!important;line-height:1.65!important}
+
+@media(max-width:900px){html body .historyModalV10 .historyFeedbackCardsV8{grid-template-columns:1fr!important}html body .historyModalV10 .historyFeedbackCardV8{padding:18px!important}}
+
+/* HISTORY_ALL_UI_FINAL_V14 */
+
+html body .historyModalV10 .historySummaryMetaV8>div{padding:16px 14px!important;min-height:62px!important;box-sizing:border-box!important}
+
+html body .historyModalV10 .historySummaryMetaV8 small{display:block!important;font-size:13px!important;line-height:1.35!important;font-weight:800!important;color:#64748b!important;margin-bottom:6px!important}
+
+html body .historyModalV10 .historySummaryMetaV8 strong{display:block!important;font-size:17px!important;line-height:1.35!important;font-weight:900!important;color:#0f172a!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8{padding:22px!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8>small{display:block!important;font-size:13px!important;line-height:1.4!important;font-weight:900!important;letter-spacing:.06em!important;color:#64748b!important;margin-bottom:7px!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8>strong{display:block!important;font-size:20px!important;line-height:1.4!important;font-weight:900!important;color:#0f172a!important;margin-bottom:8px!important}
+
+html body .historyModalV10 .historyFeedbackConclusionV8>p{font-size:15px!important;line-height:1.7!important;font-weight:600!important;color:#475569!important;margin:0!important}
+
+html body .historyModalV10 .historyStoredNoticeV9{font-size:15px!important;line-height:1.65!important;font-weight:700!important;color:#475569!important;padding:16px 20px!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumOutlook .premiumSectionTitle span{font-size:14px!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumOutlook .premiumSectionTitle b{font-size:24px!important;line-height:1.3!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumOutlook .premiumSectionTitle small{font-size:14px!important;line-height:1.55!important;font-weight:600!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumOutlook>p{font-size:16px!important;line-height:1.75!important;font-weight:600!important;color:#334155!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricHead span{font-size:13px!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricHead b{font-size:16px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>strong{font-size:19px!important;line-height:1.45!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>p{font-size:14px!important;line-height:1.7!important;font-weight:600!important;color:#475569!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricFoot span{font-size:13px!important;line-height:1.45!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection h3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow h3{font-size:23px!important;line-height:1.35!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection small,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow small{font-size:13px!important;line-height:1.5!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection strong,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection b{font-size:22px!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection p{font-size:15px!important;line-height:1.7!important;font-weight:600!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow span{font-size:14px!important;line-height:1.55!important;font-weight:800!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow p,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow b,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow strong{font-size:15px!important;line-height:1.65!important;font-weight:700!important}
+
+html body .historyModalV10 .historyFeedbackCardsV8{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important;gap:14px!important;padding:0!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8{box-sizing:border-box!important;display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important;height:100%!important;min-height:260px!important;max-height:none!important;padding:0!important;overflow:hidden!important;border-radius:16px!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header{box-sizing:border-box!important;display:flex!important;align-items:flex-start!important;justify-content:space-between!important;width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;margin:0!important;padding:18px 20px 12px!important;border:0!important;background:transparent!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header>div{box-sizing:border-box!important;display:block!important;min-width:0!important;max-width:calc(100% - 78px)!important;margin:0!important;padding:0!important;background:transparent!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header small{display:block!important;margin:0 0 5px!important;padding:0!important;background:transparent!important;box-shadow:none!important;font-size:13px!important;line-height:1.35!important;font-weight:800!important;color:#64748b!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header strong{display:block!important;margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;font-size:20px!important;line-height:1.35!important;font-weight:900!important;color:#0f172a!important;white-space:normal!important;word-break:keep-all!important;overflow-wrap:anywhere!important}
+
+html body .historyModalV10 .historyFeedbackCardV8 header>b{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;margin:0!important;padding:7px 10px!important;font-size:13px!important;line-height:1!important;font-weight:900!important;white-space:nowrap!important;border-radius:999px!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8{box-sizing:border-box!important;display:block!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;height:auto!important;max-height:none!important;margin:0!important;padding:16px 20px 10px!important;background:transparent!important;border:0!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8 span{display:block!important;margin:0 0 7px!important;padding:0!important;background:transparent!important;box-shadow:none!important;font-size:13px!important;line-height:1.4!important;font-weight:800!important;color:#64748b!important}
+
+html body .historyModalV10 .historyFeedbackReasonV8 strong{display:block!important;width:100%!important;max-width:100%!important;margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;font-size:16px!important;line-height:1.65!important;font-weight:800!important;color:#0f172a!important;white-space:normal!important;word-break:keep-all!important;overflow-wrap:anywhere!important;overflow:visible!important}
+
+html body .historyModalV10 .historyFeedbackCardV8>p{box-sizing:border-box!important;display:block!important;flex:0 0 auto!important;width:100%!important;min-width:0!important;margin:auto 0 0!important;padding:8px 20px 18px!important;background:transparent!important;box-shadow:none!important;font-size:13px!important;line-height:1.55!important;font-weight:600!important;color:#64748b!important;white-space:normal!important;word-break:keep-all!important;overflow-wrap:anywhere!important;overflow:visible!important}
+
+@media(max-width:1100px){html body .historyModalV10 .historyFeedbackCardsV8{grid-template-columns:1fr!important}html body .historyModalV10 .historyFeedbackCardV8{height:auto!important;min-height:0!important}}
+
+@media(max-width:700px){html body .historyModalV10 .historySummaryMetaV8>div{padding:14px 12px!important;min-height:58px!important}html body .historyModalV10 .historySummaryMetaV8 small{font-size:12px!important}html body .historyModalV10 .historySummaryMetaV8 strong{font-size:16px!important}html body .historyModalV10 .historyFeedbackConclusionV8{padding:18px!important}html body .historyModalV10 .historyFeedbackConclusionV8>strong{font-size:18px!important}html body .historyModalV10 .historyFeedbackConclusionV8>p,html body .historyModalV10 .historyStoredNoticeV9{font-size:14px!important}html body .historyModalV10 .historyFeedbackCardV8 header{padding:16px 16px 10px!important}html body .historyModalV10 .historyFeedbackReasonV8{padding:14px 16px 8px!important}html body .historyModalV10 .historyFeedbackCardV8>p{padding:8px 16px 16px!important}html body .historyModalV10 .historyFeedbackCardV8 header strong{font-size:18px!important}html body .historyModalV10 .historyFeedbackReasonV8 strong{font-size:15px!important}}
+
+/* HISTORY_AI_PREMIUM_TEXT_FINAL_V17 */
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"]{font-size:16px!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricHead span{font-size:15px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricHead b{font-size:18px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>strong{font-size:21px!important;line-height:1.45!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>p{font-size:16px!important;line-height:1.7!important;font-weight:650!important;color:#475569!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricFoot span{font-size:15px!important;line-height:1.5!important;font-weight:800!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection h3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow h3{font-size:25px!important;line-height:1.3!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection small,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow small{font-size:15px!important;line-height:1.5!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection strong,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection b{font-size:25px!important;line-height:1.35!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumScoreProjection p{font-size:17px!important;line-height:1.7!important;font-weight:650!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow span{font-size:16px!important;line-height:1.5!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow p,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow b,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumGameFlow strong{font-size:16px!important;line-height:1.65!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVolatility h3,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumCheckpoint h3{font-size:25px!important;line-height:1.3!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVolatility small,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumCheckpoint small{font-size:15px!important;line-height:1.5!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVolatility p,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumCheckpoint li{font-size:16px!important;line-height:1.7!important;font-weight:650!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVerdict small{font-size:15px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVerdict h3{font-size:26px!important;line-height:1.3!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVerdict p{font-size:18px!important;line-height:1.7!important;font-weight:650!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"]{font-size:16px!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumUnlockHeroV1 small{font-size:14px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumUnlockHeroV1 h2{font-size:30px!important;line-height:1.3!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumUnlockHeroV1 p{font-size:16px!important;line-height:1.7!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 h3{font-size:23px!important;line-height:1.35!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 small{font-size:14px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 strong{font-size:20px!important;line-height:1.4!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 p{font-size:15px!important;line-height:1.65!important;font-weight:700!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 span,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumMarketCardV1 b{font-size:15px!important;line-height:1.45!important;font-weight:800!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumProbabilityRowV1 strong{font-size:22px!important;font-weight:900!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumProbabilityRowV1 span{font-size:15px!important;font-weight:800!important}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumWhyV1,html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumWhyV1 p{font-size:16px!important;line-height:1.7!important;font-weight:700!important}
+
+@media(max-width:700px){html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>strong{font-size:19px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumMetricCard>p{font-size:15px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="ai"] .premiumVerdict p{font-size:16px!important}html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch[data-analysis-section="picks"] .premiumUnlockHeroV1 h2{font-size:25px!important}}
+
+/* HISTORY_ALL_TEXT_READABILITY_V10 */
+.historyModalV10 .historySummaryAiReviewV1,.historyModalV10 .historySummaryAiReviewV1 *{line-height:1.55!important}.historyModalV10 .historySummaryAiReviewV1 h2{font-size:26px!important}.historyModalV10 .historySummaryAiReviewV1 h3{font-size:21px!important}.historyModalV10 .historySummaryAiReviewV1 h4{font-size:18px!important}.historyModalV10 .historySummaryAiReviewV1 p,.historyModalV10 .historySummaryAiReviewV1 span,.historyModalV10 .historySummaryAiReviewV1 div{font-size:max(14px,1em)}.historyModalV10 .historyFeedbackCardsV8{align-items:stretch!important}.historyModalV10 .historyFeedbackCardV8{height:auto!important;min-height:230px!important;overflow:visible!important}.historyModalV10 .historyFeedbackCardV8 h3,.historyModalV10 .historyFeedbackCardV8 h4{font-size:20px!important;line-height:1.35!important}.historyModalV10 .historyFeedbackCardV8 p{font-size:15px!important;line-height:1.65!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}.historyModalV10 .historyFeedbackCardV8 span{font-size:14px!important;line-height:1.5!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h1{font-size:34px!important;line-height:1.2!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h2{font-size:25px!important;line-height:1.3!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h3{font-size:20px!important;line-height:1.4!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h4{font-size:17px!important;line-height:1.45!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch p,.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch li{font-size:15px!important;line-height:1.7!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch small{font-size:13px!important;line-height:1.5!important}.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub h1,.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub h2{font-size:28px!important;line-height:1.3!important}.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub h3{font-size:21px!important}.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub p,.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub li,.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub span{line-height:1.6!important}.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub p,.historyModalV10 .historyRealGameCardArchiveV1 .premiumDetailHub li{font-size:15px!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch article,.historyModalV10 .historyFeedbackCardV8{box-sizing:border-box!important;overflow:visible!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch article p,.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch article span{white-space:normal!important;word-break:keep-all!important;overflow-wrap:break-word!important;text-overflow:clip!important}@media(max-width:700px){.historyModalV10 .historySummaryAiReviewV1 h2{font-size:22px!important}.historyModalV10 .historyFeedbackCardV8{min-height:0!important}.historyModalV10 .historyFeedbackCardV8 h3,.historyModalV10 .historyFeedbackCardV8 h4{font-size:18px!important}.historyModalV10 .historyFeedbackCardV8 p,.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch p,.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch li{font-size:14px!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h2{font-size:22px!important}.historyModalV10 .historyRealGameCardArchiveV1 .analysisWebsiteMatch h3{font-size:18px!important}}
+
+/* HISTORY_ARCHIVE_ANALYSIS_FONT_FINAL_V1 */
+.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricHead b{font-size:17px!important;line-height:1.35!important;color:#172033!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricHead span{font-size:14px!important;font-weight:900!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricCard>strong{font-size:21px!important;line-height:1.4!important;color:#111827!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricCard>p{font-size:16px!important;line-height:1.75!important;color:#4b5563!important;min-height:110px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricFoot span{font-size:14px!important;line-height:1.4!important;padding:7px 10px!important;color:#374151!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumSectionTitle>span{font-size:14px!important;font-weight:900!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumSectionTitle b{font-size:22px!important;line-height:1.35!important;color:#172033!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumSectionTitle small{font-size:15px!important;line-height:1.5!important;color:#64748b!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumDeepCard>p{font-size:17px!important;line-height:1.8!important;color:#374151!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumProjectedScore span{font-size:16px!important;color:#64748b!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumProjectedScore b{font-size:42px!important;line-height:1.1!important;color:#111827!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumProjectedScore em{font-size:27px!important;color:#64748b!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumTimeline>div{grid-template-columns:92px 1fr!important;padding:16px 18px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumTimeline b{font-size:17px!important;line-height:1.4!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumTimeline span{font-size:16px!important;line-height:1.6!important;color:#374151!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVolatility{font-size:16px!important;font-weight:800!important;padding:8px 14px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumCheckList{gap:13px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumCheckList li{font-size:16px!important;line-height:1.7!important;color:#374151!important;padding-left:25px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumCheckList li::before{font-size:17px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVerdict span{font-size:13px!important;line-height:1.4!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVerdict b{font-size:24px!important;line-height:1.4!important;color:#111827!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVerdict p{font-size:17px!important;line-height:1.8!important;color:#374151!important}@media(max-width:700px){.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricHead b{font-size:16px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricCard>strong{font-size:19px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricCard>p,.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumDeepCard>p,.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumTimeline span,.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumCheckList li,.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVerdict p{font-size:15px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumMetricFoot span{font-size:13px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumSectionTitle b{font-size:20px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumSectionTitle small{font-size:14px!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumTimeline>div{grid-template-columns:70px 1fr!important}.historyRealGameCardArchiveV1 .analysisWebsiteMatch .premiumVerdict{grid-template-columns:1fr!important;gap:14px!important}}
+
+/* GAMECARD_HISTORY_COMMON_FONT_FINAL_V18 */
+/* 오늘경기 + 기록 GameCard 공통 AI 분석 */
+.analysisWebsiteMatch .premiumMetricHead span{font-size:15px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumMetricHead b{font-size:18px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumMetricCard>strong{font-size:20px!important;line-height:1.45!important;font-weight:900!important}.analysisWebsiteMatch .premiumMetricCard>p{font-size:16px!important;line-height:1.7!important;font-weight:650!important}.analysisWebsiteMatch .premiumMetricFoot span{font-size:15px!important;line-height:1.45!important;font-weight:800!important}.analysisWebsiteMatch .premiumSectionTitle>span{font-size:15px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumSectionTitle b{font-size:22px!important;line-height:1.35!important;font-weight:900!important}.analysisWebsiteMatch .premiumSectionTitle small{font-size:15px!important;line-height:1.5!important;font-weight:700!important}.analysisWebsiteMatch .premiumDeepCard>p{font-size:16px!important;line-height:1.75!important;font-weight:650!important}.analysisWebsiteMatch .premiumProjectedScore span{font-size:16px!important;line-height:1.4!important;font-weight:800!important}.analysisWebsiteMatch .premiumProjectedScore b{font-size:38px!important;line-height:1.15!important;font-weight:900!important}.analysisWebsiteMatch .premiumProjectedScore em{font-size:26px!important;line-height:1!important;font-weight:900!important}.analysisWebsiteMatch .premiumTimeline b{font-size:17px!important;line-height:1.45!important;font-weight:900!important}.analysisWebsiteMatch .premiumTimeline span{font-size:16px!important;line-height:1.65!important;font-weight:650!important}.analysisWebsiteMatch .premiumVolatility{font-size:16px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumCheckList li{font-size:16px!important;line-height:1.7!important;font-weight:650!important}.analysisWebsiteMatch .premiumVerdict span{font-size:14px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumVerdict b{font-size:23px!important;line-height:1.4!important;font-weight:900!important}.analysisWebsiteMatch .premiumVerdict p{font-size:17px!important;line-height:1.75!important;font-weight:650!important}
+/* 기록 AI 요약 제목 */
+.historyModalV10 .historyTabTitleV9 small{font-size:15px!important;line-height:1.4!important;font-weight:900!important;letter-spacing:.06em!important}.historyModalV10 .historyTabTitleV9 h3{font-size:25px!important;line-height:1.3!important;font-weight:900!important}.historyModalV10 .historyTabTitleV9>span{font-size:15px!important;line-height:1!important;font-weight:900!important;padding:8px 13px!important}
+/* 기록 AWAY HOME 팀명 실제스코어 */
+.historyModalV10 .historySummaryScoreV9 article small{font-size:15px!important;line-height:1.35!important;font-weight:900!important}.historyModalV10 .historySummaryScoreV9 article strong{font-size:20px!important;line-height:1.35!important;font-weight:900!important}.historyModalV10 .historySummaryScoreV9 article b{font-size:36px!important;line-height:1.1!important;font-weight:950!important}.historyModalV10 .historySummaryScoreV9>i{font-size:30px!important;line-height:1!important;font-weight:900!important}
+/* 기록 경기일 구장 승리팀 총득점 배당 라인업 */
+.historyModalV10 .historyInfoGridV9 article span{font-size:15px!important;line-height:1.4!important;font-weight:800!important;color:#64748b!important}.historyModalV10 .historyInfoGridV9 article strong{font-size:18px!important;line-height:1.45!important;font-weight:900!important;color:#0f172a!important}
+/* 기록 POST-GAME REVIEW */
+.historyModalV10 .historySummaryAiHeadV1 small{font-size:15px!important;line-height:1.4!important;font-weight:900!important;letter-spacing:.06em!important}.historyModalV10 .historySummaryAiHeadV1 h4{font-size:22px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historySummaryAiHeadV1>span{font-size:16px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historyFeedbackCardV8 header small{font-size:15px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historyFeedbackCardV8 header strong{font-size:20px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historyFeedbackCardV8 header>b{font-size:14px!important;font-weight:900!important}.historyModalV10 .historyFeedbackReasonV8 span{font-size:14px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historyFeedbackReasonV8 strong{font-size:16px!important;line-height:1.7!important;font-weight:800!important}.historyModalV10 .historyFeedbackCardV8>p{font-size:14px!important;line-height:1.65!important;font-weight:700!important}.historyModalV10 .historyFeedbackConclusionV8>small{font-size:14px!important;font-weight:900!important}.historyModalV10 .historyFeedbackConclusionV8>strong{font-size:20px!important;line-height:1.4!important;font-weight:900!important}.historyModalV10 .historyFeedbackConclusionV8>p{font-size:16px!important;line-height:1.7!important;font-weight:650!important}.historyModalV10 .historyStoredNoticeV9{font-size:15px!important;line-height:1.7!important;font-weight:700!important}
+@media(max-width:700px){.analysisWebsiteMatch .premiumMetricHead b{font-size:17px!important}.analysisWebsiteMatch .premiumMetricCard>strong{font-size:19px!important}.analysisWebsiteMatch .premiumMetricCard>p,.analysisWebsiteMatch .premiumDeepCard>p,.analysisWebsiteMatch .premiumTimeline span,.analysisWebsiteMatch .premiumCheckList li{font-size:15px!important}.analysisWebsiteMatch .premiumMetricFoot span{font-size:14px!important}.analysisWebsiteMatch .premiumSectionTitle b{font-size:20px!important}.analysisWebsiteMatch .premiumSectionTitle small{font-size:14px!important}.analysisWebsiteMatch .premiumVerdict p{font-size:16px!important}.historyModalV10 .historyTabTitleV9 h3{font-size:22px!important}.historyModalV10 .historySummaryScoreV9 article strong{font-size:18px!important}.historyModalV10 .historySummaryScoreV9 article b{font-size:32px!important}.historyModalV10 .historyInfoGridV9 article span{font-size:14px!important}.historyModalV10 .historyInfoGridV9 article strong{font-size:17px!important}.historyModalV10 .historySummaryAiHeadV1 h4{font-size:20px!important}}
+
+
+/* PURCHASED_REPLAY_FULLPAGE_V5 */
+.purchasedReplayPanelV4{position:fixed!important;inset:0!important;z-index:5000!important;width:100%!important;height:100dvh!important;max-width:none!important;margin:0!important;padding:0!important;overflow-y:auto!important;background:#f8fafc!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+.purchasedReplayHeadV4{position:sticky!important;top:0!important;z-index:5100!important;display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;width:100%!important;box-sizing:border-box!important;padding:18px 24px!important;background:#fff!important;border-bottom:1px solid #dbe3ed!important;box-shadow:0 6px 18px rgba(15,23,42,.06)!important}
+.purchasedReplayHeadV4>div{min-width:0!important}
+.purchasedReplayHeadV4 small{font-size:12px!important;font-weight:800!important;letter-spacing:.08em!important;color:#64748b!important}
+.purchasedReplayHeadV4 h3{margin:3px 0 0!important;font-size:22px!important;line-height:1.25!important;color:#0f172a!important}
+.purchasedReplayHeadV4 p{margin:4px 0 0!important;font-size:14px!important;color:#64748b!important}
+.purchasedReplayHeadV4>button{flex:0 0 auto!important;min-width:72px!important;height:42px!important;padding:0 18px!important;border:1px solid #cbd5e1!important;border-radius:12px!important;background:#fff!important;font-size:15px!important;font-weight:800!important;color:#0f172a!important;cursor:pointer!important}
+.purchasedReplayGameV4{width:min(1180px,100%)!important;margin:0 auto!important;padding:22px 18px 60px!important;box-sizing:border-box!important}
+.purchasedReplayStatusV4,.purchasedReplayErrorV4{width:min(1180px,calc(100% - 32px))!important;margin:24px auto!important;box-sizing:border-box!important}
+body:has(.purchasedReplayPanelV4){overflow:hidden!important}
+@media(max-width:760px){.purchasedReplayHeadV4{padding:13px 14px!important}.purchasedReplayHeadV4 h3{font-size:18px!important}.purchasedReplayHeadV4 p{display:none!important}.purchasedReplayHeadV4>button{min-width:58px!important;height:38px!important;padding:0 12px!important}.purchasedReplayGameV4{padding:12px 8px 40px!important}}
+
+
+
+
+
+
+
+
+
+/* PURCHASED_REPLAY_CONTENT_GUTTER_FINAL_V10
+   다시보기 최종 정렬
+   전체폭 흰 섹션 구조는 유지하고 실제 내용에 동일 gutter 적용
+*/
+
+html body .purchasedReplayGameV4 {
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+}
+
+html body .purchasedReplayGameV4 > .analysisWebsiteMatch {
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  padding:0 !important;
+  box-sizing:border-box !important;
+}
+
+/* HERO */
+html body .purchasedReplayGameV4 .gameAnalysisHeroV1 {
+  width:calc(100% - 40px) !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  box-sizing:border-box !important;
+}
+
+/* TAB */
+html body .purchasedReplayGameV4 .gameAnalysisTabsV2 {
+  width:calc(100% - 40px) !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  box-sizing:border-box !important;
+}
+
+/*
+ AI 경기 전망을 포함한 premiumDetailHub는
+ 배경/구분선 구조 때문에 전체폭 유지.
+ 대신 내부 실제 콘텐츠를 20px 안쪽으로 넣는다.
+*/
+html body .purchasedReplayGameV4 .premiumDetailHub {
+  width:100% !important;
+  max-width:none !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  box-sizing:border-box !important;
+}
+
+/* AI 경기 전망 */
+html body .purchasedReplayGameV4 .premiumDetailHub > .premiumOutlook {
+  width:100% !important;
+  max-width:none !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding-left:20px !important;
+  padding-right:20px !important;
+  box-sizing:border-box !important;
+}
+
+/* 01~04 */
+html body .purchasedReplayGameV4 .premiumDetailHub > .premiumMetricGrid {
+  width:100% !important;
+  max-width:none !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding-left:20px !important;
+  padding-right:20px !important;
+  box-sizing:border-box !important;
+}
+
+/* 05 이후 */
+html body .purchasedReplayGameV4 .premiumDetailHub > .premiumDeepGrid {
+  width:100% !important;
+  max-width:none !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  padding-left:20px !important;
+  padding-right:20px !important;
+  box-sizing:border-box !important;
+}
+
+html body .purchasedReplayGameV4 .premiumDetailHub > .premiumVerdict {
+  width:calc(100% - 40px) !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  box-sizing:border-box !important;
+}
+
+/* 다른 분석 탭의 실제 콘텐츠 */
+html body .purchasedReplayGameV4 .gameAnalysisSectionHeadV3,
+html body .purchasedReplayGameV4 .gameAnalysisSummaryV3,
+html body .purchasedReplayGameV4 .gameStarterRatingV3,
+html body .purchasedReplayGameV4 .starterCompare,
+html body .purchasedReplayGameV4 .detailTopGrid,
+html body .purchasedReplayGameV4 .lineupAnalysis,
+html body .purchasedReplayGameV4 .detailBottomGrid,
+html body .purchasedReplayGameV4 .gameFlowDetailV3,
+html body .purchasedReplayGameV4 .gameFlowEdgeV3,
+html body .purchasedReplayGameV4 .detailedOverallAnalysis {
+  width:calc(100% - 40px) !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  box-sizing:border-box !important;
+}
+
+@media(max-width:760px) {
+  html body .purchasedReplayGameV4 .gameAnalysisHeroV1,
+  html body .purchasedReplayGameV4 .gameAnalysisTabsV2,
+  html body .purchasedReplayGameV4 .premiumDetailHub > .premiumVerdict,
+  html body .purchasedReplayGameV4 .gameAnalysisSectionHeadV3,
+  html body .purchasedReplayGameV4 .gameAnalysisSummaryV3,
+  html body .purchasedReplayGameV4 .gameStarterRatingV3,
+  html body .purchasedReplayGameV4 .starterCompare,
+  html body .purchasedReplayGameV4 .detailTopGrid,
+  html body .purchasedReplayGameV4 .lineupAnalysis,
+  html body .purchasedReplayGameV4 .detailBottomGrid,
+  html body .purchasedReplayGameV4 .gameFlowDetailV3,
+  html body .purchasedReplayGameV4 .gameFlowEdgeV3,
+  html body .purchasedReplayGameV4 .detailedOverallAnalysis {
+    width:calc(100% - 16px) !important;
+  }
+
+  html body .purchasedReplayGameV4 .premiumDetailHub > .premiumOutlook,
+  html body .purchasedReplayGameV4 .premiumDetailHub > .premiumMetricGrid,
+  html body .purchasedReplayGameV4 .premiumDetailHub > .premiumDeepGrid {
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+}
+
+/* PURCHASED_REPLAY_VERDICT_GUTTER_V11 */
+/* AI 한줄평만 위 분석 콘텐츠와 동일한 좌우 기준선으로 정렬 */
+html body .purchasedReplayGameV4 .premiumDetailHub > .premiumVerdict {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: 20px !important;
+  margin-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width:760px) {
+  html body .purchasedReplayGameV4 .premiumDetailHub > .premiumVerdict {
+    width: calc(100% - 16px) !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+}
+
+/* PURCHASED_REPLAY_VERDICT_REAL_FIX_V12
+   실제 AI 한줄평 premiumVerdict 직접 정렬
+*/
+html body .purchasedReplayGameV4 .analysisWebsiteMatch .premiumVerdict {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: 20px !important;
+  margin-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width:760px) {
+  html body .purchasedReplayGameV4 .analysisWebsiteMatch .premiumVerdict {
+    width: calc(100% - 16px) !important;
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+}
+
+/* PREMIUM_VERDICT_INNER_V13
+   AI 한줄평 실제 내용 자체에 gutter 적용
+*/
+html body .premiumVerdict .premiumVerdictInnerV13 {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width:760px) {
+  html body .premiumVerdict .premiumVerdictInnerV13 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* PREMIUM_VERDICT_INNER_LAYOUT_FIX_V14
+   V13 여백 유지 + 한줄평 원래 세로 제목 구조 복원
+*/
+html body .premiumVerdict .premiumVerdictInnerV13 {
+  display: block !important;
+  width: 100% !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+html body .premiumVerdict .premiumVerdictInnerV13 > div:first-child {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
+
+html body .premiumVerdict .premiumVerdictInnerV13 > div:first-child > span,
+html body .premiumVerdict .premiumVerdictInnerV13 > div:first-child > b {
+  display: block !important;
+  width: auto !important;
+}
+
+html body .premiumVerdict .premiumVerdictInnerV13 > p {
+  display: block !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+@media(max-width:760px) {
+  html body .premiumVerdict .premiumVerdictInnerV13 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* GAMECARD_UNIFIED_GUTTER_V15
+   다시보기에서 확정한 좌우 기준을
+   일반 경기분석 + 경기기록 상세에도 동일 적용
+*/
+
+/* =========================
+   1. 일반 경기분석
+   ========================= */
+
+html body .gameGrid .analysisWebsiteMatch > .gameAnalysisHeroV1,
+html body .gameGrid .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* AI 분석 전체 구조는 전체폭 유지 */
+html body .gameGrid .analysisWebsiteMatch > .premiumDetailHub {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* AI 경기 전망 / 01~04 / 05~08 */
+html body .gameGrid .premiumDetailHub > .premiumOutlook,
+html body .gameGrid .premiumDetailHub > .premiumMetricGrid,
+html body .gameGrid .premiumDetailHub > .premiumDeepGrid {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* 한줄평: V13 wrapper 기준 */
+html body .gameGrid .premiumVerdict .premiumVerdictInnerV13 {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* 선발 / 타선라인업 / 팀흐름불펜 / 프리미엄 */
+html body .gameGrid .analysisWebsiteMatch > .gameAnalysisSectionHeadV3,
+html body .gameGrid .analysisWebsiteMatch > .gameAnalysisSummaryV3,
+html body .gameGrid .analysisWebsiteMatch > .gameStarterRatingV3,
+html body .gameGrid .analysisWebsiteMatch > .starterCompare,
+html body .gameGrid .analysisWebsiteMatch > .detailTopGrid,
+html body .gameGrid .analysisWebsiteMatch > .lineupAnalysis,
+html body .gameGrid .analysisWebsiteMatch > .detailBottomGrid,
+html body .gameGrid .analysisWebsiteMatch > .gameFlowDetailV3,
+html body .gameGrid .analysisWebsiteMatch > .gameFlowEdgeV3,
+html body .gameGrid .analysisWebsiteMatch > .detailedOverallAnalysis {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+
+/* =========================
+   2. 경기기록 상세
+   ========================= */
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisHeroV1,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .premiumDetailHub {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumOutlook,
+html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumMetricGrid,
+html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumDeepGrid {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+html body .historyRealGameCardArchiveV1 .premiumVerdict .premiumVerdictInnerV13 {
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisSectionHeadV3,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisSummaryV3,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameStarterRatingV3,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .starterCompare,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .detailTopGrid,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .lineupAnalysis,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .detailBottomGrid,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameFlowDetailV3,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameFlowEdgeV3,
+html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .detailedOverallAnalysis {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+
+/* =========================
+   모바일 공통
+   ========================= */
+
+@media(max-width:760px) {
+  html body .gameGrid .analysisWebsiteMatch > .gameAnalysisHeroV1,
+  html body .gameGrid .analysisWebsiteMatch > .gameAnalysisTabsV2,
+  html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisHeroV1,
+  html body .historyRealGameCardArchiveV1 .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+    width: calc(100% - 16px) !important;
+  }
+
+  html body .gameGrid .premiumDetailHub > .premiumOutlook,
+  html body .gameGrid .premiumDetailHub > .premiumMetricGrid,
+  html body .gameGrid .premiumDetailHub > .premiumDeepGrid,
+  html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumOutlook,
+  html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumMetricGrid,
+  html body .historyRealGameCardArchiveV1 .premiumDetailHub > .premiumDeepGrid,
+  html body .gameGrid .premiumVerdict .premiumVerdictInnerV13,
+  html body .historyRealGameCardArchiveV1 .premiumVerdict .premiumVerdictInnerV13 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* GAMECARD_REPLAY_STANDARD_FINAL_V16
+   구매분석 다시보기를 기준으로 모든 GameCard UI 통일
+   - 오늘 경기분석
+   - 경기기록 상세
+   - 구매분석 다시보기
+*/
+
+/* ===== 공통 GameCard 바깥 구조 ===== */
+html body .analysisWebsiteMatch {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== HERO : 다시보기 기준 ===== */
+html body .analysisWebsiteMatch > .gameAnalysisHeroV1 {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== 분석 탭 : 다시보기 기준 ===== */
+html body .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== AI 분석 부모 ===== */
+html body .analysisWebsiteMatch > .premiumDetailHub {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* AI 경기 전망 */
+html body .analysisWebsiteMatch .premiumDetailHub > .premiumOutlook {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* 01~04 */
+html body .analysisWebsiteMatch .premiumDetailHub > .premiumMetricGrid {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* 05~08 */
+html body .analysisWebsiteMatch .premiumDetailHub > .premiumDeepGrid {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== AI 한줄평 ===== */
+html body .analysisWebsiteMatch .premiumVerdict .premiumVerdictInnerV13 {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+html body .analysisWebsiteMatch .premiumVerdict .premiumVerdictInnerV13 > div:first-child {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
+
+html body .analysisWebsiteMatch .premiumVerdict .premiumVerdictInnerV13 > div:first-child > span,
+html body .analysisWebsiteMatch .premiumVerdict .premiumVerdictInnerV13 > div:first-child > b {
+  display: block !important;
+  width: auto !important;
+}
+
+/* ===== 선발 / 라인업 / 팀흐름 / 프리미엄 ===== */
+/* 다시보기와 동일한 20px 좌우선 */
+html body .analysisWebsiteMatch > .gameAnalysisSectionHeadV3,
+html body .analysisWebsiteMatch > .gameAnalysisSummaryV3,
+html body .analysisWebsiteMatch > .gameStarterRatingV3,
+html body .analysisWebsiteMatch > .starterCompare,
+html body .analysisWebsiteMatch > .detailTopGrid,
+html body .analysisWebsiteMatch > .lineupAnalysis,
+html body .analysisWebsiteMatch > .detailBottomGrid,
+html body .analysisWebsiteMatch > .gameFlowDetailV3,
+html body .analysisWebsiteMatch > .gameFlowEdgeV3,
+html body .analysisWebsiteMatch > .gameAnalysisLockedV2,
+html body .analysisWebsiteMatch > .detailedOverallAnalysis {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== 경기기록 wrapper가 추가 폭을 만들지 않게 ===== */
+html body .historyRealGameCardArchiveV1 {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== 구매 다시보기 wrapper도 동일 ===== */
+html body .purchasedReplayGameV4 {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ===== 모바일 ===== */
+@media(max-width:760px) {
+
+  html body .analysisWebsiteMatch > .gameAnalysisHeroV1,
+  html body .analysisWebsiteMatch > .gameAnalysisTabsV2,
+  html body .analysisWebsiteMatch > .gameAnalysisSectionHeadV3,
+  html body .analysisWebsiteMatch > .gameAnalysisSummaryV3,
+  html body .analysisWebsiteMatch > .gameStarterRatingV3,
+  html body .analysisWebsiteMatch > .starterCompare,
+  html body .analysisWebsiteMatch > .detailTopGrid,
+  html body .analysisWebsiteMatch > .lineupAnalysis,
+  html body .analysisWebsiteMatch > .detailBottomGrid,
+  html body .analysisWebsiteMatch > .gameFlowDetailV3,
+  html body .analysisWebsiteMatch > .gameFlowEdgeV3,
+  html body .analysisWebsiteMatch > .gameAnalysisLockedV2,
+  html body .analysisWebsiteMatch > .detailedOverallAnalysis {
+    width: calc(100% - 16px) !important;
+  }
+
+  html body .analysisWebsiteMatch .premiumDetailHub > .premiumOutlook,
+  html body .analysisWebsiteMatch .premiumDetailHub > .premiumMetricGrid,
+  html body .analysisWebsiteMatch .premiumDetailHub > .premiumDeepGrid,
+  html body .analysisWebsiteMatch .premiumVerdict .premiumVerdictInnerV13 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* GLOBAL_PAGE_GUTTER_STANDARD_V17
+   사이트 전체 디자인 기준
+   PC 20px / 태블릿 16px / 모바일 8px
+   body padding이 아닌 페이지 최상위 영역에만 적용
+*/
+
+:root {
+  --kbo-page-gutter: 20px;
+}
+
+/* =========================================================
+   공통 페이지 최상위 프레임
+   ========================================================= */
+
+html body .content > .communityHomeV3,
+html body .content > .historyPortalV3,
+html body .content > .communityPageV1,
+html body .content > .settingsPage,
+html body .content > .myCombosPage {
+  width: calc(100% - (var(--kbo-page-gutter) * 2)) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   홈
+   실시간 경기 기능/내부 구조는 변경하지 않고
+   페이지 바깥 시작선만 통일
+   ========================================================= */
+
+html body .content > .communityHomeV3 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* =========================================================
+   경기기록
+   ========================================================= */
+
+html body .content > .historyPortalV3 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html body .historyPortalV3 > .historyPortalHeroV3,
+html body .historyPortalV3 > .historyArchiveToolbarV3,
+html body .historyPortalV3 > .historyArchiveGridV3,
+html body .historyPortalV3 > .historyGameListV3 {
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* 경기기록 상세 전체화면은 viewport를 유지하되
+   내부 헤더/탭/본문 기준선을 동일하게 */
+html body .historyModalV10 .historyModalTopV10,
+html body .historyModalV10 .historyRealTabsV9,
+html body .historyModalV10 .historyTabPanelV9 {
+  box-sizing: border-box !important;
+}
+
+html body .historyModalV10 .historyTabPanelV9 {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* 기록 상세 GameCard는 이미 V16에서 20px 기준이므로
+   바깥에서 추가 여백을 만들지 않음 */
+html body .historyModalV10 .historyRealGameCardArchiveV1 {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   커뮤니티
+   ========================================================= */
+
+html body .content > .communityPageV1 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html body .communityPageV1 .communityLayoutV3,
+html body .communityPageV1 .communityMainV3 {
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   설정
+   ========================================================= */
+
+html body .content > .settingsPage {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html body .settingsPage .settingsHero,
+html body .settingsPage .settingsGrid {
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   마이페이지 / 내 조합
+   ========================================================= */
+
+html body .content > .myCombosPage {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+html body .myCombosPage .myPageHeroV2,
+html body .myCombosPage .myPageAccountPanelV3 {
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   GameCard 공통
+   다시보기에서 확정한 디자인 기준 유지
+   ========================================================= */
+
+html body .analysisWebsiteMatch > .gameAnalysisHeroV1,
+html body .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+  width: calc(100% - 40px) !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   반응형
+   ========================================================= */
+
+@media (max-width:1100px) {
+  :root {
+    --kbo-page-gutter: 16px;
+  }
+
+  html body .historyModalV10 .historyTabPanelV9 {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+@media (max-width:760px) {
+  :root {
+    --kbo-page-gutter: 8px;
+  }
+
+  html body .historyModalV10 .historyTabPanelV9 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  html body .analysisWebsiteMatch > .gameAnalysisHeroV1,
+  html body .analysisWebsiteMatch > .gameAnalysisTabsV2 {
+    width: calc(100% - 16px) !important;
+  }
+}
+
+/* KBO_GLOBAL_DESIGN_SYSTEM_V18
+   전체 페이지 시각 규격 통일
+   기능/데이터/실시간 경기 로직 변경 없음
+*/
+
+:root {
+  --kbo-ui-radius-lg: 20px;
+  --kbo-ui-radius-md: 16px;
+  --kbo-ui-border: #dbe3ed;
+  --kbo-ui-bg: #ffffff;
+  --kbo-ui-soft-bg: #f8fafc;
+  --kbo-ui-title: #111827;
+  --kbo-ui-text: #334155;
+  --kbo-ui-muted: #64748b;
+  --kbo-ui-section-gap: 20px;
+  --kbo-ui-card-gap: 14px;
+}
+
+/* =========================================================
+   페이지 기본 세로 리듬
+   ========================================================= */
+
+html body .communityHomeV3,
+html body .historyPortalV3,
+html body .communityPageV1,
+html body .settingsPage,
+html body .myCombosPage {
+  box-sizing: border-box !important;
+}
+
+/* 페이지의 대표 Hero */
+html body .historyPortalHeroV3,
+html body .settingsHero,
+html body .myPageHeroV2 {
+  border-radius: var(--kbo-ui-radius-lg) !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   페이지 대표 제목 크기 통일
+   ========================================================= */
+
+html body .historyPortalHeroV3 h1,
+html body .settingsHero h2,
+html body .communityPageV1 h2 {
+  font-size: 28px !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.04em !important;
+  font-weight: 900 !important;
+  margin-top: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+html body .historyPortalHeroV3 p,
+html body .settingsHero p,
+html body .communityPageV1 p {
+  font-size: 15px !important;
+  line-height: 1.65 !important;
+}
+
+/* 영문 eyebrow */
+html body .historyPortalHeroV3 > div > span:first-child,
+html body .settingsEyebrow,
+html body .communityPageV1 .communityComingSoon > span {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  font-weight: 900 !important;
+  letter-spacing: .08em !important;
+}
+
+/* =========================================================
+   공통 카드 규격
+   ========================================================= */
+
+html body .settingsCard,
+html body .communityCardV3,
+html body .historyArchiveToolbarV3,
+html body .historyGameListV3,
+html body .myPageAccountPanelV3,
+html body .autoComboCard,
+html body .featuredComboSection,
+html body .manualGameComboBuilder {
+  border-radius: var(--kbo-ui-radius-lg) !important;
+  border: 1px solid var(--kbo-ui-border) !important;
+  box-sizing: border-box !important;
+}
+
+/* 카드 내부 기본 제목 */
+html body .settingsCardHead h3,
+html body .communityTitleV3 h3,
+html body .autoComboTitle h2,
+html body .featuredComboHead h3,
+html body .manualGameComboHead h3 {
+  font-size: 19px !important;
+  line-height: 1.25 !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+}
+
+/* 카드 보조문구 */
+html body .settingsCardHead p,
+html body .communityCardV3 p,
+html body .autoComboTitle p,
+html body .featuredComboHead p {
+  font-size: 14px !important;
+  line-height: 1.55 !important;
+}
+
+/* =========================================================
+   버튼 / 입력폼 기본 높이 통일
+   ========================================================= */
+
+html body .settingsPage button,
+html body .communityPageV1 button,
+html body .historyPortalV3 button,
+html body .myCombosPage button {
+  box-sizing: border-box !important;
+}
+
+html body .settingsPage input,
+html body .settingsPage select,
+html body .historyPortalV3 select {
+  min-height: 42px !important;
+  border-radius: 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   탭 공통 느낌
+   ========================================================= */
+
+html body .communityTabsV3,
+html body .historyRealTabsV9,
+html body .gameAnalysisTabsV2 {
+  box-sizing: border-box !important;
+}
+
+html body .communityTabsV3 button,
+html body .historyRealTabsV9 button,
+html body .gameAnalysisTabsV2 button {
+  min-height: 44px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   경기기록 목록
+   ========================================================= */
+
+html body .historyArchiveToolbarV3 {
+  margin-top: var(--kbo-ui-section-gap) !important;
+}
+
+html body .historyGameRowsV3 {
+  box-sizing: border-box !important;
+}
+
+html body .historyGameRowsV3 > * {
+  box-sizing: border-box !important;
+}
+
+/* =========================================================
+   설정
+   ========================================================= */
+
+html body .settingsGrid {
+  gap: var(--kbo-ui-card-gap) !important;
+}
+
+html body .settingsCard {
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   마이페이지 / 내 조합
+   ========================================================= */
+
+html body .myCombosPage {
+  gap: var(--kbo-ui-section-gap) !important;
+}
+
+html body .myPageAccountPanelV3 {
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   자동조합
+   ========================================================= */
+
+html body .autoComboGrid,
+html body .featuredComboGrid {
+  gap: var(--kbo-ui-card-gap) !important;
+}
+
+html body .autoComboCard {
+  overflow: hidden !important;
+}
+
+/* =========================================================
+   GameCard
+   이미 확정한 다시보기 디자인 유지
+   여기서는 라운드 계열만 통일
+   ========================================================= */
+
+html body .analysisWebsiteMatch .gameAnalysisHeroV1 {
+  border-radius: var(--kbo-ui-radius-lg) !important;
+}
+
+html body .analysisWebsiteMatch .premiumMetricCard,
+html body .analysisWebsiteMatch .premiumDeepCard {
+  border-radius: var(--kbo-ui-radius-md) !important;
+}
+
+/* =========================================================
+   모바일
+   ========================================================= */
+
+@media(max-width:760px) {
+  :root {
+    --kbo-ui-radius-lg: 16px;
+    --kbo-ui-radius-md: 14px;
+    --kbo-ui-section-gap: 14px;
+    --kbo-ui-card-gap: 10px;
+  }
+
+  html body .historyPortalHeroV3 h1,
+  html body .settingsHero h2,
+  html body .communityPageV1 h2 {
+    font-size: 23px !important;
+  }
+
+  html body .settingsCardHead h3,
+  html body .communityTitleV3 h3,
+  html body .autoComboTitle h2,
+  html body .featuredComboHead h3,
+  html body .manualGameComboHead h3 {
+    font-size: 17px !important;
+  }
+
+  html body .communityTabsV3 button,
+  html body .historyRealTabsV9 button,
+  html body .gameAnalysisTabsV2 button {
+    min-height: 42px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* COMMUNITY_REAL_SERVICE_V4 */
+.communityPageV4{
+  width:calc(100% - 40px);
+  margin:0 auto;
+  padding:24px 0 56px;
+  box-sizing:border-box;
+  color:#0f172a
+}
+.communityHeroV4{
+  min-height:180px;
+  padding:34px 38px;
+  border-radius:24px;
+  background:linear-gradient(135deg,#07182e,#102b4d);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  box-shadow:0 18px 44px rgba(15,23,42,.12)
+}
+.communityHeroV4 span{
+  display:block;
+  margin-bottom:8px;
+  color:#7dd3fc;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.14em
+}
+.communityHeroV4 h1{
+  margin:0;
+  font-size:34px;
+  line-height:1.15;
+  font-weight:950
+}
+.communityHeroV4 p{
+  margin:10px 0 0;
+  color:#cbd5e1;
+  font-size:15px;
+  font-weight:700
+}
+.communityHeroV4>button{
+  min-width:118px;
+  height:48px;
+  border:0;
+  border-radius:14px;
+  background:#fff;
+  color:#0f172a;
+  font-size:15px;
+  font-weight:950;
+  cursor:pointer
+}
+.communityMessageV4{
+  margin-top:14px;
+  padding:13px 16px;
+  border:1px solid #bae6fd;
+  border-radius:14px;
+  background:#f0f9ff;
+  color:#075985;
+  font-size:14px;
+  font-weight:800
+}
+.communityToolbarV4{
+  margin-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px
+}
+.communityCategoryTabsV4,
+.communitySortV4,
+.communityGameFilterV4{
+  display:flex;
+  gap:8px;
+  overflow-x:auto
+}
+.communityCategoryTabsV4 button,
+.communitySortV4 button,
+.communityGameFilterV4 button{
+  flex:0 0 auto;
+  height:42px;
+  padding:0 16px;
+  border:1px solid #dbe3ec;
+  border-radius:12px;
+  background:#fff;
+  color:#64748b;
+  font-size:14px;
+  font-weight:850;
+  cursor:pointer
+}
+.communityCategoryTabsV4 button.active,
+.communitySortV4 button.active,
+.communityGameFilterV4 button.active{
+  border-color:#0f2745;
+  background:#0f2745;
+  color:#fff
+}
+.communityGameFilterV4{
+  margin-top:12px;
+  padding-bottom:3px
+}
+.communityLayoutV4{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:18px;
+  margin-top:18px
+}
+.communityFeedV4{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px
+}
+.communityPostV4{
+  position:relative;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 5px 18px rgba(15,23,42,.035)
+}
+.communityPostBodyV4{
+  display:block;
+  width:100%;
+  padding:22px 72px 20px 22px;
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  cursor:pointer
+}
+.communityPostMetaV4{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0
+}
+.communityPostMetaV4 span{
+  padding:5px 8px;
+  border-radius:8px;
+  background:#eaf2ff;
+  color:#1d4ed8;
+  font-size:11px;
+  font-weight:900
+}
+.communityPostMetaV4 b{
+  color:#475569;
+  font-size:12px;
+  font-weight:850;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.communityPostMetaV4 i{
+  margin-left:auto;
+  color:#94a3b8;
+  font-size:12px;
+  font-style:normal;
+  font-weight:700
+}
+.communityPostBodyV4 h3{
+  margin:13px 0 7px;
+  color:#0f172a;
+  font-size:19px;
+  line-height:1.4;
+  font-weight:950
+}
+.communityPostBodyV4>p{
+  display:-webkit-box;
+  margin:0;
+  color:#64748b;
+  font-size:14px;
+  line-height:1.65;
+  overflow:hidden;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  white-space:pre-wrap
+}
+.communityPostBodyV4 footer{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:17px;
+  color:#94a3b8;
+  font-size:12px
+}
+.communityPostBodyV4 footer strong{
+  color:#475569
+}
+.communityLikeV4{
+  position:absolute;
+  top:50%;
+  right:18px;
+  transform:translateY(-50%);
+  min-width:46px;
+  height:46px;
+  padding:0 10px;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  background:#f8fafc;
+  color:#64748b;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer
+}
+.communityLikeV4.active{
+  border-color:#fecdd3;
+  background:#fff1f2;
+  color:#e11d48
+}
+.communityEmptyV4{
+  min-height:260px;
+  border:1px dashed #cbd5e1;
+  border-radius:20px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  color:#94a3b8;
+  font-size:14px
+}
+.communityEmptyV4 strong{
+  color:#334155;
+  font-size:18px
+}
+.communitySideV4{
+  display:flex;
+  flex-direction:column;
+  gap:12px
+}
+.communitySideV4>section{
+  padding:22px;
+  border:1px solid #e2e8f0;
+  border-radius:18px;
+  background:#fff
+}
+.communitySideV4 small{
+  color:#2563eb;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.1em
+}
+.communitySideV4 h3{
+  margin:7px 0 8px;
+  color:#0f172a;
+  font-size:18px;
+  font-weight:950
+}
+.communitySideV4 p{
+  margin:0;
+  color:#64748b;
+  font-size:13px;
+  line-height:1.6
+}
+.communityTodayGamesV4{
+  display:flex;
+  flex-direction:column;
+  margin-top:12px
+}
+.communityTodayGamesV4 button{
+  padding:11px 0;
+  border:0;
+  border-top:1px solid #eef2f7;
+  background:transparent;
+  text-align:left;
+  cursor:pointer
+}
+.communityTodayGamesV4 span{
+  display:block;
+  color:#94a3b8;
+  font-size:11px
+}
+.communityTodayGamesV4 b{
+  display:block;
+  margin-top:3px;
+  color:#334155;
+  font-size:13px
+}
+.communityModalBackdropV4{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  padding:24px;
+  background:rgba(2,8,23,.64);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto
+}
+.communityWriteModalV4,
+.communityDetailModalV4{
+  width:min(720px,100%);
+  max-height:calc(100vh - 48px);
+  overflow:auto;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 30px 90px rgba(0,0,0,.25)
+}
+.communityWriteModalV4{
+  padding:26px
+}
+.communityWriteModalV4>header,
+.communityDetailModalV4>header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:20px
+}
+.communityWriteModalV4>header small{
+  color:#2563eb;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.12em
+}
+.communityWriteModalV4>header h2,
+.communityDetailModalV4>header h2{
+  margin:5px 0 0;
+  color:#0f172a;
+  font-size:25px;
+  font-weight:950
+}
+.communityWriteModalV4>header>button,
+.communityDetailModalV4>header>button{
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:12px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:24px;
+  cursor:pointer
+}
+.communityWriteModalV4>label{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:18px;
+  color:#334155;
+  font-size:13px;
+  font-weight:900
+}
+.communityWriteModalV4 input,
+.communityWriteModalV4 select,
+.communityWriteModalV4 textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:1px solid #dbe3ec;
+  border-radius:12px;
+  background:#fff;
+  color:#0f172a;
+  font:inherit;
+  outline:none
+}
+.communityWriteModalV4 input,
+.communityWriteModalV4 select{
+  height:46px;
+  padding:0 13px
+}
+.communityWriteModalV4 textarea{
+  min-height:190px;
+  padding:13px;
+  resize:vertical;
+  line-height:1.6
+}
+.communityWriteModalV4>footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:20px
+}
+.communityWriteModalV4>footer button{
+  min-width:100px;
+  height:44px;
+  border:0;
+  border-radius:12px;
+  background:#0f2745;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer
+}
+.communityWriteModalV4>footer button.secondary{
+  border:1px solid #dbe3ec;
+  background:#fff;
+  color:#475569
+}
+.communityDetailModalV4{
+  padding:0 26px 28px
+}
+.communityDetailModalV4>header{
+  position:sticky;
+  top:0;
+  z-index:2;
+  margin:0 -26px;
+  padding:24px 26px 18px;
+  border-bottom:1px solid #eef2f7;
+  background:#fff
+}
+.communityDetailModalV4>header span{
+  color:#2563eb;
+  font-size:12px;
+  font-weight:900
+}
+.communityDetailModalV4>header p{
+  margin:7px 0 0;
+  color:#94a3b8;
+  font-size:12px
+}
+.communityDetailGameV4{
+  margin-top:20px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#f1f5f9;
+  color:#334155;
+  font-size:13px;
+  font-weight:850
+}
+.communityDetailContentV4{
+  min-height:130px;
+  padding:24px 2px;
+  color:#334155;
+  font-size:15px;
+  line-height:1.8;
+  white-space:pre-wrap
+}
+.communityDetailLikeV4{
+  height:42px;
+  padding:0 15px;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  background:#fff;
+  color:#64748b;
+  font-weight:900;
+  cursor:pointer
+}
+.communityDetailLikeV4.active{
+  border-color:#fecdd3;
+  background:#fff1f2;
+  color:#e11d48
+}
+.communityCommentsV4{
+  margin-top:22px;
+  padding-top:20px;
+  border-top:1px solid #e2e8f0
+}
+.communityCommentsV4>h3{
+  margin:0 0 14px;
+  font-size:17px;
+  font-weight:950
+}
+.communityCommentsV4>article{
+  padding:14px 0;
+  border-top:1px solid #f1f5f9
+}
+.communityCommentsV4>article header{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+.communityCommentsV4>article b{
+  color:#334155;
+  font-size:13px
+}
+.communityCommentsV4>article span{
+  color:#94a3b8;
+  font-size:11px
+}
+.communityCommentsV4>article p{
+  margin:7px 0 0;
+  color:#475569;
+  font-size:14px;
+  line-height:1.6;
+  white-space:pre-wrap
+}
+.communityCommentWriteV4{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 76px;
+  gap:8px;
+  margin-top:14px
+}
+.communityCommentWriteV4 textarea{
+  min-height:76px;
+  padding:11px;
+  border:1px solid #dbe3ec;
+  border-radius:12px;
+  resize:vertical;
+  font:inherit;
+  box-sizing:border-box
+}
+.communityCommentWriteV4 button{
+  border:0;
+  border-radius:12px;
+  background:#0f2745;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer
+}
+.communityCommentWriteV4 button:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+@media(max-width:900px){
+  .communityPageV4{
+    width:calc(100% - 32px)
+  }
+  .communityLayoutV4{
+    grid-template-columns:1fr
+  }
+  .communitySideV4{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+}
+@media(max-width:700px){
+  .communityPageV4{
+    width:calc(100% - 16px);
+    padding-top:10px
+  }
+  .communityHeroV4{
+    min-height:0;
+    padding:24px 20px;
+    border-radius:18px;
+    align-items:flex-start
+  }
+  .communityHeroV4 h1{
+    font-size:28px
+  }
+  .communityHeroV4 p{
+    font-size:13px
+  }
+  .communityHeroV4>button{
+    min-width:86px;
+    height:42px;
+    font-size:13px
+  }
+  .communityToolbarV4{
+    align-items:flex-start;
+    flex-direction:column
+  }
+  .communityCategoryTabsV4,
+  .communitySortV4{
+    width:100%
+  }
+  .communityPostBodyV4{
+    padding:18px 62px 17px 16px
+  }
+  .communityPostBodyV4 h3{
+    font-size:17px
+  }
+  .communityPostMetaV4 b{
+    display:none
+  }
+  .communityPostBodyV4 footer{
+    flex-direction:column;
+    gap:4px
+  }
+  .communityLikeV4{
+    right:10px;
+    min-width:42px;
+    height:42px
+  }
+  .communitySideV4{
+    grid-template-columns:1fr
+  }
+  .communityModalBackdropV4{
+    padding:8px
+  }
+  .communityWriteModalV4,
+  .communityDetailModalV4{
+    max-height:calc(100vh - 16px);
+    border-radius:17px
+  }
+  .communityWriteModalV4{
+    padding:18px
+  }
+  .communityDetailModalV4{
+    padding:0 17px 20px
+  }
+  .communityDetailModalV4>header{
+    margin:0 -17px;
+    padding:18px 17px 14px
+  }
+  .communityDetailModalV4>header h2{
+    font-size:21px
+  }
+}
+
+/* COMMUNITY_FULL_DETAIL_V5 */
+.communityPostPageV5{
+  max-width:1180px;
+}
+
+.communityPostPageTopV5{
+  display:flex;
+  align-items:center;
+  min-height:58px;
+  margin-bottom:10px;
+}
+
+.communityBackV5,
+.communityPostBottomV5 button{
+  height:42px;
+  padding:0 16px;
+  border:1px solid #dbe3ec;
+  border-radius:12px;
+  background:#fff;
+  color:#334155;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.communityBackV5:hover,
+.communityPostBottomV5 button:hover{
+  background:#f8fafc;
+}
+
+.communityFullPostV5{
+  border:1px solid #e2e8f0;
+  border-radius:20px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:0 6px 22px rgba(15,23,42,.035);
+}
+
+.communityFullPostHeaderV5{
+  padding:30px 34px 24px;
+  border-bottom:1px solid #edf2f7;
+}
+
+.communityFullPostCategoryV5{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.communityFullPostCategoryV5 span{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:8px;
+  background:#eaf2ff;
+  color:#1d4ed8;
+  font-size:12px;
+  font-weight:950;
+}
+
+.communityFullPostCategoryV5 b{
+  color:#64748b;
+  font-size:12px;
+  font-weight:850;
+}
+
+.communityFullPostHeaderV5 h1{
+  margin:0;
+  color:#0f172a;
+  font-size:30px;
+  line-height:1.35;
+  font-weight:950;
+  word-break:break-word;
+}
+
+.communityFullPostInfoV5{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:16px;
+}
+
+.communityFullPostInfoV5 strong{
+  color:#334155;
+  font-size:13px;
+  font-weight:900;
+}
+
+.communityFullPostInfoV5 span{
+  color:#94a3b8;
+  font-size:12px;
+  font-weight:700;
+}
+
+.communityFullPostContentV5{
+  min-height:330px;
+  padding:38px 34px 48px;
+  color:#334155;
+  font-size:16px;
+  line-height:1.9;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.communityFullPostActionsV5{
+  padding:0 34px 30px;
+  display:flex;
+  justify-content:center;
+}
+
+.communityFullLikeV5{
+  min-width:126px;
+  height:48px;
+  padding:0 18px;
+  border:1px solid #dbe3ec;
+  border-radius:14px;
+  background:#fff;
+  color:#475569;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.communityFullLikeV5 span{
+  margin-right:5px;
+  font-size:18px;
+}
+
+.communityFullLikeV5.active{
+  border-color:#fecdd3;
+  background:#fff1f2;
+  color:#e11d48;
+}
+
+.communityFullCommentsV5{
+  margin-top:16px;
+  padding:28px 34px 34px;
+  border:1px solid #e2e8f0;
+  border-radius:20px;
+  background:#fff;
+}
+
+.communityFullCommentsHeadV5{
+  margin-bottom:20px;
+}
+
+.communityFullCommentsHeadV5 h2{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0;
+  color:#0f172a;
+  font-size:20px;
+  font-weight:950;
+}
+
+.communityFullCommentsHeadV5 h2 b{
+  color:#2563eb;
+  font-size:18px;
+}
+
+.communityFullCommentsHeadV5 p{
+  margin:6px 0 0;
+  color:#94a3b8;
+  font-size:12px;
+}
+
+.communityFullCommentWriteV5{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 110px;
+  gap:10px;
+  padding-bottom:24px;
+  border-bottom:1px solid #edf2f7;
+}
+
+.communityFullCommentWriteV5 textarea{
+  width:100%;
+  min-height:92px;
+  padding:14px 15px;
+  box-sizing:border-box;
+  border:1px solid #dbe3ec;
+  border-radius:13px;
+  background:#fff;
+  color:#334155;
+  font:inherit;
+  font-size:14px;
+  line-height:1.6;
+  resize:vertical;
+  outline:none;
+}
+
+.communityFullCommentWriteV5 textarea:focus{
+  border-color:#94a3b8;
+}
+
+.communityFullCommentWriteV5 button{
+  border:0;
+  border-radius:13px;
+  background:#0f2745;
+  color:#fff;
+  font-size:14px;
+  font-weight:950;
+  cursor:pointer;
+}
+
+.communityFullCommentWriteV5 button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.communityFullCommentListV5{
+  display:flex;
+  flex-direction:column;
+}
+
+.communityFullCommentV5{
+  padding:20px 2px;
+  border-bottom:1px solid #edf2f7;
+}
+
+.communityFullCommentV5 header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.communityFullCommentV5 header strong{
+  color:#334155;
+  font-size:13px;
+  font-weight:950;
+}
+
+.communityFullCommentV5 header span{
+  color:#94a3b8;
+  font-size:11px;
+}
+
+.communityFullCommentV5 p{
+  margin:10px 0 0;
+  color:#475569;
+  font-size:14px;
+  line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.communityFullCommentEmptyV5{
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  color:#94a3b8;
+  font-size:13px;
+}
+
+.communityFullCommentEmptyV5 strong{
+  color:#475569;
+  font-size:15px;
+}
+
+.communityPostBottomV5{
+  display:flex;
+  justify-content:flex-start;
+  padding:18px 0 0;
+}
+
+@media(max-width:700px){
+  .communityPostPageTopV5{
+    min-height:48px;
+  }
+
+  .communityFullPostV5,
+  .communityFullCommentsV5{
+    border-radius:16px;
+  }
+
+  .communityFullPostHeaderV5{
+    padding:22px 18px 19px;
+  }
+
+  .communityFullPostHeaderV5 h1{
+    font-size:23px;
+  }
+
+  .communityFullPostContentV5{
+    min-height:250px;
+    padding:28px 18px 38px;
+    font-size:15px;
+  }
+
+  .communityFullPostActionsV5{
+    padding:0 18px 24px;
+  }
+
+  .communityFullCommentsV5{
+    padding:22px 18px 25px;
+  }
+
+  .communityFullCommentWriteV5{
+    grid-template-columns:1fr;
+  }
+
+  .communityFullCommentWriteV5 button{
+    height:44px;
+  }
+
+  .communityFullPostCategoryV5{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:7px;
+  }
+}
+
+/* COMMUNITY_V6_FULL_WIDTH_IMAGES_REPLIES_BEST */
+.communityPostPageV5{
+  max-width:none !important;
+  width:calc(100% - 40px) !important;
+}
+
+.communityPostImagesV6{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-top:30px;
+}
+
+.communityPostImagesV6 a{
+  display:block;
+  overflow:hidden;
+  border-radius:14px;
+  background:#f1f5f9;
+}
+
+.communityPostImagesV6 img{
+  display:block;
+  width:100%;
+  max-height:720px;
+  object-fit:contain;
+  background:#f8fafc;
+}
+
+.communityPostImagesV6 a:only-child{
+  grid-column:1/-1;
+}
+
+.communityImageUploadV6{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid #dbe3ec;
+  border-radius:14px;
+  background:#f8fafc;
+}
+
+.communityImageUploadHeadV6{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.communityImageUploadHeadV6 strong,
+.communityImageUploadHeadV6 span{
+  display:block;
+}
+
+.communityImageUploadHeadV6 strong{
+  color:#334155;
+  font-size:13px;
+  font-weight:950;
+}
+
+.communityImageUploadHeadV6 span{
+  margin-top:3px;
+  color:#94a3b8;
+  font-size:11px;
+}
+
+.communityImageUploadHeadV6>label{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height:38px;
+  padding:0 13px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  background:#fff;
+  color:#334155;
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.communityImageUploadHeadV6 input{
+  display:none;
+}
+
+.communityImagePreviewV6{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin-top:14px;
+}
+
+.communityImagePreviewV6 div{
+  aspect-ratio:1;
+  overflow:hidden;
+  border-radius:10px;
+  background:#e2e8f0;
+}
+
+.communityImagePreviewV6 img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.communityReplyTargetV6{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#eff6ff;
+  color:#475569;
+  font-size:12px;
+}
+
+.communityReplyTargetV6 b{
+  color:#2563eb;
+}
+
+.communityReplyTargetV6 button{
+  border:0;
+  background:transparent;
+  color:#64748b;
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.communityBestCommentV6{
+  position:relative;
+  margin:10px 0;
+  padding:18px 20px;
+  border:1px solid #fde68a;
+  border-radius:14px;
+  background:#fffbeb;
+}
+
+.communityBestBadgeV6{
+  margin-bottom:9px;
+  color:#b45309;
+  font-size:11px;
+  font-weight:950;
+}
+
+.communityBestCommentV6 header,
+.communityReplyV6 header{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.communityBestCommentV6 header strong,
+.communityReplyV6 header strong{
+  color:#334155;
+  font-size:13px;
+}
+
+.communityBestCommentV6 header span,
+.communityReplyV6 header span{
+  color:#94a3b8;
+  font-size:11px;
+}
+
+.communityBestCommentV6>p,
+.communityReplyV6 p{
+  margin:9px 0 0;
+  color:#475569;
+  font-size:14px;
+  line-height:1.65;
+  white-space:pre-wrap;
+}
+
+.communityAllCommentsLabelV6{
+  margin-top:22px;
+  padding:13px 2px;
+  border-bottom:1px solid #e2e8f0;
+  color:#334155;
+  font-size:13px;
+  font-weight:950;
+}
+
+.communityCommentThreadV6{
+  border-bottom:1px solid #edf2f7;
+}
+
+.communityCommentThreadV6 .communityFullCommentV5{
+  border-bottom:0;
+}
+
+.communityCommentActionsV6{
+  display:flex;
+  gap:6px;
+  margin-top:11px;
+}
+
+.communityCommentActionsV6 button{
+  height:30px;
+  padding:0 9px;
+  border:1px solid #e2e8f0;
+  border-radius:8px;
+  background:#fff;
+  color:#64748b;
+  font-size:11px;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.communityCommentActionsV6 button.active{
+  border-color:#fecdd3;
+  background:#fff1f2;
+  color:#e11d48;
+}
+
+.communityCommentActionsV6 button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.communityReplyV6{
+  display:grid;
+  grid-template-columns:26px minmax(0,1fr);
+  gap:5px;
+  padding:16px 18px 16px 34px;
+  border-top:1px solid #f1f5f9;
+  background:#f8fafc;
+}
+
+.communityReplyArrowV6{
+  color:#94a3b8;
+  font-size:16px;
+}
+
+.communityMentionV6{
+  color:#2563eb;
+  font-weight:900;
+}
+
+.communityFullCommentV5.deleted p,
+.communityReplyV6.deleted p{
+  color:#94a3b8;
+  font-style:italic;
+}
+
+@media(max-width:900px){
+  .communityPostPageV5{
+    width:calc(100% - 32px) !important;
+  }
+
+  .communityImagePreviewV6{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:700px){
+  .communityPostPageV5{
+    width:calc(100% - 16px) !important;
+  }
+
+  .communityPostImagesV6{
+    grid-template-columns:1fr;
+  }
+
+  .communityImageUploadHeadV6{
+    align-items:flex-start;
+  }
+
+  .communityImagePreviewV6{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+
+  .communityReplyV6{
+    padding:14px 10px 14px 18px;
+  }
+}
+
+/* COMMUNITY_DETAIL_POLISH_V7 */
+
+/* 상세화면은 공통 좌우 여백만 유지 */
+.communityPostPageV5{
+  width:calc(100% - 40px) !important;
+  max-width:none !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* 게시글 상단 좌우가 테두리에 붙지 않도록 */
+.communityFullPostHeaderV5{
+  padding-left:30px !important;
+  padding-right:30px !important;
+}
+
+/* 게시판 배지 */
+.communityFullPostCategoryV5{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+.communityFullPostCategoryV5 span{
+  font-size:14px !important;
+  line-height:1.4 !important;
+}
+
+/* 제목 */
+.communityFullPostHeaderV5 h1{
+  font-size:28px !important;
+  line-height:1.4 !important;
+}
+
+/* 작성자 / 날짜 */
+.communityFullPostInfoV5{
+  padding-right:0 !important;
+  gap:10px !important;
+}
+
+.communityFullPostInfoV5 strong{
+  color:#0f172a !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+
+.communityFullPostInfoV5 span{
+  color:#334155 !important;
+  font-size:14px !important;
+  font-weight:800 !important;
+}
+
+/* 본문 - 사이트 다른 영역과 비슷한 가독성 */
+.communityFullPostContentV5{
+  padding-left:30px !important;
+  padding-right:30px !important;
+  color:#1e293b !important;
+  font-size:15px !important;
+  line-height:1.8 !important;
+}
+
+/* 댓글 제목/안내 */
+.communityFullCommentsHeadV5{
+  padding-left:30px !important;
+  padding-right:30px !important;
+}
+
+.communityFullCommentsHeadV5 h2{
+  color:#0f172a !important;
+  font-size:18px !important;
+  font-weight:950 !important;
+}
+
+.communityFullCommentsHeadV5 h2 b{
+  font-size:16px !important;
+}
+
+.communityFullCommentsHeadV5 p{
+  color:#64748b !important;
+  font-size:14px !important;
+  font-weight:600 !important;
+}
+
+/* 댓글 입력 */
+.communityFullCommentWriteV5{
+  padding-left:30px !important;
+  padding-right:30px !important;
+}
+
+.communityFullCommentWriteV5 textarea{
+  color:#0f172a !important;
+  font-size:14px !important;
+  font-weight:500 !important;
+}
+
+.communityFullCommentWriteV5 textarea::placeholder{
+  color:#64748b !important;
+  opacity:1 !important;
+}
+
+/* 댓글 등록 버튼 - 항상 진한 남색 */
+.communityFullCommentWriteV5 button{
+  background:#0f2745 !important;
+  border:1px solid #0f2745 !important;
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:950 !important;
+}
+
+.communityFullCommentWriteV5 button:disabled{
+  background:#0f2745 !important;
+  border-color:#0f2745 !important;
+  color:#fff !important;
+  opacity:.65 !important;
+}
+
+/* 댓글 목록 */
+.communityFullCommentListV5{
+  padding-left:30px !important;
+  padding-right:30px !important;
+}
+
+.communityFullCommentV5 header strong{
+  color:#0f172a !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+
+/* 날짜/시간을 연한 회색 대신 진하게 */
+.communityFullCommentV5 header span{
+  color:#334155 !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+}
+
+.communityFullCommentV5 p{
+  color:#1e293b !important;
+  font-size:14px !important;
+  line-height:1.75 !important;
+}
+
+/* 좋아요/답글도 다른 UI와 동일한 크기 */
+.communityCommentActionsV6 button{
+  font-size:13px !important;
+  font-weight:800 !important;
+}
+
+/* 답글 작성자/날짜 */
+.communityReplyV6 header strong,
+.communityBestCommentV6 header strong{
+  color:#0f172a !important;
+  font-size:14px !important;
+  font-weight:900 !important;
+}
+
+.communityReplyV6 header span,
+.communityBestCommentV6 header span{
+  color:#334155 !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+}
+
+.communityReplyV6 p,
+.communityBestCommentV6 > p{
+  color:#1e293b !important;
+  font-size:14px !important;
+  line-height:1.75 !important;
+}
+
+/* 아래 목록 버튼도 공통 크기 */
+.communityPostBottomV5{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+
+@media(max-width:900px){
+  .communityPostPageV5{
+    width:calc(100% - 32px) !important;
+  }
+}
+
+@media(max-width:700px){
+  .communityPostPageV5{
+    width:calc(100% - 16px) !important;
+  }
+
+  .communityFullPostHeaderV5,
+  .communityFullPostContentV5,
+  .communityFullCommentsHeadV5,
+  .communityFullCommentWriteV5,
+  .communityFullCommentListV5{
+    padding-left:16px !important;
+    padding-right:16px !important;
+  }
+
+  .communityFullPostHeaderV5 h1{
+    font-size:23px !important;
+  }
+
+  .communityFullPostCategoryV5 span,
+  .communityFullPostInfoV5 strong,
+  .communityFullPostInfoV5 span,
+  .communityFullCommentV5 header strong,
+  .communityFullCommentV5 header span{
+    font-size:13px !important;
+  }
+}
+
+/* COMMUNITY_HEADER_CLIP_FIX_V8 */
+
+/* 상세글 헤더 자체에 좌우 안전영역 확보 */
+.communityFullPostHeaderV5{
+  box-sizing:border-box !important;
+  position:relative !important;
+  padding-left:32px !important;
+  padding-right:32px !important;
+  overflow:visible !important;
+}
+
+/* 작성자 + 날짜가 우측 테두리에 붙거나 잘리지 않게 */
+.communityFullPostInfoV5{
+  box-sizing:border-box !important;
+  right:32px !important;
+  max-width:calc(50% - 50px) !important;
+  padding:0 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+}
+
+/* 작성자/날짜는 줄이지 않음 */
+.communityFullPostInfoV5 strong,
+.communityFullPostInfoV5 span{
+  flex:0 0 auto !important;
+  white-space:nowrap !important;
+}
+
+/* 게시판 배지도 좌측 안전영역 안에 배치 */
+.communityFullPostCategoryV5{
+  left:32px !important;
+  max-width:calc(35% - 32px) !important;
+}
+
+/* 제목은 양쪽 정보와 겹치지 않도록 중앙 영역 확보 */
+.communityFullPostHeaderV5 h1{
+  box-sizing:border-box !important;
+  max-width:55% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  padding-left:12px !important;
+  padding-right:12px !important;
+  text-align:center !important;
+}
+
+/* 댓글 날짜도 우측에서 잘리지 않게 */
+.communityFullCommentV5 header{
+  box-sizing:border-box !important;
+  padding-left:0 !important;
+  padding-right:0 !important;
+  overflow:visible !important;
+}
+
+.communityFullCommentV5 header span{
+  flex:0 0 auto !important;
+  padding-right:0 !important;
+  white-space:nowrap !important;
+}
+
+/* 모바일은 절대배치 대신 자연스럽게 */
+@media(max-width:700px){
+  .communityFullPostHeaderV5{
+    padding-left:16px !important;
+    padding-right:16px !important;
+  }
+
+  .communityFullPostInfoV5{
+    position:static !important;
+    max-width:none !important;
+    margin-top:12px !important;
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+
+  .communityFullPostCategoryV5{
+    position:static !important;
+    max-width:none !important;
+  }
+
+  .communityFullPostHeaderV5 h1{
+    max-width:none !important;
+    margin-top:12px !important;
+    padding:0 !important;
+    text-align:left !important;
+  }
+}
+
+/* COMMUNITY_HEADER_EDGE_FIX_V9 */
+
+/* PC 상세 헤더: 좌/우 메타정보를 카드 안쪽으로 강제 이동 */
+.communityFullPostHeaderV5{
+  position:relative !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  min-height:84px !important;
+}
+
+/* 자유게시판 */
+.communityFullPostCategoryV5{
+  position:absolute !important;
+  left:32px !important;
+  right:auto !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  margin:0 !important;
+  padding:0 !important;
+  width:auto !important;
+  max-width:25% !important;
+}
+
+/* 작성자 · 내 글 / 날짜 */
+.communityFullPostInfoV5{
+  position:absolute !important;
+  left:auto !important;
+  right:32px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  margin:0 !important;
+  padding:0 !important;
+  width:auto !important;
+  max-width:35% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:10px !important;
+  white-space:nowrap !important;
+}
+
+/* 기존 absolute 자식 위치값 영향 제거 */
+.communityFullPostInfoV5 strong,
+.communityFullPostInfoV5 span{
+  position:static !important;
+  inset:auto !important;
+  margin:0 !important;
+  padding:0 !important;
+  width:auto !important;
+  max-width:none !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+
+/* 가운데 제목 */
+.communityFullPostHeaderV5 h1{
+  position:relative !important;
+  inset:auto !important;
+  width:40% !important;
+  max-width:40% !important;
+  margin:0 auto !important;
+  padding:0 12px !important;
+  box-sizing:border-box !important;
+  text-align:center !important;
+  white-space:normal !important;
+}
+
+/* 댓글 날짜도 오른쪽 여백 확보 */
+.communityFullCommentV5 header{
+  padding-left:0 !important;
+  padding-right:16px !important;
+}
+
+.communityFullCommentV5 header span{
+  position:static !important;
+  margin-left:auto !important;
+  margin-right:0 !important;
+  padding:0 !important;
+  color:#334155 !important;
+  white-space:nowrap !important;
+}
+
+/* 모바일은 세로형 */
+@media(max-width:700px){
+  .communityFullPostHeaderV5{
+    min-height:0 !important;
+    padding:18px 16px !important;
+    overflow:visible !important;
+  }
+
+  .communityFullPostCategoryV5,
+  .communityFullPostInfoV5{
+    position:static !important;
+    transform:none !important;
+    max-width:none !important;
+  }
+
+  .communityFullPostHeaderV5 h1{
+    width:100% !important;
+    max-width:none !important;
+    margin:14px 0 !important;
+    padding:0 !important;
+    text-align:left !important;
+  }
+
+  .communityFullPostInfoV5{
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+}

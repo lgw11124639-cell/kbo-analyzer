@@ -1,5 +1,6 @@
 "use client";
 import AppSidebar from "../components/AppSidebar";
+import CommunityPage from "../components/CommunityPage";
 
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -2838,6 +2839,23 @@ function GameCard({
 
     이 3개만 비교해 최고후보 1개를 선정한다.
   */
+  /* LIVE_ALL_MARKET_PROBABILITY_V1 */
+  const liveMarketProbabilityPair = (market: "ML" | "HANDICAP" | "TOTAL") => {
+    const marketPicks = sortPredictionPicks(market, picks.filter((pick) => pick.market === market));
+    if (marketPicks.length < 2) return null;
+    const left = marketPicks[0];
+    const right = marketPicks[1];
+    const leftRaw = liveDisplayProbability(left, game);
+    const rightRaw = liveDisplayProbability(right, game);
+    const sum = leftRaw + rightRaw;
+    if (!Number.isFinite(sum) || sum <= 0) return null;
+    const leftProbability = leftRaw / sum;
+    return { left, right, leftProbability, rightProbability: 1 - leftProbability };
+  };
+  const liveMlProbability = isLiveGame ? liveMarketProbabilityPair("ML") : null;
+  const liveHandicapProbability = isLiveGame ? liveMarketProbabilityPair("HANDICAP") : null;
+  const liveTotalProbability = isLiveGame ? liveMarketProbabilityPair("TOTAL") : null;
+
   const cardPreferredCandidates =
     (
       [
@@ -2995,6 +3013,19 @@ function GameCard({
     </div>
 
     <section className="gameAnalysisHeroV1"><div className="gameAnalysisHeroTeamV1 away"><div className="gameAnalysisHeroPhotoV1"><span>{(game.startingPitchers.away?.name || game.awayTeamName || "?").slice(0,1)}</span>{game.startingPitchers.away?.id && <img src={kboPlayerPhoto(game.startingPitchers.away.id)} alt={game.startingPitchers.away?.name || "원정 선발"} onError={(e)=>{e.currentTarget.style.display="none";}} />}<img className="gameAnalysisHeroLogoV1" src={`/api/kbo/team-logo?team=${encodeURIComponent(game.awayTeamName)}`} alt="" /></div><small>AWAY</small><h2>{game.awayTeamName}</h2><p>선발 <b>{game.startingPitchers.away?.name || "미정"}</b></p><span>{game.awayRank ? `${game.awayRank}위` : "순위 확인중"}</span></div><div className="gameAnalysisHeroCenterV1"><div className="gameAnalysisHeroMetaV1"><span>{game.time || "시간 미정"}</span><i>·</i><span>{game.stadium || "구장 미정"}</span></div><div className="gameAnalysisHeroScoreV1"><b>{awayDisplayScore ?? "-"}</b><em>:</em><b>{homeDisplayScore ?? "-"}</b></div>{!hasActualScore && projectedScores && <small className="gameAnalysisExpectedV1">AI 예상점수</small>}<strong className={`gameAnalysisStatusV1 ${isLiveGame?"live":isFinishedGame?"done":"pregame"}`}>{isFinishedGame?"경기 종료":isLiveGame?(liveInningLabel || "경기중"):game.status.cancelCode && game.status.cancelCode!=="0"?(game.status.cancelName || "경기 취소"):"경기 전"}</strong><div className="gameAnalysisHeroInfoV1"><div><span>원정 선발</span><b>{awayStarterStats?.era!=null?`ERA ${awayStarterStats.era.toFixed(2)}`:"ERA -"}</b></div><div><span>홈 선발</span><b>{homeStarterStats?.era!=null?`ERA ${homeStarterStats.era.toFixed(2)}`:"ERA -"}</b></div></div></div><div className="gameAnalysisHeroTeamV1 home"><div className="gameAnalysisHeroPhotoV1"><span>{(game.startingPitchers.home?.name || game.homeTeamName || "?").slice(0,1)}</span>{game.startingPitchers.home?.id && <img src={kboPlayerPhoto(game.startingPitchers.home.id)} alt={game.startingPitchers.home?.name || "홈 선발"} onError={(e)=>{e.currentTarget.style.display="none";}} />}<img className="gameAnalysisHeroLogoV1" src={`/api/kbo/team-logo?team=${encodeURIComponent(game.homeTeamName)}`} alt="" /></div><small>HOME</small><h2>{game.homeTeamName}</h2><p>선발 <b>{game.startingPitchers.home?.name || "미정"}</b></p><span>{game.homeRank ? `${game.homeRank}위` : "순위 확인중"}</span></div></section>
+    {/* LIVE_ALL_MARKET_PROBABILITY_UI_V1 */}
+    {isLiveGame && (
+      <section className="liveMarketProbabilityV1">
+        <div className="liveMarketProbabilityHeadV1"><div><strong>🔴 LIVE 확률</strong><span>{liveInningLabel || "경기 진행 중"} · 현재 스코어 반영</span></div><small>경기 전 AI 예측은 그대로 보존</small></div>
+        <div className="liveMarketProbabilityGridV1">
+          {[["승패", liveMlProbability], ["핸디캡", liveHandicapProbability], ["언더/오버", liveTotalProbability]].map(([title,data]) => {
+            const pair = data as ReturnType<typeof liveMarketProbabilityPair>;
+            return <article className="liveMarketProbabilityCardV1" key={String(title)}><span className="liveMarketProbabilityTitleV1">{String(title)}</span>{pair ? <><div className="liveMarketProbabilitySidesV1"><div><small>{pair.left.label}</small><b>{(pair.leftProbability*100).toFixed(1)}%</b></div><em>VS</em><div><small>{pair.right.label}</small><b>{(pair.rightProbability*100).toFixed(1)}%</b></div></div><div className="liveMarketProbabilityBarV1"><i style={{width:`${(pair.leftProbability*100).toFixed(1)}%`}} /></div></> : <div className="liveMarketProbabilityWaitingV1">기준점 또는 예측값 확인 중</div>}</article>;
+          })}
+        </div>
+      </section>
+    )}
+
     {!hideAnalysisTabs && <nav className="gameAnalysisTabsV2">{([["ai","AI 분석"],["starter","선발"],["lineup","타선·라인업"],["flow","팀흐름·불펜"],["picks",analysisUnlocked ? "프리미엄 분석 🔓" : "프리미엄 분석 🔒"]] as const).map(([key,label])=><button type="button" key={key} className={analysisSection===key?"active":""} onClick={()=>setAnalysisSection(key)}>{label}</button>)}</nav>}
     {analysisSection !== "picks" && <section className="analysisLogicProV11">
       <div className="analysisLogicTitleV11"><div><small>PRO ANALYSIS LOGIC</small><h3>왜 이렇게 판단했나</h3><p>실제 경기 전 데이터 → 비교 기준 → 우위/열세 → 반대 근거 → 불확실성 순서로 설명합니다.</p></div><span>배당 미사용 · 모델 로직 유지</span></div>
@@ -5632,6 +5663,7 @@ function GameCard({
         </div>
 
         {/* TODAY_EXPERT_REPORT_V1 */}<div className="todayExpertDataV1"><div className="premiumSectionTitle"><span>09</span><div><b>선발투수 상세 비교</b><small>시즌 성적 · 최근 평가 · 이닝 소화력</small></div></div><div className="starterCompare"><div className="starterBox awayStarter"><div className="starterIdentityText"><span className="starterLabel">원정 선발</span><b>{game.startingPitchers.away?.name || "미정"}</b></div><small className="starterMainStat">ERA {awayStarterStats?.era != null ? awayStarterStats.era.toFixed(2) : "-"} · {awayStarterStats?.wins != null && awayStarterStats?.losses != null ? `${awayStarterStats.wins}승 ${awayStarterStats.losses}패` : "승패 -"}</small><small className="starterWhipStat">WHIP {awayStarterStats?.whip != null ? awayStarterStats.whip.toFixed(2) : "-"}</small><em>{awayStarterStats?.innings || "-"}이닝 · K {awayStarterStats?.strikeouts ?? "-"} · QS {awayStarterStats?.qs ?? "-"}</em><small>종합 {awayStarterRating?.score ?? "-"} · 시즌 {awayStarterRating?.seasonScore ?? "-"} · 최근 {awayStarterRating?.recentScore ?? "-"}</small></div><div className="starterVs">VS</div><div className="starterBox right homeStarter"><div className="starterIdentityText"><span className="starterLabel">홈 선발</span><b>{game.startingPitchers.home?.name || "미정"}</b></div><small className="starterMainStat">ERA {homeStarterStats?.era != null ? homeStarterStats.era.toFixed(2) : "-"} · {homeStarterStats?.wins != null && homeStarterStats?.losses != null ? `${homeStarterStats.wins}승 ${homeStarterStats.losses}패` : "승패 -"}</small><small className="starterWhipStat">WHIP {homeStarterStats?.whip != null ? homeStarterStats.whip.toFixed(2) : "-"}</small><em>{homeStarterStats?.innings || "-"}이닝 · K {homeStarterStats?.strikeouts ?? "-"} · QS {homeStarterStats?.qs ?? "-"}</em><small>종합 {homeStarterRating?.score ?? "-"} · 시즌 {homeStarterRating?.seasonScore ?? "-"} · 최근 {homeStarterRating?.recentScore ?? "-"}</small></div></div><div className="premiumSectionTitle"><span>10</span><div><b>최근 10경기 팀 흐름</b><small>승패 · 득실 · 공격/수비 흐름</small></div></div><div className="teamFormGrid"><div className="teamFormBox"><b>{game.awayTeamName}</b><strong>{awayTeamForm ? `${awayTeamForm.wins}승 ${awayTeamForm.losses}패${awayTeamForm.draws ? ` ${awayTeamForm.draws}무` : ""}` : "-"}</strong><span>평균 득점 {awayTeamForm?.avgRuns?.toFixed(1) ?? "-"} · 실점 {awayTeamForm?.avgRunsAllowed?.toFixed(1) ?? "-"}</span><small>득실차 {awayTeamForm ? `${awayTeamForm.runDifferential > 0 ? "+" : ""}${awayTeamForm.runDifferential}` : "-"} · 폼지수 {awayTeamFormRating?.score ?? "-"}</small></div><div className="teamFormVs">VS</div><div className="teamFormBox right"><b>{game.homeTeamName}</b><strong>{homeTeamForm ? `${homeTeamForm.wins}승 ${homeTeamForm.losses}패${homeTeamForm.draws ? ` ${homeTeamForm.draws}무` : ""}` : "-"}</strong><span>평균 득점 {homeTeamForm?.avgRuns?.toFixed(1) ?? "-"} · 실점 {homeTeamForm?.avgRunsAllowed?.toFixed(1) ?? "-"}</span><small>득실차 {homeTeamForm ? `${homeTeamForm.runDifferential > 0 ? "+" : ""}${homeTeamForm.runDifferential}` : "-"} · 폼지수 {homeTeamFormRating?.score ?? "-"}</small></div></div><div className="premiumSectionTitle"><span>11</span><div><b>불펜 가용성</b><small>최근 3일 투구량 · 연투 · 피로도</small></div></div><div className="bullpenGrid"><div className="bullpenBox"><b>{game.awayTeamName}</b><strong>피로도 {awayBullpen?.summary.fatigueIndex.toFixed(1) ?? "-"}</strong><span>3일 총 {awayBullpen?.summary.totalPitches ?? "-"}구 · 등판 {awayBullpen?.summary.bullpenAppearances ?? "-"}회</span><small>전일 {awayBullpen?.summary.yesterdayPitches ?? "-"}구 · 연투 {awayBullpen?.summary.backToBackCount ?? "-"}명 · {awayBullpenRating?.status ?? "-"}</small></div><div className="bullpenVs">VS</div><div className="bullpenBox right"><b>{game.homeTeamName}</b><strong>피로도 {homeBullpen?.summary.fatigueIndex.toFixed(1) ?? "-"}</strong><span>3일 총 {homeBullpen?.summary.totalPitches ?? "-"}구 · 등판 {homeBullpen?.summary.bullpenAppearances ?? "-"}회</span><small>전일 {homeBullpen?.summary.yesterdayPitches ?? "-"}구 · 연투 {homeBullpen?.summary.backToBackCount ?? "-"}명 · {homeBullpenRating?.status ?? "-"}</small></div></div><div className="premiumSectionTitle"><span>12</span><div><b>확정 라인업 분석</b><small>시즌 OPS · 상대 선발 상성 · 타순 가중치</small></div></div><div className="lineupScoreCompare"><div><span>{game.awayTeamName}</span><strong>{lineupMatchup?.ready ? lineupMatchup.away?.matchupSummary?.score ?? "-" : "대기"}</strong><small>OPS {stat3(lineupMatchup?.away?.baseSummary?.avgOps)} · OBP {stat3(lineupMatchup?.away?.baseSummary?.avgObp)} · SLG {stat3(lineupMatchup?.away?.baseSummary?.avgSlg)} · HR {lineupMatchup?.away?.baseSummary?.totalHr ?? "-"}</small></div><em>VS</em><div><span>{game.homeTeamName}</span><strong>{lineupMatchup?.ready ? lineupMatchup.home?.matchupSummary?.score ?? "-" : "대기"}</strong><small>OPS {stat3(lineupMatchup?.home?.baseSummary?.avgOps)} · OBP {stat3(lineupMatchup?.home?.baseSummary?.avgObp)} · SLG {stat3(lineupMatchup?.home?.baseSummary?.avgSlg)} · HR {lineupMatchup?.home?.baseSummary?.totalHr ?? "-"}</small></div></div></div><div className="premiumVerdict">
+          <div className="premiumVerdictInnerV13">
           <div>
             <span>AI ONE-LINE VERDICT</span>
             <b>AI 한줄평</b>
@@ -5806,6 +5838,8 @@ function GameCard({
 
             })()}
           </p>
+        
+          </div>
         </div>
       </section>
     )}
@@ -5907,6 +5941,55 @@ function GameCard({
                     ? oppositeOdds
                     : null,
               });
+            }
+
+            /* PREMIUM_TOTAL_TWO_WAY_V1 - stored pick + complementary display probability */
+            if (rows.length === 1 && market === "TOTAL") {
+              const first = rows[0];
+              const rawLine = typeof odds.totalLine === "number" ? odds.totalLine : Number(first.label.match(/([0-9]+(?:\\.[0-9]+)?)/)?.[1]);
+              const lineText = Number.isFinite(rawLine) ? ` ${rawLine}` : "";
+              const firstIsUnder = first.label.includes("언더");
+              const firstIsOver = first.label.includes("오버");
+              if (firstIsUnder || firstIsOver) {
+                const oppositeOdds = firstIsUnder ? odds.overOdds : odds.underOdds;
+                rows.push({
+                  label: `${firstIsUnder ? "오버" : "언더"}${lineText}`,
+                  confidence: Math.max(0, Math.min(1, 1 - first.confidence)),
+                  odds: typeof oppositeOdds === "number" && Number.isFinite(oppositeOdds) && oppositeOdds > 1 ? oppositeOdds : null,
+                });
+              }
+            }
+
+            /* PREMIUM_HANDICAP_TWO_WAY_V2 */
+            if (rows.length === 1 && market === "HANDICAP") {
+              const first = rows[0];
+              const firstIsAway = first.label.includes(game.awayTeamName);
+              const firstIsHome = first.label.includes(game.homeTeamName);
+
+              if (firstIsAway || firstIsHome) {
+                const oppositeTeam = firstIsAway ? game.homeTeamName : game.awayTeamName;
+                const storedOppositeLine = firstIsAway ? odds.homeHandicapLine : odds.awayHandicapLine;
+                const storedFirstLine = firstIsAway ? odds.awayHandicapLine : odds.homeHandicapLine;
+                const labelMatch = first.label.match(/([+-]?\\d+(?:\\.\\d+)?)/);
+                const parsedFirstLine = labelMatch ? Number(labelMatch[1]) : null;
+                const oppositeLine =
+                  typeof storedOppositeLine === "number" && Number.isFinite(storedOppositeLine)
+                    ? storedOppositeLine
+                    : typeof storedFirstLine === "number" && Number.isFinite(storedFirstLine)
+                      ? -storedFirstLine
+                      : parsedFirstLine !== null && Number.isFinite(parsedFirstLine)
+                        ? -parsedFirstLine
+                        : null;
+                const oppositeOdds = firstIsAway ? odds.homeHandicap : odds.awayHandicap;
+
+                if (oppositeLine !== null) {
+                  rows.push({
+                    label: `${oppositeTeam} ${oppositeLine > 0 ? "+" : ""}${oppositeLine}`,
+                    confidence: Math.max(0, Math.min(1, 1 - first.confidence)),
+                    odds: typeof oppositeOdds === "number" && Number.isFinite(oppositeOdds) && oppositeOdds > 1 ? oppositeOdds : null,
+                  });
+                }
+              }
             }
 
             return rows;
@@ -8743,6 +8826,8 @@ export default function Home() {
     teamForms: Record<string, TeamForm>;
     bullpens: Record<string, BullpenData>;
     lineup: LineupMatchupData | null;
+    picks: Pick[];
+    projectedScore: { awayRuns: number; homeRuns: number; total: number } | null;
   };
 
   const [purchasedReplay, setPurchasedReplay] =
@@ -17398,27 +17483,6 @@ const [
                 </div>
               ) : selectedHistory ? (
                 <>
-                  <div className="historyScorePlaceholderV3 historyFinalScoreV8">
-                    <small>FINAL SCORE</small>
-
-                    <strong>
-                      {selectedHistory.awayTeamName}
-                      {" "}
-                      {selectedHistory.awayScore ?? "-"}
-                      {" : "}
-                      {selectedHistory.homeScore ?? "-"}
-                      {" "}
-                      {selectedHistory.homeTeamName}
-                    </strong>
-
-                    <p>
-                      {selectedHistory.date}
-                      {selectedHistory.stadium
-                        ? ` · ${selectedHistory.stadium}`
-                        : ""}
-                    </p>
-                  </div>
-
                   <nav className="historyRealTabsV9">
                     {[
                       ["summary","AI 요약"],
@@ -17599,7 +17663,7 @@ const [
                       </section>
                     )}
 
-                    {/* HISTORY_REAL_GAMECARD_REUSE_V1 */}                     {historyDetailTab !== "summary" && historyDetailTab !== "betman" && (() => {                       const snap = selectedHistory?.pregameAnalysis;                       const archiveGame = snap?.game as KboGame | undefined;                       if (!archiveGame) return <section className="historyTabSectionV9"><div className="historyTabTitleV9"><div><small>PREGAME SNAPSHOT</small><h3>당시 경기 전 분석 저장본 없음</h3></div></div><p>이 경기는 경기 전 분석 화면 스냅샷이 저장되지 않아 원본 분석 화면을 재생할 수 없습니다.</p></section>;                       const starterMap: Record<number, PitcherStats> = {};                       const awayStarterId = archiveGame.startingPitchers?.away?.id;                       const homeStarterId = archiveGame.startingPitchers?.home?.id;                       if (awayStarterId && snap?.starterStats?.away) starterMap[awayStarterId] = snap.starterStats.away as PitcherStats;                       if (homeStarterId && snap?.starterStats?.home) starterMap[homeStarterId] = snap.starterStats.home as PitcherStats;                       const formMap: Record<string, TeamForm> = {};                       if (archiveGame.awayTeamCode && snap?.teamForms?.away) formMap[archiveGame.awayTeamCode] = snap.teamForms.away as TeamForm;                       if (archiveGame.homeTeamCode && snap?.teamForms?.home) formMap[archiveGame.homeTeamCode] = snap.teamForms.home as TeamForm;                       const bullpenMap: Record<string, BullpenData> = {};                       if (archiveGame.awayTeamCode && snap?.bullpens?.away) bullpenMap[archiveGame.awayTeamCode] = snap.bullpens.away as BullpenData;                       if (archiveGame.homeTeamCode && snap?.bullpens?.home) bullpenMap[archiveGame.homeTeamCode] = snap.bullpens.home as BullpenData;                       const savedLineup = (snap?.lineup ?? selectedHistory?.lineup) as LineupMatchupData | undefined;                       const lineupMap: Record<string, LineupMatchupData> = savedLineup ? { [archiveGame.gameId]: savedLineup } : {};                       const archiveOdds = ((selectedHistory?.betman?.odds ?? selectedHistory?.betman ?? {}) as OddsInput);                       const archiveSection = historyDetailTab === "premium" ? "picks" : historyDetailTab as "ai" | "starter" | "lineup" | "flow";                       return <div className="historyRealGameCardArchiveV1"><GameCard key={`${archiveGame.gameId}-${archiveSection}`} archiveMode hideAnalysisTabs forcedAnalysisSection={archiveSection} analysisUserId={null} onAnalysisBalanceChange={()=>{}} game={archiveGame} odds={archiveOdds} setOdds={()=>{}} pitcherStats={starterMap} teamForms={formMap} bullpens={bullpenMap} lineupMatchups={lineupMap} oddsLocked oddsSaveBusy={false} oddsSaveMessage="" onSaveOdds={()=>{}} onUnlockOdds={()=>{}} selectedPickKeys={[]} onTogglePick={()=>{}} archiveFinalScore={Number.isFinite(Number(selectedHistory?.awayScore)) && Number.isFinite(Number(selectedHistory?.homeScore)) ? { away: Number(selectedHistory?.awayScore), home: Number(selectedHistory?.homeScore) } : null} archiveProjectedScore={snap?.projectedScore && Number.isFinite(Number(snap.projectedScore.awayRuns)) && Number.isFinite(Number(snap.projectedScore.homeRuns)) && Number.isFinite(Number(snap.projectedScore.total)) ? { awayRuns: Number(snap.projectedScore.awayRuns), homeRuns: Number(snap.projectedScore.homeRuns), total: Number(snap.projectedScore.total) } : null} frozenPicks={(selectedHistory?.ai?.picks ?? []) as Pick[]} /></div>;                     })()}                     {/* HISTORY_PRO_BASEBALL_ANALYSIS_V9 */}
+                    {/* HISTORY_REAL_GAMECARD_REUSE_V1 */}                     {historyDetailTab !== "summary" && historyDetailTab !== "betman" && (() => {                       const snap = selectedHistory?.pregameAnalysis;                       const archiveGame = snap?.game as KboGame | undefined;                       if (!archiveGame) return <section className="historyTabSectionV9"><div className="historyTabTitleV9"><div><small>PREGAME SNAPSHOT</small><h3>당시 경기 전 분석 저장본 없음</h3></div></div><p>이 경기는 경기 전 분석 화면 스냅샷이 저장되지 않아 원본 분석 화면을 재생할 수 없습니다.</p></section>;                       const starterMap: Record<number, PitcherStats> = {};                       const awayStarterId = archiveGame.startingPitchers?.away?.id;                       const homeStarterId = archiveGame.startingPitchers?.home?.id;                       if (awayStarterId && snap?.starterStats?.away) starterMap[awayStarterId] = snap.starterStats.away as PitcherStats;                       if (homeStarterId && snap?.starterStats?.home) starterMap[homeStarterId] = snap.starterStats.home as PitcherStats;                       /* HISTORY_ARCHIVE_TEAM_NAME_MAP_V1 */                       const formMap: Record<string, TeamForm> = {};                       if (snap?.teamForms?.away) { formMap[archiveGame.awayTeamName] = snap.teamForms.away as TeamForm; if (archiveGame.awayTeamCode) formMap[archiveGame.awayTeamCode] = snap.teamForms.away as TeamForm; }                       if (snap?.teamForms?.home) { formMap[archiveGame.homeTeamName] = snap.teamForms.home as TeamForm; if (archiveGame.homeTeamCode) formMap[archiveGame.homeTeamCode] = snap.teamForms.home as TeamForm; }                       const bullpenMap: Record<string, BullpenData> = {};                       if (snap?.bullpens?.away) { bullpenMap[archiveGame.awayTeamName] = snap.bullpens.away as BullpenData; if (archiveGame.awayTeamCode) bullpenMap[archiveGame.awayTeamCode] = snap.bullpens.away as BullpenData; }                       if (snap?.bullpens?.home) { bullpenMap[archiveGame.homeTeamName] = snap.bullpens.home as BullpenData; if (archiveGame.homeTeamCode) bullpenMap[archiveGame.homeTeamCode] = snap.bullpens.home as BullpenData; }                       const savedLineup = (snap?.lineup ?? selectedHistory?.lineup) as LineupMatchupData | undefined;                       const lineupMap: Record<string, LineupMatchupData> = savedLineup ? { [archiveGame.gameId]: savedLineup } : {};                       const archiveOdds = ((selectedHistory?.betman?.odds ?? selectedHistory?.betman ?? {}) as OddsInput);                       const archiveSection = historyDetailTab === "premium" ? "picks" : historyDetailTab as "ai" | "starter" | "lineup" | "flow";                       return <div className="historyRealGameCardArchiveV1"><GameCard key={`${archiveGame.gameId}-${archiveSection}`} archiveMode hideAnalysisTabs forcedAnalysisSection={archiveSection} analysisUserId={null} onAnalysisBalanceChange={()=>{}} game={archiveGame} odds={archiveOdds} setOdds={()=>{}} pitcherStats={starterMap} teamForms={formMap} bullpens={bullpenMap} lineupMatchups={lineupMap} oddsLocked oddsSaveBusy={false} oddsSaveMessage="" onSaveOdds={()=>{}} onUnlockOdds={()=>{}} selectedPickKeys={[]} onTogglePick={()=>{}} archiveFinalScore={Number.isFinite(Number(selectedHistory?.awayScore)) && Number.isFinite(Number(selectedHistory?.homeScore)) ? { away: Number(selectedHistory?.awayScore), home: Number(selectedHistory?.homeScore) } : null} archiveProjectedScore={snap?.projectedScore && Number.isFinite(Number(snap.projectedScore.awayRuns)) && Number.isFinite(Number(snap.projectedScore.homeRuns)) && Number.isFinite(Number(snap.projectedScore.total)) ? { awayRuns: Number(snap.projectedScore.awayRuns), homeRuns: Number(snap.projectedScore.homeRuns), total: Number(snap.projectedScore.total) } : null} frozenPicks={(selectedHistory?.ai?.picks ?? []) as Pick[]} /></div>;                     })()}                     {/* HISTORY_PRO_BASEBALL_ANALYSIS_V9 */}
 {false && historyDetailTab === "ai" && (() => {
   const picks = selectedHistory?.ai?.picks ?? [];
 
@@ -18388,8 +18452,12 @@ const [
         </main>
       )}
 
+      {/* COMMUNITY_REAL_SERVICE_V4 */}
       {activeTab === "community" && (
-        <div className="communityPageV1"><section className="communityComingSoon"><span>COMMUNITY</span><h2>야구를 보는 사람들이 모이는 곳</h2><p>픽 공유, 경기 토론, 적중 인증과 사용자 랭킹을 연결할 커뮤니티입니다.</p><div className="communityFeatureGrid"><article><b>픽 공유</b><span>내 분석과 조합을 공유</span></article><article><b>경기 토론</b><span>경기별 의견과 분석 교환</span></article><article><b>적중 인증</b><span>결과 자동 판정과 기록</span></article></div></section></div>
+        <CommunityPage
+          user={authUser}
+          games={games}
+        />
       )}
 
       {activeTab === "settings" && (
@@ -22134,7 +22202,7 @@ const [
                   )}
 
                   {purchasedReplay && (
-                    <div className="purchasedReplayGameV4">
+                    <div className="purchasedReplayGameV4 historyRealGameCardArchiveV1">
                       <GameCard
                         key={`replay:${purchasedReplay.gameId}`}
                         analysisUserId={authUser?.id || null}
@@ -22154,7 +22222,7 @@ const [
                               }
                             : {}
                         }
-                        frozenPicks={[]}
+                        frozenPicks={Array.isArray(purchasedReplay.picks) ? purchasedReplay.picks : []}
                         selectedPickKeys={[]}
                         onTogglePick={() => {}}
                         oddsLocked={true}
