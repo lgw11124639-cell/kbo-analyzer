@@ -22633,21 +22633,8 @@ const [
                     </div>
                   </div>
 
-                  <div className="myPageFinalProfileRowV2">
-                    <div className="myPageShirtFinalV1" aria-hidden="true">
-              <div className="myPageShirtFinalV1Body">
-                <div className="myPageShirtFinalV1Collar" />
-                <div className="myPageShirtFinalV1Sleeve myPageShirtFinalV1SleeveLeft" />
-                <div className="myPageShirtFinalV1Sleeve myPageShirtFinalV1SleeveRight" />
-                <div className="myPageShirtFinalV1Name">
-                  {myPageNickname || "PLAYER"}
-                </div>
-                <div className="myPageShirtFinalV1Number">
-                  {myPageJerseyNumber ?? 99}
-                </div>
-              </div>
-            </div>
-            <small>
+                  <div>
+                    <small>
                       MY KBO PICKS
                     </small>
 
