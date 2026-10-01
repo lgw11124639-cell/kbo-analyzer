@@ -7,6 +7,7 @@ export type MainSidebarTab =
   | "history"
   | "community"
   | "store"
+  | "profile"
   | "my-combos"
   | "settings";
 
@@ -94,6 +95,14 @@ export default function AppSidebar({
 
         <button
           type="button"
+          className={active === "profile" ? "active" : ""}
+          onClick={() => openMain("profile")}
+        >
+          프로필
+        </button>
+
+        <button
+          type="button"
           className={
             active === "my-combos"
               ? "active"
@@ -103,7 +112,7 @@ export default function AppSidebar({
             openMain("my-combos")
           }
         >
-          마이페이지
+          구매내역
         </button>
 
 

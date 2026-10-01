@@ -8,12 +8,17 @@ import s from "./CommunityPage.module.css";
 type Img={path:string;url:string;name?:string};
 type Post={id:string;user_id:string;author_name:string;category:string;game_id:string|null;title:string;content:string;images?:Img[];is_notice?:boolean;like_count:number;comment_count:number;created_at:string;updated_at:string;likedByMe?:boolean;mine?:boolean};
 type Comment={id:string;post_id:string;user_id:string;author_name:string;content:string;created_at:string;parent_id?:string|null;reply_to_name?:string|null;like_count?:number;is_deleted?:boolean;likedByMe?:boolean;mine?:boolean};
-type Props={user:User|null;games:KboGame[]};
+type Props={
+ user:User|null;
+ games:KboGame[];
+ openPostId?:string|null;
+ onPostOpened?:()=>void;
+};
 const labels:Record<string,string>={talk:"자유게시판",game:"경기토론",analysis:"AI 분석",combo:"내 조합"};
 async function token(){return (await supabase.auth.getSession()).data.session?.access_token||""}
 function dt(v:string){try{return new Intl.DateTimeFormat("ko-KR",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"Asia/Seoul"}).format(new Date(v))}catch{return""}}
 
-export default function CommunityPage({user,games}:Props){
+export default function CommunityPage({user,games,openPostId,onPostOpened}:Props){
  const [posts,setPosts]=useState<Post[]>([]),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[message,setMessage]=useState("");
  const [category,setCategory]=useState("all"),[sort,setSort]=useState<"latest"|"popular">("latest"),[gameFilter,setGameFilter]=useState("");
  const [selected,setSelected]=useState<Post|null>(null),[comments,setComments]=useState<Comment[]>([]),[commentsLoading,setCommentsLoading]=useState(false),[commentText,setCommentText]=useState(""),[reply,setReply]=useState<Comment|null>(null);
@@ -26,6 +31,18 @@ export default function CommunityPage({user,games}:Props){
  const loadPosts=useCallback(async()=>{setLoading(true);try{const p=new URLSearchParams({sort});if(category!=="all")p.set("category",category);if(gameFilter)p.set("gameId",gameFilter);const r=await fetch("/api/community/posts?"+p,{headers:await headers(),cache:"no-store"}),j=await r.json();if(!r.ok||!j.ok)throw Error(j.error);setPosts(j.posts||[]);setIsAdmin(!!j.isAdmin)}catch(e){setMessage(e instanceof Error?e.message:"게시글을 불러오지 못했습니다.")}finally{setLoading(false)}},[category,sort,gameFilter,headers]);
  useEffect(()=>{void loadPosts()},[loadPosts,user?.id]);
  useEffect(()=>()=>previews.forEach(URL.revokeObjectURL),[previews]);
+
+ /* COMMUNITY_DIRECT_OPEN_V1 */
+ useEffect(()=>{
+  if(!openPostId||loading)return;
+
+  const post=posts.find(x=>x.id===openPostId);
+
+  if(!post)return;
+
+  void loadComments(post);
+  onPostOpened?.();
+ },[openPostId,loading,posts]);
 
  async function loadComments(post:Post){setSelected(post);setReply(null);setCommentText("");setCommentsLoading(true);try{const r=await fetch("/api/community/comments?postId="+encodeURIComponent(post.id),{headers:await headers(),cache:"no-store"}),j=await r.json();if(!r.ok||!j.ok)throw Error(j.error);setComments(j.comments||[])}catch(e){setMessage(e instanceof Error?e.message:"댓글을 불러오지 못했습니다.")}finally{setCommentsLoading(false)}}
  function resetEditor(){previews.forEach(URL.revokeObjectURL);setEditing(null);setWriteCategory("talk");setWriteGameId("");setTitle("");setBody("");setImages([]);setFiles([]);setPreviews([]);setIsNotice(false)}

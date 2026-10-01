@@ -356,6 +356,27 @@ export async function GET(request: Request) {
 
       const analysisSnapshot = analysisById.get(idKey) || null;
       const recoveredDetails = recoveredDetailsById.get(idKey) || null;
+
+      /*
+       * HISTORY_SNAPSHOT_PREMIUM_FALLBACK_V2
+       *
+       * 현재 모델로 과거 경기를 다시 계산하지 않는다.
+       * genuine live prediction / recovered prediction이 모두 없을 때만
+       * 당시 pregame analysis snapshot 내부에 실제 저장된 prediction을 사용한다.
+       */
+      const snapshotPremiumRows = analysisSnapshot
+        ? (
+            Array.isArray(analysisSnapshot?.predictions)
+              ? analysisSnapshot.predictions
+              : Array.isArray(analysisSnapshot?.allPredictions)
+                ? analysisSnapshot.allPredictions
+                : analysisSnapshot?.prediction
+                  ? [analysisSnapshot.prediction]
+                  : []
+          ).filter((p: any) =>
+            ["ML", "HANDICAP", "TOTAL"].includes(text(p?.market))
+          )
+        : [];
       const savedLineup = analysisSnapshot?.lineup;
       const lineup = savedLineup?.ready === true ? {
         confirmed: true,
@@ -371,6 +392,19 @@ export async function GET(request: Request) {
       if (Array.isArray(score) && score.length >= 2) { awayScore = num(score[0]); homeScore = num(score[1]); }
       else if (score && typeof score === "object") { awayScore = num(score.away ?? score.awayScore); homeScore = num(score.home ?? score.homeScore); }
       else if (typeof score === "string") { const m = score.match(/(\d+)\D+(\d+)/); if (m) { awayScore = num(m[1]); homeScore = num(m[2]); } }
+
+      /*
+       * 실제 prediction JSON이 없더라도 당시 분석 snapshot에
+       * 시장별 저장값이 있으면 그 값만 복원한다.
+       */
+      if (latestByMarket.size === 0) {
+        for (const p of snapshotPremiumRows) {
+          latestByMarket.set(
+            text(p?.market),
+            p
+          );
+        }
+      }
 
       const picks = Array.from(
         latestByMarket.values()

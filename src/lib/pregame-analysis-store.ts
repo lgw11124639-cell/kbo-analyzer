@@ -36,6 +36,35 @@ export async function savePregameAnalysis(date: string, incoming: any[]) {
     const lineup = payload.lineup;
     if (lineup?.ready === true && lineup.gameId === game.gameId && lineup.date === date && lineup.away?.confirmed === true && lineup.home?.confirmed === true) next.lineup = lineup;
 
+    /* PREGAME_PREMIUM_MARKETS_SNAPSHOT_V2 */
+    const premiumPredictions =
+      Array.isArray((input as any)?.allPredictions)
+        ? (input as any).allPredictions
+            .filter((x: any) =>
+              ["ML", "HANDICAP", "TOTAL"].includes(String(x?.market || ""))
+            )
+            .map((x: any) => ({
+              market: x.market,
+              label: x.label,
+              grade: x.grade ?? null,
+              confidence: x.confidence ?? null,
+              ev: x.ev ?? null,
+              odds: x.odds ?? null,
+              starterEdge: x.starterEdge ?? null,
+              formEdge: x.formEdge ?? null,
+              bullpenEdge: x.bullpenEdge ?? null,
+              lineupEdge: x.lineupEdge ?? null,
+              projectedTotal: x.projectedTotal ?? null,
+              projectedScore: x.projectedScore ?? null,
+              totalLine: x.totalLine ?? null,
+              totalEdge: x.totalEdge ?? null,
+            }))
+        : [];
+
+    if (premiumPredictions.length) {
+      next.predictions = premiumPredictions;
+    }
+
     /* PREGAME_PROJECTED_SCORE_SNAPSHOT_V1 */
     if (previous?.projectedScore === undefined) {
       const predictions = Array.isArray((input as any)?.allPredictions) ? (input as any).allPredictions : [];
