@@ -14,7 +14,7 @@ export type MainSidebarTab =
 export type AppSidebarTab =
   | MainSidebarTab
   | "stats"
-  | "ai-learning-report";
+  | "ai-learning-report" | "ai-learning";
 
 type AppSidebarProps = {
   active: AppSidebarTab;

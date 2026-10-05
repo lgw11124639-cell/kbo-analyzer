@@ -12,6 +12,7 @@ import {
   makeFlexibleAutoCombos,
 } from "@/lib/analyzer";
 import { analyzeKboPickGame } from "@/lib/kbo-pick-engine";
+import AiLearningReport from "../components/AiLearningReport";
 
 const emptyOdds: OddsInput = { awayMl: null, homeMl: null, awayHandicapLine: null, homeHandicapLine: null, awayHandicap: null, homeHandicap: null, totalLine: null, overOdds: null, underOdds: null };
 
@@ -7755,6 +7756,7 @@ export default function Home() {
       "community" | "store" |
       "profile" |
       "my-combos" |
+      "ai-learning" |
       "settings"
     >("home");
 
@@ -7873,7 +7875,12 @@ export default function Home() {
     if (
       requestedTab === "games" ||
       requestedTab === "combos" ||
+      requestedTab === "history" ||
+      requestedTab === "community" ||
+      requestedTab === "store" ||
+      requestedTab === "profile" ||
       requestedTab === "my-combos" ||
+      requestedTab === "ai-learning" ||
       requestedTab === "settings"
     ) {
       setActiveTab(requestedTab);
@@ -16435,7 +16442,7 @@ const [
         </button>
         <button type="button" className={activeTab === "profile" ? "active" : ""} onClick={() => setActiveTab("profile")}>프로필</button>
         <button type="button" className={activeTab === "my-combos" ? "active" : ""} onClick={() => setActiveTab("my-combos")}>구매내역</button>
-          <a href="/ai-learning-report">AI 학습</a>
+          <button type="button" className={activeTab === "ai-learning" ? "active" : ""} onClick={() => setActiveTab("ai-learning")}>AI 학습</button>
           <button type="button" className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>설정</button>
         </nav>
 
@@ -16489,6 +16496,9 @@ const [
         </div>
       </div>
 
+
+      {/* AI_LEARNING_COMMON_CONTENT_V1 */}
+      {activeTab === "ai-learning" && <AiLearningReport />}
 
       {/* HOME_COMMUNITY_FEED_LOADER_V1 */}
       {activeTab === "home" && (

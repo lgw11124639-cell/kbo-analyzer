@@ -1,0 +1,21 @@
+"use client";
+import { useEffect, useState } from "react";
+type Report={date:string;gameId:string;game?:any;projectedScore:{awayRuns:number;homeRuns:number};result:{awayScore:number;homeScore:number;settledAt?:string};errors:{away:number;home:number;total:number}};
+type Data={version:string;trainingGames:number;trainedThrough:string;reports:Report[];todayCount:number;avgTotalError:number|null};
+export default function AiLearningReport(){
+ const [data,setData]=useState<Data|null>(null);
+ useEffect(()=>{fetch("/api/ai-learning-report",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("load");return r.json()}).then(setData).catch(()=>setData(null))},[]);
+ if(!data)return <main className="learningMain"><section className="learningPanel"><div className="learningEmpty"><strong>AI 학습 리포트를 불러오는 중입니다.</strong></div></section></main>;
+ const {version,trainingGames,trainedThrough,reports,todayCount,avgTotalError}=data;
+ return <main className="learningMain">
+  <section className="learningHero"><div><span className="learningEyebrow">KBO PICK ENGINE</span><h1>AI 학습 리포트</h1><p>경기 종료 후 실제 결과가 KBO PICK 엔진 학습과 검증에 어떻게 반영되는지 보여줍니다.</p></div><div className="engineBadge"><span>현재 Champion</span><strong>KBO PICK 엔진 {version}</strong><small>운영 적용 중</small></div></section>
+  <section className="learningStats"><article><span>현재 엔진</span><strong>{version}</strong><small>KBO PICK Champion</small></article><article><span>학습 완료 경기</span><strong>{trainingGames.toLocaleString()}경기</strong><small>현재 Champion 기준</small></article><article><span>학습 완료 시점</span><strong>{trainedThrough}</strong><small>현재 Champion 학습 범위</small></article><article><span>새 학습 데이터</span><strong>{reports.length.toLocaleString()}경기</strong><small>종료 경기 · Champion 승격 전</small></article></section>
+  <div className="learningGrid">
+   <section className="learningPanel learningWide"><div className="panelHead"><div><span>DAILY LEARNING</span><h2>오늘의 학습</h2></div><b className={todayCount?"statusOk":"statusWait"}>{todayCount}경기</b></div>{todayCount?<div className="learningEmpty"><strong>오늘 종료된 {todayCount}경기의 실제 결과를 수집했습니다.</strong><p>예상 총점 평균 오차 {avgTotalError?.toFixed(2)}점 · 현재는 학습 후보 데이터로 누적되며 검증 통과 전 Champion 가중치는 변경하지 않습니다.</p></div>:<div className="learningEmpty"><strong>오늘 반영할 종료 경기가 없습니다.</strong><p>경기가 종료되면 당시 예상 점수와 실제 점수를 자동 비교합니다.</p></div>}</section>
+   <section className="learningPanel"><div className="panelHead"><div><span>CHAMPION / CHALLENGER</span><h2>엔진 검증 현황</h2></div></div><div className="engineCompare"><div><span>CHAMPION</span><strong>{version}</strong><small>{trainingGames.toLocaleString()}경기 학습</small></div><b>VS</b><div><span>CHALLENGER</span><strong>대기</strong><small>최신 데이터 학습 전</small></div></div></section>
+   <section className="learningPanel"><div className="panelHead"><div><span>AUTO PROMOTION</span><h2>자동승격 상태</h2></div><b className="statusWait">준비중</b></div><div className="promotionFlow"><strong>경기 종료</strong><i>→</i><strong>학습</strong><i>→</i><strong>검증</strong><i>→</i><strong>승격</strong></div><p className="panelNote">검증을 통과한 Challenger만 다음 Champion으로 적용됩니다.</p></section>
+   <section className="learningPanel learningWide"><div className="panelHead"><div><span>GAME REPORTS</span><h2>경기별 AI 학습 리포트</h2></div><b>{reports.length}경기</b></div>{reports.length?<div className="learningReportList">{reports.slice(0,20).map(r=><div className="learningReportRow" key={`${r.date}-${r.gameId}`}><div><strong>{r.date} · {r.game?.awayTeamName||r.game?.awayTeam||"원정"} vs {r.game?.homeTeamName||r.game?.homeTeam||"홈"}</strong><p>예상 {Number(r.projectedScore.awayRuns).toFixed(1)} : {Number(r.projectedScore.homeRuns).toFixed(1)} → 실제 {r.result.awayScore} : {r.result.homeScore}</p></div><div><strong>총점 오차 {r.errors.total.toFixed(1)}점</strong><p>원정 {r.errors.away.toFixed(1)} · 홈 {r.errors.home.toFixed(1)} · 학습 후보 반영</p></div></div>)}</div>:<div className="learningEmpty"><strong>경기 종료 후 자동 생성</strong><p>분석 당시 예상 점수 · 실제 점수 · 팀별 득점 오차 · 총점 오차를 경기별로 기록합니다.</p></div>}</section>
+   <section className="learningPanel learningWide"><div className="panelHead"><div><span>VERSION HISTORY</span><h2>엔진 버전 기록</h2></div></div><div className="versionRow"><i></i><div><strong>KBO PICK 엔진 {version}</strong><p>{trainedThrough}까지 학습 · {trainingGames.toLocaleString()}경기</p></div><b>현재 Champion</b></div></section>
+  </div>
+ </main>;
+}

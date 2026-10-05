@@ -9,6 +9,14 @@ async function run() {
     const body = await response.json();
     console.log("[HISTORY_SETTLEMENT]", new Date().toISOString(), JSON.stringify(body));
     if (!response.ok || !body.ok) throw new Error("Settlement incomplete: HTTP " + response.status);
+    /* KBO_PICK_LEARNING_SYNC_V1 */
+    try {
+      const { execFileSync } = require("node:child_process");
+      const out = execFileSync(process.execPath, ["/opt/kbo-analyzer/scripts/kbo-pick-learning-sync.cjs"], { cwd: "/opt/kbo-analyzer", encoding: "utf8", timeout: 60000 });
+      console.log("[KBO_PICK_LEARNING_SYNC]", out.trim().replace(/\n/g, " | "));
+    } catch (syncError) {
+      console.error("[KBO_PICK_LEARNING_SYNC_FAILED]", syncError.message);
+    }
   } catch (error) {
     console.error("[HISTORY_SETTLEMENT_FAILED]", error.message);
     if (once) process.exitCode = 1;
