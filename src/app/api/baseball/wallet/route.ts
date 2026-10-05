@@ -149,8 +149,7 @@ function isKboGameBettingClosed(
   const started =
     stateCode === "2" ||
     stateCode === "3" ||
-    inning > 0 ||
-    !!topBottom;
+    (!stateCode && (inning > 0 || !!topBottom));
 
   return (
     cancelled ||

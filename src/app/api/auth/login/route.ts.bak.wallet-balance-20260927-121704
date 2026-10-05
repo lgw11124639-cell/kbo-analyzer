@@ -1,0 +1,206 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+export const dynamic = "force-dynamic";
+
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+const publishableKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+const secretKey =
+  process.env.SUPABASE_SECRET_KEY;
+
+if (
+  !supabaseUrl ||
+  !publishableKey ||
+  !secretKey
+) {
+  throw new Error(
+    "Supabase environment variables are missing"
+  );
+}
+
+const SUPABASE_URL: string =
+  supabaseUrl;
+
+const SUPABASE_PUBLISHABLE_KEY: string =
+  publishableKey;
+
+const SUPABASE_SECRET_KEY: string =
+  secretKey;
+
+const admin =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_SECRET_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    }
+  );
+
+export async function POST(
+  request: Request
+) {
+  try {
+    const body =
+      await request.json();
+
+    const login =
+      String(
+        body?.login ?? ""
+      )
+        .trim()
+        .toLowerCase();
+
+    const password =
+      String(
+        body?.password ?? ""
+      );
+
+    if (!login || !password) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "아이디와 비밀번호를 확인해주세요.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    let email =
+      login;
+
+    if (!login.includes("@")) {
+      const {
+        data,
+        error,
+      } =
+        await admin
+          .from("kbo_profiles")
+          .select("email")
+          .eq(
+            "login_id",
+            login
+          )
+          .maybeSingle();
+
+      if (error) {
+        console.error(
+          "[ID LOGIN] profile lookup error:",
+          error
+        );
+
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "아이디 또는 비밀번호를 확인해주세요.",
+          },
+          {
+            status: 401,
+          }
+        );
+      }
+
+      if (!data?.email) {
+        console.error(
+          "[ID LOGIN] profile not found:",
+          login
+        );
+
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              "아이디 또는 비밀번호를 확인해주세요.",
+          },
+          {
+            status: 401,
+          }
+        );
+      }
+
+      console.log(
+        "[ID LOGIN] profile found:",
+        login
+      );
+
+      email =
+        data.email;
+    }
+
+    const authClient =
+      createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+          },
+        }
+      );
+
+    const {
+      data,
+      error,
+    } =
+      await authClient.auth
+        .signInWithPassword({
+          email,
+          password,
+        });
+
+    if (
+      error ||
+      !data.session
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "아이디 또는 비밀번호를 확인해주세요.",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+
+      session: {
+        access_token:
+          data.session.access_token,
+
+        refresh_token:
+          data.session.refresh_token,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "ID login failed",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "로그인 처리 중 오류가 발생했습니다.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
