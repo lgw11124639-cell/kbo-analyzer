@@ -11,6 +11,7 @@ import {
   analyzeGame,
   makeFlexibleAutoCombos,
 } from "@/lib/analyzer";
+import { analyzeKboPickGame } from "@/lib/kbo-pick-engine";
 
 const emptyOdds: OddsInput = { awayMl: null, homeMl: null, awayHandicapLine: null, homeHandicapLine: null, awayHandicap: null, homeHandicap: null, totalLine: null, overOdds: null, underOdds: null };
 
@@ -2342,20 +2343,11 @@ function GameCard({
       ? (() => { const savedPick = frozenPicks.find((item) => { const value = (item as Pick & { projectedTotal?: number | null }).projectedTotal; return typeof value === "number" && Number.isFinite(value); }); return savedPick ? (savedPick as Pick & { projectedTotal?: number | null }).projectedTotal ?? null : null; })()
       : null;
 
+  /* KBO_PICK_ENGINE_1_0_LIVE_V1 */
+  const kboPickLive = !archiveMode && awayTeamForm && homeTeamForm ? analyzeKboPickGame({ awayAvgRuns: awayTeamForm.avgRuns ?? awayTeamForm.seasonAvgRuns ?? 4.5, awayAvgRunsAllowed: awayTeamForm.avgRunsAllowed ?? awayTeamForm.seasonAvgRunsAllowed ?? 4.5, homeAvgRuns: homeTeamForm.avgRuns ?? homeTeamForm.seasonAvgRuns ?? 4.5, homeAvgRunsAllowed: homeTeamForm.avgRunsAllowed ?? homeTeamForm.seasonAvgRunsAllowed ?? 4.5, starterEdge: starterScoreEdge, formEdge: teamFormEdgeScore, awayLineupOps: lineupMatchup?.away?.baseSummary?.avgOps ?? undefined, homeLineupOps: lineupMatchup?.home?.baseSummary?.avgOps ?? undefined }) : null;
+
   /* HISTORY_ARCHIVE_PROJECTED_SCORE_V2 */
-  const projectedScores =
-    archiveMode
-      ? archiveProjectedScore
-      : estimateProjectedScores(
-          awayTeamForm,
-          homeTeamForm,
-          awayStarterStats,
-          homeStarterStats,
-          awayBullpen,
-          homeBullpen,
-          lineupMatchup,
-          odds
-        );
+  const projectedScores = archiveMode ? archiveProjectedScore : kboPickLive ? { awayRuns: Number(kboPickLive.expected.away.toFixed(2)), homeRuns: Number(kboPickLive.expected.home.toFixed(2)), total: Number((kboPickLive.expected.away + kboPickLive.expected.home).toFixed(2)) } : estimateProjectedScores(awayTeamForm, homeTeamForm, awayStarterStats, homeStarterStats, awayBullpen, homeBullpen, lineupMatchup, odds);
 
   const projectedTotal =
     archiveMode
@@ -2435,17 +2427,8 @@ function GameCard({
       : "";
 
   /* HISTORY_ARCHIVE_NO_REANALYZE_V1 */
-  const computedPicks: Pick[] = archiveMode
-    ? []
-    : analyzeGame(
-        game,
-        odds,
-        starterScoreEdge,
-        teamFormEdgeScore,
-        bullpenEdgeScore,
-        lineupMatchupEdgeScore,
-        projectedTotal
-      );
+  const legacyComputedPicks: Pick[] = archiveMode ? [] : analyzeGame(game, odds, starterScoreEdge, teamFormEdgeScore, bullpenEdgeScore, lineupMatchupEdgeScore, projectedTotal);
+  const computedPicks: Pick[] = !kboPickLive ? legacyComputedPicks : (() => { const totalLine = typeof odds.totalLine === "number" ? odds.totalLine : null; const rawTotal = totalLine !== null ? kboPickLive.total(totalLine) : null; const expectedTotal = kboPickLive.expected.away + kboPickLive.expected.home; const totalResult = rawTotal && totalLine !== null ? (() => { let over = rawTotal.over, under = rawTotal.under; const noPush = Math.abs(totalLine - Math.round(totalLine)) > 1e-9; if (noPush) { const sum = over + under; if (sum > 0) { over /= sum; under /= sum; } if (expectedTotal > totalLine && over <= under) { over = Math.max(over, 0.5001); under = 1 - over; } else if (expectedTotal < totalLine && under <= over) { under = Math.max(under, 0.5001); over = 1 - under; } } return { over, under, push: rawTotal.push }; })() : null; return legacyComputedPicks.map((pick) => { let confidence = pick.confidence; if (pick.market === "ML") { if (pick.label === `${game.awayTeamName} 승`) confidence = kboPickLive.moneyline.away; else if (pick.label === `${game.homeTeamName} 승`) confidence = kboPickLive.moneyline.home; } else if (pick.market === "HANDICAP") { const awaySide = pick.label.startsWith(`${game.awayTeamName} `); const homeSide = pick.label.startsWith(`${game.homeTeamName} `); const line = awaySide ? odds.awayHandicapLine : homeSide ? odds.homeHandicapLine : null; if (typeof line === "number") confidence = kboPickLive.handicap(awaySide ? "away" : "home", line).win; } else if (pick.market === "TOTAL" && totalResult) { if (pick.label.includes("오버")) confidence = totalResult.over; else if (pick.label.includes("언더")) confidence = totalResult.under; } const grade = confidence >= 0.62 ? "A" : confidence >= 0.57 ? "B" : "C"; const ev = typeof pick.odds === "number" && pick.odds > 1 ? confidence * pick.odds - 1 : null; return { ...pick, confidence, grade, ev, projectedTotal }; }); })();
 
   /* GAME_CARD_FROZEN_PREDICTION_V1 */
   const useFrozenPrediction =
@@ -2457,7 +2440,7 @@ function GameCard({
   /*
     추천 자격:
     - 배당 존재
-    - 시장 가치 양수
+    - 배당 가치 양수
     - A/B급
 
     조건을 못 넘으면 억지 추천 대신 관망.
@@ -3147,6 +3130,14 @@ function GameCard({
             <small>
               {starterEdge?.text || "선발 데이터 확인 중"}
             </small>
+              <div className="aiEdgeGauge">
+                <span>AWAY</span>
+                <div className="aiEdgeGaugeTrack">
+                  <i className="aiEdgeGaugeCenter" />
+                  <i className={starterScoreEdge >= 0 ? "aiEdgeGaugeBar away" : "aiEdgeGaugeBar home"} style={{ width: `${Math.min(50, Math.abs(starterScoreEdge))}%` }} />
+                </div>
+                <span>HOME</span>
+              </div>
           </article>
 
           <article>
@@ -3348,10 +3339,7 @@ function GameCard({
           </h3>
 
           <p className="analysisPurchaseLeadV2">
-            승패 · 핸디캡 · O/U 확률을 각각 독립적으로 분석합니다.
-            시장별 모델 확률과 확률 차이, 선발, 최근 흐름, 불펜,
-            확정 라인업이 왜 그 수치에 반영됐는지 설명합니다.
-          </p>
+            KBO PICK 엔진이 하나의 경기 예상 점수분포를 기반으로 승패 · 핸디캡 · 오버/언더 확률을 함께 분석합니다. AI 분석 확률과 배당 기준 확률을 비교하고, 선발 · 최근 흐름 · 불펜 · 라인업이 확률에 어떻게 반영됐는지 보여줍니다.</p>
 
           <div className="analysisPurchaseFeatureGridV2">
             <span>
@@ -3371,12 +3359,12 @@ function GameCard({
 
             <span>
               <i>04</i>
-              모델 확률
+              AI 확률
             </span>
 
             <span>
               <i>05</i>
-              시장 가치
+              배당 가치
             </span>
 
             <span>
@@ -4481,7 +4469,7 @@ function GameCard({
       <div className="marketProbabilityAnalysis">
         <div className="marketProbabilityHead">
           <div>
-            <b>시장별 모델 확률</b>
+            <b>시장별 AI 확률</b>
             <small>
               승패 · 핸디캡 · O/U 확률 전체 비교
             </small>
@@ -5444,35 +5432,25 @@ function GameCard({
               }
             }
 
-            /* PREMIUM_HANDICAP_TWO_WAY_V2 */
+            /* PREMIUM_HANDICAP_TWO_WAY_V3 - preserve frozen pick side, pair with archived market */
             if (rows.length === 1 && market === "HANDICAP") {
               const first = rows[0];
               const firstIsAway = first.label.includes(game.awayTeamName);
               const firstIsHome = first.label.includes(game.homeTeamName);
-
               if (firstIsAway || firstIsHome) {
+                const firstTeam = firstIsAway ? game.awayTeamName : game.homeTeamName;
                 const oppositeTeam = firstIsAway ? game.homeTeamName : game.awayTeamName;
-                const storedOppositeLine = firstIsAway ? odds.homeHandicapLine : odds.awayHandicapLine;
-                const storedFirstLine = firstIsAway ? odds.awayHandicapLine : odds.homeHandicapLine;
-                const labelMatch = first.label.match(/([+-]?\\d+(?:\\.\\d+)?)/);
-                const parsedFirstLine = labelMatch ? Number(labelMatch[1]) : null;
-                const oppositeLine =
-                  typeof storedOppositeLine === "number" && Number.isFinite(storedOppositeLine)
-                    ? storedOppositeLine
-                    : typeof storedFirstLine === "number" && Number.isFinite(storedFirstLine)
-                      ? -storedFirstLine
-                      : parsedFirstLine !== null && Number.isFinite(parsedFirstLine)
-                        ? -parsedFirstLine
-                        : null;
+                const firstLine = firstIsAway ? odds.awayHandicapLine : odds.homeHandicapLine;
+                const oppositeLine = firstIsAway ? odds.homeHandicapLine : odds.awayHandicapLine;
+                const firstOdds = firstIsAway ? odds.awayHandicap : odds.homeHandicap;
                 const oppositeOdds = firstIsAway ? odds.homeHandicap : odds.awayHandicap;
-
-                if (oppositeLine !== null) {
-                  rows.push({
-                    label: `${oppositeTeam} ${oppositeLine > 0 ? "+" : ""}${oppositeLine}`,
-                    confidence: Math.max(0, Math.min(1, 1 - first.confidence)),
-                    odds: typeof oppositeOdds === "number" && Number.isFinite(oppositeOdds) && oppositeOdds > 1 ? oppositeOdds : null,
-                  });
-                }
+                const parsed = first.label.match(/([+-]?\d+(?:\.\d+)?)/);
+                const parsedLine = parsed ? Number(parsed[1]) : null;
+                const canonicalFirstLine = typeof firstLine === "number" && Number.isFinite(firstLine) ? firstLine : parsedLine;
+                const canonicalOppositeLine = typeof oppositeLine === "number" && Number.isFinite(oppositeLine) ? oppositeLine : canonicalFirstLine !== null ? -canonicalFirstLine : null;
+                if (canonicalFirstLine !== null && Number.isFinite(canonicalFirstLine)) first.label = `${firstTeam} ${canonicalFirstLine > 0 ? "+" : ""}${canonicalFirstLine}`;
+                if (typeof firstOdds === "number" && Number.isFinite(firstOdds) && firstOdds > 1) first.odds = firstOdds;
+                if (canonicalOppositeLine !== null && Number.isFinite(canonicalOppositeLine)) rows.push({ label: `${oppositeTeam} ${canonicalOppositeLine > 0 ? "+" : ""}${canonicalOppositeLine}`, confidence: Math.max(0, Math.min(1, 1 - first.confidence)), odds: typeof oppositeOdds === "number" && Number.isFinite(oppositeOdds) && oppositeOdds > 1 ? oppositeOdds : null });
               }
             }
 
@@ -5691,9 +5669,7 @@ function GameCard({
                         <div className="premiumMarketNumbersV4">
 
                           <span>
-                            <small>
-                              MODEL
-                            </small>
+                            <small>AI 확률</small>
 
                             <b>
                               {modelPct.toFixed(
@@ -5704,9 +5680,7 @@ function GameCard({
                           </span>
 
                           <span>
-                            <small>
-                              ODDS
-                            </small>
+                            <small>배당</small>
 
                             <b>
                               {row.odds
@@ -5718,9 +5692,7 @@ function GameCard({
                           </span>
 
                           <span>
-                            <small>
-                              MARKET
-                            </small>
+                            <small>기준 확률</small>
 
                             <b>
                               {marketPct !==
@@ -5733,9 +5705,7 @@ function GameCard({
                           </span>
 
                           <span>
-                            <small>
-                              GAP
-                            </small>
+                            <small>확률 차이</small>
 
                             <b
                               className={
@@ -5939,7 +5909,7 @@ function GameCard({
                   </small>
 
                   <h2>
-                    시장별 확률 분석
+                    경기 확률 분석
                   </h2>
 
                   <p>
@@ -5954,10 +5924,7 @@ function GameCard({
 
               <div className="premiumMarketNoticeV4">
                 <p>
-                  승패 · 핸디캡 · O/U 확률을 각각 독립적으로 분석합니다.
-                  시장별 모델 확률과 확률 차이, 선발, 최근 흐름, 불펜,
-                  확정 라인업이 왜 그 수치에 반영됐는지 설명합니다.
-                </p>
+                  KBO PICK 엔진이 하나의 경기 예상 점수분포를 기반으로 승패 · 핸디캡 · 오버/언더 확률을 함께 분석합니다. AI 분석 확률과 배당 기준 확률을 비교하고, 선발 · 최근 흐름 · 불펜 · 라인업이 확률에 어떻게 반영됐는지 보여줍니다.</p>
               </div>
 
 
@@ -5967,9 +5934,7 @@ function GameCard({
 
                   <div className="premiumMarketTitleV4">
                     <div>
-                      <small>
-                        MONEYLINE
-                      </small>
+                      <small>승패 분석</small>
 
                       <h3>
                         승패
@@ -5990,9 +5955,7 @@ function GameCard({
                   )}
 
                   <div className="premiumMarketWhyV4">
-                    <small>
-                      WHY
-                    </small>
+                    <small>분석 근거</small>
 
                     <p>
                       {mlReasonParts.join(
@@ -6008,9 +5971,7 @@ function GameCard({
 
                   <div className="premiumMarketTitleV4">
                     <div>
-                      <small>
-                        HANDICAP
-                      </small>
+                      <small>핸디캡 분석</small>
 
                       <h3>
                         핸디캡
@@ -6031,9 +5992,7 @@ function GameCard({
                   )}
 
                   <div className="premiumMarketWhyV4">
-                    <small>
-                      WHY
-                    </small>
+                    <small>분석 근거</small>
 
                     <p>
                       {
@@ -6049,9 +6008,7 @@ function GameCard({
 
                   <div className="premiumMarketTitleV4">
                     <div>
-                      <small>
-                        TOTAL
-                      </small>
+                      <small>오버·언더 분석</small>
 
                       <h3>
                         오버 / 언더
@@ -6075,9 +6032,7 @@ function GameCard({
                   )}
 
                   <div className="premiumMarketWhyV4">
-                    <small>
-                      WHY
-                    </small>
+                    <small>분석 근거</small>
 
                     <p>
                       {
@@ -6172,7 +6127,7 @@ function GameCard({
           <div>
             <b>경기 종합 분석</b>
             <small>
-              시장별 확률 · 선발 · 최근 흐름 · 불펜 · 라인업 상세 근거
+              승패 · 핸디캡 · 오버/언더 확률 · 선발 · 최근 흐름 · 불펜 · 라인업 상세 근거
             </small>
           </div>
 
@@ -6259,9 +6214,9 @@ function GameCard({
                       : "O/U 확률";
 
                 return (
-                  `승패 최고 시장 가치 ${formatEv(mlEv)}, ` +
-                  `핸디캡 최고 시장 가치 ${formatEv(handicapEv)}, ` +
-                  `O/U 확률 최고 시장 가치 ${formatEv(totalEv)}로 비교했습니다. ` +
+                  `승패 최고 배당 가치 ${formatEv(mlEv)}, ` +
+                  `핸디캡 최고 배당 가치 ${formatEv(handicapEv)}, ` +
+                  `O/U 확률 최고 배당 가치 ${formatEv(totalEv)}로 비교했습니다. ` +
                   `${selected.label}이 전체 후보 중 가장 높은 평가를 받아 ` +
                   `${selectedMarket} 시장을 우선했습니다.`
                 );
@@ -6429,15 +6384,15 @@ function GameCard({
                 }
 
                 return (
-                  `${selected.label}의 모델 확률은 ` +
+                  `${selected.label}의 AI 확률은 ` +
                   `${(selected.confidence * 100).toFixed(1)}%이며, ` +
-                  `현재 배당 기준 시장 가치은 ` +
+                  `현재 배당 기준 가치는 ` +
                   `${selected.ev !== null
                     ? `${selected.ev >= 0 ? "+" : ""}${(selected.ev * 100).toFixed(1)}%`
                     : "계산 대기"}입니다. ` +
                   `${best
-                    ? "현재 시장에서 모델 확률과 가격 조건이 함께 높게 나타납니다."
-                    : "모델 확률은 상대적으로 높지만 현재 시장 가격 조건은 강하지 않습니다."}`
+                    ? "AI 확률과 배당 기준 확률의 차이가 상대적으로 크게 나타납니다."
+                    : "AI 확률은 상대적으로 높지만 배당 기준 확률과의 차이는 크지 않습니다."}`
                 );
               })()}
             </p>
@@ -6508,8 +6463,8 @@ function GameCard({
 
                 const evText =
                   pick.ev === null
-                    ? "시장 가치 계산 대기"
-                    : `시장 가치 ${
+                    ? "배당 가치 계산 대기"
+                    : `배당 가치 ${
                         pick.ev >= 0
                           ? "+"
                           : ""
@@ -6696,10 +6651,10 @@ function GameCard({
               if (best) {
                 conclusion =
                   `세 시장을 종합하면 ${best.label}이 현재 추천 기준을 가장 안정적으로 충족합니다. ` +
-                  `모델 확률 ${(best.confidence * 100).toFixed(
+                  `AI 확률 ${(best.confidence * 100).toFixed(
                     1
                   )}% ${best.grade}급, ` +
-                  `시장 가치 ${
+                  `배당 가치 ${
                     best.ev !== null &&
                     best.ev >= 0
                       ? "+"
@@ -7236,7 +7191,7 @@ function comboStyleInfo(
   if (style === "TOP") {
     return {
       icon: "👍",
-      subtitle: "모델 확률 TOP 픽 조합",
+      subtitle: "AI 확률 TOP 픽 조합",
       className: "top",
     };
   }
@@ -7397,7 +7352,7 @@ function pickMarketLabel(
 ============================================================
 DISPLAY ONLY LIVE PROBABILITY
 
-- 추천 엔진 / V3.7 confidence / 시장 가치 수정 안 함
+- 추천 엔진 / V3.7 confidence / 배당 가치 수정 안 함
 - 현재 점수 + 이닝 + 초/말만 이용한 표시용 실시간 추정치
 ============================================================
 */
@@ -11423,16 +11378,36 @@ const [
             lineupMatchups[g.gameId]
           );
 
-        return analyzeGame(
-          g,
-          odds[g.gameId] ||
-            emptyOdds,
-          starterEdge,
-          formEdge,
-          bullpenEdge,
-          lineupEdge,
-          projectedTotal
-        );
+        const gameOdds = odds[g.gameId] || emptyOdds;
+        const legacyPicks = analyzeGame(g, gameOdds, starterEdge, formEdge, bullpenEdge, lineupEdge, projectedTotal);
+        const awayForm = teamForms[g.awayTeamName];
+        const homeForm = teamForms[g.homeTeamName];
+        const ar = Number(awayForm?.seasonAvgRuns);
+        const ara = Number(awayForm?.seasonAvgRunsAllowed);
+        const hr = Number(homeForm?.seasonAvgRuns);
+        const hra = Number(homeForm?.seasonAvgRunsAllowed);
+        if (![ar, ara, hr, hra].every(Number.isFinite)) return legacyPicks;
+        const kp = analyzeKboPickGame({ awayAvgRuns: ar, awayAvgRunsAllowed: ara, homeAvgRuns: hr, homeAvgRunsAllowed: hra, starterEdge, formEdge });
+        const kpTotal = kp.expected.away + kp.expected.home;
+        return legacyPicks.map((pick) => {
+          let confidence = pick.confidence;
+          if (pick.market === "ML") {
+            if (pick.label === `${g.awayTeamName} 승`) confidence = kp.moneyline.away;
+            else if (pick.label === `${g.homeTeamName} 승`) confidence = kp.moneyline.home;
+          } else if (pick.market === "HANDICAP") {
+            const awaySide = pick.label.startsWith(`${g.awayTeamName} `);
+            const homeSide = pick.label.startsWith(`${g.homeTeamName} `);
+            const line = awaySide ? gameOdds.awayHandicapLine : homeSide ? gameOdds.homeHandicapLine : null;
+            if (typeof line === "number") confidence = kp.handicap(awaySide ? "away" : "home", line).win;
+          } else if (pick.market === "TOTAL" && typeof gameOdds.totalLine === "number") {
+            const total = kp.total(gameOdds.totalLine);
+            if (pick.label.includes("오버")) confidence = total.over;
+            else if (pick.label.includes("언더")) confidence = total.under;
+          }
+          const grade = confidence >= 0.62 ? "A" : confidence >= 0.57 ? "B" : "C";
+          const ev = typeof pick.odds === "number" && pick.odds > 1 ? confidence * pick.odds - 1 : null;
+          return { ...pick, confidence, grade, ev, projectedTotal: kpTotal };
+        });
       }),
     [
       games,
@@ -11457,7 +11432,7 @@ const [
     - 기존 LIVE_PREDICTION_CAPTURE_V1
       선정 규칙을 그대로 유지
     - 배당 존재
-    - 시장 가치 > 0
+    - 배당 가치 > 0
     - C등급 제외
 
     과거 날짜는 서버가 새 LIVE 생성을
@@ -11845,7 +11820,7 @@ const [
                   date,
 
                   engineVersion:
-                    "v0.1",
+                    "KBO_PICK_1.0",
 
                   allPredictions,
 
@@ -12049,7 +12024,7 @@ const [
     async function loadFrozenGamePredictions() {
       try {
         const response = await fetch(
-          "/api/predictions/live?engineVersion=v0.1&scope=ALL",
+          "/api/predictions/live?engineVersion=KBO_PICK_1.0&scope=ALL",
           { cache: "no-store" }
         );
 
@@ -12668,7 +12643,7 @@ const [
 
           /*
             가치형:
-            승률 + 시장 가치 + 배당가치의
+            승률 + 배당 가치 + 배당가치의
             균형을 본다.
           */
           if (
@@ -13506,7 +13481,7 @@ const [
 
     if (positiveEvCount > 0) {
       parts.push(
-        `양수 시장 가치 ${positiveEvCount}픽`
+        `양수 배당 가치 ${positiveEvCount}픽`
       );
     }
 
@@ -14442,8 +14417,8 @@ const [
   /*
     FROZEN_V37_2COMBO_BUILDER
 
-    A = V3.7 HANDICAP 시장 가치 > 0 #1
-    B = V3.7 HANDICAP 시장 가치 > 0 #2,
+    A = V3.7 HANDICAP 배당 가치 > 0 #1
+    B = V3.7 HANDICAP 배당 가치 > 0 #2,
         A와 다른 경기
 
     C = ML partnerScore #1,
@@ -15879,10 +15854,10 @@ const [
                     !finalPick
                       ? "입력된 배당과 기준점이 부족해 최종 예측을 대기하고 있습니다."
                       : finalPick.market === "ML"
-                        ? `승패 시장의 모델 확률 ${(finalPick.confidence * 100).toFixed(1)}%와 시장 가치 ${finalPick.ev !== null ? `${finalPick.ev >= 0 ? "+" : ""}${(finalPick.ev * 100).toFixed(1)}%` : "-"}가 핸디캡 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}, O/U 확률 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 종합 점수가 높아 승패를 우선 선택했습니다.`
+                        ? `승패 시장의 AI 확률 ${(finalPick.confidence * 100).toFixed(1)}%와 배당 가치 ${finalPick.ev !== null ? `${finalPick.ev >= 0 ? "+" : ""}${(finalPick.ev * 100).toFixed(1)}%` : "-"}가 핸디캡 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}, O/U 확률 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 종합 점수가 높아 승패를 우선 선택했습니다.`
                         : finalPick.market === "HANDICAP"
-                          ? `핸디캡 시장이 승패 시장 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 O/U 확률 시장 가치 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 가격 가치와 모델 확률의 균형이 좋아 최종 선택했습니다.`
-                          : `예상 득점 흐름과 현재 기준점의 차이가 승패 시장 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 핸디캡 시장 가치 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}보다 뚜렷해 O/U 확률를 최종 선택했습니다.`;
+                          ? `핸디캡 시장이 승패 배당 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 O/U 확률 배당 가치 ${totalEv !== null ? `${totalEv >= 0 ? "+" : ""}${(totalEv * 100).toFixed(1)}%` : "-"}보다 가격 가치와 AI 확률의 균형이 좋아 최종 선택했습니다.`
+                          : `예상 득점 흐름과 현재 기준점의 차이가 승패 배당 가치 ${mlEv !== null ? `${mlEv >= 0 ? "+" : ""}${(mlEv * 100).toFixed(1)}%` : "-"}와 핸디캡 배당 가치 ${handicapEv !== null ? `${handicapEv >= 0 ? "+" : ""}${(handicapEv * 100).toFixed(1)}%` : "-"}보다 뚜렷해 O/U 확률를 최종 선택했습니다.`;
 
                   const predictionResults =
                     availablePicks.map(
@@ -16460,7 +16435,7 @@ const [
         </button>
         <button type="button" className={activeTab === "profile" ? "active" : ""} onClick={() => setActiveTab("profile")}>프로필</button>
         <button type="button" className={activeTab === "my-combos" ? "active" : ""} onClick={() => setActiveTab("my-combos")}>구매내역</button>
-          <a href="/stats">통계</a>
+          <a href="/ai-learning-report">AI 학습</a>
           <button type="button" className={activeTab === "settings" ? "active" : ""} onClick={() => setActiveTab("settings")}>설정</button>
         </nav>
 
@@ -18011,8 +17986,8 @@ const [
                   내 조합
                 </button>
 
-                <a href="/stats">
-                  통계
+                <a href="/ai-learning-report">
+                  AI 학습
                 </a>
 
                 <button
@@ -18338,9 +18313,9 @@ const [
                         </div>
 
                         <div className="aiSingleMetrics">
-                          <div><span>모델 확률</span><strong>{(pick.confidence * 100).toFixed(1)}%</strong></div>
+                          <div><span>AI 확률</span><strong>{(pick.confidence * 100).toFixed(1)}%</strong></div>
                           <div><span>배당</span><strong>{pick.odds != null ? pick.odds.toFixed(2) : "-"}</strong></div>
-                          <div><span>시장 가치</span><strong>{pick.ev != null ? `${pick.ev >= 0 ? "+" : ""}${(pick.ev * 100).toFixed(1)}%` : "-"}</strong></div>
+                          <div><span>배당 가치</span><strong>{pick.ev != null ? `${pick.ev >= 0 ? "+" : ""}${(pick.ev * 100).toFixed(1)}%` : "-"}</strong></div>
                         </div>
 
                         <div className="aiSingleLock">
@@ -18426,17 +18401,17 @@ const [
                      !!game.status.cancelCode &&
                      game.status.cancelCode !== "0";
 
-                   const gameBettingClosed =
-                     gameCancelled ||
-                     game.status.stateCode === "2" ||
-                     game.status.stateCode === "3" ||
-                     (game.status.inning ?? 0) > 0 ||
-                     !!game.status.topBottom;
+                   const gameStateCode = String(game.status.stateCode || "");
+                    const gameBettingClosed =
+                      gameCancelled ||
+                      gameStateCode === "2" ||
+                      gameStateCode === "3" ||
+                      (!gameStateCode && ((game.status.inning ?? 0) > 0 || !!game.status.topBottom));
 
                    const gamePicks = allPicks.filter((pick) => pick.gameId === game.gameId);
-                   const mlPicks = gamePicks.filter((pick) => pick.market === "ML");
-                   const handicapPicks = gamePicks.filter((pick) => pick.market === "HANDICAP");
-                   const totalPicks = gamePicks.filter((pick) => pick.market === "TOTAL");
+                   const mlPicks = gamePicks.filter((pick) => pick.market === "ML").sort((a, b) => Number(b.label.includes(game.homeTeamName)) - Number(a.label.includes(game.homeTeamName)));
+                    const handicapPicks = gamePicks.filter((pick) => pick.market === "HANDICAP").sort((a, b) => Number(b.label.includes(game.homeTeamName)) - Number(a.label.includes(game.homeTeamName)));
+                    const totalPicks = gamePicks.filter((pick) => pick.market === "TOTAL").sort((a, b) => Number(b.label.includes("오버")) - Number(a.label.includes("오버")));
                    const renderPickButton = (pick: Pick) => {
                      const key = `${pick.gameId}::${pick.market}::${pick.label}`;
                      const selected = selectedGamePickKeys.includes(key);
@@ -18578,12 +18553,12 @@ const [
               !!targetGame.status.cancelCode &&
               targetGame.status.cancelCode !== "0";
 
+            const targetStateCode = String(targetGame.status.stateCode || "");
             return (
               cancelled ||
-              targetGame.status.stateCode === "2" ||
-              targetGame.status.stateCode === "3" ||
-              (targetGame.status.inning ?? 0) > 0 ||
-              !!targetGame.status.topBottom
+              targetStateCode === "2" ||
+              targetStateCode === "3" ||
+              (!targetStateCode && ((targetGame.status.inning ?? 0) > 0 || !!targetGame.status.topBottom))
             );
           });
 
@@ -19364,7 +19339,7 @@ const [
               ? "예상 적중확률과 평균 예측확률을 가장 중요하게 평가합니다."
               : aiPickMode === "VALUE"
                 ? "예상 적중확률과 EV, 배당가치를 함께 평가합니다."
-                : "높은 배당 후보 중 확률과 시장 가치 품질까지 함께 평가합니다."}
+                : "높은 배당 후보 중 확률과 배당 가치 품질까지 함께 평가합니다."}
           </div>
 
           <div className="aiPickRecommendationGrid">
@@ -20578,7 +20553,7 @@ const [
             </label>
 
             <label>
-              <span>최소 모델 확률</span>
+              <span>최소 AI 확률</span>
 
               <select
                 value={
